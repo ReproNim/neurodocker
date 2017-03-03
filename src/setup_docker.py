@@ -18,8 +18,8 @@ def get_docker_args():
             return package, version
         except:
             raise argparse.ArgumentTypeError("Not a valid format."
-                            "Packages can be specified by either {PACKAGE_NAME} "
-                            "or {PACKAGE_NAME,VERSION}")
+                           "Packages can be specified by either {PACKAGE_NAME} "
+                           "or {PACKAGE_NAME,VERSION}")
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-base', required=True,
@@ -54,7 +54,8 @@ def install_miniconda(py_version, miniconda_version='latest'):
     """"""
     comment = "# Install miniconda."
     base_url = "https://repo.continuum.io/miniconda/"
-    install_file = "Miniconda{}-{}-Linux-x86_64.sh".format(py_version[0], miniconda_version)
+    install_file = "Miniconda{}-{}-Linux-x86_64.sh".format(py_version[0],
+                                                        miniconda_version)
     install_url = base_url + install_file
 
     install_cmd = ("curl -sSLO {install_url} && \\\n"
