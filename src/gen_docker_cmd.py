@@ -5,7 +5,7 @@ script_types = {'py': 'python',
                 'sh': '/bin/bash'}
 
 class DockerCommand(object):
-
+    # TODO: use docker-py.
     def __init__(self, image, script=None, cmdline=None, script_args=None,
                  mount=None):
         self.image = image
@@ -13,7 +13,7 @@ class DockerCommand(object):
         self.script = script
         self.script_args = script_args
         self.mount = mount
-        self._cmd = 'docker run -t {}'.format(self.image)
+        self._cmd = 'docker run'
 
     def _is_valid_cmd(self):
         """ Ensure only one command is run """
@@ -28,8 +28,9 @@ class DockerCommand(object):
             raise IOError('{} not found'.format(self.script))
 
     def _is_valid_mnt(self):
-        local, mnt = self.split(':')
-        if not os.path.exists(local):
+        local, mnt = self.mount.split(':')
+        # if not os.path.exists(local):
+
 
     def add_mount(self):
         if ':' not in self.mount:
@@ -45,7 +46,7 @@ class DockerCommand(object):
         self._is_valid_cmd()
         if self.mount:
             self._cmd += self.add_mount()
-
+        self._cmd += " -t {}".format(self.image)
         if self.cmdline:
             self._cmd += self.add_src(self.cmdline)
         elif self.script:
