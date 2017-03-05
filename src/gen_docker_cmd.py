@@ -1,63 +1,23 @@
 import os
 
-# start with the basics
-script_types = {'py': 'python',
-                'sh': '/bin/bash'}
+" image: {image} "
+" command: {cmd} "
+" volumes:
+    "{abspath({local_mnt}): {"bind: 'abspath({docker})'",
+                 "mode: 'optional'"}
 
 class DockerCommand(object):
-    # TODO: use docker-py.
-    def __init__(self, image, script=None, cmdline=None, script_args=None,
-                 mount=None):
+    """ """
+    def __init__(self, image, cmd=None, volumes=[]):
         self.image = image
-        self.cmdline = cmdline
-        self.script = script
-        self.script_args = script_args
-        self.mount = mount
-        self._cmd = 'docker run'
+        self.cmd = cmd
+        if self.volumes:
+            self.volumes = self._fmt_vols()
 
-    def _is_valid_cmd(self):
-        """ Ensure only one command is run """
-        if not self.script and not self.cmdline:
-            raise AttributeError('DockerCommand missing required arg')
-        elif self.script and self.cmdline:
-            raise AttributeError(
-            'DockerCommand cannot accept multiple executables')
-
-    def _is_valid_script(self):
-        if not os.path.exists(self.script):
-            raise IOError('{} not found'.format(self.script))
-
-    def _is_valid_mnt(self):
-        local, mnt = self.mount.split(':')
-        # if not os.path.exists(local):
-
-
-    def add_mount(self):
-        if ':' not in self.mount:
-            raise AttributeError(
-            'Mount must include target inside docker image.')
-        self._is_valid_mnt()
-        return ' -v {}'.format(os.path.abspath(self.mount))
-
-    def add_src(self, src):
-        return ' {}'.format(src)
-
-    def composite_cmd(self):
-        self._is_valid_cmd()
-        if self.mount:
-            self._cmd += self.add_mount()
-        self._cmd += " -t {}".format(self.image)
-        if self.cmdline:
-            self._cmd += self.add_src(self.cmdline)
-        elif self.script:
-            suffix = self.script.split('.')[-1]
-            if suffix in script_types:
-                prefix = script_types[suffix]
-            else:
-                raise Exception(
-                "Only scripts ending in {} are currently supported".format(
-                str(list(script_types))))
-            self._cmd += self.add_src(prefix + ' ' + self.script)
-            if self.script_args:
-                self._cmd += self.add_src(self.script_args)
-        return self._cmd
+    def _fmt_vols(self):
+        volumes = {}
+        for vol in self.volumes:
+            local, mnt = vol.split(':')
+            if os.path.exists(local):
+                volumes[os.path.abspath(local)] = {"bind": mnt}
+        return volumes
