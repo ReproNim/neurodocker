@@ -4,7 +4,7 @@ import os
 script_types = {'py': 'python',
                 'sh': '/bin/bash'}
 
-class DockerCommand():
+class DockerCommand(object):
 
     def __init__(self, image, script=None, cmdline=None, script_args=None,
                  mount=None):

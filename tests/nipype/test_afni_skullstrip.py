@@ -1,6 +1,7 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 import os
 import argparse
+from __future__ import absolute_import
 
 from bids.grabbids import BIDSLayout
 from nipype import Node
