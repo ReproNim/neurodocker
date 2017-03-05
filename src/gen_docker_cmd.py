@@ -1,11 +1,5 @@
 import os
 
-" image: {image} "
-" command: {cmd} "
-" volumes:
-    "{abspath({local_mnt}): {"bind: 'abspath({docker})'",
-                 "mode: 'optional'"}
-
 class DockerCommand(object):
     """ """
     def __init__(self, image, cmd=None, volumes=[]):
