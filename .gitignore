@@ -1,0 +1,6 @@
+.DS_Store
+*.pyc
+
+# Ignore Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
