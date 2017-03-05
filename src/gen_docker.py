@@ -3,7 +3,12 @@ import argparse
 from distutils.version import LooseVersion
 import os.path as op
 
+import docker
+
 LATEST_PYTHON = "3.6.0"
+
+# Begin talking with Docker daemon.
+client = docker.from_env()
 
 
 def get_docker_args():
@@ -44,13 +49,18 @@ class Dockerfile(object):
 
     Parameters
     ----------
-    software : dict
+    specs : dict
         Software specifications for the Dockerfile. Keys include 'base',
         'py_version', and 'py_pkgs' (so far)
     """
-    def __init__(self, software):
-        self.software = software
+    def __init__(self, specs, img_name, path='.'):
+        self.specs = specs
+        self.path = op.abspath(path)
+        self.img_name = img_name
         self._cmds = []  # List of Dockerfile commands.
+
+        if self.specs['base'] is None:
+            raise Exception("key `base` is required")
 
     def add_base(self):
         """Return Dockerfile command to use the baseimage `base`.
@@ -61,7 +71,30 @@ class Dockerfile(object):
             The base image and its version (e.g., Ubuntu:16.04). Does the base
             image have to be hosted on Dockerhub?
         """
-        cmd = "FROM {}".format(self.software['base'])
+        cmd = "FROM {}".format(self.specs['base'])
+        self._cmds.append(cmd)
+
+    def add_afni(self):
+        """Add Dockerfile to install ANTs software.
+
+        NOTE: This method does not consider AFNI version!
+        The method does not install R libraries either.
+        """
+        comments = ["# Install AFNI dependencies.", "# Install AFNI."]
+        cmd = ("apt-get -y -qq install libxp6 libglu1-mesa gsl-bin libjpeg62-dev libxft-dev")
+        cmd = indent("RUN", cmd, ' \\')
+
+        base_url = "https://afni.nimh.nih.gov/pub/dist/tgz/"
+        install_file = "linux_openmp_64.tgz"
+        install_url = base_url + install_file
+        install_cmd = ("curl -L {} | tar zxC /usr/local\n"
+                       "mv /usr/local/linux_openmp_64 /usr/local/afni"
+                       "".format(install_url, install_file))
+        install_cmd = indent("RUN", install_cmd, " && \\")
+
+        env_cmd = "ENV PATH $PATH:/usr/local/afni"
+
+        cmd = "\n".join((comments[0], cmd, comments[1], install_cmd, env_cmd))
         self._cmds.append(cmd)
 
     def add_miniconda(self, miniconda_version='latest'):
@@ -74,8 +107,7 @@ class Dockerfile(object):
         miniconda_version : str
             Miniconda version. Defaults to 'latest'.
         """
-        py_version = self.software['py_version']
-        if py_version is None: return
+        py_version = self.specs['py_version']
 
         comments = ["# Install miniconda.",
                     "# Define environment variables.",
@@ -111,8 +143,6 @@ class Dockerfile(object):
 
         cmd = "\n".join((comments[0], install_cmd, comments[1], env_cmd,
                         comments[2], conda_python_cmd))
-        # cmd = "{}\n{}\n{}\n{}".format(comments[0], install_cmd, comments[1],
-        #                              env_cmd, comments[2], conda_python_cmd)
         self._cmds.append(cmd)
 
     def add_python_pkgs(self):
@@ -125,15 +155,13 @@ class Dockerfile(object):
             being the name of the package and the second being the version.
             String must be name of package.
         """
-        if self.software['py_pkgs'] is None: return
-
-        if not self.software['py_version']:
+        if not self.specs['py_version']:
             raise Exception("Python version must be specified in order to add "
                             "Python packages")
 
         comment = "# Install Python packages."
         conda_install_list = []
-        for item in self.software['py_pkgs']:
+        for item in self.specs['py_pkgs']:
             if isinstance(item, tuple):  # e.g., ('numpy', 1.10)
                 # e.g., numpy==1.10
                 install_str = "{}=={}".format(item[0], item[1])
@@ -144,36 +172,62 @@ class Dockerfile(object):
         add_channel_cmd = "conda config --add channels conda-forge"
         install_cmd = "conda install -y " + ' '.join(conda_install_list)
 
-        # cmd = "{}\n{}".format(add_channel_cmd, install_cmd)
         cmd = "\n".join((add_channel_cmd, install_cmd))
         cmd = indent("RUN", cmd, line_suffix=" && \\")
 
-        # cmd = "{}\n{}".format(comment, cmd)
         cmd = "\n".join((comment, cmd))
         self._cmds.append(cmd)
 
-    def add_command(self, cmd):
+    def add_command(self, docker_cmd, cmd, line_suffix):
         """
+        docker_cmd : str
+            The Docker command (e.g., 'RUN' or 'ENV').
         cmd : str
             Command to be added.
         """
+        cmd = indent(docker_cmd, cmd, line_suffix)
         self._cmds.append(cmd)
 
-    def create(self):
+    def _create(self):
         """Return Dockerfile as string."""
+        reqs_cmd = ("apt-get update && apt-get install -yq\n"
+                    "--no-install-recommends\n"
+                    "bzip2\n"
+                    "ca-certificates\n"
+                    "curl\n"
+                    "xvfb")
+        if self.specs['base']:
+            self.add_base()
+        self.add_command("RUN", reqs_cmd, ' \\')
+        if self.specs['afni']:
+            self.add_afni()
+        if self.specs['py_version']:
+            self.add_miniconda()
+        if self.specs['py_pkgs']:
+            self.add_python_pkgs()
+        self.add_command("RUN", "pip install pybids", "")
         return '\n\n'.join(self._cmds)
 
-    def save(self):
+    def _save(self):
         """Save Dockerfile."""
-        fname = "Dockerfile"
-        obj = self.create()
-        with open(fname, 'w') as fp:
-            fp.write(obj)
+        obj = self._create()
+        file_path = op.join(self.path, "Dockerfile")
+        with open(file_path, 'w') as stream:
+            stream.write(obj)
+            return
 
+    def build(self):
+        """Build Docker image from Dockerfile.
+        Should we make a temporary directory?
+        """
+        self._save()
+        print("Building Docker image")
+        image = client.images.build(path=self.path, tag=self.img_name)
+        return image
 
 
 def indent(docker_cmd, text, line_suffix=''):
-    """docstring"""
+    """Add Docker command and indent."""
     amount = len(docker_cmd) + 1
     indent = ' ' * amount
     split_lines = text.splitlines()
@@ -193,15 +247,16 @@ def indent(docker_cmd, text, line_suffix=''):
 
 
 def main():
-    software = get_docker_args()
-    reqs_cmd = ("RUN apt-get update && apt-get install -y bzip2 curl")
+    env = get_docker_args()
 
-    df = Dockerfile(software)
-    df.add_base()
-    df.add_command(reqs_cmd)
-    df.add_miniconda()
-    df.add_python_pkgs()
-    df.save()
+    # Change this so it is not hard-coded.
+    d = Dockerfile(d, 'afni-py35', path='samples/afni-py35')
+    d._save()  # Save Dockerfile.
+
+    # Build image using saved Dockerfile.
+    image = d.build()
+
+    # Run script within Docker container?
 
 
 if __name__ == "__main__":
