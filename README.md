@@ -10,6 +10,6 @@ To-do
 
 - [x] create Dockerfiles automatically
 - [ ] setup testing for docker image
-- [ ] allow code to be run in images (include mounts)
-- [ ] extract code output
+- [x] allow code to be run in images (include mounts)
+- [x] extract code output
 - [ ] compare code output among matrix
