@@ -5,6 +5,7 @@ class DockerCommand(object):
     def __init__(self, image, cmd=None, volumes=[]):
         self.image = image
         self.cmd = cmd
+        self.volumes = volumes
         if self.volumes:
             self.volumes = self._fmt_vols()
 

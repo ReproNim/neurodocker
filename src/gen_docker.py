@@ -43,6 +43,26 @@ def get_docker_args():
     return vars(args)
 
 
+def indent(docker_cmd, text, line_suffix=''):
+    """Add Docker command and indent."""
+    amount = len(docker_cmd) + 1
+    indent = ' ' * amount
+    split_lines = text.splitlines()
+
+    if len(split_lines) == 1:
+        return "{} {}".format(docker_cmd, text)
+
+    out = ''
+    for i, line in enumerate(split_lines):
+        if i == 0:
+            out += "{} {}{}".format(docker_cmd, line, line_suffix)
+        elif i == len(split_lines) - 1:
+            out += "\n{}{}".format(indent, line)
+        else:
+            out += "\n{}{}{}".format(indent, line, line_suffix)
+    return out
+
+
 
 class Dockerfile(object):
     """Dockerfile object.
@@ -77,8 +97,8 @@ class Dockerfile(object):
     def add_afni(self):
         """Add Dockerfile to install ANTs software.
 
-        NOTE: This method does not consider AFNI version!
-        The method does not install R libraries either.
+        NOTE: This has to be fixed. Should we build from source? Are the
+        binaries for previous versions stored somewhere online?
         """
         comments = ["# Install AFNI dependencies.", "# Install AFNI."]
         cmd = ("apt-get -y -qq install libxp6 libglu1-mesa gsl-bin libjpeg62-dev libxft-dev")
@@ -195,17 +215,17 @@ class Dockerfile(object):
                     "bzip2\n"
                     "ca-certificates\n"
                     "curl\n"
+                    "wget\n"
                     "xvfb")
         if self.specs['base']:
             self.add_base()
         self.add_command("RUN", reqs_cmd, ' \\')
-        if self.specs['afni']:
-            self.add_afni()
+        # if self.specs['afni']:
+        #     self.add_afni()
         if self.specs['py_version']:
             self.add_miniconda()
         if self.specs['py_pkgs']:
             self.add_python_pkgs()
-        self.add_command("RUN", "pip install pybids", "")
         return '\n\n'.join(self._cmds)
 
     def _save(self):
@@ -217,33 +237,12 @@ class Dockerfile(object):
             return
 
     def build(self):
-        """Build Docker image from Dockerfile.
-        Should we make a temporary directory?
-        """
+        """Save Dockerfile and build Docker image from saved Dockerfile."""
         self._save()
         print("Building Docker image")
         image = client.images.build(path=self.path, tag=self.img_name)
         return image
 
-
-def indent(docker_cmd, text, line_suffix=''):
-    """Add Docker command and indent."""
-    amount = len(docker_cmd) + 1
-    indent = ' ' * amount
-    split_lines = text.splitlines()
-
-    if len(split_lines) == 1:
-        return "{} {}".format(docker_cmd, text)
-
-    out = ''
-    for i, line in enumerate(split_lines):
-        if i == 0:
-            out += "{} {}{}".format(docker_cmd, line, line_suffix)
-        elif i == len(split_lines) - 1:
-            out += "\n{}{}".format(indent, line)
-        else:
-            out += "\n{}{}{}".format(indent, line, line_suffix)
-    return out
 
 
 def main():
