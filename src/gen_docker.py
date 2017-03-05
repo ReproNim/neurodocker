@@ -249,11 +249,11 @@ def main():
     env = get_docker_args()
 
     # Change this so it is not hard-coded.
-    d = Dockerfile(d, 'afni-py35', path='samples/afni-py35')
+    d = Dockerfile(env, 'test_out', path='samples/test_out')
     d._save()  # Save Dockerfile.
 
     # Build image using saved Dockerfile.
-    image = d.build()
+    # image = d.build()
 
     # Run script within Docker container?
 
