@@ -6,7 +6,8 @@ script_types = {'py': 'python',
 
 class DockerCommand():
 
-    def __init__(self, image, script=None, cmdline=None, script_args=None, mount=None):
+    def __init__(self, image, script=None, cmdline=None, script_args=None,
+                 mount=None):
         self.image = image
         self.cmdline = cmdline
         self.script = script
@@ -26,11 +27,16 @@ class DockerCommand():
         if not os.path.exists(self.script):
             raise IOError('{} not found'.format(self.script))
 
+    def _is_valid_mnt(self):
+        local, mnt = self.split(':')
+        if not os.path.exists(local):
+
     def add_mount(self):
         if ':' not in self.mount:
             raise AttributeError(
             'Mount must include target inside docker image.')
-        return ' -v {}'.format(self.mount)
+        self._is_valid_mnt()
+        return ' -v {}'.format(os.path.abspath(self.mount))
 
     def add_src(self, src):
         return ' {}'.format(src)
