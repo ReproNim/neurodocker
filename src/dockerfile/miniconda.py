@@ -1,28 +1,37 @@
-"""Class to add Miniconda and/or Python packages to Dockerfile."""
+"""Class to add Miniconda and create Conda environment."""
 from __future__ import absolute_import, division, print_function
 import os
 
-from .utils import check_url, indent
-from ..utils import logger, save_yaml
+from .utils import indent
+from ..utils import logger, save_yaml, check_url
 
 
 
 class Miniconda(object):
-    """Class to add Miniconda installation and Python packages to Dockerfile.
+    """Class to add Miniconda installation and Conda environment to Dockerfile.
 
     Parameters
     ----------
     conda_env : dict
         Dictionary of environment specifications.
         See https://github.com/conda/conda/tree/master/conda_env.
+    filepath : str
+        Path to save environment file. Must be saved within
+        the scope of the Dockerfile.
     miniconda_version : str
         Version of Miniconda to use. Defaults to "latest".
     """
-    def __init__(self, conda_env, miniconda_version="latest"):
+    def __init__(self, conda_env, filepath, miniconda_version="latest"):
         self.conda_env = conda_env
+        self.filepath = os.path.join(filepath, "conda-env.yml")
         self.miniconda_version = miniconda_version
+        self.dependencies = {
+            'apt-get': ['bzip2', 'ca-certificates', 'curl'],
+            'yum': ['bzip2', 'ca-certificates', 'curl'],}
 
-        self.cmd = self._add_miniconda()
+        comment = "# Install Miniconda, and create Conda environment from file."
+        self.cmd = "\n".join((comment, self._add_miniconda(),
+                              self._add_conda_env()))
 
     def _add_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
@@ -42,36 +51,38 @@ class Miniconda(object):
                                            path=miniconda_path))
         download_cmd = indent("RUN", download_cmd, line_suffix=" && \\")
 
-        # Add miniconda to PATH.
-        env_cmd = ("PATH {}/bin:$PATH\n"
-                   "LANG C.UTF-8\n"
-                   "LC_ALL C.UTF-8".format(miniconda_path))
+        # Add Miniconda to PATH.
+        env_cmd = ("CONDAPATH=/usr/local/miniconda/bin\n"
+                   "LANG=C.UTF-8\n"
+                   "LC_ALL=C.UTF-8".format(miniconda_path))
         env_cmd = indent("ENV", env_cmd, line_suffix=" \\")
 
-        # Install the requested version of Python.
-        create_env_cmd = self._create_env()
+        return "\n".join((download_cmd, env_cmd))
 
-        return "\n".join((download_cmd, env_cmd, create_env_cmd))
-
-    def _create_env(self):
-        """Create new environment based on the specifications in `conda_env`.
+    def _add_conda_env(self, env_name="new_env"):
+        """Return Dockerfile instructions to create new Conda environment based
+        on the specifications in `conda_env`.
         """
-        # try:
-        #     env_name = self.conda_env['name']
-        # except KeyError:
-        #     raise KeyError("`name` must be specified in `conda-env`.")
-        # Save YAML file.
-        filepath = "environment.yml"
-        docker_filepath = "/home/{}".format(filepath)
-        save_yaml(self.conda_env, filepath)
+        # Save Conda environment YAML file and copy this file to /home
+        # directory in Docker container. YAML file must be saved in scope of
+        # Dockerfile.
+        docker_filepath = "/home/{}".format(os.path.basename(self.filepath))
+        base_name = os.path.basename(self.filepath)
+        copy_cmd = "COPY {} {}".format(base_name, docker_filepath)
 
-        # COPY that file into the Docker image.
-        copy_cmd = "COPY {} {}".format(filepath, docker_filepath)
-
-        # Set up a command to create (and source) new environment.
-        create_env_cmd = ("conda env create -f {} -n new_env\n"
-                          "source activate new_env\n"
-                          "".format(docker_filepath))
+        # Set up a command to create and source new environment.
+        create_env_cmd = ("$CONDAPATH/conda update -y conda\n"
+                          "$CONDAPATH/conda env create -f {} -n {}\n"
+                          "".format(docker_filepath, env_name))
         create_env_cmd = indent("RUN", create_env_cmd, " && \\")
 
-        return "\n".join((copy_cmd, create_env_cmd))
+        env_cmd = "PATH=/usr/local/miniconda/envs/{}/bin:$PATH".format(env_name)
+        env_cmd = indent("ENV", env_cmd, line_suffix=' \\')
+
+        return "\n".join((copy_cmd, create_env_cmd, env_cmd))
+
+    def _save_conda_env(self):
+        """Save Conda environment specs and YAML file. File must be saved
+        in order to be copied into Docker container. Where should we save? In
+        the Dockerfile class?"""
+        save_yaml(self.conda_env, self.filepath)
