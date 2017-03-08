@@ -38,7 +38,6 @@ class Dockerfile(object):
         self._add_base()
         self._get_instructs_and_deps(deps_method)
         self.cmd = "\n\n".join(self._cmds)
-        self.save(self.cmd)
 
     def add_instruction(self, instruction):
         """Add instruction to list of instructions."""
@@ -93,7 +92,7 @@ class Dockerfile(object):
         self.add_instruction(install_deps_cmd)
         self.add_instruction(all_install_cmds)
 
-    def save(self, obj):
+    def save(self):
         """Save Dockerfile. Will overwrite file if it exists.
 
         Parameters
@@ -101,6 +100,9 @@ class Dockerfile(object):
         obj : str
             String representation of Dockerfile.
         """
-        filepath = os.path.join(self.savedir, "Dockerfile")
-        with open(filepath, 'w') as stream:
-            stream.write(obj)
+        try:
+            filepath = os.path.join(self.savedir, "Dockerfile")
+            with open(filepath, 'w') as stream:
+                stream.write(self.cmd)
+        except NameError:
+            raise Exception("Command is not defined yet.")
