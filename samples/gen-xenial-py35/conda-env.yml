@@ -1,0 +1,6 @@
+name: sample-env
+dependencies:
+  - python=3.5.1
+  - numpy
+  - pip:
+    - pandas
