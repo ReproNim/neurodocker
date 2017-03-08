@@ -6,11 +6,14 @@ from ..utils import logger
 
 
 INSTALL_FSL = {
-    "xenial": {
-        "deps": ["bzip2", "ca-certificates", "curl"],
-        "method": "neurodebian"
-    }
+    "5_0_8": {
+        "xenial": {
+            "method": "neurodebian",
+            "deps": ["bzip2", "ca-certificates", "curl"],
+        },
+    },
 }
+
 
 
 class FSL(object):
@@ -26,3 +29,8 @@ class FSL(object):
     def __init__(self, os, version):
         self.os = os
         self.version = version
+
+    def _add_version_5_0_8(self):
+        """Return Dockerfile instructions to install FSL 5.0.8, and add list
+        of dependencies to `self.dependencies`."""
+        pass

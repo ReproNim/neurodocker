@@ -4,21 +4,6 @@ import http.client  # This should have been backported to Python2.
 from ..utils import logger, load_yaml, save_yaml
 
 
-def check_url(url):
-    """Return true if `url` is reachable.
-    http://stackoverflow.com/a/16778473/5666087
-    """
-    pass
-    # connection = http.client.HTTPConnection(url)
-    # connection.request("HEAD", "")
-    # status_code = connection.getresponse().status
-    # if status_code < 400:
-    #     return True
-    # else:
-    #     logger.warning("URL {} not reachable (status code {})"
-    #                    "".format(url, status_code))
-
-
 def indent(instruction, cmd, line_suffix=' \\'):
     """Add Docker instruction and indent command.
 
@@ -64,6 +49,31 @@ def _parse_versions(item):
         return item
 
 
+def add_neurodebian(os, full=True):
+    """Return instructions to add NeuroDebian to Dockerfile.
+
+    Parameters
+    ----------
+    os : str
+        Operating system. See http://neuro.debian.net/.
+        Options: 'yakkety', 'xenial', 'trusty', 'precise', 'sid', 'stretch',
+                 'jessie', 'wheezy', 'squeeze'
+    full : bool
+        If true, use the full NeuroDebian sources. If false, use the libre
+        sources.
+    """
+    suffix = "full" if full else "libre"
+    neurodebian_url = ("http://neuro.debian.net/lists/{}.us-nh.{}"
+                       "".format(os, suffix))
+    # Change this to store the key locally.
+    cmd = ("RUN curl -sSl {} >> "
+           "/etc/apt/sources.list.d/neurodebian.sources.list\n"
+           "apt-key adv --recv-keys --keyserver"
+           "hkp://pgp.mit.edu:80 0xA5D32F012649A5A9\n"
+           "apt-get update".format(neurodebian_url))
+    return indent("RUN", cmd, line_suffix=" && \\")
+
+
 
 class SpecsParser(object):
     """Class to parse specs for Dockerfile.
@@ -88,7 +98,9 @@ class SpecsParser(object):
 
         self._validate_keys()
         self.keys_not_present = set(self.TOP_LEVEL_KEYS) - set(self.specs)
-        self.parse_versions('neuroimaging-software')
+
+        # Only parse versions if key is present.
+        # self.parse_versions('neuroimaging-software')
 
     def _validate_keys(self):
         """Raise KeyError if unexpected top-level key."""
