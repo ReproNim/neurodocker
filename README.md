@@ -10,9 +10,10 @@ To-do
 -----
 
 - [x] create Dockerfiles automatically
-- [ ] setup testing for docker image
-- [x] allow code to be run in images (include mounts)
-- [x] extract code output
+- [ ] set up testing for Dockerfiles
+- [ ] automatically build Docker image from Dockerfile
+- [ ] run code in Docker container (include mounts)
+- [ ] extract code output
 - [ ] compare code output among matrix
 
 
