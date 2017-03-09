@@ -71,9 +71,15 @@ class Miniconda(object):
         copy_cmd = "COPY {} {}".format(base_name, docker_filepath)
 
         # Set up a command to create and source new environment.
+        # Is it necessary to update conda?
         create_env_cmd = ("$CONDAPATH/conda update -y conda\n"
                           "$CONDAPATH/conda env create -f {} -n {}\n"
-                          "".format(docker_filepath, env_name))
+                          # Delete the root conda environment. This frees up
+                          # ~200 MB of space.
+                          "cd $CONDAPATH/../ && rm -rf "
+                          "conda-meta include share ssl\n"
+                          "$CONDAPATH/conda clean -y -a"
+                          "".format(docker_filepath, env_name, env_name))
         create_env_cmd = indent("RUN", create_env_cmd, " && \\")
 
         env_cmd = "PATH=/usr/local/miniconda/envs/{}/bin:$PATH".format(env_name)
