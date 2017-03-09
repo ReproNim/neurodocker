@@ -1,6 +1,5 @@
-base: ubuntu:16.04
+base: ubuntu:xenial-20170214
 conda-env:
-  name: sample-env
   dependencies:
     - python=3.5.1
     - numpy
