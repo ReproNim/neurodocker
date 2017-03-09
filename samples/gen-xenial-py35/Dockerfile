@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:xenial-20170214
 
 # Get dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -15,5 +15,7 @@ ENV CONDAPATH=/usr/local/miniconda/bin \
     LC_ALL=C.UTF-8
 COPY conda-env.yml /home/conda-env.yml
 RUN $CONDAPATH/conda update -y conda && \
-    $CONDAPATH/conda env create -f /home/conda-env.yml -n new_env
+    $CONDAPATH/conda env create -f /home/conda-env.yml -n new_env && \
+    cd $CONDAPATH/../ && rm -rf conda-meta include share ssl && \
+    $CONDAPATH/conda clean -y -a
 ENV PATH=/usr/local/miniconda/envs/new_env/bin:$PATH
