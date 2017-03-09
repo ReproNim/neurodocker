@@ -9,7 +9,10 @@ try:
 except ImportError:
     import urllib2 as urllib  # Python 2
 
-import ruamel_yaml as yaml
+try:  # Why the different names?
+    import ruamel_yaml as yaml  # Installed with pip.
+except ImportError:
+    import ruamel.yaml as yaml  # Installed with conda.
 
 
 # Create logger.
