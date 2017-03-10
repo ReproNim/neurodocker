@@ -16,11 +16,11 @@ FSL
   - In v5.0.6+, uncomment lines 52,53, and 55 in `${FSLDIR}/etc/fslconf/fsl.sh`
   - Set FSL environment variables: `. ${FSLDIR}/etc/fslconf/fsl.sh`
   - Check if machine is supported by default: `ls $FSLDIR/config/$FSLMACHTYPE`
-  - Select closest match: `cp -r $FSLDIR/config/closestmatch $FSLDIR/config/$FSLMACHTYPE`
+    - If that command fails, copy the closest match: `cp -r $FSLDIR/config/closestmatch $FSLDIR/config/$FSLMACHTYPE`
   - symlink `install` and `ginstall`: `ln -s /usr/bin/install /usr/bin/ginstall`
   - `cd $FSLDIR` and run `./build`.
   - After following these steps, `precise-py27` docker container could not make `fslsurface`, `film`, `miscvis`, and `ptx2`.
-- Update `PATH`
+- Update `PATH`:
   - `PATH=${FSLDIR}/bin:${PATH}`
   - `export FSLDIR PATH`
 

@@ -21,9 +21,10 @@ ENV FSLDIR=$DOWNLOAD_DIR/fsl \
 
 # Download and extract source.
 RUN mkdir $DOWNLOAD_DIR && cd $DOWNLOAD_DIR && \
+    echo Downloading from URL ${BASE_URL}${TARBALL} && \
     curl -LO ${BASE_URL}${TARBALL} && \
-    tar zxf ${TARBALL} && \
-    rm ${TARBALL}
+    tar zxf $TARBALL && \
+    rm $TARBALL
 
 # Uncomment lines pertaining to vars FSLMACHTYPE and FSLCONFDIR.
 # The -i flag makes the changes in-place.
