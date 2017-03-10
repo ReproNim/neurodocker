@@ -1,0 +1,2 @@
+docker>=1.10.6
+ruamel.yaml>=0.13.14
