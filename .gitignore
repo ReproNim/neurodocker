@@ -6,3 +6,6 @@ __pycache__
 # Ignore Jupyter Notebooks
 .ipynb_checkpoints
 *.ipynb
+
+# related to pytest
+.cache
