@@ -1,6 +1,5 @@
 """Utility functions."""
 from __future__ import absolute_import, division, print_function
-import http.client  # This should have been backported to Python2.
 from ..utils import logger, load_yaml, save_yaml
 
 

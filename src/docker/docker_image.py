@@ -13,7 +13,7 @@ def _create_volumes_dict(volume_mapping):
 
     >>> volume_mapping = [("local/dir", "/path/on/docker", "rw")]
     >>> create_volumes_dict(volume_mapping)
-    {'/abspath/to/local/dir': {'bind': '/tests/nipype',
+    {'/abspath/to/local/dir': {'bind': '/path/on/docker',
                                'mode': 'rw'}}
 
     Parameters

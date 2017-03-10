@@ -46,12 +46,6 @@ class Dockerfile(object):
         """Add instruction to list of instructions."""
         self._cmds.append(instruction)
 
-    def create(self):
-        """Create Dockerfile. Stores string representation in `self.cmd`."""
-        self._add_base()
-        self._get_instructs_and_deps(self.deps_method)
-        self.cmd = "\n\n".join(self._cmds)
-
     def _add_base(self):
         """Add FROM instruction using specs['base']."""
         cmd = "FROM {}".format(self.specs['base'])
@@ -100,6 +94,12 @@ class Dockerfile(object):
 
         self.add_instruction(install_deps_cmd)
         self.add_instruction(all_install_cmds)
+
+    def create(self):
+        """Create Dockerfile. Stores string representation in `self.cmd`."""
+        self._add_base()
+        self._get_instructs_and_deps(self.deps_method)
+        self.cmd = "\n\n".join(self._cmds)
 
     def save(self):
         """Save Dockerfile. Overwrite file if it exists.
