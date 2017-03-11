@@ -44,7 +44,7 @@ class Miniconda(object):
 
         miniconda_path = "/usr/local/miniconda"
         # Download and install miniconda.
-        download_cmd = ("curl -sSLO {url}\n"
+        download_cmd = ("curl -LO {url}\n"
                         "/bin/bash {file} -b -p {path} \n"
                         "rm {file}".format(url=install_url, file=install_file,
                                            path=miniconda_path))
