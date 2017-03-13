@@ -3,6 +3,7 @@
 To run on command-line: python -m pytest path/to/nipype-regtests/src/
 """
 from __future__ import absolute_import, division, print_function
+from copy import deepcopy
 
 import pytest
 
@@ -42,9 +43,9 @@ class TestDockerfile(object):
 
     def test_add_instruction(self):
         cmd = "RUN echo Hello, World!"
-        cmds_pre = self.dfile._cmds[:]  # Make a copy.
+        cmds_pre = deepcopy(self.dfile._cmds)  # Make a copy.
         self.dfile.add_instruction(cmd)
-        cmds_post = self.dfile._cmds[:]  # Make a copy.
+        cmds_post = deepcopy(self.dfile._cmds)  # Make a copy.
         assert len(cmds_post) == len(cmds_pre)+1, "Error appending command."
         assert  cmds_post == cmds_pre + [cmd], "Error appending command."
         self.dfile._cmds = []  # Reset the list of commands.
