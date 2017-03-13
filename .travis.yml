@@ -2,6 +2,10 @@ branches:
   only:  # Only build on PRs (or pushes) to master branch.
     - master
 
+sudo: required
+services:
+  - docker
+
 language: python
 python:
   - "2.7"
