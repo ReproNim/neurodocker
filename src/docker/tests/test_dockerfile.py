@@ -60,8 +60,6 @@ class TestDockerfile(object):
         self.dfile.cmd = ""
 
         self.dfile.create()
-        print(self.dfile._cmds)
-        print(cmds_list)
         assert self.dfile._cmds == cmds_list, "Error creating list of commands."
         self.dfile._cmds = []  # Reset list of commands.
 
