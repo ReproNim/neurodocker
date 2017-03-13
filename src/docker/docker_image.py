@@ -91,7 +91,8 @@ class DockerImage(object):
 
     # Log Docker events in separate thread.
     events = client.events(decode=True)
-    event_logger = EventLogger(events, name="Event-Logger", daemon=True)
+    event_logger = EventLogger(events, name="Event-Logger")
+    event_logger.daemon = True
     event_logger.start()
 
     def __init__(self, path=None, fileobj=None, **kwargs):

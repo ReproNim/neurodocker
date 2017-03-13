@@ -3,6 +3,7 @@
 To run on command-line: python -m pytest path/to/nipype-regtests/src/
 """
 from __future__ import absolute_import, division, print_function
+from copy import deepcopy
 
 import pytest
 
@@ -22,7 +23,7 @@ specs = {
 cmds_list = [
     'FROM ubuntu:16.04',
     '# Get dependencies.\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n    bzip2 \\\n    ca-certificates \\\n    curl',
-    '# Install Miniconda, and create Conda environment from file.\nRUN curl -sSLO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \\\n    /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p /usr/local/miniconda  && \\\n    rm Miniconda3-latest-Linux-x86_64.sh\nENV CONDAPATH=/usr/local/miniconda/bin \\\n    LANG=C.UTF-8 \\\n    LC_ALL=C.UTF-8\nCOPY conda-env.yml /home/conda-env.yml\nRUN $CONDAPATH/conda update -y conda && \\\n    $CONDAPATH/conda env create -f /home/conda-env.yml -n new_env && \\\n    cd $CONDAPATH/../ && rm -rf conda-meta include share ssl && \\\n    $CONDAPATH/conda clean -y -a\nENV PATH=/usr/local/miniconda/envs/new_env/bin:$PATH'
+    '# Install Miniconda, and create Conda environment from file.\nRUN curl -LO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \\\n    /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p /usr/local/miniconda  && \\\n    rm Miniconda3-latest-Linux-x86_64.sh\nENV CONDAPATH=/usr/local/miniconda/bin \\\n    LANG=C.UTF-8 \\\n    LC_ALL=C.UTF-8\nCOPY conda-env.yml /home/conda-env.yml\nRUN $CONDAPATH/conda update -y conda && \\\n    $CONDAPATH/conda env create -f /home/conda-env.yml -n new_env && \\\n    cd $CONDAPATH/../ && rm -rf conda-meta include share ssl && \\\n    $CONDAPATH/conda clean -y -a\nENV PATH=/usr/local/miniconda/envs/new_env/bin:$PATH'
 ]
 
 
@@ -42,9 +43,9 @@ class TestDockerfile(object):
 
     def test_add_instruction(self):
         cmd = "RUN echo Hello, World!"
-        cmds_pre = self.dfile._cmds[:]  # Make a copy.
+        cmds_pre = deepcopy(self.dfile._cmds)  # Make a copy.
         self.dfile.add_instruction(cmd)
-        cmds_post = self.dfile._cmds[:]  # Make a copy.
+        cmds_post = deepcopy(self.dfile._cmds)  # Make a copy.
         assert len(cmds_post) == len(cmds_pre)+1, "Error appending command."
         assert  cmds_post == cmds_pre + [cmd], "Error appending command."
         self.dfile._cmds = []  # Reset the list of commands.

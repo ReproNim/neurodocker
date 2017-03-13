@@ -1,13 +1,14 @@
 """Package utility functions."""
 from __future__ import absolute_import, division, print_function
+import contextlib
 import logging
 import os.path as op
 import sys
 
 try:
-    import urllib.request as urllib  # Python 3
+    from urllib.request import urlopen, HTTPError, URLError  # Python 3
 except ImportError:
-    import urllib2 as urllib  # Python 2
+    from urllib2 import urlopen, HTTPError, URLError  # Python 2
 
 try:  # Why the different names?
     import ruamel_yaml as yaml  # Installed with pip.
@@ -68,8 +69,8 @@ def check_url(url):
     try:
         # Is `with` necessary? Do we have to close the url?
         # Read http://stackoverflow.com/a/1522709/5666087
-        with urllib.urlopen(url):
+        with contextlib.closing(urlopen(url)) as x:
             return True
-    except (urllib.HTTPError, urllib.URLError) as e:
+    except (HTTPError, URLError) as e:
         logger.warning("{} error on URL {}".format(url, e))
         return False
