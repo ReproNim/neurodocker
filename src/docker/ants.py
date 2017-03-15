@@ -44,10 +44,28 @@ class ANTs(object):
     ----------
     version : str
         ANTs version to use.
+    os : {'Centos', 'Debian', 'RedHat', 'Ubuntu'}
+        Operating system.
     """
-    def __init__(self, version):
+    def __init__(self, version, os=None):
         self.version = version
+        self.os = os
         self._check_version()
+
+        if self.os is not None:
+            self.os = self.os.lower()
+            if self.os not in ['centos', 'debian', 'redhat', 'ubuntu']:
+                raise ValueError("Invalid operating system")
+
+        self.deps = ['bzip2', 'ca-certificates', 'curl']
+
+        # Dependencies to build from source.
+        self.deps_for_source = {
+            "centos": ['cmake', 'g++', 'git', 'zlib-devel'],
+            "debian": ['cmake', 'g++', 'git', 'zlib1g-dev'],
+            "redhat": ['cmake', 'g++', 'git', 'zlib-devel'],
+            "ubuntu": ['cmake', 'g++', 'git', 'zlib1g-dev']
+        }
 
     def _check_version(self):
         """Raise ValueError if version is invalid."""
@@ -58,6 +76,28 @@ class ANTs(object):
             version_split[1] = int(version_split[1])
         except ValueError:
             raise ValueError("Invalid version.")
+
+    def _add_version_2_1_0(self):
+        """Return Dockerfile instructions to install ANTs 2.1.0. Uses binaries
+        from GitHub."""
+        base_url = "https://github.com/stnava/ANTs/releases/download/v2.1.0/"
+        install_files = {
+            "centos": "Linux_X_64.tar.bz2.RedHat",
+            "debian": "Linux_Debian_jessie_x64.tar.bz2",
+            "redhat": "Linux_X_64.tar.bz2.RedHat",
+            "ubuntu": "Linux_Ubuntu14.04.tar.bz2"
+        }
+        install_file = install_files[self.os]
+        install_url = base_url + install_file
+
+        download_cmd = ("curl -LO {url}\n"
+                        "mkdir ants-2.1.0\n"
+                        "tar jxvf {file} -C ants-2.1.0 --strip-components 1\n"
+                        "rm -f {file}"
+                        "".format(url=install_url, file=install_file))
+        download_cmd = indent("RUN", download_cmd, " && \\")
+        env_cmd = ("ENV PATH=/ants-2.1.0:$PATH")
+        return "\n".join((download_cmd, env_cmd))
 
     def _add_version_1_9_x(self):
         """Return Dockerfile instructions to install ANTs 1.9.x. Uses binaries
