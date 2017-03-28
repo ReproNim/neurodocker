@@ -32,83 +32,85 @@ Dockerfile commands to download ANTs binaries:
 """
 from __future__ import absolute_import, division, print_function
 
-from .utils import indent
-from ..utils import logger, check_url
-
+from src.docker.utils import indent
+from src.utils import logger
 
 class ANTs(object):
-    """Class to add ANTs installation to Dockerfile. Versions 2.0.0 and newer
-    are available on GitHub. Previous versions are available on SourceForge.
+    """Add Dockerfile instructions to install ANTs. Versions 2.0.0+ are
+    supported.
 
-    Parameters
-    ----------
-    version : str
-        ANTs version to use.
-    os : {'Centos', 'Debian', 'RedHat', 'Ubuntu'}
-        Operating system.
+    Inspired by the Dockerfile at https://hub.docker.com/r/nipype/workshops/
+    `docker pull nipype/workshops:latest-nofsspm`
     """
-    def __init__(self, version, os=None):
+    VERSION_HASHES = {"2.1.0": "78931aa6c4943af25e0ee0644ac611d27127a01e",
+                      "2.1.0rc3": "465cc8cdf0f8cc958edd2d298e05cc2d7f8a48d8",
+                      "2.1.0rc2": "17160f72f5e1c9d6759dd32b7f2dc0b36ded338b",
+                      "2.1.0rc1": "1593a7777d0e6c8be0b9462012328bde421510b9",
+                      "2.0.3": "c9965390c1a302dfa9e63f6ca3cb88f68aab329f",
+                      "2.0.2": "7b83036c987e481b2a04490b1554196cb2fc0dab",
+                      "2.0.1": "dd23c394df9292bae4c5a4ece3023a7571791b7d",
+                      "2.0.0": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",
+                      "HoneyPot": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",}
+
+    BUILD_DEPENDENCIES = {"centos": ['cmake', 'g++', 'git', 'zlib-devel'],
+                          "debian": ['cmake', 'build-essential', 'git',
+                                     'zlib1g-dev'],
+                          "ubuntu": ['cmake', 'build-essential', 'git',
+                                     'zlib1g-dev'],}
+
+    def __init__(self, version, os):
         self.version = version
         self.os = os
-        self._check_version()
 
-        if self.os is not None:
-            self.os = self.os.lower()
-            if self.os not in ['centos', 'debian', 'redhat', 'ubuntu']:
-                raise ValueError("Invalid operating system")
+        valid_ants_versions = ANTs.VERSION_HASHES.keys()
+        if self.version not in valid_ants_versions:
+            raise ValueError("ANTs version not supported. Supported versions "
+                             "are {}.".format(', '.join(valid_ants_versions)))
+        valid_operating_systems = ANTs.BUILD_DEPENDENCIES.keys()
+        if self.os not in valid_operating_systems:
+            raise ValueError("Operating system not supported.")
 
-        self.deps = ['bzip2', 'ca-certificates', 'curl']
+        self.cmd = self._create_cmd()
 
-        # Dependencies to build from source.
-        self.deps_for_source = {
-            "centos": ['cmake', 'g++', 'git', 'zlib-devel'],
-            "debian": ['cmake', 'g++', 'git', 'zlib1g-dev'],
-            "redhat": ['cmake', 'g++', 'git', 'zlib-devel'],
-            "ubuntu": ['cmake', 'g++', 'git', 'zlib1g-dev']
-        }
+    def _create_cmd(self):
+        """"""
+        comment = "#-------------\n# Install ANTs\n#-------------"
+        chunks = [comment, self.get_dependencies(),
+                  self.build_from_source_github()]
+        return "\n".join(chunks)
 
-    def _check_version(self):
-        """Raise ValueError if version is invalid."""
-        version_split = self.version.split('.')
-        # Check that major and minor version numbers are integers.
-        try:
-            version_split[0] = int(version_split[0])
-            version_split[1] = int(version_split[1])
-        except ValueError:
-            raise ValueError("Invalid version.")
+    def get_dependencies(self):
+        """Return Dockerfile instructions to install build dependencies."""
+        deps = ANTs.BUILD_DEPENDENCIES[self.os]
+        deps = sorted(deps)
+        deps = "\n".join(deps)
+        if self.os in ['debian', 'ubuntu']:
+            cmd = ("apt-get update -qq && apt-get install -yq --no-install-recommends\n"
+                   "{} &&\n"
+                   "apt-get clean &&\n"
+                   "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*".format(deps))
+        elif self.os in ['centos']:
+            pass
+        return indent("RUN", cmd)
 
-    def _add_version_2_1_0(self):
-        """Return Dockerfile instructions to install ANTs 2.1.0. Uses binaries
-        from GitHub."""
-        base_url = "https://github.com/stnava/ANTs/releases/download/v2.1.0/"
-        install_files = {
-            "centos": "Linux_X_64.tar.bz2.RedHat",
-            "debian": "Linux_Debian_jessie_x64.tar.bz2",
-            "redhat": "Linux_X_64.tar.bz2.RedHat",
-            "ubuntu": "Linux_Ubuntu14.04.tar.bz2"
-        }
-        install_file = install_files[self.os]
-        install_url = base_url + install_file
+    def build_from_source_github(self):
+        """Return Dockerfile instructions to build ANTs from source hosted on
+        GitHub (https://github.com/stnava/ANTs).
+        """
+        version_hash = ANTs.VERSION_HASHES[self.version]
+        workdir_cmd = "WORKDIR /tmp"
 
-        download_cmd = ("curl -LO {url}\n"
-                        "mkdir ants-2.1.0\n"
-                        "tar jxvf {file} -C ants-2.1.0 --strip-components 1\n"
-                        "rm -f {file}"
-                        "".format(url=install_url, file=install_file))
-        download_cmd = indent("RUN", download_cmd, " && \\")
-        env_cmd = ("ENV PATH=/ants-2.1.0:$PATH")
-        return "\n".join((download_cmd, env_cmd))
+        cmd = ("git clone https://github.com/stnava/ANTs.git && \n"
+               "cd ANTs && \n"
+               "git checkout {} && \n"
+               "mkdir build && cd build && cmake .. && make && \n"
+               "mkdir -p /opt/ants && \n"
+               "cp bin/* /opt/ants && cp ../Scripts/* /opt/ants && \n"
+               "cd /tmp && rm -rf ANTs".format(version_hash))
+        cmd = indent("RUN", cmd)
 
-    def _add_version_1_9_x(self):
-        """Return Dockerfile instructions to install ANTs 1.9.x. Uses binaries
-        from SourceForge."""
-        base_url = "https://sourceforge.net/projects/advants/files/ANTS/ANTS_1_9_x/"
-        install_file = "ANTs-1.9.x-Linux.tar.gz"
-        install_url = base_url + install_file
+        env_cmd = ("ANTSPATH=/opt/ants/\n"
+                   "PATH=/opt/ants:$PATH")
+        env_cmd = indent("ENV", env_cmd)
 
-        download_cmd = ("curl -LO {url}\n"
-                        "tar zxvf {file}\n"
-                        "rm {file}".format(url=install_url, file=install_file))
-        download_cmd = indent("RUN", download_cmd, " && \\")
-        env_cmd = ("ENV PATH=/ANTs-1.9.x-Linux/bin:$PATH")
-        return "\n".join((download_cmd, env_cmd))
+        return "\n".join((workdir_cmd, cmd, env_cmd))
