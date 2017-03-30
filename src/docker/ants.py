@@ -10,6 +10,32 @@ https://github.com/stnava/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS
 
 When building ANTs versions 2.0.1 and 2.1.0, ITK build broke because of gcc
 (version 5.x?). Getting an older version of gcc (4.9) fixed that issue.
+QUESTION: How do we install gcc-4.9 everytime?
+
+    # ----- UBUNTU -----
+    # Get version codename.
+    . /etc/os-release
+    UBUNTU_CODENAME=$(echo "$VERSION" | grep -o '\<[A-Z][a-z]*\>' | awk 'NR==1{print $1}' | awk '{print tolower($0)}')
+    # Add PPA with gcc-4.9
+    echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu $UBUNTU_CODENAME main" >> /etc/apt/sources.list
+    echo "deb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu $UBUNTU_CODENAME main" >> /etc/apt/sources.list
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
+    apt-get update
+
+    # ----- DEBIAN ----- (non-wheezy)
+    # http://stackoverflow.com/a/29729834/5666087
+    # Get version codename. Does not work on Debian 6 (/etc/os-release does not exist).
+    . /etc/os-release
+    DEBIAN_CODENAME=$(echo "$VERSION" | grep -o '\<[a-z]*\>')
+    # Update apt to find Debian jessie packages.
+    apt-get update
+    cp /etc/apt/sources.list /etc/apt/sources.list.ORIGINAL
+    sed -i -- 's/${DEBIAN_CODENAME}/jessie/g' /etc/apt/sources.list
+    apt-get update
+    apt-get install gcc-4.9 g++-4.9
+    cp /etc/apt/sources.list.ORIGINAL /etc/apt/sources.list
+    apt-get update
+
 
 Dockerfile commands to build ANTs from source on Ubuntu 16.04:
 
@@ -17,7 +43,6 @@ Dockerfile commands to build ANTs from source on Ubuntu 16.04:
     # Install ANTs
     #-------------
     RUN apt-get update -qq && \
-        add-apt-repository ppa:ubuntu-toolchain-r/test && apt-get update && \
         apt-get install -yq --no-install-recommends \
         ca-certificates \
         cmake \
