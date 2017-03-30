@@ -223,7 +223,7 @@ class ANTs(object):
         """Return Dockerfile instructions to install build dependencies."""
         deps = ANTs.BUILD_DEPENDENCIES[self.os]
         deps = sorted(deps)
-        deps = "\n".join(deps)
+        
         if self.os == "ubuntu":
             cmd = _get_dependencies_ubuntu(deps)
 
