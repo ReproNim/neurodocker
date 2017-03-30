@@ -10,7 +10,8 @@ https://github.com/stnava/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS
 
 When building ANTs versions 2.0.1 and 2.1.0, ITK build broke because of gcc
 (version 5.x?). Getting an older version of gcc (4.9) fixed that issue.
-QUESTION: How do we install gcc-4.9 everytime?
+
+How to install gcc-4.9 on Ubuntu and Debian:
 
     # ----- UBUNTU -----
     # Get version codename.
@@ -22,7 +23,7 @@ QUESTION: How do we install gcc-4.9 everytime?
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
     apt-get update
 
-    # ----- DEBIAN ----- (non-wheezy)
+    # ----- DEBIAN ----- (non-jessie)
     # http://stackoverflow.com/a/29729834/5666087
     # Get version codename. Does not work on Debian 6 (/etc/os-release does not exist).
     . /etc/os-release
@@ -75,6 +76,100 @@ from __future__ import absolute_import, division, print_function
 
 from src.docker.utils import indent
 from src.utils import logger
+
+
+def _get_dependencies_ubuntu(pkgs):
+    """Get ANTs build dependencies on Ubuntu.
+
+    Parameters
+    ----------
+    pkgs : list, tuple
+        Packages to install using apt-get.
+
+    Returns
+    -------
+    instruction : str
+        Dockerfile instruction to install ANTs build dependencies.
+    """
+    comment = "# Install gcc-4.9, g++-4.9, and other dependencies."
+    # Get Ubuntu version codename (e.g., xenial).
+    get_codename = (". /etc/os-release &&\n"
+                    "UBUNTU_CODENAME=$(echo \"$VERSION\" "
+                    "| grep -o '\<[A-Z][a-z]*\>' "
+                    "| awk 'NR==1{print $1}' "
+                    "| awk '{print tolower($0)}')")
+    get_codename = indent("RUN", get_codename)
+    # Add PPA that contains gcc-4.9.
+    ppa_url = "http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu"
+    ppa_key = "BA9EF27F"
+    add_ppa = ('echo "deb {url} $UBUNTU_CODENAME main" >> /etc/apt/sources.list &&\n'
+               'echo "deb-src {url} $UBUNTU_CODENAME main" >> /etc/apt/sources.list &&\n'
+               "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys {key} &&\n"
+               "apt-get update -qq".format(url=ppa_url, key=ppa_key))
+    # Install all dependencies
+    pkgs_str = '\n'.join(pkgs)
+    install_pkgs = ("&& apt-get install -yq --no-install-recommends\n{}"
+                    "".format(pkgs_str))
+    cleanup = ("&& apt-get clean &&\n"
+               "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+    full_install_cmd = '\n'.join((add_ppa, install_pkgs, cleanup))
+    full_install_cmd = indent("RUN", full_install_cmd)
+
+    symlinks = ("ln -s /usr/bin/gcc-4.9 /usr/bin/cc &&\n"
+                "ln -s /usr/bin/gcc-4.9 /usr/bin/gcc &&\n"
+                "ln -s /usr/bin/g++-4.9 /usr/bin/g++ &&\n"
+                "ln -s /usr/bin/g++-4.9 /usr/bin/c++")
+    symlinks = indent("RUN", symlinks)
+
+    return '\n'.join((comment, get_codename, full_install_cmd, symlinks))
+
+
+def _get_dependencies_debian(pkgs):
+    """Get ANTs build dependencies on Debian.
+
+    Parameters
+    ----------
+    pkgs : list, tuple
+        Packages to install using apt-get.
+
+    Returns
+    -------
+    instruction : str
+        Dockerfile instruction to install ANTs build dependencies.
+    """
+    gcc_comment = "# Install gcc-4.9 and g++-4.9 from jessie package repository"
+    # Get Debian version codename (e.g., wheezy).
+    get_codename = (". /etc/os-release &&\n"
+                    "DEBIAN_CODENAME=$(echo \"$VERSION\" "
+                    "| grep -o '\<[a-z]*\>')")
+    get_codename = indent("RUN", get_codename)
+    # Install gcc-4.9 and g++-4.9 from jessie package repository.
+    workdir = "WORKDIR /etc/apt"
+    install_gcc = ("apt-get update &&\n"
+                   "cp sources.list sources.list.ORIGINAL &&\n"
+                   "sed -i -- 's/${DEBIAN_CODENAME}/jessie/g' sources.list &&\n"
+                   "apt-get update &&\n"
+                   "apt-get install gcc-4.9 g++-4.9 &&\n"
+                   "cp sources.list.ORIGINAL sources.list &&\n"
+                   "apt-get update")
+    # Install packages other than gcc and g++.
+    pkgs = [p for p in pkgs if "gcc" not in p and "g++" not in p]
+    pkgs_str = '\n'.join(pkgs)
+    install_pkgs = ("&& apt-get install -yq --no-install-recommends\n{}"
+                    "".format(pkgs_str))
+    cleanup = ("&& apt-get clean &&\n"
+               "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+    full_install_cmd = '\n'.join(install_gcc, install_pkgs, cleanup)
+    install_pkgs = indent("RUN", full_install_cmd)
+    symlinks = ("ln -s /usr/bin/gcc-4.9 /usr/bin/cc &&\n"
+                "ln -s /usr/bin/gcc-4.9 /usr/bin/gcc &&\n"
+                "ln -s /usr/bin/g++-4.9 /usr/bin/g++ &&\n"
+                "ln -s /usr/bin/g++-4.9 /usr/bin/c++")
+    symlinks = indent("RUN", symlinks)
+
+    return '\n'.join((gcc_comment, get_codename, workdir, install_pkgs,
+                      symlinks))
+
 
 class ANTs(object):
     """Add Dockerfile instructions to install ANTs. Versions 2.0.0+ are
@@ -129,23 +224,13 @@ class ANTs(object):
         deps = ANTs.BUILD_DEPENDENCIES[self.os]
         deps = sorted(deps)
         deps = "\n".join(deps)
-        if self.os in ['debian', 'ubuntu']:
-            cmd = ("apt-get update -qq &&\n"
-                   "add-apt-repository ppa:ubuntu-toolchain-r/test &&\n"
-                   "apt-get update &&\n"
-                   "apt-get install -yq --no-install-recommends\n"
-                   "{} &&\n"
-                   "apt-get clean &&\n"
-                   "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*".format(deps))
-            symlinks = ("ln -s /usr/bin/gcc-4.9 /usr/bin/cc &&\n"
-                        "ln -s /usr/bin/gcc-4.9 /usr/bin/gcc &&\n"
-                        "ln -s /usr/bin/g++-4.9 /usr/bin/g++ &&\n"
-                        "ln -s /usr/bin/g++-4.9 /usr/bin/c++")
-            cmd = indent("RUN", cmd)
-            symlinks = indent("RUN", symlinks)
-            cmd = "\n".join((cmd, symlinks))
+        if self.os == "ubuntu":
+            cmd = _get_dependencies_ubuntu(deps)
 
-        elif self.os in ['centos']:
+        elif self.os == "debian":
+            cmd = _get_dependencies_debian(deps)
+
+        elif self.os == 'centos':
             cmd = ("yum -y install\n"
                    "{} &&\n"
                    "yum clean packages &&\n"
