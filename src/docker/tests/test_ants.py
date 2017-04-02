@@ -21,7 +21,8 @@ def test_manage_pkgs():
 class TestANTs(object):
     """Tests for ANTs class."""
     def install_binaries_apt(self):
-        # Version
+        # --- Version 2.1.0 ---
+        # apt
         url = "https://www.dropbox.com/s/x7eyk125bhwiisu/ants-2.1.0_centos-5.tar.gz?dl=1"
         test = ("#-------------------\n"
                 "# Install ANTs 2.1.0\n"
@@ -38,7 +39,7 @@ class TestANTs(object):
         ants = ANTs(version='2.1.0', pkg_manager='apt', use_binaries=True)
         assert ants.cmd == test, "command to install ANTs binaries not correct (apt)"
 
-    def install_binaries_yum(self):
+        # yum
         url = "https://www.dropbox.com/s/x7eyk125bhwiisu/ants-2.1.0_centos-5.tar.gz?dl=1"
         test = ("#-------------------\n"
                 "# Install ANTs 2.1.0\n"
@@ -55,5 +56,48 @@ class TestANTs(object):
         ants = ANTs(version='2.1.0', pkg_manager='yum', use_binaries=True)
         assert ants.cmd == test, "command to install ANTs binaries not correct (yum)"
 
-    # def test_build_from_source_github(self):
-    #     pass
+        # --- next version ---
+        # apt
+        # yum
+
+    def test_build_from_source_github(self):
+        # --- latest version (master branch) ---
+        # apt
+        test = ("#-------------------\n"
+                "# Install ANTs latest\n"
+                "#-------------------\n"
+                "WORKDIR /tmp/ants-build\n"
+                "RUN deps='ca-certificates cmake g++ gcc git make zlib1g-dev' \\\n"
+                "    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \\\n"
+                "    && git clone https://github.com/stnava/ANTs.git \\\n"
+                "    && cd ANTs \\\n"
+                "    && cd .. && mkdir build && cd build \\\n"
+                "    && cmake ../ANTs && make -j 2 \\\n"
+                "    && mkdir -p /opt/ants \\\n"
+                "    && mv bin/* /opt/ants && mv ../ANTs/Scripts/* /opt/ants \\\n"
+                "    && cd /tmp && rm -rf ants-build \\\n"
+                "    && apt-get purge -y --auto-remove $deps\n"
+                "ENV ANTSPATH=/opt/ants\n"
+                "ENV PATH=$ANTSPATH:$PATH")
+        ants = ANTs(version='latest', pkg_manager='apt', use_binaries=False)
+        assert ants.cmd == test, "command to compile ANTs not correct (apt)"
+
+        # yum
+        test = ("#-------------------\n"
+                "# Install ANTs latest\n"
+                "#-------------------\n"
+                "WORKDIR /tmp/ants-build\n"
+                "RUN deps='ca-certificates cmake gcc-c++ git make zlib-devel' \\\n"
+                "    && yum install -y -q $deps \\\n"
+                "    && git clone https://github.com/stnava/ANTs.git \\\n"
+                "    && cd ANTs \\\n"
+                "    && cd .. && mkdir build && cd build \\\n"
+                "    && cmake ../ANTs && make -j 2 \\\n"
+                "    && mkdir -p /opt/ants \\\n"
+                "    && mv bin/* /opt/ants && mv ../ANTs/Scripts/* /opt/ants \\\n"
+                "    && cd /tmp && rm -rf ants-build \\\n"
+                '    && yum remove $(echo "$deps" | sed "s/ca-certificates//g")\n'
+                "ENV ANTSPATH=/opt/ants\n"
+                "ENV PATH=$ANTSPATH:$PATH")
+        ants = ANTs(version='latest', pkg_manager='yum', use_binaries=False)
+        assert ants.cmd == test, "command to compile ANTs not correct (yum)"
