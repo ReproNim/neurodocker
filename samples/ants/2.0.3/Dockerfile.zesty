@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt
 RUN deps='ca-certificates wget' \
     && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \
-    && wget -qO ants.tar.gz $tar_url https://www.dropbox.com/s/09yd0jbohcwl24z/ants-2.0.3_centos-5.tar.gz?dl=1 \
+    && wget -qO ants.tar.gz https://www.dropbox.com/s/09yd0jbohcwl24z/ants-2.0.3_centos-5.tar.gz?dl=1 \
     && tar xzf ants.tar.gz \
     && rm -f ants.tar.gz \
     && apt-get purge -y --auto-remove $deps
