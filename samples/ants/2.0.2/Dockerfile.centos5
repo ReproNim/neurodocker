@@ -1,5 +1,5 @@
-# Build ANTs 2.0.3
-# Git hash c9965390c1a302dfa9e63f6ca3cb88f68aab329f
+# Build ANTs 2.0.2
+# Git hash 7b83036c987e481b2a04490b1554196cb2fc0dab
 FROM centos:5
 MAINTAINER Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -32,7 +32,7 @@ ENV PATH=/usr/local/src/cmake-2.8.12.2-Linux-i386/bin:$PATH
 WORKDIR /tmp
 RUN git clone git://github.com/stnava/ANTs.git \
     && cd ANTs \
-    && git checkout c9965390c1a302dfa9e63f6ca3cb88f68aab329f \
+    && git checkout 7b83036c987e481b2a04490b1554196cb2fc0dab \
     && mkdir build && cd build && cmake .. && make -j 2 \
     && mkdir -p /opt/ants \
     && cp bin/* /opt/ants && cp ../Scripts/* /opt/ants \
