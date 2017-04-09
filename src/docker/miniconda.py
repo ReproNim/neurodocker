@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 import os
 
 from .utils import indent
-from ..utils import logger, save_yaml, check_url
+from ..utils import logger, save_json, check_url
 
 
 class Miniconda(object):
@@ -22,7 +22,7 @@ class Miniconda(object):
     """
     def __init__(self, conda_env, filepath, miniconda_version="latest"):
         self.conda_env = conda_env
-        self.filepath = os.path.join(filepath, "conda-env.yml")
+        self.filepath = os.path.join(filepath, "conda-env.json")
         self.miniconda_version = miniconda_version
         self.dependencies = {
             'apt-get': ['bzip2', 'ca-certificates', 'curl'],
@@ -62,9 +62,9 @@ class Miniconda(object):
         """Return Dockerfile instructions to create new Conda environment based
         on the specifications in `conda_env`.
         """
-        # Save Conda environment YAML file and copy this file to /home
-        # directory in Docker container. YAML file must be saved in scope of
-        # Dockerfile.
+        # Save Conda environment JSON file and copy this file to /home
+        # directory in Docker container. JSON file must be saved within scope
+        # of Dockerfile.
         docker_filepath = "/home/{}".format(os.path.basename(self.filepath))
         base_name = os.path.basename(self.filepath)
         copy_cmd = "COPY {} {}".format(base_name, docker_filepath)
@@ -90,4 +90,4 @@ class Miniconda(object):
         """Save Conda environment specs and YAML file. File must be saved
         in order to be copied into Docker container. Where should we save? In
         the Dockerfile class?"""
-        save_yaml(self.conda_env, self.filepath)
+        save_json(self.conda_env, self.filepath)

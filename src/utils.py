@@ -1,6 +1,7 @@
 """Package utility functions."""
 from __future__ import absolute_import, division, print_function
 import contextlib
+import json
 import logging
 import os.path as op
 import sys
@@ -9,11 +10,6 @@ try:
     from urllib.request import urlopen, HTTPError, URLError  # Python 3
 except ImportError:
     from urllib2 import urlopen, HTTPError, URLError  # Python 2
-
-try:  # Why the different names?
-    import ruamel_yaml as yaml  # Installed with pip.
-except ImportError:
-    import ruamel.yaml as yaml  # Installed with conda.
 
 
 # Create logger.
@@ -46,19 +42,14 @@ def set_log_level(level):
         raise ValueError("invalid level '{}'".format(level))
 
 
-def load_yaml(filepath):
-    """Load YAML file as Python dictionary."""
-    with open(filepath, 'r') as stream:
-        return yaml.load(stream, Loader=yaml.RoundTripLoader)
+def load_json(filepath):
+    with open(filepath, 'r') as fp:
+        return json.load(fp)
 
 
-def save_yaml(obj, filepath):
-    """Save Python dictionary as YAML file."""
-    # Add overwrite option.
-    # if op.exists(filepath):
-    #     raise Exception("File already exists: {}".format(filepath))
-    with open(filepath, 'w') as stream:
-        yaml.dump(obj, stream, Dumper=yaml.RoundTripDumper, block_seq_indent=2)
+def save_json(obj, filepath):
+    with open(filepath, 'w') as fp:
+        json.dump(obj, fp, indent=4)
 
 
 def check_url(url):

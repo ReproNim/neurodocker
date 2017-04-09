@@ -1,6 +1,6 @@
 """Utility functions."""
 from __future__ import absolute_import, division, print_function
-from ..utils import logger, load_yaml, save_yaml
+from ..utils import logger, load_json
 
 
 def indent(instruction, cmd, line_suffix=' \\'):
@@ -79,7 +79,7 @@ class SpecsParser(object):
     Parameters
     ----------
     filepath : str
-        Path to YAML file.
+        Path to JSON file.
     specs : dict
         Dictionary of specs.
     """
@@ -90,7 +90,7 @@ class SpecsParser(object):
         if filepath is not None and specs is not None:
             raise ValueError("Specify either `filepath` or `specs`, not both.")
         elif filepath is not None:
-            self.specs = load_yaml(filepath)
+            self.specs = load_json(filepath)
         elif specs is not None:
             self.specs = specs
 

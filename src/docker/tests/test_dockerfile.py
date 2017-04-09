@@ -23,7 +23,7 @@ specs = {
 cmds_list = [
     'FROM ubuntu:16.04',
     '# Get dependencies.\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n    bzip2 \\\n    ca-certificates \\\n    curl',
-    '# Install Miniconda, and create Conda environment from file.\nRUN curl -LO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \\\n    /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p /usr/local/miniconda  && \\\n    rm Miniconda3-latest-Linux-x86_64.sh\nENV CONDAPATH=/usr/local/miniconda/bin \\\n    LANG=C.UTF-8 \\\n    LC_ALL=C.UTF-8\nCOPY conda-env.yml /home/conda-env.yml\nRUN $CONDAPATH/conda update -y conda && \\\n    $CONDAPATH/conda env create -f /home/conda-env.yml -n new_env && \\\n    cd $CONDAPATH/../ && rm -rf conda-meta include share ssl && \\\n    $CONDAPATH/conda clean -y -a\nENV PATH=/usr/local/miniconda/envs/new_env/bin:$PATH'
+    '# Install Miniconda, and create Conda environment from file.\nRUN curl -LO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \\\n    /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p /usr/local/miniconda  && \\\n    rm Miniconda3-latest-Linux-x86_64.sh\nENV CONDAPATH=/usr/local/miniconda/bin \\\n    LANG=C.UTF-8 \\\n    LC_ALL=C.UTF-8\nCOPY conda-env.json /home/conda-env.json\nRUN $CONDAPATH/conda update -y conda && \\\n    $CONDAPATH/conda env create -f /home/conda-env.json -n new_env && \\\n    cd $CONDAPATH/../ && rm -rf conda-meta include share ssl && \\\n    $CONDAPATH/conda clean -y -a\nENV PATH=/usr/local/miniconda/envs/new_env/bin:$PATH'
 ]
 
 
