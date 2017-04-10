@@ -42,14 +42,20 @@ def set_log_level(level):
         raise ValueError("invalid level '{}'".format(level))
 
 
-def load_json(filepath):
+def load_json(filepath, **kwargs):
+    """Load JSON file `filepath` as dictionary. `kwargs` can be keyword
+    arguments for `json.load()`.
+    """
     with open(filepath, 'r') as fp:
-        return json.load(fp)
+        return json.load(fp, **kwargs)
 
 
-def save_json(obj, filepath):
+def save_json(obj, filepath, indent=4, **kwargs):
+    """Save `obj` to JSON file `filepath`. `kwargs` can be keyword arguments
+    for `json.dump()`.
+    """
     with open(filepath, 'w') as fp:
-        json.dump(obj, fp, indent=4)
+        json.dump(obj, fp, indent=indent, **kwargs)
 
 
 def check_url(url):
