@@ -1,0 +1,57 @@
+# Build ANTs 2.0.1
+# Git hash dd23c394df9292bae4c5a4ece3023a7571791b7d
+FROM centos:5
+MAINTAINER Jakub Kaczmarzyk <jakubk@mit.edu>
+
+#---------------------------
+# Install build dependencies
+#---------------------------
+RUN rpm --import http://mirrors.mit.edu/centos/RPM-GPG-KEY-CentOS-5 \
+    && rpm --import http://mirrors.mit.edu/epel/RPM-GPG-KEY-EPEL-5 \
+    && rpm -Uvh http://mirrors.mit.edu/epel/5/x86_64/epel-release-5-4.noarch.rpm \
+    && yum install -y -q git \
+                         make \
+                         wget \
+                         zlib-devel \
+    && yum clean packages \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#--------------------
+# Install newer cmake
+#--------------------
+WORKDIR /usr/local/src
+RUN wget -q --no-check-certificate https://cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz \
+    && tar xzf cmake-2.8.12.2-Linux-i386.tar.gz \
+    && rm -f cmake-2.8.12.2-Linux-i386.tar.gz
+ENV PATH=/usr/local/src/cmake-2.8.12.2-Linux-i386/bin:$PATH
+
+# -----------------
+# Install newer gcc
+# -----------------
+# https://github.com/stnava/ANTs/issues/97
+RUN wget http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo -P /etc/yum.repos.d \
+    && echo "enabled=1" >> /etc/yum.repos.d/devtools-1.1.repo \
+    && yum install -y -q devtoolset-1.1-gcc devtoolset-1.1-gcc-c++ \
+    && yum clean packages \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENV CC=/opt/centos/devtoolset-1.1/root/usr/bin/gcc \
+    CPP=/opt/centos/devtoolset-1.1/root/usr/bin/cpp \
+    CXX=/opt/centos/devtoolset-1.1/root/usr/bin/c++
+
+
+#-------------
+# Install ANTs
+#-------------
+WORKDIR /tmp
+RUN git clone git://github.com/stnava/ANTs.git \
+    && cd ANTs \
+    && git checkout dd23c394df9292bae4c5a4ece3023a7571791b7d \
+    && mkdir build && cd build && cmake .. && make -j 2 \
+    && mkdir -p /opt/ants \
+    && cp bin/* /opt/ants && cp ../Scripts/* /opt/ants \
+    && cd /tmp && rm -rf ANTs
+ENV ANTSPATH=/opt/ants/ \
+    PATH=/opt/ants:$PATH
+
+WORKDIR /home
+ENTRYPOINT ["/bin/bash"]

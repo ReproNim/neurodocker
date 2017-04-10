@@ -1,0 +1,20 @@
+FROM ubuntu:17.04
+MAINTAINER Jakub Kaczmarzyk <jakubk@mit.edu>
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+#-------------------
+# Install ANTs 2.0.3
+#-------------------
+WORKDIR /opt
+RUN deps='ca-certificates wget' \
+    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \
+    && wget -qO ants.tar.gz https://www.dropbox.com/s/09yd0jbohcwl24z/ants-2.0.3_centos-5.tar.gz?dl=1 \
+    && tar xzf ants.tar.gz \
+    && rm -f ants.tar.gz \
+    && apt-get purge -y --auto-remove $deps
+ENV ANTSPATH=/opt/ants
+ENV PATH=$ANTSPATH:$PATH
+
+WORKDIR /home
+ENTRYPOINT ["/bin/bash"]
