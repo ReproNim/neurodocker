@@ -1,0 +1,14 @@
+{
+  "base": "ubuntu:16.04",
+  "conda-env": {
+    "dependencies": [
+      "python=3.5.1",
+      "numpy",
+      {
+        "pip": [
+          "pandas"
+        ]
+      }
+    ]
+  }
+}
