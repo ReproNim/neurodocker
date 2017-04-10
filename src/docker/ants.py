@@ -18,7 +18,7 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                        'remove': 'apt-get purge -y --auto-remove {pkgs}'},
                'yum': {'install': 'yum install -y -q {pkgs}',
                        # Trying to uninstall ca-certificates breaks things.
-                       'remove': 'yum remove $(echo "{pkgs}" | sed "s/ca-certificates//g")'},}
+                       'remove': 'yum remove -y -q $(echo "{pkgs}" | sed "s/ca-certificates//g")'},}
 
 
 class ANTs(object):
