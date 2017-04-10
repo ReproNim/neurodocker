@@ -56,6 +56,7 @@ def save_json(obj, filepath, indent=4, **kwargs):
     """
     with open(filepath, 'w') as fp:
         json.dump(obj, fp, indent=indent, **kwargs)
+        fp.write('\n')
 
 
 def check_url(url):
