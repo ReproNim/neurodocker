@@ -96,7 +96,7 @@ class TestANTs(object):
                 "    && mkdir -p /opt/ants \\\n"
                 "    && mv bin/* /opt/ants && mv ../ANTs/Scripts/* /opt/ants \\\n"
                 "    && cd /tmp && rm -rf ants-build \\\n"
-                '    && yum remove $(echo "$deps" | sed "s/ca-certificates//g")\n'
+                '    && yum remove -y -q $(echo "$deps" | sed "s/ca-certificates//g")\n'
                 "ENV ANTSPATH=/opt/ants\n"
                 "ENV PATH=$ANTSPATH:$PATH")
         ants = ANTs(version='latest', pkg_manager='yum', use_binaries=False)
