@@ -33,11 +33,15 @@ class SPM(object):
         MATLAB version. For example, 'R2017a'.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
+    check_urls : bool
+        If true, throw warning if URLs relevant to the installation cannot be
+        reached.
     """
-    def __init__(self, version, matlab_version, pkg_manager):
+    def __init__(self, version, matlab_version, pkg_manager, check_urls=True):
         self.version = str(version)
         self.matlab_version = matlab_version
         self.pkg_manager = pkg_manager
+        self.check_urls = check_urls
 
         if self.version not in ['12'] or self.matlab_version not in ['R2017a']:
             raise ValueError("Only SPM12 and MATLAB R2017a are supported.")
@@ -49,8 +53,19 @@ class SPM(object):
         comment = ("#----------------------\n"
                    "# Install MCR and SPM{}\n"
                    "#----------------------".format(self.version))
-        chunks = [comment, self.install_mcr(), '', self.install_spm()]
+        chunks = [comment, self.install_libs(), '', self.install_mcr(), '',
+                  self.install_spm()]
         return "\n".join(chunks)
+
+    def install_libs(self):
+        """Return Dockerfile instructions to install libxext6 and libxt6.
+        Without these libraries, SPM encounters segmentation fault."""
+        libs = {'apt': 'libxext6 libxt6',
+                'yum': 'libXext.x86_64 libXt.x86_64'}
+        comment = "# Install required libraries"
+        cmd = "RUN {install}".format(**manage_pkgs[self.pkg_manager])
+        cmd = cmd.format(pkgs=libs[self.pkg_manager])
+        return "\n".join((comment, cmd))
 
     def install_mcr(self):
         """Return Dockerfile insructions to install MATLAB Compiler Runtime."""
@@ -59,7 +74,8 @@ class SPM(object):
                    "deployment_files/{ver}/installers/glnxa64/"
                    "MCR_{ver}_glnxa64_installer.zip"
                    "".format(ver=self.matlab_version))
-        check_url(mcr_url)
+        if self.check_urls:
+            check_url(mcr_url)
 
         workdir_cmd = "WORKDIR /opt"
         cmd = ("deps='ca-certificates unzip wget'\n"
@@ -82,9 +98,10 @@ class SPM(object):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
         spm_url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
-           "utopia/dev/spm{spm_ver}_latest_Linux_{matlab_ver}.zip"
-           "".format(spm_ver=self.version, matlab_ver=self.matlab_version))
-        check_url(spm_url)
+                   "utopia/dev/spm{spm}_latest_Linux_{matlab}.zip"
+                   "".format(spm=self.version, matlab=self.matlab_version))
+        if self.check_urls:
+            check_url(spm_url)
 
         workdir_cmd = "WORKDIR /opt"
         cmd = ("deps='ca-certificates unzip wget'\n"
