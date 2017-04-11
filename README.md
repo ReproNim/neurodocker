@@ -1,4 +1,5 @@
 # nipype-regtests
+![Build Status](https://travis-ci.org/mgxd/nipype-regtests.svg?branch=master)
 
 Regression testing on nipype's interfaces
 
