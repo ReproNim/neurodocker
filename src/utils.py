@@ -1,16 +1,12 @@
 """Package utility functions."""
 from __future__ import absolute_import, division, print_function
-import contextlib
 import json
 import logging
 import os.path as op
 import sys
+import warnings
 
-try:
-    from urllib.request import urlopen, HTTPError, URLError  # Python 3
-except ImportError:
-    from urllib2 import urlopen, HTTPError, URLError  # Python 2
-
+import requests
 
 # Create logger.
 logger = logging.getLogger('nipype_regtests')
@@ -59,16 +55,26 @@ def save_json(obj, filepath, indent=4, **kwargs):
         fp.write('\n')
 
 
-def check_url(url):
-    """Return true if `url` is reachable. Otherwise, log warning and return
-    false.
-    http://stackoverflow.com/a/16778473/5666087
+def check_url(url, timeout=5, **kwargs):
+    """Return true if `url` is returns a status code < 400. Otherwise, log
+    warning and return false. `kwargs` are arguments for `requests.get()`.
+
+    Parameters
+    ----------
+    url : str
+        The URL to check.
+    timeout : numeric
+        Number of seconds to wait for response from server.
     """
     try:
-        # Is `with` necessary? Do we have to close the url?
-        # Read http://stackoverflow.com/a/1522709/5666087
-        with contextlib.closing(urlopen(url)) as x:
-            return True
-    except (HTTPError, URLError) as e:
-        logger.warning("{} error on URL {}".format(url, e))
+        request = requests.head(url, timeout=timeout, **kwargs)
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
+        warnings.warn("Connection timed out. Is the website down? ({})"
+                      "".format(url))
+        return False
+    if request.status_code < 400:
+        return True
+    else:
+        warnings.warn("URL ({}) returned status code {}."
+                      "".format(url, request.status_code))
         return False

@@ -1,7 +1,18 @@
 """Utility functions."""
 from __future__ import absolute_import, division, print_function
-from ..utils import logger, load_json
+from ..utils import check_url, logger, load_json
 
+manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
+                                   '--no-install-recommends {pkgs}'),
+                       'remove': 'apt-get purge -y --auto-remove {pkgs}',
+                       'clean': ('apt-get clean '
+                                '&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*'),},
+               'yum': {'install': 'yum install -y -q {pkgs}',
+                       # Trying to uninstall ca-certificates breaks things.
+                       'remove': 'yum remove -y $(echo "{pkgs}" | sed "s/ca-certificates//g")',
+                       'clean': ('yum clean packages '
+                                 '&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*'),},
+                }
 
 def indent(instruction, cmd, line_suffix=' \\'):
     """Add Docker instruction and indent command.
@@ -48,29 +59,38 @@ def _parse_versions(item):
         return item
 
 
-def add_neurodebian(os, full=True):
+def add_neurodebian(os_codename, full=True, check_urls=True):
     """Return instructions to add NeuroDebian to Dockerfile.
 
     Parameters
     ----------
-    os : str
-        Operating system. See http://neuro.debian.net/.
-        Options: 'yakkety', 'xenial', 'trusty', 'precise', 'sid', 'stretch',
-                 'jessie', 'wheezy', 'squeeze'
+    os_codename : str
+        Operating system codename (e.g., 'zesty', 'jessie'). Used in the
+        NeuroDebian url: http://neuro.debian.net/lists/OS_CODENAME.us-nh.full.
     full : bool
         If true, use the full NeuroDebian sources. If false, use the libre
         sources.
+    check_urls : bool
+        If true, throw warning if URLs relevant to the installation cannot be
+        reached.
     """
     suffix = "full" if full else "libre"
     neurodebian_url = ("http://neuro.debian.net/lists/{}.us-nh.{}"
-                       "".format(os, suffix))
-    # Change this to store the key locally.
-    cmd = ("RUN curl -sSl {} >> "
+                       "".format(os_codename, suffix))
+    if check_urls:
+        check_url(neurodebian_url)
+
+    cmd = ("deps='dirmngr wget'\n"
+           "&& {install}\n"
+           "&& wget -O- {url} >> "
            "/etc/apt/sources.list.d/neurodebian.sources.list\n"
-           "apt-key adv --recv-keys --keyserver"
-           "hkp://pgp.mit.edu:80 0xA5D32F012649A5A9\n"
-           "apt-get update".format(neurodebian_url))
-    return indent("RUN", cmd, line_suffix=" && \\")
+           "&& apt-key adv --recv-keys --keyserver "
+           "hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9\n"
+           "&& apt-get update\n"
+           "&& {remove}\n"
+           "&& {clean}".format(url=neurodebian_url, **manage_pkgs['apt']))
+    cmd = cmd.format(pkgs="$deps")
+    return indent("RUN", cmd)
 
 
 class SpecsParser(object):
