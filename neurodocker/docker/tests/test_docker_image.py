@@ -4,10 +4,10 @@ import os
 import docker
 import pytest
 
-from src.docker import DockerImage, DockerContainer
-from src.docker.ants import ANTs
-from src.docker.fsl import FSL
-from src.docker.spm import SPM
+from neurodocker.docker import DockerImage, DockerContainer
+from neurodocker.docker.ants import ANTs
+from neurodocker.docker.fsl import FSL
+from neurodocker.docker.spm import SPM
 
 class TestBuildCompleteDockerImage(object):
     """Build a Docker image that includes all of the supported software.
