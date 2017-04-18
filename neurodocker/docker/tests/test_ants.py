@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
-from src.docker.ants import ANTs, manage_pkgs
+from neurodocker.docker.ants import ANTs, manage_pkgs
 
 def test_manage_pkgs():
     assert 'yum' in manage_pkgs.keys(), "yum not found"
