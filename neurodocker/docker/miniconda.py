@@ -7,87 +7,97 @@ from neurodocker.docker.utils import indent
 
 
 class Miniconda(object):
-    """Class to add Miniconda installation and Conda environment to Dockerfile.
+    """Add Dockerfile instructions to install Miniconda and requested packages.
 
     Parameters
     ----------
-    conda_env : dict
-        Dictionary of environment specifications.
-        See https://github.com/conda/conda/tree/master/conda_env.
-    filepath : str
-        Path to save environment file. Must be saved within
-        the scope of the Dockerfile.
-    miniconda_version : str
-        Version of Miniconda to use. Defaults to "latest".
+    python_version : str
+        Version of Python to install. For example, '3.6.1'.
+    pkg_manager : {'apt', 'yum'}
+        Linux package manager.
+    conda_pkgs : str or list or tuple
+        Packages to install using `conda`. Follow the syntax for
+        `conda install`. For example, the input ['numpy=1.12', 'scipy'] is
+        interpreted as `conda install numpy=1.12 scipy`. The conda-forge channel
+        is added by default.
+    pip_pkgs : str or list or tuple
+        Packages to install using `pip`. Follow the syntax for `pip install`.
+        For example, the input "https://github.com/nipy/nipype/" is interpreted
+        as `pip install https://github.com/nipy/nipype/`.
+    miniconda_verion : str
+        Version of Miniconda to install. Defaults to 'latest'. This does not
+        correspond to Python version.
+    check_urls : bool
+        If true, throw warning if a URL used by this class respond with a
+        status code greater than 400.
     """
-    def __init__(self, conda_env, filepath, miniconda_version="latest"):
-        self.conda_env = conda_env
-        self.filepath = os.path.join(filepath, "conda-env.json")
-        self.miniconda_version = miniconda_version
-        self.dependencies = {
-            'apt-get': ['bzip2', 'ca-certificates', 'curl'],
-            'yum': ['bzip2', 'ca-certificates', 'curl'], }
+    def __init__(self, python_version, pkg_manager, conda_pkgs=None,
+                 pip_pkgs=None, miniconda_verion='latest', check_urls=True):
+        self.python_version = python_version
+        self.pkg_manager = pkg_manager
+        self.conda_pkgs = conda_pkgs
+        self.pip_pkgs = pip_pkgs
+        self.miniconda_verion = miniconda_verion
+        self.check_urls = check_urls
 
-        comment = "# Install Miniconda, and create Conda environment from file."
-        self.cmd = "\n".join((comment, self._add_miniconda(),
-                              self._add_conda_env()))
+        self.cmd = self._create_cmd()
 
-    def _add_miniconda(self):
+    def _create_cmd(self):
+        comment = ("#-------------------------------------------------\n"
+                   "# Install Miniconda, and set up Python environment\n"
+                   "#-------------------------------------------------")
+        return "\n".join((comment, self.install_miniconda(),
+                          self.install_pkgs()))
+
+    def install_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
-        base_url = "https://repo.continuum.io/miniconda/"
-        install_file = ("Miniconda3-{}-Linux-x86_64.sh"
-                        "".format(self.miniconda_version))
-        install_url = base_url + install_file
+        install_url = ("https://repo.continuum.io/miniconda/"
+                       "Miniconda3-{}-Linux-x86_64.sh"
+                       "".format(self.miniconda_verion))
+        if self.check_urls:
+            check_url(install_url)
 
-        # Warn if URL is not reachable.
-        check_url(install_url)
+        workdir_cmd = "WORKDIR /opt"
+        miniconda_cmd = ("deps='bzip2 ca-certificates wget'\n"
+                         "&& {install}\n"
+                         "&& wget -qO miniconda.sh {url}\n"
+                         "&& bash miniconda.sh -b -p /opt/miniconda\n"
+                         "&& rm -f miniconda.sh\n"
+                         "&& {remove}\n"
+                         "&& {clean}"
+                         "".format(url=install_url,
+                            **manage_pkgs[self.pkg_manager]))
+        miniconda_cmd = miniconda_cmd.format(pkgs="$deps")
+        miniconda_cmd = indent("RUN", miniconda_cmd)
+        env_cmd = "ENV PATH=/opt/miniconda/bin:$PATH"
+        return "\n".join((workdir_cmd, miniconda_cmd, env_cmd))
 
-        miniconda_path = "/usr/local/miniconda"
-        # Download and install miniconda.
-        download_cmd = ("curl -LO {url}\n"
-                        "/bin/bash {file} -b -p {path} \n"
-                        "rm {file}".format(url=install_url, file=install_file,
-                                           path=miniconda_path))
-        download_cmd = indent("RUN", download_cmd, line_suffix=" && \\")
+    @staticmethod
+    def _install_conda_pkgs(python_version, conda_pkgs):
+        base_cmd = "\n&& conda install -y -q python={}".format(python_version)
+        if conda_pkgs is not None:
+            if isinstance(conda_pkgs, (list, tuple)):
+                conda_pkgs = " ".join(conda_pkgs)
+            return " ".join((base_cmd, conda_pkgs))
+        else:
+            return base_cmd
 
-        # Add Miniconda to PATH.
-        env_cmd = ("CONDAPATH=/usr/local/miniconda/bin\n"
-                   "LANG=C.UTF-8\n"
-                   "LC_ALL=C.UTF-8".format(miniconda_path))
-        env_cmd = indent("ENV", env_cmd, line_suffix=" \\")
+    @staticmethod
+    def _install_pip_pkgs(pip_pkgs):
+        if pip_pkgs is not None:
+            if isinstance(pip_pkgs, (list, tuple)):
+                pip_pkgs = " ".join(pip_pkgs)
+            return ("\n&& pip install -q --no-cache-dir {}"
+                    "".format(pip_pkgs))
+        else:
+            return ""
 
-        return "\n".join((download_cmd, env_cmd))
-
-    def _add_conda_env(self, env_name="new_env"):
-        """Return Dockerfile instructions to create new Conda environment based
-        on the specifications in `conda_env`.
-        """
-        # Save Conda environment JSON file and copy this file to /home
-        # directory in Docker container. JSON file must be saved within scope
-        # of Dockerfile.
-        docker_filepath = "/home/{}".format(os.path.basename(self.filepath))
-        base_name = os.path.basename(self.filepath)
-        copy_cmd = "COPY {} {}".format(base_name, docker_filepath)
-
-        # Set up a command to create and source new environment.
-        # Is it necessary to update conda?
-        create_env_cmd = ("$CONDAPATH/conda update -y conda\n"
-                          "$CONDAPATH/conda env create -f {} -n {}\n"
-                          # Delete the root conda environment. This frees up
-                          # ~200 MB of space.
-                          "cd $CONDAPATH/../ && rm -rf "
-                          "conda-meta include share ssl\n"
-                          "$CONDAPATH/conda clean -y -a"
-                          "".format(docker_filepath, env_name, env_name))
-        create_env_cmd = indent("RUN", create_env_cmd, " && \\")
-
-        env_cmd = "PATH=/usr/local/miniconda/envs/{}/bin:$PATH".format(env_name)
-        env_cmd = indent("ENV", env_cmd, line_suffix=' \\')
-
-        return "\n".join((copy_cmd, create_env_cmd, env_cmd))
-
-    def _save_conda_env(self):
-        """Save Conda environment specs and YAML file. File must be saved
-        in order to be copied into Docker container. Where should we save? In
-        the Dockerfile class?"""
-        save_json(self.conda_env, self.filepath)
+    def install_pkgs(self):
+        cmds = [self._install_conda_pkgs(self.python_version, self.conda_pkgs),
+                self._install_pip_pkgs(self.pip_pkgs)]
+        pkgs_cmd = ("conda config --add channels conda-forge"
+                    "{0}"
+                    "{1}"
+                    "\n&& conda clean -y --all"
+                    "".format(*cmds))
+        return indent("RUN", pkgs_cmd)
