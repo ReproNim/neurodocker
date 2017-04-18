@@ -2,8 +2,8 @@
 from __future__ import absolute_import, division, print_function
 import os
 
-from src.utils import logger, save_json, check_url
-from src.docker.utils import indent, manage_pkgs
+from neurodocker.utils import logger, save_json, check_url
+from neurodocker.docker.utils import indent
 
 
 class Miniconda(object):

@@ -5,7 +5,7 @@ from copy import deepcopy
 
 import pytest
 
-from src.docker.dockerfile import Dockerfile
+from neurodocker.docker.dockerfile import Dockerfile
 
 specs = {
     "base": "ubuntu:16.04",

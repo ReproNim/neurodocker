@@ -4,10 +4,10 @@ import os
 import docker
 import pytest
 
-from src.docker import DockerImage, DockerContainer
-from src.docker.ants import ANTs
-from src.docker.fsl import FSL
-from src.docker.spm import SPM
+from neurodocker.docker import DockerImage, DockerContainer
+from neurodocker.docker.ants import ANTs
+from neurodocker.docker.fsl import FSL
+from neurodocker.docker.spm import SPM
 
 class TestBuildCompleteDockerImage(object):
     """Build a Docker image that includes all of the supported software.
@@ -23,7 +23,8 @@ class TestBuildCompleteDockerImage(object):
         cmds = [base_cmd,
                 ANTs('2.1.0', pkg_manager).cmd,
                 FSL('5.0.8', pkg_manager, use_binaries=True).cmd,
-                SPM(12, 'R2017a', pkg_manager).cmd]
+                # SPM(12, 'R2017a', pkg_manager).cmd,
+                ]
         self.full_dockerfile = '\n\n'.join(cmds)
 
         # Save Dockerfile.
@@ -44,7 +45,7 @@ class TestBuildCompleteDockerImage(object):
         container.start()
         # "bash -c '$SPMMCRCMD'" should be tested, but it blocks. How do we get
         # around that?
-        cmds = ["Atropos", "bet2",]
+        cmds = ["Atropos -h", "bet -h",]
         outputs = []
         for cmd in cmds:
             output = container.exec_run(cmd=cmd)
