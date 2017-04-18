@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from .docker_image import DockerContainer, DockerImage
+from .docker_image import DockerImage
+from .docker_image import DockerContainer
 from .dockerfile import Dockerfile
 from .fsl import FSL
 from .miniconda import Miniconda

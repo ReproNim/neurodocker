@@ -15,5 +15,8 @@ before_install:
   - sudo apt-get -qq update && sudo apt-get install -yq docker-engine
 install:
   - pip install -r requirements.txt
+  - pip install pytest-cov
 script:
-  - travis_wait 30 py.test
+  - py.test --cov=./
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
