@@ -2,10 +2,10 @@
 from __future__ import absolute_import, division, print_function
 import os
 
-from .fsl import FSL
-from .miniconda import Miniconda
-from .utils import indent
-from ..utils import logger
+from neurodocker.utils import logger
+from neurodocker.docker.fsl import FSL
+from neurodocker.docker.miniconda import Miniconda
+from neurodocker.docker.utils import indent
 
 
 def _append_nonempty(deps_list, items):

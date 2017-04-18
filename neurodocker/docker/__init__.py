@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
-from .docker_image import DockerImage
-from .dockerfile import Dockerfile
-from .fsl import FSL
-from .miniconda import Miniconda
-from .utils import SpecsParser
+from neurodocker.docker.docker_image import DockerImage
+from neurodocker.docker.dockerfile import Dockerfile
+from neurodocker.docker.fsl import FSL
+from neurodocker.docker.miniconda import Miniconda
+from neurodocker.docker.utils import SpecsParser
