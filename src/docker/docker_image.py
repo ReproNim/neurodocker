@@ -58,7 +58,6 @@ def require_docker(func):
     return wrapper
 
 
-
 class RawOutputLogger(threading.Thread):
     """Log raw output of Docker commands in separate thread.
 
@@ -71,7 +70,6 @@ class RawOutputLogger(threading.Thread):
     >>> build_logger = RawOutputLogger(output, name="Build-Logger")
     >>> build_logger.daemon = True
     >>> build_logger.start()
-    >>>
 
     Parameters
     ----------
@@ -134,7 +132,6 @@ class RawOutputLogger(threading.Thread):
             return "\n".join(self.list_of_logs)
 
 
-
 class DockerImage(object):
     """Build Docker image."""
     def __init__(self, path, fileobj=None, tag=None):
@@ -169,7 +166,6 @@ class DockerImage(object):
         except docker.errors.NullResource:
             error_logs = build_logger.show_logs(last=2)
             raise docker.errors.BuildError(error_logs)
-
 
 
 class DockerContainer(object):
