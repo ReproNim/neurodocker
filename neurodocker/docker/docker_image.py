@@ -5,7 +5,7 @@ import threading
 
 import docker
 
-from ..utils import logger
+from neurodocker.utils import logger
 
 
 def _create_volumes_dict(volume_mapping):

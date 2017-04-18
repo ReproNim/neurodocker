@@ -7,8 +7,8 @@ but does not require a MATLAB license.
 """
 from __future__ import absolute_import, division, print_function
 
-from src.docker.utils import indent
-from src.utils import check_url, logger
+from neurodocker.utils import check_url, logger
+from neurodocker.docker.utils import indent
 
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                    '--no-install-recommends {pkgs}'),

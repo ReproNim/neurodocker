@@ -10,8 +10,8 @@ https://github.com/stnava/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS
 """
 from __future__ import absolute_import, division, print_function
 
-from src.docker.utils import indent
-from src.utils import logger
+from neurodocker.utils import logger
+from neurodocker.docker.utils import indent
 
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                    '--no-install-recommends {pkgs}'),
