@@ -1,6 +1,6 @@
 """Utility functions."""
 from __future__ import absolute_import, division, print_function
-from ..utils import check_url, logger, load_json
+from neurodocker.utils import check_url, logger, load_json
 
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                    '--no-install-recommends {pkgs}'),

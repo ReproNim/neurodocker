@@ -1,8 +1,8 @@
 """Class to add FSL installation to Dockerfile."""
 from __future__ import absolute_import, division, print_function
 
-from .utils import add_neurodebian, indent, manage_pkgs
-from ..utils import check_url, logger
+from neurodocker.utils import check_url, logger
+from neurodocker.docker.utils import add_neurodebian, indent, manage_pkgs
 
 
 class FSL(object):

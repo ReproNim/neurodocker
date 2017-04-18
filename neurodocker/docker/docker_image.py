@@ -7,7 +7,7 @@ import warnings
 import docker
 import requests
 
-from ..utils import logger
+from neurodocker.utils import logger
 
 
 def docker_is_running(client):
