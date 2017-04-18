@@ -1,22 +1,22 @@
 branches:
-  only:  # Only build on PRs (or pushes) to master branch.
+  only:
     - master
 sudo: required
 services:
   - docker
 language: python
 python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "nightly"
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+  - nightly
 before_install:
-  - sudo apt-get -qq update && sudo apt-get install -yq docker-engine
+  - travis_retry sudo apt-get update && sudo apt-get install -yq docker-engine
 install:
-  - pip install -r requirements.txt
-  - pip install pytest-cov
+  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install pytest-cov
 script:
-  - py.test --cov=./
+  - travis_wait 60 py.test --cov=./
 after_success:
   - bash <(curl -s https://codecov.io/bash)
