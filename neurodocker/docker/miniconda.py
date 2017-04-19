@@ -2,8 +2,8 @@
 from __future__ import absolute_import, division, print_function
 import os
 
-from neurodocker.utils import logger, save_json, check_url
-from neurodocker.docker.utils import indent
+from neurodocker.utils import logger, check_url
+from neurodocker.docker.utils import indent, manage_pkgs
 
 
 class Miniconda(object):
@@ -15,12 +15,12 @@ class Miniconda(object):
         Version of Python to install. For example, '3.6.1'.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
-    conda_pkgs : str or list or tuple
+    conda_install : str or list or tuple
         Packages to install using `conda`. Follow the syntax for
         `conda install`. For example, the input ['numpy=1.12', 'scipy'] is
         interpreted as `conda install numpy=1.12 scipy`. The conda-forge channel
         is added by default.
-    pip_pkgs : str or list or tuple
+    pip_install : str or list or tuple
         Packages to install using `pip`. Follow the syntax for `pip install`.
         For example, the input "https://github.com/nipy/nipype/" is interpreted
         as `pip install https://github.com/nipy/nipype/`.
@@ -28,15 +28,15 @@ class Miniconda(object):
         Version of Miniconda to install. Defaults to 'latest'. This does not
         correspond to Python version.
     check_urls : bool
-        If true, throw warning if a URL used by this class respond with a
+        If true, throw warning if a URL used by this class responds with a
         status code greater than 400.
     """
-    def __init__(self, python_version, pkg_manager, conda_pkgs=None,
-                 pip_pkgs=None, miniconda_verion='latest', check_urls=True):
+    def __init__(self, python_version, pkg_manager, conda_install=None,
+                 pip_install=None, miniconda_verion='latest', check_urls=True):
         self.python_version = python_version
         self.pkg_manager = pkg_manager
-        self.conda_pkgs = conda_pkgs
-        self.pip_pkgs = pip_pkgs
+        self.conda_install = conda_install
+        self.pip_install = pip_install
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
@@ -73,28 +73,28 @@ class Miniconda(object):
         return "\n".join((workdir_cmd, miniconda_cmd, env_cmd))
 
     @staticmethod
-    def _install_conda_pkgs(python_version, conda_pkgs):
+    def _install_conda_pkgs(python_version, conda_install):
         base_cmd = "\n&& conda install -y -q python={}".format(python_version)
-        if conda_pkgs is not None:
-            if isinstance(conda_pkgs, (list, tuple)):
-                conda_pkgs = " ".join(conda_pkgs)
-            return " ".join((base_cmd, conda_pkgs))
+        if conda_install is not None:
+            if isinstance(conda_install, (list, tuple)):
+                conda_install = " ".join(conda_install)
+            return " ".join((base_cmd, conda_install))
         else:
             return base_cmd
 
     @staticmethod
-    def _install_pip_pkgs(pip_pkgs):
-        if pip_pkgs is not None:
-            if isinstance(pip_pkgs, (list, tuple)):
-                pip_pkgs = " ".join(pip_pkgs)
+    def _install_pip_pkgs(pip_install):
+        if pip_install is not None:
+            if isinstance(pip_install, (list, tuple)):
+                pip_install = " ".join(pip_install)
             return ("\n&& pip install -q --no-cache-dir {}"
-                    "".format(pip_pkgs))
+                    "".format(pip_install))
         else:
             return ""
 
     def install_pkgs(self):
-        cmds = [self._install_conda_pkgs(self.python_version, self.conda_pkgs),
-                self._install_pip_pkgs(self.pip_pkgs)]
+        cmds = [self._install_conda_pkgs(self.python_version, self.conda_install),
+                self._install_pip_pkgs(self.pip_install)]
         pkgs_cmd = ("conda config --add channels conda-forge"
                     "{0}"
                     "{1}"
