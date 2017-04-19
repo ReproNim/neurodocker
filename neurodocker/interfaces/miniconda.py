@@ -1,9 +1,12 @@
 """Class to add Miniconda and create Conda environment."""
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
+import logging
 import os
 
-from neurodocker.utils import logger, check_url
-from neurodocker.docker.utils import indent, manage_pkgs
+from neurodocker.utils import check_url, indent, manage_pkgs
+
+logger = logging.getLogger(__name__)
 
 
 class Miniconda(object):

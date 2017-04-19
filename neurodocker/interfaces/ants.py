@@ -8,10 +8,13 @@ on GitHub, and older versions are available on SourceForge.
 Build from source (takes approximately 40 minutes):
 https://github.com/stnava/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS
 """
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
+import logging
 
-from neurodocker.utils import logger
-from neurodocker.docker.utils import indent
+from neurodocker.utils import indent
+
+logger = logging.getLogger(__name__)
 
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                    '--no-install-recommends {pkgs}'),
