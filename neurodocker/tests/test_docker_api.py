@@ -27,15 +27,15 @@ class TestDockerfile(object):
     def setup(self, tmpdir):
         self.tmpdir = tmpdir
         self.specs = {'base': 'ubuntu:16.04',
-                      'pkg_manager': 'apt',
                       'conda_env': {'python_version': '3.5.1',
                                     'conda_install': 'numpy',
                                     'pip_install': 'pandas'},
                       'software': {'ants': {'use_binaries': True, 'version': '2.1.0'}}}
 
         base = "FROM {}".format(self.specs['base'])
-        miniconda = Miniconda(**self.specs['conda_env']).cmd
-        ants = ANTs(**self.specs['software']['ants']).cmd
+        miniconda = Miniconda(pkg_manager='apt', **self.specs['conda_env']).cmd
+        ants = ANTs(pkg_manager='apt', **self.specs['software']['ants']).cmd
+        self.full = "\n\n".join((base, miniconda, ants))
 
     def test_init(self):
         assert Dockerfile(self.specs, 'apt').cmd == self.full, "error creating Dockerfile"
