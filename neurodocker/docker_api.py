@@ -206,10 +206,13 @@ class RawOutputLogger(threading.Thread):
 
 class DockerImage(object):
     """Build Docker image."""
-    def __init__(self, path, fileobj=None, tag=None):
-        self.path = os.path.abspath(path)
-        self.fileobj = None
+    def __init__(self, path=None, fileobj=None, tag=None):
+        self.path = path
+        self.fileobj = fileobj
         self.tag = tag
+
+        if self.path is None and self.fileobj is None:
+            raise ValueError("`path` or `fileobj` must be specified.")
 
     @require_docker
     def build(self, **kwargs):
