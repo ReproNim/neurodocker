@@ -50,7 +50,7 @@ class Miniconda(object):
                    "# Install Miniconda, and set up Python environment\n"
                    "#-------------------------------------------------")
         return "\n".join((comment, self.install_miniconda(),
-                          self.install_pkgs()))
+                          self.setup_environment()))
 
     def install_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
@@ -66,41 +66,50 @@ class Miniconda(object):
                          "&& wget -qO miniconda.sh {url}\n"
                          "&& bash miniconda.sh -b -p /opt/miniconda\n"
                          "&& rm -f miniconda.sh\n"
-                         "&& {remove}\n"
+                         #"&& {remove}\n"
                          "&& {clean}"
                          "".format(url=install_url,
                             **manage_pkgs[self.pkg_manager]))
         miniconda_cmd = miniconda_cmd.format(pkgs="$deps")
         miniconda_cmd = indent("RUN", miniconda_cmd)
-        env_cmd = "ENV PATH=/opt/miniconda/bin:$PATH"
-        return "\n".join((workdir_cmd, miniconda_cmd, env_cmd))
+        # env_cmd = "ENV PATH=/opt/miniconda/bin:$PATH"
+        return "\n".join((workdir_cmd, miniconda_cmd))
 
     @staticmethod
-    def _install_conda_pkgs(python_version, conda_install):
-        base_cmd = "\n&& conda install -y -q python={}".format(python_version)
+    def _create_conda_env(python_version, conda_install):
+        cmd = ("/opt/miniconda/bin/conda create -y -q -n default python={}"
+               "".format(python_version))
         if conda_install is not None:
             if isinstance(conda_install, (list, tuple)):
                 conda_install = " ".join(conda_install)
-            return " ".join((base_cmd, conda_install))
-        else:
-            return base_cmd
+            # conda_install = "\n&& conda install -y -q {}".format(conda_install)
+            cmd = " ".join((cmd, conda_install))
+        return cmd
 
     @staticmethod
     def _install_pip_pkgs(pip_install):
         if pip_install is not None:
             if isinstance(pip_install, (list, tuple)):
                 pip_install = " ".join(pip_install)
-            return ("\n&& pip install -q --no-cache-dir {}"
+            return ("pip install -q --no-cache-dir {}"
                     "".format(pip_install))
         else:
             return ""
 
-    def install_pkgs(self):
-        cmds = [self._install_conda_pkgs(self.python_version, self.conda_install),
+    def setup_environment(self):
+        cmds = [self._create_conda_env(self.python_version, self.conda_install),
                 self._install_pip_pkgs(self.pip_install)]
-        pkgs_cmd = ("conda config --add channels conda-forge"
-                    "{0}"
-                    "{1}"
-                    "\n&& conda clean -y --all"
-                    "".format(*cmds))
-        return indent("RUN", pkgs_cmd)
+        conda_cmd = ("/opt/miniconda/bin/conda config --add channels conda-forge"
+                     "\n&& {0}")
+        conda_cmd = indent("RUN", conda_cmd)
+
+        env_cmd = "ENV PATH=/opt/miniconda/envs/default/bin:$PATH"
+
+        pip_and_clean = ("{1}"
+                         "\n&& conda clean -y --all"
+                         "\n&& cd /opt/miniconda"
+                         "\n&& rm -rf bin conda-meta include lib pkgs share ssl")
+        pip_and_clean = indent("RUN", pip_and_clean)
+
+        cmd = "\n".join((conda_cmd, env_cmd, pip_and_clean))
+        return cmd.format(*cmds)
