@@ -3,19 +3,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
-from neurodocker.docker.ants import ANTs, manage_pkgs
-
-def test_manage_pkgs():
-    assert 'yum' in manage_pkgs.keys(), "yum not found"
-    assert 'apt' in manage_pkgs.keys(), "apt not found"
-
-    # Test that each entry is a dictionary with 'install' and 'remove' keys.
-    for manager in manage_pkgs:
-        assert 'install' in manage_pkgs[manager].keys(), 'install not found'
-        assert 'remove' in manage_pkgs[manager].keys(), 'remove not found'
-
-    assert "yum" not in manage_pkgs['apt'].values()
-    assert "apt" not in manage_pkgs['yum'].values()
+from neurodocker.interfaces import ANTs
 
 
 class TestANTs(object):

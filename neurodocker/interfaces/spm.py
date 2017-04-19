@@ -5,17 +5,13 @@ Project website: http://www.fil.ion.ucl.ac.uk/spm/
 This script installs the standalone SPM, which requires MATLAB Compiler Runtime
 but does not require a MATLAB license.
 """
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
+import logging
 
-from neurodocker.utils import check_url, logger
-from neurodocker.docker.utils import indent
+from neurodocker.utils import check_url, indent, manage_pkgs
 
-manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
-                                   '--no-install-recommends {pkgs}'),
-                       'remove': 'apt-get purge -y --auto-remove {pkgs}'},
-               'yum': {'install': 'yum install -y -q {pkgs}',
-                       # Trying to uninstall ca-certificates breaks things.
-                       'remove': 'yum remove -y -q $(echo "{pkgs}" | sed "s/ca-certificates//g")'},}
+logger = logging.getLogger(__name__)
 
 
 class SPM(object):

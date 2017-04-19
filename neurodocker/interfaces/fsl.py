@@ -1,8 +1,11 @@
 """Class to add FSL installation to Dockerfile."""
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
+import logging
 
-from neurodocker.utils import check_url, logger
-from neurodocker.docker.utils import add_neurodebian, indent, manage_pkgs
+from neurodocker.utils import add_neurodebian, check_url, indent, manage_pkgs
+
+logger = logging.getLogger(__name__)
 
 
 class FSL(object):
