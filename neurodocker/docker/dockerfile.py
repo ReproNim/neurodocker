@@ -2,39 +2,37 @@
 from __future__ import absolute_import, division, print_function
 import os
 
-from neurodocker.utils import logger
-from neurodocker.docker.fsl import FSL
 from neurodocker.docker.miniconda import Miniconda
-from neurodocker.docker.utils import indent
-
-
-def _append_nonempty(deps_list, items):
-    """Append `items` to `deps_list` if `items` is not empty. Operates in-place
-    on `deps_list`.
-    """
-    if items:
-        deps_list.append(items)
+from neurodocker.utils import logger, SUPPORTED_NI_SOFTWARE
 
 
 class Dockerfile(object):
-    """Class to generate Dockerfile.
+    """Class to create Dockerfile.
 
     Parameters
     ----------
     specs : dict
-        Software specifications for the Dockerfile.
-    savedir : str
-        Directory in which to save Dockerfile (and optionally Conda environment
-        YAML file).
-    deps_method : {'apt-get', 'yum'}
-        Method to use to get dependencies.
+        Dictionary with keys 'base', etc.
+    pkg_manager : {'apt', 'yum'}
+        Linux package manager.
+    check_urls : bool
+        If true, throw warning if a URL used by this class responds with a
+        status code greater than 400.
     """
-    def __init__(self, specs, savedir, deps_method):
+
+    def __init__(self, specs, pkg_manager, check_urls=True):
         self.specs = specs
-        self.savedir = savedir
-        self.deps_method = deps_method
+        self.pkg_manager = pkg_manager
+        self.check_urls = check_urls
         self._cmds = []
-        self.cmd = ""
+
+        self.add_base()
+        if "conda_env" in self.specs.keys():
+            self.add_miniconda()
+        if "software" in self.specs.keys():
+            self.add_ni_software()
+
+        self.cmd = "\n\n".join(self._cmds)
 
     def __repr__(self):
         return "{self.__class__.__name__}({self.cmd})".format(self=self)
@@ -43,74 +41,34 @@ class Dockerfile(object):
         return self.cmd
 
     def add_instruction(self, instruction):
-        """Add instruction to list of instructions."""
         self._cmds.append(instruction)
 
-    def _add_base(self):
-        """Add FROM instruction using specs['base']."""
+    def add_base(self):
+        """Add Dockerfile FROM instruction."""
         cmd = "FROM {}".format(self.specs['base'])
         self.add_instruction(cmd)
 
-    def _get_instructs_and_deps(self, method):
-        """Get installation instructions and dependencies of other environment
-        specifications while, and remove duplicate dependencies.
+    def add_miniconda(self):
+        """Add Dockerfile instructions to install Miniconda."""
+        kwargs = self.specs['conda_env']
+        obj = Miniconda(pkg_manager=self.pkg_manager,
+                        check_urls=self.check_urls, **kwargs)
+        self.add_instruction(obj.cmd)
 
-        This function will probably become too complicated. Separate getting
-        the dependencies and getting the installation instructions.
 
-        Parameters
-        ----------
-        method : {'apt-get', 'yum'}
-            Method to use to get dependencies.
-        """
-        # Join all dependencies
-        all_deps = []
-        all_install_cmds = []
-        if 'conda-env' in self.specs:
-            miniconda = Miniconda(self.specs['conda-env'],
-                                  filepath=self.savedir)
-            deps = miniconda.dependencies[method]
-            miniconda._save_conda_env()  # Save conda-env.yml file
-            _append_nonempty(all_install_cmds, miniconda.cmd)
-            _append_nonempty(all_deps, deps)
+    def add_ni_software(self):
+        """Add Dockerfile instructions to install neuroimaging software."""
+        software = self.specs['software']
+        for pkg, kwargs in software.items():
+            obj = SUPPORTED_NI_SOFTWARE[pkg](pkg_manager=self.pkg_manager,
+                                             check_urls=self.check_urls,
+                                             **kwargs)
+            self.add_instruction(obj.cmd)
 
-        # Take care of installation isntructions.
-        all_install_cmds = "\n\n".join(all_install_cmds)
-
-        # Take care of dependencies.
-        all_deps = [d for sublist in all_deps for d in sublist]  # Flatten list
-        all_deps = set(all_deps)  # Remove duplicates
-        all_deps = sorted(list(all_deps))  # Sort list
-        all_deps = "\n".join(all_deps)  # Join deps into a single string
-
-        if method == "apt-get":
-            cmd = ("apt-get update && apt-get install -y "
-                   "--no-install-recommends\n{}".format(all_deps))
-        elif method == "yum":
-            cmd = ("yum check-update && yum install -y\n{}".format(all_deps))
-        install_deps_cmd = indent("RUN", cmd, line_suffix=" \\")
-        comment = "# Get dependencies."
-        install_deps_cmd = "\n".join((comment, install_deps_cmd))
-
-        self.add_instruction(install_deps_cmd)
-        self.add_instruction(all_install_cmds)
-
-    def create(self):
-        """Create Dockerfile. Stores string representation in `self.cmd`."""
-        self._add_base()
-        self._get_instructs_and_deps(self.deps_method)
-        self.cmd = "\n\n".join(self._cmds)
-
-    def save(self):
-        """Save Dockerfile. Overwrite file if it exists.
-
-        Parameters
-        ----------
-        obj : str
-            String representation of Dockerfile.
-        """
+    def save(self, filepath="Dockerfile", **kwargs):
+        """Save `self.cmd` to `filepath`. `kwargs` are for `open()`."""
         if not self.cmd:
             raise Exception("Instructions are empty.")
-        filepath = os.path.join(self.savedir, "Dockerfile")
-        with open(filepath, 'w') as stream:
-            stream.write(self.cmd)
+        with open(filepath, mode='w', **kwargs) as fp:
+            fp.write(self.cmd)
+            fp.write('\n')
