@@ -37,6 +37,9 @@ class ANTs(object):
     use_binaries : bool
         If true, uses pre-compiled ANTs binaries. If false, attempts to build
         from source.
+    check_urls : bool
+        If true, throw warning if a URL used by this class responds with a
+        status code greater than 400.
     """
     VERSION_HASHES = {"latest": None,
                       "2.1.0": "78931aa6c4943af25e0ee0644ac611d27127a01e",
@@ -52,10 +55,12 @@ class ANTs(object):
     VERSION_TARBALLS = {"2.1.0": "https://www.dropbox.com/s/x7eyk125bhwiisu/ants-2.1.0_centos-5.tar.gz?dl=1",
                         "2.0.3": "https://www.dropbox.com/s/09yd0jbohcwl24z/ants-2.0.3_centos-5.tar.gz?dl=1",}
 
-    def __init__(self, version, pkg_manager, use_binaries=True):
+    def __init__(self, version, pkg_manager, use_binaries=True,
+                 check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
+        self.check_urls = check_urls
 
         self.cmd = self._create_cmd()
 
