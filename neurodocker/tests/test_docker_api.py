@@ -33,9 +33,10 @@ class TestDockerfile(object):
                       'software': {'ants': {'use_binaries': True, 'version': '2.1.0'}}}
 
         base = "FROM {}".format(self.specs['base'])
+        noninteractive = "ARG DEBIAN_FRONTEND=noninteractive"
         miniconda = Miniconda(pkg_manager='apt', **self.specs['conda_env']).cmd
         ants = ANTs(pkg_manager='apt', **self.specs['software']['ants']).cmd
-        self.full = "\n\n".join((base, miniconda, ants))
+        self.full = "\n\n".join((base, noninteractive, miniconda, ants))
 
     def test_init(self):
         assert Dockerfile(self.specs, 'apt').cmd == self.full, "error creating Dockerfile"
