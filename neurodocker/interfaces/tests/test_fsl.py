@@ -9,10 +9,6 @@ from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
 from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import FSL
 
-# Decorate functions with @build_image if the function builds an image.
-build_image = pytest.mark.skipif(not pytest.config.getoption("--build-images"),
-                                 reason="requires --build-images option to run")
-
 
 class TestFSL(object):
     """Tests for FSL class."""
