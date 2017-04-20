@@ -14,14 +14,16 @@ class FSL(object):
     Parameters
     ----------
     version : str
-        Version of FSL.
+        Version of FSL. Latest version is installed if using the Python
+        installer.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     use_binaries : bool
         If true, use binaries from FSL's website (compiled on Centos 5).
         Defaults to True.
     use_installer : bool
-        If true, install with FSL's Python installer. Only works on Centos/RHEL.
+        If true, install with the latest version of FSL using FSL's Python
+        installer. Only works on CentOS/RHEL.
     use_neurodebian : bool
         If true, install FSL from NeuroDebian. Only latest version is supported
         (for now).
