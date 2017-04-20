@@ -83,6 +83,7 @@ class Dockerfile(object):
         self._cmds = []
 
         self.add_base()
+        self.add_beginning_instructions()
         if "conda_env" in self.specs.keys():
             self.add_miniconda()
         if "software" in self.specs.keys():
@@ -103,6 +104,15 @@ class Dockerfile(object):
         """Add Dockerfile FROM instruction."""
         cmd = "FROM {}".format(self.specs['base'])
         self.add_instruction(cmd)
+
+    def add_beginning_instructions(self):
+        """Add instructions at the beginning of the Dockerfile depending on the
+        base image.
+        """
+        base = self.specs['base'].split(':')[0]
+        if base in ['debian', 'ubuntu']:
+            cmd = "ARG DEBIAN_FRONTEND=noninteractive"
+            self.add_instruction(cmd)
 
     def add_miniconda(self):
         """Add Dockerfile instructions to install Miniconda."""
