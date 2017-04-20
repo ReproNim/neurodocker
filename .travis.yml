@@ -11,14 +11,14 @@ sudo: required
 services:
   - docker
 env:
-  - TEST_PREFIX="not test_build_image_"  # Do not build Docker images.
-  - TEST_PREFIX="test_build_image_"  # Build Docker images.
+  - PYTEST_ARGS=(-k="test_build_image_")
+  - PYTEST_ARGS=(-k="not test_build_image_")
 before_install:
   - travis_retry sudo apt-get update && sudo apt-get install -yq docker-engine
 install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install pytest-cov
 script:
-  - travis_wait 90 py.test -k $TEST_PREFIX --cov=./
+  - travis_wait 90 py.test "${PYTEST_ARGS}" --cov=./ neurodocker
 after_success:
   - bash <(curl -s https://codecov.io/bash)
