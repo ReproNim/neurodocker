@@ -136,8 +136,9 @@ class FSL(object):
                "".format(url=url, **manage_pkgs['yum']))
         cmd = cmd.format(pkgs="$deps")
         cmd = indent("RUN", cmd)
+        path_cmd = "ENV PATH=/opt/fsl/bin:$PATH"
 
-        return "\n".join((workdir_cmd, env_cmd, cmd))
+        return "\n".join((workdir_cmd, env_cmd, cmd, path_cmd))
 
     def install_binaries(self):
         """Return Dockerfile instructions to install FSL using binaries hosted
