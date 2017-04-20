@@ -82,35 +82,6 @@ class FSL(object):
 
         return "\n".join((comment, cmd))
 
-    def install_5_0_8_apt(self):
-        """Return Dockerfile instructions to install FSL 5.0.8 from NeuroDebian.
-        """
-        if self.version != "5.0.8":
-            raise ValueError("Installation by NeuroDebain only supports "
-                             "version 5.0.8 supported for now.")
-        comments = ["# Add NeuroDebian repository",
-                    "# Install FSL",]
-        neuro_cmd = add_neurodebian(self.os_codename,
-                                    check_urls=self.check_urls)
-
-        cmd = ("deps='fsl-5.0-core fsl-mni152-templates fsl-atlases "
-               "fsl-5.0-eddy-nonfree octave'\n"
-               "&& {install}\n"
-               "&& {clean}".format(**manage_pkgs['apt']))
-        cmd = cmd.format(pkgs="$deps")
-        cmd = indent("RUN", cmd)
-
-        env_cmd = ("FSLDIR=/usr/share/fsl/5.0\n"
-                   "FSLOUTPUTTYPE=NIFTI_GZ\n"
-                   "FSLMULTIFILEQUIT=TRUE\n"
-                   "POSSUMDIR=/usr/share/fsl/5.0\n"
-                   "LD_LIBRARY_PATH=/usr/lib/fsl/5.0:$LD_LIBRARY_PATH\n"
-                   "FSLTCLSH=/usr/bin/tclsh\n"
-                   "FSLWISH=/usr/bin/wish\n"
-                   "PATH=/usr/lib/fsl/5.0:$PATH")
-        env_cmd = indent("ENV", env_cmd)
-
-        return "\n".join((comments[0], neuro_cmd, comments[1], cmd, env_cmd))
 
     def install_with_pyinstaller(self):
         """Return Dockerfile instructions to install FSL using FSL's Python

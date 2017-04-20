@@ -30,25 +30,6 @@ class TestFSL(object):
         client.containers.prune()
         client.images.prune()
 
-    def test_build_image_fsl_508_neurodebian_jessie(self):
-        """Install FSL on Debian with NeuroDebian Jessie."""
-        specs = {'base': 'debian:jessie',
-                 'software': {
-                     'fsl': {'version': '5.0.8', 'use_neurodebian': True,
-                             'os_codename': 'jessie'}}}
-        parser = SpecsParser(specs=specs)
-        cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
-        fileobj = BytesIO(cmd.encode('utf-8'))
-
-        image = DockerImage(fileobj=fileobj).build_raw()
-        container = DockerContainer(image)
-        container.start()
-        output = container.exec_run('bet')
-        assert "error" not in output, "error running bet"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
-
     def test_build_image_fsl_508_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
         specs = {'base': 'ubuntu:xenial',
