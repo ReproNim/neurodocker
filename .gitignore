@@ -1,11 +1,11 @@
 __pycache__
-.DS_Store
-*.pyc
-*.tar.gz
-
-# Ignore Jupyter Notebooks
-.ipynb_checkpoints
-*.ipynb
-
-# related to pytest
 .cache
+.DS_Store
+.ipynb_checkpoints
+/dockerfile_tests
+
+*.ipynb
+*.py
+*.pyc
+*.tar
+*.tar.gz

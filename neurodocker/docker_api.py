@@ -218,7 +218,7 @@ class DockerImage(object):
     def build(self, **kwargs):
         """Return image object."""
         return client.images.build(path=self.path, fileobj=self.fileobj,
-                                   tag=self.tags, **kwargs)
+                                   tag=self.tag, **kwargs)
 
     @require_docker
     def build_raw(self, console=True, filepath=None, **kwargs):
