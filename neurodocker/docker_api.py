@@ -190,7 +190,11 @@ class RawOutputLogger(threading.Thread):
         if re.search("error", last_line, re.IGNORECASE):
             return None
         elif re.search("successfully built", last_line, re.IGNORECASE):
-            return re.search('[0-9a-f]{12}', last_line).group(0)
+            try:
+                return re.findall('[0-9a-f]{12}', last_line)[-1]
+            except IndexError:
+                raise Exception("Docker image ID could not be found but build "
+                                "error was not found.")
 
     def show_logs(self, first=None, last=None):
         """Options `first` and `last` can be integers."""
