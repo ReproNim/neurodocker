@@ -17,6 +17,6 @@ install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install pytest-cov
 script:
-  - travis_wait 90 py.test --cov=./
+  - travis_wait 90 py.test -s --cov=./
 after_success:
   - bash <(curl -s https://codecov.io/bash)
