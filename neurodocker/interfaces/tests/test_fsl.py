@@ -3,9 +3,8 @@
 from __future__ import absolute_import, division, print_function
 from io import BytesIO
 
-import pytest
-
-from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
+from neurodocker.docker_api import (client, Dockerfile, DockerImage,
+                                    DockerContainer)
 from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import FSL
 
@@ -13,8 +12,8 @@ from neurodocker.interfaces import FSL
 class TestFSL(object):
     """Tests for FSL class."""
 
-    def test_install_centos7_pyinstaller(self):
-        """Install latest FSL on CentOS 7 with FSL's Python installer."""
+    def test_build_image_fsl_latest_pyinstaller_centos7(self):
+        """Install latest FSL with FSL's Python installer on CentOS 7."""
         specs = {'base': 'centos:7',
                  'software': {
                      'fsl': {'version': 'latest', 'use_installer': True}}}
@@ -28,9 +27,11 @@ class TestFSL(object):
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
         container.cleanup(remove=True, force=True)
+        client.containers.prune()
+        client.images.prune()
 
-    def test_install_debian_neurodebian(self):
-        """Install FSL on Debian with NeuroDebian."""
+    def test_build_image_fsl_508_neurodebian_jessie(self):
+        """Install FSL on Debian with NeuroDebian Jessie."""
         specs = {'base': 'debian:jessie',
                  'software': {
                      'fsl': {'version': '5.0.8', 'use_neurodebian': True}}}
@@ -44,10 +45,12 @@ class TestFSL(object):
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
         container.cleanup(remove=True, force=True)
+        client.containers.prune()
+        client.images.prune()
 
-    def test_install_ubuntu_binaries(self):
-        """Install FSL binaries on Ubuntu."""
-        specs = {'base': 'ubuntu:16.04',
+    def test_build_image_fsl_508_binaries_xenial(self):
+        """Install FSL binaries on Ubuntu Xenial."""
+        specs = {'base': 'ubuntu:xenial',
                  'software': {
                      'fsl': {'version': '5.0.8', 'use_binaries': True}}}
         parser = SpecsParser(specs=specs)
@@ -60,3 +63,5 @@ class TestFSL(object):
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
         container.cleanup(remove=True, force=True)
+        client.containers.prune()
+        client.images.prune()

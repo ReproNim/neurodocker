@@ -3,17 +3,17 @@
 from __future__ import absolute_import, division, print_function
 from io import BytesIO
 
-import pytest
-
-from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
+from neurodocker.docker_api import (client, Dockerfile, DockerImage,
+                                    DockerContainer)
 from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import ANTs
 
 
 class TestANTs(object):
     """Tests for ANTs class."""
-    def install_binaries_centos7(self):
-        """Install ANTs 2.1.0 binaries on Ubuntu."""
+
+    def test_build_image_ants_210_binaries_centos7(self):
+        """Install ANTs 2.1.0 binaries on CentOS 7."""
         specs = {'base': 'centos:7',
                  'software': {
                      'ants': {'version': '2.1.0', 'use_binaries': True}}}
@@ -27,6 +27,8 @@ class TestANTs(object):
         output = container.exec_run('Atropos')
         assert "error" not in output, "error running bet"
         container.cleanup(remove=True, force=True)
+        client.containers.prune()
+        client.images.prune()
 
     def test_build_from_source_github(self):
         # --- latest version (master branch) ---
