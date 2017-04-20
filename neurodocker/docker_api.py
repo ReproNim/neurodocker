@@ -218,13 +218,13 @@ class DockerImage(object):
     def build(self, **kwargs):
         """Return image object."""
         return client.images.build(path=self.path, fileobj=self.fileobj,
-                                   tag=self.tag, **kwargs)
+                                   tag=self.tag, rm=True, **kwargs)
 
     @require_docker
     def build_raw(self, console=True, filepath=None, **kwargs):
         """Return generator of raw console output."""
         logs = client.api.build(path=self.path, fileobj=self.fileobj,
-                                tag=self.tag, **kwargs)
+                                tag=self.tag, rm=True, **kwargs)
         # QUESTION: how do we prevent multiple threads?
         build_logger = RawOutputLogger(logs, console, filepath,
                                        name="BuildLogger")
