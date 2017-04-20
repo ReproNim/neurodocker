@@ -34,7 +34,8 @@ class TestFSL(object):
         """Install FSL on Debian with NeuroDebian Jessie."""
         specs = {'base': 'debian:jessie',
                  'software': {
-                     'fsl': {'version': '5.0.8', 'use_neurodebian': True}}}
+                     'fsl': {'version': '5.0.8', 'use_neurodebian': True,
+                             'os_codename': 'jessie'}}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))

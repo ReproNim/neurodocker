@@ -25,7 +25,7 @@ class TestSPM(object):
         container = DockerContainer(image)
         container.start(working_dir='/home')
 
-        cmd = ["/bin/sh", "-c", """echo 'fprintf("\ndesired output")' > test.m """]
+        cmd = ["/bin/sh", "-c", """echo 'fprintf("desired output")' > test.m """]
         container.exec_run(cmd)
         cmd = ["/bin/sh", "-c", "$SPMMCRCMD test.m"]
         output = container.exec_run(cmd)
