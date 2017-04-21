@@ -21,6 +21,6 @@ install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install pytest-cov
 script:
-  - travis_wait 50 pytest -v -k=\"$PYTEST_EXPRESSION\" --cov=./ neurodocker
+  - travis_wait 50 py.test -v -k=\"$PYTEST_EXPRESSION\" --cov=./ neurodocker
 after_success:
   - bash <(curl -s https://codecov.io/bash)
