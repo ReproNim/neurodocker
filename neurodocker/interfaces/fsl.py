@@ -14,14 +14,16 @@ class FSL(object):
     Parameters
     ----------
     version : str
-        Version of FSL.
+        Version of FSL. Latest version is installed if using the Python
+        installer.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     use_binaries : bool
         If true, use binaries from FSL's website (compiled on Centos 5).
         Defaults to True.
     use_installer : bool
-        If true, install with FSL's Python installer. Only works on Centos/RHEL.
+        If true, install with the latest version of FSL using FSL's Python
+        installer. Only works on CentOS/RHEL.
     use_neurodebian : bool
         If true, install FSL from NeuroDebian. Only latest version is supported
         (for now).
@@ -80,35 +82,6 @@ class FSL(object):
 
         return "\n".join((comment, cmd))
 
-    def install_5_0_8_apt(self):
-        """Return Dockerfile instructions to install FSL 5.0.8 from NeuroDebian.
-        """
-        if self.version != "5.0.8":
-            raise ValueError("Installation by NeuroDebain only supports "
-                             "version 5.0.8 supported for now.")
-        comments = ["# Add NeuroDebian repository",
-                    "# Install FSL",]
-        neuro_cmd = add_neurodebian(self.os_codename,
-                                    check_urls=self.check_urls)
-
-        cmd = ("deps='fsl-5.0-core fsl-mni152-templates fsl-atlases "
-               "fsl-5.0-eddy-nonfree octave'\n"
-               "&& {install}\n"
-               "&& {clean}".format(**manage_pkgs['apt']))
-        cmd = cmd.format(pkgs="$deps")
-        cmd = indent("RUN", cmd)
-
-        env_cmd = ("FSLDIR=/usr/share/fsl/5.0\n"
-                   "FSLOUTPUTTYPE=NIFTI_GZ\n"
-                   "FSLMULTIFILEQUIT=TRUE\n"
-                   "POSSUMDIR=/usr/share/fsl/5.0\n"
-                   "LD_LIBRARY_PATH=/usr/lib/fsl/5.0:$LD_LIBRARY_PATH\n"
-                   "FSLTCLSH=/usr/bin/tclsh\n"
-                   "FSLWISH=/usr/bin/wish\n"
-                   "PATH=/usr/lib/fsl/5.0:$PATH")
-        env_cmd = indent("ENV", env_cmd)
-
-        return "\n".join((comments[0], neuro_cmd, comments[1], cmd, env_cmd))
 
     def install_with_pyinstaller(self):
         """Return Dockerfile instructions to install FSL using FSL's Python
@@ -134,8 +107,9 @@ class FSL(object):
                "".format(url=url, **manage_pkgs['yum']))
         cmd = cmd.format(pkgs="$deps")
         cmd = indent("RUN", cmd)
+        path_cmd = "ENV PATH=/opt/fsl/bin:$PATH"
 
-        return "\n".join((workdir_cmd, env_cmd, cmd))
+        return "\n".join((workdir_cmd, env_cmd, cmd, path_cmd))
 
     def install_binaries(self):
         """Return Dockerfile instructions to install FSL using binaries hosted

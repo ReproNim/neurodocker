@@ -18,7 +18,7 @@ To install, include `'ants'` (case-insensitive) under `'software'` in the specif
 
 ### Conda
 
-To install, include `'conda-env'` in the specifications dictionary. Valid keys within `'conda-env'` are keywords for [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py#L12). The `conda-forge` channel is added by default.
+To install, include `'conda_env'` in the specifications dictionary. Valid keys within `'conda_env'` are keywords for [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py#L12). The `conda-forge` channel is added by default.
 
 ### FSL
 

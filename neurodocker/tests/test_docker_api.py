@@ -33,9 +33,10 @@ class TestDockerfile(object):
                       'software': {'ants': {'use_binaries': True, 'version': '2.1.0'}}}
 
         base = "FROM {}".format(self.specs['base'])
+        noninteractive = "ARG DEBIAN_FRONTEND=noninteractive"
         miniconda = Miniconda(pkg_manager='apt', **self.specs['conda_env']).cmd
         ants = ANTs(pkg_manager='apt', **self.specs['software']['ants']).cmd
-        self.full = "\n\n".join((base, miniconda, ants))
+        self.full = "\n\n".join((base, noninteractive, miniconda, ants))
 
     def test_init(self):
         assert Dockerfile(self.specs, 'apt').cmd == self.full, "error creating Dockerfile"
@@ -71,48 +72,3 @@ class TestRawOutputLogger(object):
 
         image = client.images.get(logger.id)
         assert isinstance(image, docker.models.images.Image), "image is not a Docker image!"
-
-
-class TestBuildCompleteDockerImage(object):
-    """Build a Docker image that includes all of the supported software.
-    """
-    @pytest.fixture(autouse=True)
-    def setup(self, tmpdir):
-        self.tmpdir = tmpdir
-
-        self.specs = {'base': 'ubuntu:16.04',
-                      'conda_env': {'python_version': '3.5.1',
-                                    'conda_install': 'traits',
-                                    'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
-                      'software': {'ants': {'use_binaries': True, 'version': '2.1.0'},
-                                   'fsl': {'use_binaries': True, 'version': '5.0.8'},
-                                   #'spm': {''}
-                                   }}
-
-    def test_create_build_and_run(self):
-        """Test building Docker image and running command within Docker
-        container.
-        """
-        tag = "test:complete"
-
-        cmd = Dockerfile(self.specs, 'apt').cmd
-        print(cmd)
-        cmd = cmd.encode('utf-8')
-        cmd = BytesIO(cmd)
-
-        # Build the image.
-        image = DockerImage(fileobj=cmd).build_raw()
-
-        container = DockerContainer(image)
-        container.start()
-        # "bash -c '$SPMMCRCMD'" should be tested, but it blocks. How do we get
-        # around that?
-        cmds = ["Atropos -h", "bet -h",]
-        outputs = []
-        for cmd in cmds:
-            output = container.exec_run(cmd=cmd)
-            outputs.append(output)
-        container.cleanup(remove=True, force=True)
-
-        outputs_str = ' '.join(outputs)
-        assert "error:" not in outputs_str, "Error in command execution."

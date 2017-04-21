@@ -5,7 +5,6 @@ __pycache__
 /dockerfile_tests
 
 *.ipynb
-*.py
 *.pyc
 *.tar
 *.tar.gz

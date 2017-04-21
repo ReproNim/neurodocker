@@ -83,6 +83,7 @@ class Dockerfile(object):
         self._cmds = []
 
         self.add_base()
+        self.add_beginning_instructions()
         if "conda_env" in self.specs.keys():
             self.add_miniconda()
         if "software" in self.specs.keys():
@@ -103,6 +104,15 @@ class Dockerfile(object):
         """Add Dockerfile FROM instruction."""
         cmd = "FROM {}".format(self.specs['base'])
         self.add_instruction(cmd)
+
+    def add_beginning_instructions(self):
+        """Add instructions at the beginning of the Dockerfile depending on the
+        base image.
+        """
+        base = self.specs['base'].split(':')[0]
+        if base in ['debian', 'ubuntu']:
+            cmd = "ARG DEBIAN_FRONTEND=noninteractive"
+            self.add_instruction(cmd)
 
     def add_miniconda(self):
         """Add Dockerfile instructions to install Miniconda."""
@@ -190,7 +200,11 @@ class RawOutputLogger(threading.Thread):
         if re.search("error", last_line, re.IGNORECASE):
             return None
         elif re.search("successfully built", last_line, re.IGNORECASE):
-            return re.search('[0-9a-f]{12}', last_line).group(0)
+            try:
+                return re.findall('[0-9a-f]{12}', last_line)[-1]
+            except IndexError:
+                raise Exception("Docker image ID could not be found but build "
+                                "error was not found.")
 
     def show_logs(self, first=None, last=None):
         """Options `first` and `last` can be integers."""
@@ -218,13 +232,13 @@ class DockerImage(object):
     def build(self, **kwargs):
         """Return image object."""
         return client.images.build(path=self.path, fileobj=self.fileobj,
-                                   tag=self.tag, **kwargs)
+                                   tag=self.tag, rm=True, **kwargs)
 
     @require_docker
     def build_raw(self, console=True, filepath=None, **kwargs):
         """Return generator of raw console output."""
         logs = client.api.build(path=self.path, fileobj=self.fileobj,
-                                tag=self.tag, **kwargs)
+                                tag=self.tag, rm=True, **kwargs)
         # QUESTION: how do we prevent multiple threads?
         build_logger = RawOutputLogger(logs, console, filepath,
                                        name="BuildLogger")
