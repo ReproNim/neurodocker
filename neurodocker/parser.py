@@ -51,7 +51,10 @@ class SpecsParser(object):
         for key, val in self.specs['conda_env'].items():
             if key == "python_version":
                 continue
-            self.specs['conda_env'][key] = ' '.join(val)
+            if isinstance(val, (list, tuple)):
+                self.specs['conda_env'][key] = ' '.join(val)
+            if isinstance(val, str):
+                self.specs['conda_env'][key] = val
 
     def _validate_software(self):
         """Parse software version by splitting at '='."""
