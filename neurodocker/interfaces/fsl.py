@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function
 import logging
 
-from neurodocker.utils import add_neurodebian, check_url, indent, manage_pkgs
+from neurodocker.utils import add_neurodebian, check_url, indent
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,8 @@ class FSL(object):
 
     def _check_args(self):
         """Raise `ValueError` if combinations of arguments are invalid."""
+        if self.use_neurodebian:
+            raise ValueError("Installation from NeuroDebian unavailable.")
         if self.use_binaries + self.use_installer + self.use_neurodebian > 1:
             raise ValueError("More than one installation method specified.")
         if self.use_installer and self.pkg_manager != 'yum':
@@ -82,7 +84,6 @@ class FSL(object):
 
         return "\n".join((comment, cmd))
 
-
     def install_with_pyinstaller(self):
         """Return Dockerfile instructions to install FSL using FSL's Python
         installer. This will install the latest version and only works on
@@ -91,21 +92,16 @@ class FSL(object):
         # TODO: installer script can take a tarball. Try installing previous
         # version using that method.
         workdir_cmd = "WORKDIR /opt"
-        env_cmd = "ENV SHELL='bash'"
+        env_cmd = "ENV SHELL=bash"
 
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
         if self.check_urls:
             check_url(url)
-        cmd = ("deps='bzip2 wget'\n"
-               "&& {install}\n"
-               "&& wget -q {url}\n"
+        cmd = ("curl -sSL -o fslinstaller.py {url}\n"
                "&& python fslinstaller.py --dest=/opt --quiet\n"
                "&& cp /opt/fsl/etc/fslconf/fsl.sh /etc/profile.d/\n"
-               "&& rm -f fslinstaller.py\n"
-               "&& {remove}\n"
-               "&& {clean}\n"
-               "".format(url=url, **manage_pkgs['yum']))
-        cmd = cmd.format(pkgs="$deps")
+               "&& rm -f fslinstaller.py"
+               "".format(url=url))
         cmd = indent("RUN", cmd)
         path_cmd = "ENV PATH=/opt/fsl/bin:$PATH"
 
@@ -126,19 +122,12 @@ class FSL(object):
         if self.check_urls:
             check_url(url)
 
-        cmd = ("deps='ca-certificates bzip2 wget'\n"
-               "&& {install}\n"
-               "&& wget -qO- {url} | tar xvz\n"
-               # "&& rm -f {tarball}\n"
-               "&& cp fsl/etc/fslconf/fsl.sh /etc/profile.d/\n"
-               "&& {remove}\n"
-               "&& {clean}"
-               "".format(url=url, tarball=tarball,
-                         **manage_pkgs[self.pkg_manager]))
-        cmd = cmd.format(pkgs="$deps")
+        cmd = ("curl -sSL {url} | tar zx\n"
+               "&& cp fsl/etc/fslconf/fsl.sh /etc/profile.d/"
+               "".format(url=url))
         cmd = indent("RUN", cmd)
-        fsl_env_cmd = ("ENV FSLDIR=/opt/fsl\n"
-                       "ENV PATH=$FSLDIR/bin:$PATH")
-
+        fsl_env_cmd = ("FSLDIR=/opt/fsl\n"
+                       "PATH=/opt/fsl/bin:$PATH")
+        fsl_env_cmd = indent("ENV", fsl_env_cmd)
 
         return "\n".join((workdir_cmd, env_cmd, cmd, fsl_env_cmd))

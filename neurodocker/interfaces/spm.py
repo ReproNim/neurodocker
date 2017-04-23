@@ -74,19 +74,16 @@ class SPM(object):
             check_url(mcr_url)
 
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("deps='ca-certificates unzip wget'\n"
-               '&& {install}\n'
-               '&& echo "destinationFolder=/opt/mcr" > mcr_options.txt\n'
+        cmd = ('echo "destinationFolder=/opt/mcr" > mcr_options.txt\n'
                '&& echo "agreeToLicense=yes" >> mcr_options.txt\n'
                '&& echo "outputFile=/tmp/matlabinstall_log" >> mcr_options.txt\n'
                '&& echo "mode=silent" >> mcr_options.txt\n'
                '&& mkdir -p matlab_installer\n'
-               '&& wget -qO matlab_installer/installer.zip {mcr_url}\n'
+               '&& curl -sSL -o matlab_installer/installer.zip {mcr_url}\n'
                '&& unzip matlab_installer/installer.zip -d matlab_installer/\n'
                '&& matlab_installer/install -inputFile /opt/mcr_options.txt\n'
                '&& rm -rf matlab_installer mcr_options.txt\n'
-               ''.format(mcr_url=mcr_url, **manage_pkgs[self.pkg_manager]))
-        cmd = cmd.format(pkgs="$deps")
+               ''.format(mcr_url=mcr_url))
         cmd = indent("RUN", cmd)
         return '\n'.join((comment, workdir_cmd, cmd))
 
@@ -100,14 +97,10 @@ class SPM(object):
             check_url(spm_url)
 
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("deps='ca-certificates unzip wget'\n"
-               '&& wget -qO spm{ver}.zip {spm_url}\n'
+        cmd = ('curl -sSL -o spm{ver}.zip {spm_url}\n'
                '&& unzip spm{ver}.zip\n'
                '&& rm -rf spm{ver}.zip /tmp/*\n'
-               '&& {remove}'
-               ''.format(spm_url=spm_url, ver=self.version,
-                         **manage_pkgs[self.pkg_manager]))
-        cmd = cmd.format(pkgs="$deps")
+               ''.format(spm_url=spm_url, ver=self.version))
         cmd = indent("RUN", cmd)
 
         # TODO: older versions of MCR might not have the same directory

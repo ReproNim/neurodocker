@@ -48,23 +48,21 @@ def test_indent():
 
 def test_add_neurodebian():
     os = "xenial"
-    full = ("RUN deps='dirmngr wget' \\\n"
-            "    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \\\n"
-            "    && wget -O- http://neuro.debian.net/lists/xenial.us-nh.full >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
+    full = ("RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \\\n"
+            "    && apt-get clean \\\n"
+            "    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \\\n"
+            "    && curl -sSL http://neuro.debian.net/lists/xenial.us-nh.full >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
             "    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \\\n"
-            "    && apt-get update \\\n"
-            "    && apt-get purge -y --auto-remove $deps \\\n"
-            "    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+            "    && apt-get update")
     assert add_neurodebian(os, full=True), "error adding full neurodebian on xenial"
 
     os = "fakeos"
-    libre = ("RUN deps='dirmngr wget' \\\n"
-             "    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \\\n"
-             "    && wget -O- http://neuro.debian.net/lists/fakeos.us-nh.libre >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
+    libre = ("RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \\\n"
+             "    && apt-get clean \\\n"
+             "    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \\\n"
+             "    && curl -sSL http://neuro.debian.net/lists/fakeos.us-nh.libre >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
              "    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \\\n"
-             "    && apt-get update \\\n"
-             "    && apt-get purge -y --auto-remove $deps \\\n"
-             "    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+             "    && apt-get update")
     with pytest.warns(UserWarning):
         add_neurodebian(os, full=False)
     assert add_neurodebian(os, full=False) == libre, "error adding libre neurodebian on fakeos"

@@ -12,16 +12,9 @@ https://github.com/stnava/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS
 from __future__ import absolute_import, division, print_function
 import logging
 
-from neurodocker.utils import indent
+from neurodocker.utils import indent, manage_pkgs
 
 logger = logging.getLogger(__name__)
-
-manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
-                                   '--no-install-recommends {pkgs}'),
-                       'remove': 'apt-get purge -y --auto-remove {pkgs}'},
-               'yum': {'install': 'yum install -y -q {pkgs}',
-                       # Trying to uninstall ca-certificates breaks things.
-                       'remove': 'yum remove -y -q $(echo "{pkgs}" | sed "s/ca-certificates//g")'},}
 
 
 class ANTs(object):
@@ -85,25 +78,20 @@ class ANTs(object):
             raise ValueError("No tarball for version {}".format(self.version))
 
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("deps='ca-certificates wget'\n"
-               "&& {install}\n"
-               "&& wget -qO ants.tar.gz {url}\n"
-               "&& tar xzf ants.tar.gz\n"
-               "&& rm -f ants.tar.gz\n"
-               "&& {remove}"
-               "".format(url=url, **manage_pkgs[self.pkg_manager]))
-        cmd = cmd.format(pkgs="$deps")
+        cmd = ("URL={url}\n"
+               "&& curl -sSL $URL | tar zx\n".format(url=url))
         cmd = indent("RUN", cmd)
         # Requires two ENV instructions because the second uses one defined in
         # the first.
-        env_cmd = ("ENV ANTSPATH=/opt/ants\n"
-                    "ENV PATH=$ANTSPATH:$PATH")
+        env_cmd = ("ANTSPATH=/opt/ants\n"
+                   "PATH=/opt/ants:$PATH")
+        env_cmd = indent("ENV", env_cmd)
         return "\n".join((workdir_cmd, cmd, env_cmd))
 
     def build_from_source_github(self):
         """Return Dockerfile instructions to build ANTs from source."""
-        pkgs = {'apt': 'ca-certificates cmake g++ gcc git make zlib1g-dev',
-                'yum': 'ca-certificates cmake gcc-c++ git make zlib-devel'}
+        pkgs = {'apt': 'cmake g++ gcc git make zlib1g-dev',
+                'yum': 'cmake gcc-c++ git make zlib-devel'}
 
         if self.version == "latest":
             checkout = ""
@@ -114,6 +102,7 @@ class ANTs(object):
         workdir_cmd = "WORKDIR /tmp/ants-build"
         cmd = ("deps='{pkgs}'\n"
                "&& {install}\n"
+               "&& {clean}\n"
                "&& git clone https://github.com/stnava/ANTs.git\n"
                "&& cd ANTs\n"
                "{checkout}"

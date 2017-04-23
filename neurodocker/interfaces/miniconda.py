@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import os
 
-from neurodocker.utils import check_url, indent, manage_pkgs
+from neurodocker.utils import check_url, indent
 
 logger = logging.getLogger(__name__)
 
@@ -61,16 +61,10 @@ class Miniconda(object):
             check_url(install_url)
 
         workdir_cmd = "WORKDIR /opt"
-        miniconda_cmd = ("deps='bzip2 ca-certificates wget'\n"
-                         "&& {install}\n"
-                         "&& wget -qO miniconda.sh {url}\n"
+        miniconda_cmd = ("curl -ssL -o miniconda.sh {url}\n"
                          "&& bash miniconda.sh -b -p /opt/miniconda\n"
-                         "&& rm -f miniconda.sh\n"
-                         #"&& {remove}\n"
-                         "&& {clean}"
-                         "".format(url=install_url,
-                            **manage_pkgs[self.pkg_manager]))
-        miniconda_cmd = miniconda_cmd.format(pkgs="$deps")
+                         "&& rm -f miniconda.sh"
+                         "".format(url=install_url))
         miniconda_cmd = indent("RUN", miniconda_cmd)
         # env_cmd = "ENV PATH=/opt/miniconda/bin:$PATH"
         return "\n".join((workdir_cmd, miniconda_cmd))
@@ -91,7 +85,8 @@ class Miniconda(object):
         if pip_install is not None:
             if isinstance(pip_install, (list, tuple)):
                 pip_install = " ".join(pip_install)
-            return ("pip install -q --no-cache-dir {}"
+            return ("pip install --upgrade -q --no-cache-dir pip\n"
+                    "&& pip install -q --no-cache-dir {}"
                     "".format(pip_install))
         else:
             return ""

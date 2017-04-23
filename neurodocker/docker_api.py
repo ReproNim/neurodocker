@@ -11,7 +11,7 @@ import requests
 
 from neurodocker import SUPPORTED_NI_SOFTWARE
 from neurodocker.interfaces import Miniconda
-from neurodocker.utils import logger
+from neurodocker.utils import indent, manage_pkgs
 
 
 def docker_is_running(client):
@@ -80,16 +80,7 @@ class Dockerfile(object):
         self.specs = specs
         self.pkg_manager = pkg_manager
         self.check_urls = check_urls
-        self._cmds = []
-
-        self.add_base()
-        self.add_beginning_instructions()
-        if "conda_env" in self.specs.keys():
-            self.add_miniconda()
-        if "software" in self.specs.keys():
-            self.add_ni_software()
-
-        self.cmd = "\n\n".join(self._cmds)
+        self.cmd = self._create_cmd()
 
     def __repr__(self):
         return "{self.__class__.__name__}({self.cmd})".format(self=self)
@@ -97,39 +88,62 @@ class Dockerfile(object):
     def __str__(self):
         return self.cmd
 
-    def add_instruction(self, instruction):
-        self._cmds.append(instruction)
+    def _create_cmd(self):
+        cmds = [self.add_base()]
+        noninteractive = self.add_debian_noninteractive()
+        if noninteractive is not None:
+            cmds.append(noninteractive)
+        cmds.append(self.add_common_dependencies())
+        if "conda_env" in self.specs.keys():
+            cmds.append(self.add_miniconda())
+        if "software" in self.specs.keys():
+            cmds.append(self.add_ni_software())
+        return "\n\n".join(cmds)
 
     def add_base(self):
         """Add Dockerfile FROM instruction."""
-        cmd = "FROM {}".format(self.specs['base'])
-        self.add_instruction(cmd)
+        return "FROM {}".format(self.specs['base'])
 
-    def add_beginning_instructions(self):
+    def add_debian_noninteractive(self):
         """Add instructions at the beginning of the Dockerfile depending on the
         base image.
         """
         base = self.specs['base'].split(':')[0]
         if base in ['debian', 'ubuntu']:
-            cmd = "ARG DEBIAN_FRONTEND=noninteractive"
-            self.add_instruction(cmd)
+            return "ARG DEBIAN_FRONTEND=noninteractive"
+        return None
+
+    def add_common_dependencies(self):
+        """Add Dockerfile instructions to download dependencies common to many
+        software packages.
+        """
+        deps = "bzip2 ca-certificates curl unzip"
+        comment = ("#----------------------------\n"
+                   "# Install common dependencies\n"
+                   "#----------------------------")
+        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
+        cmd = cmd.format(pkgs=deps)
+        cmd = indent("RUN", cmd)
+        return "\n".join((comment, cmd))
 
     def add_miniconda(self):
         """Add Dockerfile instructions to install Miniconda."""
         kwargs = self.specs['conda_env']
         obj = Miniconda(pkg_manager=self.pkg_manager,
                         check_urls=self.check_urls, **kwargs)
-        self.add_instruction(obj.cmd)
+        return obj.cmd
 
 
     def add_ni_software(self):
         """Add Dockerfile instructions to install neuroimaging software."""
         software = self.specs['software']
+        cmds = []
         for pkg, kwargs in software.items():
             obj = SUPPORTED_NI_SOFTWARE[pkg](pkg_manager=self.pkg_manager,
                                              check_urls=self.check_urls,
                                              **kwargs)
-            self.add_instruction(obj.cmd)
+            cmds.append(obj.cmd)
+        return "\n\n".join(cmds)
 
     def save(self, filepath="Dockerfile", **kwargs):
         """Save `self.cmd` to `filepath`. `kwargs` are for `open()`."""

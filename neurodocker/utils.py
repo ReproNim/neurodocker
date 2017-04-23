@@ -13,12 +13,12 @@ import requests
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                    '--no-install-recommends {pkgs}'),
                        'remove': 'apt-get purge -y --auto-remove {pkgs}',
-                       'clean': ('apt-get clean '
+                       'clean': ('apt-get clean\n'
                                 '&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*'),},
                'yum': {'install': 'yum install -y -q {pkgs}',
                        # Trying to uninstall ca-certificates breaks things.
                        'remove': 'yum remove -y $(echo "{pkgs}" | sed "s/ca-certificates//g")',
-                       'clean': ('yum clean packages '
+                       'clean': ('yum clean packages\n'
                                  '&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*'),},
                 }
 
@@ -153,14 +153,14 @@ def add_neurodebian(os_codename, full=True, check_urls=True):
     if check_urls:
         check_url(neurodebian_url)
 
-    cmd = ("deps='dirmngr wget'\n"
-           "&& {install}\n"
-           "&& wget -O- {url} >> "
+    deps = "dirmngr"
+    cmd = ("{install}\n"
+           "&& {clean}\n"
+           "&& curl -sSL {url} >> "
            "/etc/apt/sources.list.d/neurodebian.sources.list\n"
            "&& apt-key adv --recv-keys --keyserver "
            "hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9\n"
-           "&& apt-get update\n"
-           "&& {remove}\n"
-           "&& {clean}".format(url=neurodebian_url, **manage_pkgs['apt']))
-    cmd = cmd.format(pkgs="$deps")
+           "&& apt-get update"
+           "".format(url=neurodebian_url, **manage_pkgs['apt']))
+    cmd = cmd.format(pkgs=deps)
     return indent("RUN", cmd)
