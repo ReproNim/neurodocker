@@ -74,7 +74,7 @@ class SPM(object):
             check_url(mcr_url)
 
         workdir_cmd = "WORKDIR /opt"
-        cmd = ('&& echo "destinationFolder=/opt/mcr" > mcr_options.txt\n'
+        cmd = ('echo "destinationFolder=/opt/mcr" > mcr_options.txt\n'
                '&& echo "agreeToLicense=yes" >> mcr_options.txt\n'
                '&& echo "outputFile=/tmp/matlabinstall_log" >> mcr_options.txt\n'
                '&& echo "mode=silent" >> mcr_options.txt\n'
