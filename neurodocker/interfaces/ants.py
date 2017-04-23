@@ -79,7 +79,7 @@ class ANTs(object):
 
         workdir_cmd = "WORKDIR /opt"
         cmd = ("URL={url}\n"
-               "curl -sSL $URL | tar zx\n".format(url=url))
+               "&& curl -sSL $URL | tar zx\n".format(url=url))
         cmd = indent("RUN", cmd)
         # Requires two ENV instructions because the second uses one defined in
         # the first.
