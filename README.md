@@ -93,8 +93,8 @@ RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-lat
 RUN /opt/miniconda/bin/conda config --add channels conda-forge \
     && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 traits
 ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN pip install --upgrade -q --no-cache-dir pip
-&& pip install -q --no-cache-dir https://github.com/nipy/nipype/archive/master.tar.gz \
+RUN pip install --upgrade -q --no-cache-dir pip \
+    && pip install -q --no-cache-dir https://github.com/nipy/nipype/archive/master.tar.gz \
     && conda clean -y --all \
     && cd /opt/miniconda \
     && rm -rf bin conda-meta include lib pkgs share ssl
