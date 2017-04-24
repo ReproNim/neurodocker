@@ -92,19 +92,19 @@ class Miniconda(object):
             return ""
 
     def setup_environment(self):
-        cmds = [self._create_conda_env(self.python_version, self.conda_install),
-                self._install_pip_pkgs(self.pip_install)]
         conda_cmd = ("/opt/miniconda/bin/conda config --add channels conda-forge"
-                     "\n&& {0}")
+                     "\n&& {}"
+                     "".format(self._create_conda_env(self.python_version,
+                                                      self.conda_install)))
         conda_cmd = indent("RUN", conda_cmd)
 
         env_cmd = "ENV PATH=/opt/miniconda/envs/default/bin:$PATH"
 
-        pip_and_clean = ("{1}"
+        pip_and_clean = ("{}"
                          "\n&& conda clean -y --all"
                          "\n&& cd /opt/miniconda"
-                         "\n&& rm -rf bin conda-meta include lib pkgs share ssl")
+                         "\n&& rm -rf bin conda-meta include lib pkgs share ssl"
+                         "".format(self._install_pip_pkgs(self.pip_install)))
         pip_and_clean = indent("RUN", pip_and_clean)
 
-        cmd = "\n".join((conda_cmd, env_cmd, pip_and_clean))
-        return cmd.format(*cmds)
+        return "\n".join((conda_cmd, env_cmd, pip_and_clean))
