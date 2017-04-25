@@ -1,10 +1,8 @@
 """Classes to interact with the Docker Engine (using the docker-py package)."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
-import os
 import posixpath
 import threading
-import warnings
 
 import docker
 import requests
@@ -239,6 +237,13 @@ class DockerImage(object):
         self.fileobj = fileobj
         self.tag = tag
 
+        # If fileobj is a string, convert to bytes.
+        try:
+            from io import BytesIO
+            self.fileobj = BytesIO(self.fileobj.encode('utf-8'))
+        except (AttributeError, TypeError):
+            pass
+
         if self.path is None and self.fileobj is None:
             raise ValueError("`path` or `fileobj` must be specified.")
 
@@ -286,6 +291,7 @@ class DockerContainer(object):
         self.container = client.containers.run(self.image, command=None,
                                                detach=True, tty=True,
                                                stdin_open=True, **kwargs)
+        return self
 
     @require_docker
     def exec_run(self, cmd, **kwargs):
@@ -334,7 +340,7 @@ class DockerContainer(object):
             raise ValueError("`path_in_container` must be absolute.")
 
         archive = self.container.get_archive(path_in_container)
-        response, stat = archive
+        response, _ = archive
 
         with open(filepath, 'wb') as fp:
             fp.write(response.data)
