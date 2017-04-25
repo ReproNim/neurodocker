@@ -15,8 +15,8 @@ class TestFSL(object):
     def test_build_image_fsl_latest_pyinstaller_centos7(self):
         """Install latest FSL with FSL's Python installer on CentOS 7."""
         specs = {'base': 'centos:7',
-                 'software': {
-                     'fsl': {'version': 'latest', 'use_installer': True}}}
+                 'pkg_manager': 'yum',
+                 'fsl': {'version': 'latest', 'use_installer': True}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))
@@ -33,8 +33,8 @@ class TestFSL(object):
     def test_build_image_fsl_508_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
         specs = {'base': 'ubuntu:xenial',
-                 'software': {
-                     'fsl': {'version': '5.0.8', 'use_binaries': True}}}
+                 'pkg_manager': 'apt',
+                 'fsl': {'version': '5.0.8', 'use_binaries': True}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))

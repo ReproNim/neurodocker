@@ -15,8 +15,8 @@ class TestANTs(object):
     def test_build_image_ants_210_binaries_centos7(self):
         """Install ANTs 2.1.0 binaries on CentOS 7."""
         specs = {'base': 'centos:7',
-                 'software': {
-                     'ants': {'version': '2.1.0', 'use_binaries': True}}}
+                 'pkg_manager': 'yum'
+                 'ants': {'version': '2.1.0', 'use_binaries': True}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))
@@ -25,7 +25,7 @@ class TestANTs(object):
         container = DockerContainer(image)
         container.start()
         output = container.exec_run('Atropos')
-        assert "error" not in output, "error running bet"
+        assert "error" not in output, "error running Atropos"
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
