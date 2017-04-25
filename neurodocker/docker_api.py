@@ -241,7 +241,7 @@ class DockerImage(object):
         try:
             from io import BytesIO
             self.fileobj = BytesIO(self.fileobj.encode('utf-8'))
-        except TypeError:
+        except (AttributeError, TypeError):
             pass
 
         if self.path is None and self.fileobj is None:
