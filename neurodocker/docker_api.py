@@ -7,7 +7,7 @@ import threading
 import docker
 import requests
 
-from neurodocker import SUPPORTED_NI_SOFTWARE
+from neurodocker import SUPPORTED_SOFTWARE
 from neurodocker.interfaces import Miniconda
 from neurodocker.utils import indent, manage_pkgs
 
@@ -68,16 +68,20 @@ class Dockerfile(object):
     specs : dict
         Dictionary with keys 'base', etc.
     pkg_manager : {'apt', 'yum'}
-        Linux package manager.
+        Linux package manager. If None, uses the value of `specs['pkg_manager']`.
     check_urls : bool
         If true, throw warning if a URL used by this class responds with a
         status code greater than 400.
     """
 
-    def __init__(self, specs, pkg_manager, check_urls=True):
+    def __init__(self, specs, pkg_manager=None, check_urls=True):
         self.specs = specs
         self.pkg_manager = pkg_manager
         self.check_urls = check_urls
+
+        if self.pkg_manager is None:
+            self.pkg_manager = self.specs['pkg_manager']
+
         self.cmd = self._create_cmd()
 
     def __repr__(self):
@@ -92,10 +96,11 @@ class Dockerfile(object):
         if noninteractive is not None:
             cmds.append(noninteractive)
         cmds.append(self.add_common_dependencies())
-        if "conda_env" in self.specs.keys():
+        # Separate Miniconda from the other software here to ensure that
+        # Miniconda is always installed before the other software.
+        if "miniconda" in self.specs.keys():
             cmds.append(self.add_miniconda())
-        if "software" in self.specs.keys():
-            cmds.append(self.add_ni_software())
+        cmds.append(self.add_software())
         return "\n\n".join(cmds)
 
     def add_base(self):
@@ -126,21 +131,24 @@ class Dockerfile(object):
 
     def add_miniconda(self):
         """Add Dockerfile instructions to install Miniconda."""
-        kwargs = self.specs['conda_env']
+        kwargs = self.specs['miniconda']
         obj = Miniconda(pkg_manager=self.pkg_manager,
                         check_urls=self.check_urls, **kwargs)
         return obj.cmd
 
-
-    def add_ni_software(self):
+    def add_software(self):
         """Add Dockerfile instructions to install neuroimaging software."""
-        software = self.specs['software']
         cmds = []
-        for pkg, kwargs in software.items():
-            obj = SUPPORTED_NI_SOFTWARE[pkg](pkg_manager=self.pkg_manager,
-                                             check_urls=self.check_urls,
-                                             **kwargs)
-            cmds.append(obj.cmd)
+        for pkg, kwargs in self.specs.items():
+            if pkg == 'miniconda':
+                continue
+            try:
+                obj = SUPPORTED_SOFTWARE[pkg](pkg_manager=self.pkg_manager,
+                                              check_urls=self.check_urls,
+                                              **kwargs)
+                cmds.append(obj.cmd)
+            except KeyError:
+                pass
         return "\n\n".join(cmds)
 
     def save(self, filepath="Dockerfile", **kwargs):

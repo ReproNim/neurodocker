@@ -2,7 +2,7 @@
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
 
-from neurodocker import SUPPORTED_NI_SOFTWARE
+from neurodocker import SUPPORTED_SOFTWARE
 from neurodocker.utils import load_json
 
 
@@ -12,12 +12,12 @@ class SpecsParser(object):
     Parameters
     ----------
     filepath : str
-        Path to JSON file.
+        Path to JSON file containing environment specifications.
     specs : dict
-        Dictionary of specs.
+        Dictionary of environment specifications.
     """
-    # Update these as necessary.
-    VALID_TOP_LEVEL_KEYS = ['base', 'conda_env', 'software']
+    VALID_TOP_LEVEL_KEYS = ['base', 'pkg_manager']
+    VALID_TOP_LEVEL_KEYS.extend(SUPPORTED_SOFTWARE.keys())
 
     def __init__(self, filepath=None, specs=None):
         if filepath is not None and specs is not None:
@@ -27,46 +27,39 @@ class SpecsParser(object):
         elif specs is not None:
             self.specs = specs
 
-        if 'base' not in self.specs.keys():
-            raise ValueError("A base image must be specified in 'base' key.")
-        self._validate_keys()
-        if 'conda_env' in self.specs.keys():
-            self._parse_conda()
-        if 'software' in self.specs.keys():
-            self._validate_software()
+        self.parse()
 
     def __str__(self):
         return str(self.specs)
 
-    def _validate_keys(self):
-        """Raise KeyError if unexpected top-level key."""
-        unexpected = set(self.specs) - set(self.VALID_TOP_LEVEL_KEYS)
-        if unexpected:
-            items = ", ".join(unexpected)
-            raise KeyError("Unexpected top-level key(s) in input: {}"
-                           "".format(items))
+    def parse(self):
+        self._validate_keys()
+        try:
+            self._parse_conda_pip()
+        except KeyError:
+            pass
 
-    def _parse_conda(self):
+    def _validate_keys(self):
+        """Raise KeyError if invalid top-level key(s)."""
+        if 'base' not in self.specs.keys():
+            raise KeyError("A base image must be specified in the key 'base'.")
+        if 'pkg_manager' not in self.specs.keys():
+            raise KeyError("The Linux package manager must be specified in the "
+                           "key 'pkg_manager'.")
+        invalid = set(self.specs) - set(self.VALID_TOP_LEVEL_KEYS)
+        if invalid:
+            invalid = ", ".join(invalid)
+            valid = ", ".join(self.VALID_TOP_LEVEL_KEYS)
+            raise KeyError("Unexpected top-level key(s) in input: {0}. Valid "
+                           "keys are {1}."
+                           "".format(invalid, valid))
+
+    def _parse_conda_pip(self):
         """Parse packages to install with `conda` and/or `pip`."""
-        for key, val in self.specs['conda_env'].items():
+        for key, val in self.specs['miniconda'].items():
             if key == "python_version":
                 continue
             if isinstance(val, (list, tuple)):
-                self.specs['conda_env'][key] = ' '.join(val)
+                self.specs['miniconda'][key] = ' '.join(val)
             if isinstance(val, str):
-                self.specs['conda_env'][key] = val
-
-    def _validate_software(self):
-        """Parse software version by splitting at '='."""
-        software = self.specs['software']
-        for pkg, info in software.items():
-            if pkg.lower() != pkg:
-                software[pkg.lower()] = software.pop(pkg)
-            pkg = pkg.lower()
-            if pkg not in SUPPORTED_NI_SOFTWARE.keys():
-               raise ValueError("The package {} is not supported".format(pkg))
-            try:
-                if not info['version']:
-                    raise ValueError
-            except ValueError:
-                raise ValueError("Version must be specified for {}".format(pkg))
+                self.specs['miniconda'][key] = val
