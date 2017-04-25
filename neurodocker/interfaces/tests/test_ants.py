@@ -15,7 +15,7 @@ class TestANTs(object):
     def test_build_image_ants_210_binaries_centos7(self):
         """Install ANTs 2.1.0 binaries on CentOS 7."""
         specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum'
+                 'pkg_manager': 'yum',
                  'ants': {'version': '2.1.0', 'use_binaries': True}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
