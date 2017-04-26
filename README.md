@@ -33,7 +33,7 @@ To install, include `'spm'` (case-insensitive) under `'software'` in the specifi
 ## Example
 
 
-In the following example, a dictionary of specifications is used to generate a Dockerfile. The resulting Docker image contains Python 3.5.1, Nipype, and ANTs 2.1.0.
+In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container can be started from that container, and commands can be run within the running container. When finished, the container is stopped and removed.
 
 
 ```python
@@ -42,16 +42,14 @@ from neurodocker import (DockerContainer, Dockerfile, DockerImage,
 # Specify the environment.
 specs = {
     'base': 'ubuntu:16.04',
-    'conda_env': {
+    'pkg_manager': 'apt',
+    'miniconda': {
         'python_version': '3.5.1',
-        'conda_install': ['traits'],
-        'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']
-    },
-    'software': {
-        'ants': {'version': '2.1.0', 'use_binaries': True},
-        'fsl': {'version': '5.0.8', 'use_binaries': True},
-        'spm': {'version': '12', 'matlab_version': 'R2017a'}
-    }
+        'conda_install': 'traits',
+        'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
+    'ants': {'version': '2.1.0', 'use_binaries': True},
+    'fsl': {'version': '5.0.8', 'use_binaries': True},
+    'spm': {'version': '12', 'matlab_version': 'R2017a'},
 }
 # Generate the Dockerfile.
 parser = SpecsParser(specs=specs)
@@ -69,7 +67,7 @@ container.exec_run('ANTS')
 container.cleanup(remove=True, force=True)
 ```
 
-Here is the content of the Dockerfile in the example above:
+The example above creates this Dockerfile:
 
 ```dockerfile
 FROM ubuntu:16.04

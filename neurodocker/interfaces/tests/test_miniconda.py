@@ -16,10 +16,11 @@ class TestMiniconda(object):
         script on Ubuntu Xenial.
         """
         specs = {'base': 'ubuntu:xenial',
-                 'conda_env': {
+                 'pkg_manager': 'apt',
+                 'miniconda': {
                     'python_version': '3.5.1',
-                    'conda_install': ['traits'],
-                    'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}
+                    'conda_install': 'traits',
+                    'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))
@@ -40,7 +41,8 @@ class TestMiniconda(object):
         script on CentOS 7.
         """
         specs = {'base': 'centos:7',
-                 'conda_env': {
+                 'pkg_manager': 'yum',
+                 'miniconda': {
                     'python_version': '3.5.1',
                     'conda_install': ['traits'],
                     'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}

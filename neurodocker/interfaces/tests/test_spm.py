@@ -15,8 +15,8 @@ class TestSPM(object):
     def test_build_image_spm_12_standalone_centos7(self):
         """Install standalone SPM12 and MATLAB MCR R2017a on CentOS 7."""
         specs = {'base': 'centos:7',
-                 'software': {
-                     'spm': {'version': '12', 'matlab_version': 'R2017a'}}}
+                 'pkg_manager': 'yum',
+                 'spm': {'version': '12', 'matlab_version': 'R2017a'}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))

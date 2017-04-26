@@ -27,15 +27,16 @@ class TestDockerfile(object):
     def setup(self, tmpdir):
         self.tmpdir = tmpdir
         self.specs = {'base': 'ubuntu:16.04',
-                      'conda_env': {'python_version': '3.5.1',
+                      'pkg_manager': 'apt',
+                      'miniconda': {'python_version': '3.5.1',
                                     'conda_install': 'numpy',
                                     'pip_install': 'pandas'},
-                      'software': {'ants': {'use_binaries': True, 'version': '2.1.0'}}}
+                      'ants': {'use_binaries': True, 'version': '2.1.0'}}
 
         self.base = "FROM {}".format(self.specs['base'])
         self.noninteractive = "ARG DEBIAN_FRONTEND=noninteractive"
-        self.miniconda = Miniconda(pkg_manager='apt', **self.specs['conda_env']).cmd
-        self.ants = ANTs(pkg_manager='apt', **self.specs['software']['ants']).cmd
+        self.miniconda = Miniconda(pkg_manager='apt', **self.specs['miniconda']).cmd
+        self.ants = ANTs(pkg_manager='apt', **self.specs['ants']).cmd
 
     def test_init(self):
         cmd = Dockerfile(self.specs, 'apt').cmd
