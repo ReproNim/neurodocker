@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import pytest
+from requests.exceptions import RequestException
 
 from neurodocker.utils import add_neurodebian, check_url, indent, manage_pkgs
 
@@ -26,8 +27,9 @@ def test_check_url():
             'timeout': 'http://10.255.255.255'}
 
     assert check_url(urls['good']), "Bad response from google.com"
-    assert not check_url(urls['404']), "404 url returned status < 400"
-    assert not check_url(urls['timeout']), "timeout url returned status < 400"
+    with pytest.raises(RequestException):
+        assert not check_url(urls['404']), "404 url returned status < 400"
+        assert not check_url(urls['timeout']), "timeout url returned status < 400"
 
 
 def test_indent():
@@ -63,6 +65,6 @@ def test_add_neurodebian():
              "    && curl -sSL http://neuro.debian.net/lists/fakeos.us-nh.libre >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
              "    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \\\n"
              "    && apt-get update")
-    with pytest.warns(UserWarning):
+    with pytest.raises(RequestException):
         add_neurodebian(os, full=False)
-    assert add_neurodebian(os, full=False) == libre, "error adding libre neurodebian on fakeos"
+        assert add_neurodebian(os, full=False) == libre, "error adding libre neurodebian on fakeos"

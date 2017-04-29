@@ -71,8 +71,8 @@ def save_json(obj, filepath, indent=4, **kwargs):
 
 
 def check_url(url, timeout=5, **kwargs):
-    """Return true if `url` is returns a status code < 400. Otherwise, log
-    warning and return false. `kwargs` are arguments for `requests.get()`.
+    """Return true if `url` is returns a status code < 400. Otherwise, raise an
+    error. `kwargs` are arguments for `requests.head()`.
 
     Parameters
     ----------
@@ -81,18 +81,10 @@ def check_url(url, timeout=5, **kwargs):
     timeout : numeric
         Number of seconds to wait for response from server.
     """
-    try:
-        request = requests.head(url, timeout=timeout, **kwargs)
-    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
-        warnings.warn("Connection timed out. Is the website down? ({})"
-                      "".format(url))
-        return False
-    if request.status_code < 400:
-        return True
-    else:
-        warnings.warn("URL ({}) returned status code {}."
-                      "".format(url, request.status_code))
-        return False
+    request = requests.head(url, timeout=timeout, **kwargs)
+    request.raise_for_status()
+    return True
+
 
 
 def indent(instruction, cmd, line_suffix=' \\'):
