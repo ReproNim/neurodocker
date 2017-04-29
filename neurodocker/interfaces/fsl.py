@@ -78,19 +78,15 @@ class FSL(object):
             cmd = self.install_binaries(url)
         elif self.use_installer:
             cmd = self.install_with_pyinstaller(self.check_urls)
-        elif self.use_neurodebian:
-            cmd = self.install_5_0_8_apt()
         return "\n".join((comment, cmd))
 
     @staticmethod
-    def install_with_pyinstaller(check_urls):
+    def install_with_pyinstaller(check_urls=False):
         """Return Dockerfile instructions to install FSL using FSL's Python
         installer. This will install the latest version and only works on
         Centos/RHEL.
         """
         workdir_cmd = "WORKDIR /opt"
-        env_cmd = "ENV SHELL=bash"
-
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
         if check_urls:
             check_url(url)
@@ -100,9 +96,12 @@ class FSL(object):
                "&& rm -f fslinstaller.py"
                "".format(url=url))
         cmd = indent("RUN", cmd)
-        path_cmd = "ENV PATH=/opt/fsl/bin:$PATH"
 
-        return "\n".join((workdir_cmd, env_cmd, cmd, path_cmd))
+        path_cmd = ("FSLDIR=/opt/fsl"
+                    "\n&& PATH=/opt/fsl/bin:$PATH")
+        path_cmd = indent("ENV", path_cmd)
+
+        return "\n".join((workdir_cmd, cmd, path_cmd))
 
     def _get_binaries_url(self):
         base = "https://fsl.fmrib.ox.ac.uk/fsldownloads/"
