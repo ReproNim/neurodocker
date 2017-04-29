@@ -14,7 +14,7 @@ from neurodocker.interfaces import FSL
 class TestFSL(object):
     """Tests for FSL class."""
 
-    @pytest.mark.xfail
+    @pytest.mark.skip(reason="python installer raises KeyError")
     def test_build_image_fsl_latest_pyinstaller_centos7(self):
         """Install latest FSL with FSL's Python installer on CentOS 7."""
         specs = {'base': 'centos:7',
@@ -37,7 +37,7 @@ class TestFSL(object):
         """Install FSL binaries on Ubuntu Xenial."""
         specs = {'base': 'ubuntu:xenial',
                  'pkg_manager': 'apt',
-                 'fsl': {'version': '5.0.8', 'use_binaries': True}}
+                 'fsl': {'version': '5.0.9', 'use_binaries': True}}
         parser = SpecsParser(specs=specs)
         cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
         fileobj = BytesIO(cmd.encode('utf-8'))
