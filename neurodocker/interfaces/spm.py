@@ -61,9 +61,9 @@ class SPM(object):
                    "# Install MCR and SPM{}\n"
                    "#----------------------".format(self.version))
         mcr_url = self._get_mcr_url()
-        spm_url = None
+        spm_url = self._get_spm_url()
         chunks = [comment, self.install_libs(), '', self.install_mcr(mcr_url),
-                  '', self.install_spm()]
+                  '', self.install_spm(spm_url)]
         return "\n".join(chunks)
 
     def install_libs(self):
@@ -72,8 +72,10 @@ class SPM(object):
         libs = {'apt': 'libxext6 libxt6',
                 'yum': 'libXext.x86_64 libXt.x86_64'}
         comment = "# Install required libraries"
-        cmd = "RUN {install}".format(**manage_pkgs[self.pkg_manager])
+        cmd = ("{install}"
+               "\n&& {clean}").format(**manage_pkgs[self.pkg_manager])
         cmd = cmd.format(pkgs=libs[self.pkg_manager])
+        cmd = indent("RUN", cmd)
         return "\n".join((comment, cmd))
 
     def _get_mcr_url(self):
@@ -100,30 +102,30 @@ class SPM(object):
                # grep '^/[^/].*:' matches absolute paths that have colons.
                # tr -d '[:space:]' trims all whitespace.
                "\n&& export LD_LIBRARY_PATH=$(grep '^/[^/].*:' mcr.log | tr -d '[:space:]')$LD_LIBRARY_PATH "
-               "\n&& rm -rf mcrtmp mcr.log mcr.zip".format(url))
+               "\n&& rm -rf mcrtmp mcr.log mcr.zip /tmp/*".format(url))
         cmd = indent("RUN", cmd)
         return '\n'.join((comment, workdir_cmd, cmd))
 
-    def install_spm(self):
+    def _get_spm_url(self):
+        url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
+               "utopia/dev/spm{spm}_latest_Linux_{matlab}.zip"
+               "".format(spm=self.version, matlab=self.matlab_version))
+        if self.check_urls:
+            check_url(url)
+        return url
+
+    @staticmethod
+    def install_spm(url):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
-        spm_url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
-                   "utopia/dev/spm{spm}_latest_Linux_{matlab}.zip"
-                   "".format(spm=self.version, matlab=self.matlab_version))
-        if self.check_urls:
-            check_url(spm_url)
-
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("curl -sSL -o spm{ver}.zip {spm_url}\n"
-               "&& unzip spm{ver}.zip\n"
-               "&& rm -rf spm{ver}.zip\n"
-               "".format(spm_url=spm_url, ver=self.version))
+        cmd = ("curl -sSL -o spm.zip {}\n"
+               "&& unzip -q spm.zip -d spm\n"
+               "&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
-        # TODO: older versions of MCR might not have the same directory
-        # structure. This works with MCR from MATLAB R2017a.
         env_cmd = ("MATLABCMD=/opt/mcr/v*/toolbox/matlab"
-                   "\nSPMMCRCMD=/opt/spm{ver}/run_spm{ver}.sh /opt/mcr/v*/ script"
-                   "\nFORCE_SPMMCR=1".format(ver=self.version))
+                   '\nSPMMCRCMD="/opt/spm/run_spm*.sh /opt/mcr/v*/ script"'
+                   "\nFORCE_SPMMCR=1".format())
         env_cmd = indent("ENV", env_cmd)
         return '\n'.join((comment, workdir_cmd, cmd, env_cmd))
