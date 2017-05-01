@@ -19,7 +19,7 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                        # Trying to uninstall ca-certificates breaks things.
                        'remove': 'yum remove -y $(echo "{pkgs}" | sed "s/ca-certificates//g")',
                        'clean': ('yum clean packages\n'
-                                 '&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*'),},
+                                 '&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*'),},
                 }
 
 # Create logger.

@@ -7,7 +7,13 @@ but does not require a MATLAB license.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
+from distutils.version import LooseVersion
 import logging
+
+try:
+    from urllib.parse import urljoin  # Python 3
+except ImportError:
+    from urlparse import urljoin  # Python 2
 
 from neurodocker.utils import check_url, indent, manage_pkgs
 
@@ -32,15 +38,20 @@ class SPM(object):
     check_urls : bool
         If true, throw warning if URLs relevant to the installation cannot be
         reached.
+
+    Notes
+    -----
+    Instructions to install MATLAB Compiler Runtime can be found at
+    https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html.
     """
     def __init__(self, version, matlab_version, pkg_manager, check_urls=True):
         self.version = str(version)
-        self.matlab_version = matlab_version
+        self.matlab_version = LooseVersion(matlab_version)
         self.pkg_manager = pkg_manager
         self.check_urls = check_urls
 
-        if self.version not in ['12'] or self.matlab_version not in ['R2017a']:
-            raise ValueError("Only SPM12 and MATLAB R2017a are supported.")
+        if self.version not in ['12']:
+            raise ValueError("Only SPM12 is supported (for now).")
 
         self.cmd = self._create_cmd()
 
@@ -49,8 +60,10 @@ class SPM(object):
         comment = ("#----------------------\n"
                    "# Install MCR and SPM{}\n"
                    "#----------------------".format(self.version))
-        chunks = [comment, self.install_libs(), '', self.install_mcr(), '',
-                  self.install_spm()]
+        mcr_url = self._get_mcr_url()
+        spm_url = self._get_spm_url()
+        chunks = [comment, self.install_libs(), '', self.install_mcr(mcr_url),
+                  '', self.install_spm(spm_url)]
         return "\n".join(chunks)
 
     def install_libs(self):
@@ -59,58 +72,57 @@ class SPM(object):
         libs = {'apt': 'libxext6 libxt6',
                 'yum': 'libXext.x86_64 libXt.x86_64'}
         comment = "# Install required libraries"
-        cmd = "RUN {install}".format(**manage_pkgs[self.pkg_manager])
+        cmd = ("{install}"
+               "\n&& {clean}").format(**manage_pkgs[self.pkg_manager])
         cmd = cmd.format(pkgs=libs[self.pkg_manager])
+        cmd = indent("RUN", cmd)
         return "\n".join((comment, cmd))
 
-    def install_mcr(self):
+    def _get_mcr_url(self):
+        base = 'https://www.mathworks.com/supportfiles/'
+        if self.matlab_version > LooseVersion("R2013a"):
+            rel = ('downloads/{ver}/deployment_files/{ver}/installers/'
+                   'glnxa64/MCR_{ver}_glnxa64_installer.zip')
+        else:
+            rel = ('MCR_Runtime/{ver}/MCR_{ver}_glnxa64_installer.zip')
+        url = urljoin(base, rel).format(ver=self.matlab_version)
+        if self.check_urls:
+            check_url(url)
+        return url
+
+    @staticmethod
+    def install_mcr(url):
         """Return Dockerfile insructions to install MATLAB Compiler Runtime."""
         comment = "# Install MATLAB Compiler Runtime"
-        mcr_url = ("https://www.mathworks.com/supportfiles/downloads/{ver}/"
-                   "deployment_files/{ver}/installers/glnxa64/"
-                   "MCR_{ver}_glnxa64_installer.zip"
-                   "".format(ver=self.matlab_version))
-        if self.check_urls:
-            check_url(mcr_url)
-
         workdir_cmd = "WORKDIR /opt"
-        cmd = ('echo "destinationFolder=/opt/mcr" > mcr_options.txt\n'
-               '&& echo "agreeToLicense=yes" >> mcr_options.txt\n'
-               '&& echo "outputFile=/tmp/matlabinstall_log" >> mcr_options.txt\n'
-               '&& echo "mode=silent" >> mcr_options.txt\n'
-               '&& mkdir -p matlab_installer\n'
-               '&& curl -sSL -o matlab_installer/installer.zip {mcr_url}\n'
-               '&& unzip matlab_installer/installer.zip -d matlab_installer/\n'
-               '&& matlab_installer/install -inputFile /opt/mcr_options.txt\n'
-               '&& rm -rf matlab_installer mcr_options.txt\n'
-               ''.format(mcr_url=mcr_url))
+        cmd = ("curl -sSL -o mcr.zip {}"
+               "\n&& unzip -q mcr.zip -d mcrtmp"
+               "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
+               "\n&& rm -rf mcrtmp mcr.zip /tmp/*".format(url))
         cmd = indent("RUN", cmd)
         return '\n'.join((comment, workdir_cmd, cmd))
 
-    def install_spm(self):
+    def _get_spm_url(self):
+        url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
+               "utopia/dev/spm{spm}_latest_Linux_{matlab}.zip"
+               "".format(spm=self.version, matlab=self.matlab_version))
+        if self.check_urls:
+            check_url(url)
+        return url
+
+    @staticmethod
+    def install_spm(url):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
-        spm_url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
-                   "utopia/dev/spm{spm}_latest_Linux_{matlab}.zip"
-                   "".format(spm=self.version, matlab=self.matlab_version))
-        if self.check_urls:
-            check_url(spm_url)
-
         workdir_cmd = "WORKDIR /opt"
-        cmd = ('curl -sSL -o spm{ver}.zip {spm_url}\n'
-               '&& unzip spm{ver}.zip\n'
-               '&& rm -rf spm{ver}.zip /tmp/*\n'
-               ''.format(spm_url=spm_url, ver=self.version))
+        cmd = ("curl -sSL -o spm.zip {}"
+               "\n&& unzip -q spm.zip"
+               "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
-        # TODO: older versions of MCR might not have the same directory
-        # structure. This works with MCR from MATLAB R2017a.
-        env_cmd = ('MATLABCMD="/opt/mcr/v92/toolbox/matlab"\n'
-                   'SPMMCRCMD="/opt/spm{ver}/run_spm{ver}.sh /opt/mcr/v92/ script"\n'
-                   'FORCE_SPMMCR=1\n'
-                   'LD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:'
-                   '/opt/mcr/v92/bin/glnxa64:'
-                   '/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH'
-                   ''.format(ver=self.version))
+        env_cmd = ("MATLABCMD=/opt/mcr/v*/toolbox/matlab"
+                   '\nSPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script"'
+                   "\nFORCE_SPMMCR=1"
+                   "\nLD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH")
         env_cmd = indent("ENV", env_cmd)
         return '\n'.join((comment, workdir_cmd, cmd, env_cmd))
