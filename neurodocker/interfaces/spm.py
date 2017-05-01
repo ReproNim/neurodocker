@@ -97,12 +97,8 @@ class SPM(object):
         workdir_cmd = "WORKDIR /opt"
         cmd = ("curl -sSL -o mcr.zip {}"
                "\n&& unzip -q mcr.zip -d mcrtmp"
-               "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes | tee mcr.log"
-               # Append MCR things to LD_LIBRARY_PATH.
-               # grep '^/[^/].*:' matches absolute paths that have colons.
-               # tr -d '[:space:]' trims all whitespace.
-               "\n&& export LD_LIBRARY_PATH=$(grep '^/[^/].*:' mcr.log | tr -d '[:space:]')$LD_LIBRARY_PATH "
-               "\n&& rm -rf mcrtmp mcr.log mcr.zip /tmp/*".format(url))
+               "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
+               "\n&& rm -rf mcrtmp mcr.zip /tmp/*".format(url))
         cmd = indent("RUN", cmd)
         return '\n'.join((comment, workdir_cmd, cmd))
 
@@ -119,13 +115,14 @@ class SPM(object):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("curl -sSL -o spm.zip {}\n"
-               "&& unzip -q spm.zip -d spm\n"
-               "&& rm -rf spm.zip\n".format(url))
+        cmd = ("curl -sSL -o spm.zip {}"
+               "\n&& unzip -q spm.zip"
+               "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
         env_cmd = ("MATLABCMD=/opt/mcr/v*/toolbox/matlab"
-                   '\nSPMMCRCMD="/opt/spm/run_spm*.sh /opt/mcr/v*/ script"'
-                   "\nFORCE_SPMMCR=1".format())
+                   '\nSPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script"'
+                   "\nFORCE_SPMMCR=1"
+                   "\nLD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH")
         env_cmd = indent("ENV", env_cmd)
         return '\n'.join((comment, workdir_cmd, cmd, env_cmd))
