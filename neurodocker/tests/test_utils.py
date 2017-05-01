@@ -66,7 +66,7 @@ def test_indent():
 
 
 def test_save_load_json(tmpdir):
-    filepath = tmpdir.join('test.json')
+    filepath = tmpdir.join('test.json').strpath
 
     obj = {'foo': 'bar'}
     utils.save_json(obj, filepath)
