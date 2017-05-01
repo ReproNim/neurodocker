@@ -31,7 +31,6 @@ class TestFSL(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
-        client.images.remove(image.id)
 
     def test_build_image_fsl_508_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
@@ -49,4 +48,3 @@ class TestFSL(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
-        client.images.remove(image.id)

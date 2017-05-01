@@ -34,4 +34,3 @@ class TestSPM(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
-        client.images.remove(image.id)

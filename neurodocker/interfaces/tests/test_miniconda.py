@@ -35,7 +35,6 @@ class TestMiniconda(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
-        client.images.remove(image.id)
 
     def test_build_image_miniconda_latest_shellscript_centos7(self):
         """Install latest version of Miniconda via ContinuumIO's installer
@@ -61,4 +60,3 @@ class TestMiniconda(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
-        client.images.remove(image.id)
