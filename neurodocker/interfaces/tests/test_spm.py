@@ -13,15 +13,15 @@ class TestSPM(object):
     """Tests for SPM class."""
 
     def test_build_image_spm_12_standalone_centos7(self):
-        """Install standalone SPM12 and MATLAB MCR R2017a on CentOS 7."""
-        specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum',
+        """Install standalone SPM12 and MATLAB MCR R2017a."""
+        specs = {'base': 'ubuntu:17.04',
+                 'pkg_manager': 'apt',
+                 'check_urls': False,
                  'spm': {'version': '12', 'matlab_version': 'R2017a'}}
-        parser = SpecsParser(specs=specs)
-        cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
-        fileobj = BytesIO(cmd.encode('utf-8'))
+        parser = SpecsParser(specs)
+        cmd = Dockerfile(parser.specs).cmd
 
-        image = DockerImage(fileobj=fileobj).build_raw()
+        image = DockerImage(fileobj=cmd).build_raw()
         container = DockerContainer(image)
         container.start(working_dir='/home')
 

@@ -11,21 +11,18 @@ class SpecsParser(object):
 
     Parameters
     ----------
-    filepath : str
-        Path to JSON file containing environment specifications.
-    specs : dict
-        Dictionary of environment specifications.
+    dict_or_filepath : dict, str
+        The dictionary of specifications, or the name of the JSON file with the
+        specifications.
     """
-    VALID_TOP_LEVEL_KEYS = ['base', 'pkg_manager']
+    VALID_TOP_LEVEL_KEYS = ['base', 'pkg_manager', 'check_urls']
     VALID_TOP_LEVEL_KEYS.extend(SUPPORTED_SOFTWARE.keys())
 
-    def __init__(self, filepath=None, specs=None):
-        if filepath is not None and specs is not None:
-            raise ValueError("Specify either `filepath` or `specs`, not both.")
-        elif filepath is not None:
-            self.specs = load_json(filepath)
-        elif specs is not None:
-            self.specs = specs
+    def __init__(self, dict_or_filepath):
+        try:
+            self.specs = load_json(dict_or_filepath)
+        except TypeError:
+            self.specs = dict_or_filepath
 
         self.parse()
 
@@ -46,13 +43,13 @@ class SpecsParser(object):
         if 'pkg_manager' not in self.specs.keys():
             raise KeyError("The Linux package manager must be specified in the "
                            "key 'pkg_manager'.")
+
         invalid = set(self.specs) - set(self.VALID_TOP_LEVEL_KEYS)
         if invalid:
             invalid = ", ".join(invalid)
             valid = ", ".join(self.VALID_TOP_LEVEL_KEYS)
-            raise KeyError("Unexpected top-level key(s) in input: {0}. Valid "
-                           "keys are {1}."
-                           "".format(invalid, valid))
+            raise KeyError("Unexpected top-level key(s) in input: {}. Valid "
+                           "keys are {}.".format(invalid, valid))
 
     def _parse_conda_pip(self):
         """Parse packages to install with `conda` and/or `pip`."""

@@ -16,12 +16,11 @@ class TestANTs(object):
         """Install ANTs 2.1.0 binaries on CentOS 7."""
         specs = {'base': 'centos:7',
                  'pkg_manager': 'yum',
+                 'check_urls': False,
                  'ants': {'version': '2.1.0', 'use_binaries': True}}
-        parser = SpecsParser(specs=specs)
-        cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
-        fileobj = BytesIO(cmd.encode('utf-8'))
-
-        image = DockerImage(fileobj=fileobj).build_raw()
+        parser = SpecsParser(specs)
+        cmd = Dockerfile(parser.specs).cmd
+        image = DockerImage(fileobj=cmd).build_raw()
         container = DockerContainer(image)
         container.start()
         output = container.exec_run('Atropos')

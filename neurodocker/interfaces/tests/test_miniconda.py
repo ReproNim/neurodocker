@@ -17,15 +17,15 @@ class TestMiniconda(object):
         """
         specs = {'base': 'ubuntu:xenial',
                  'pkg_manager': 'apt',
+                 'check_urls': False,
                  'miniconda': {
                     'python_version': '3.5.1',
                     'conda_install': 'traits',
                     'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}}
-        parser = SpecsParser(specs=specs)
-        cmd = Dockerfile(specs=parser.specs, pkg_manager='apt').cmd
-        fileobj = BytesIO(cmd.encode('utf-8'))
+        parser = SpecsParser(specs)
+        cmd = Dockerfile(parser.specs).cmd
 
-        image = DockerImage(fileobj=fileobj).build_raw()
+        image = DockerImage(fileobj=cmd).build_raw()
         container = DockerContainer(image)
         container.start()
         output = container.exec_run('python -V')
@@ -42,15 +42,15 @@ class TestMiniconda(object):
         """
         specs = {'base': 'centos:7',
                  'pkg_manager': 'yum',
+                 'check_urls': False,
                  'miniconda': {
                     'python_version': '3.5.1',
                     'conda_install': ['traits'],
                     'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}
-        parser = SpecsParser(specs=specs)
-        cmd = Dockerfile(specs=parser.specs, pkg_manager='yum').cmd
-        fileobj = BytesIO(cmd.encode('utf-8'))
+        parser = SpecsParser(specs)
+        cmd = Dockerfile(parser.specs).cmd
 
-        image = DockerImage(fileobj=fileobj).build_raw()
+        image = DockerImage(fileobj=cmd).build_raw()
         container = DockerContainer(image)
         container.start()
         output = container.exec_run('python -V')
