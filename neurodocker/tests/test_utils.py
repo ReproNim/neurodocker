@@ -45,8 +45,9 @@ def test_check_url():
 
     assert utils.check_url(urls['good']), "Bad response from google.com"
     with pytest.raises(RequestException):
-        assert not utils.check_url(urls['404']), "404 url returned status < 400"
-        assert not utils.check_url(urls['timeout']), "timeout url returned status < 400"
+        utils.check_url(urls['404'])
+    with pytest.raises(RequestException):
+        utils.check_url(urls['timeout'])
 
 
 def test_indent():

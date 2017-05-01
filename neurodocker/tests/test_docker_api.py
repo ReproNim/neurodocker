@@ -87,7 +87,7 @@ class TestDockerfile(object):
         assert df.cmd in filepath.read(), "file content not correct"
 
         with pytest.raises(Exception):
-            df = Dockerfile()
+            df = Dockerfile(self.specs)
             df.cmd = ""
             df.save(filepath.strpath)
 
