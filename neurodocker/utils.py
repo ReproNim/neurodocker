@@ -33,41 +33,38 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def set_log_level(level):
-    """Set logger verbosity.
+def add_neurodebian(os_codename, full=True, check_urls=True):
+    """Return instructions to add NeuroDebian to Dockerfile.
 
     Parameters
     ----------
-    level: {'debug', 'info', 'warning', 'error', 'critical}
-        The level at which to print messages. Case-insensitive.
+    os_codename : str
+        Operating system codename (e.g., 'zesty', 'jessie'). Used in the
+        NeuroDebian url: http://neuro.debian.net/lists/OS_CODENAME.us-nh.full.
+    full : bool
+        If true, use the full NeuroDebian sources. If false, use the libre
+        sources.
+    check_urls : bool
+        If true, throw warning if URLs relevant to the installation cannot be
+        reached.
     """
-    logging_levels = {'DEBUG': logging.DEBUG,
-                      'INFO': logging.INFO,
-                      'WARNING': logging.WARNING,
-                      'ERROR': logging.ERROR,
-                      'CRITICAL': logging.CRITICAL}
-    try:
-        level = logging_levels[level.upper()]
-        logger.setLevel(level)
-    except KeyError:
-        raise ValueError("invalid level '{}'".format(level))
+    suffix = "full" if full else "libre"
+    neurodebian_url = ("http://neuro.debian.net/lists/{}.us-nh.{}"
+                       "".format(os_codename, suffix))
+    if check_urls:
+        check_url(neurodebian_url)
 
-
-def load_json(filepath, **kwargs):
-    """Load JSON file `filepath` as dictionary. `kwargs` can be keyword
-    arguments for `json.load()`.
-    """
-    with open(filepath, 'r') as fp:
-        return json.load(fp, **kwargs)
-
-
-def save_json(obj, filepath, indent=4, **kwargs):
-    """Save `obj` to JSON file `filepath`. `kwargs` can be keyword arguments
-    for `json.dump()`.
-    """
-    with open(filepath, 'w') as fp:
-        json.dump(obj, fp, indent=indent, **kwargs)
-        fp.write('\n')
+    deps = "dirmngr"
+    cmd = ("{install}\n"
+           "&& {clean}\n"
+           "&& curl -sSL {url} >> "
+           "/etc/apt/sources.list.d/neurodebian.sources.list\n"
+           "&& apt-key adv --recv-keys --keyserver "
+           "hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9\n"
+           "&& apt-get update"
+           "".format(url=neurodebian_url, **manage_pkgs['apt']))
+    cmd = cmd.format(pkgs=deps)
+    return indent("RUN", cmd)
 
 
 def check_url(url, timeout=5, **kwargs):
@@ -84,7 +81,6 @@ def check_url(url, timeout=5, **kwargs):
     request = requests.head(url, timeout=timeout, **kwargs)
     request.raise_for_status()
     return True
-
 
 
 def indent(instruction, cmd, line_suffix=' \\'):
@@ -124,35 +120,38 @@ def indent(instruction, cmd, line_suffix=' \\'):
     return dockerfile_chunk
 
 
-def add_neurodebian(os_codename, full=True, check_urls=True):
-    """Return instructions to add NeuroDebian to Dockerfile.
+def load_json(filepath, **kwargs):
+    """Load JSON file `filepath` as dictionary. `kwargs` can be keyword
+    arguments for `json.load()`.
+    """
+    with open(filepath, 'r') as fp:
+        return json.load(fp, **kwargs)
+
+
+def save_json(obj, filepath, indent=4, **kwargs):
+    """Save `obj` to JSON file `filepath`. `kwargs` can be keyword arguments
+    for `json.dump()`.
+    """
+    with open(filepath, 'w') as fp:
+        json.dump(obj, fp, indent=indent, **kwargs)
+        fp.write('\n')
+
+
+def set_log_level(level):
+    """Set logger verbosity.
 
     Parameters
     ----------
-    os_codename : str
-        Operating system codename (e.g., 'zesty', 'jessie'). Used in the
-        NeuroDebian url: http://neuro.debian.net/lists/OS_CODENAME.us-nh.full.
-    full : bool
-        If true, use the full NeuroDebian sources. If false, use the libre
-        sources.
-    check_urls : bool
-        If true, throw warning if URLs relevant to the installation cannot be
-        reached.
+    level: {'debug', 'info', 'warning', 'error', 'critical}
+        The level at which to print messages. Case-insensitive.
     """
-    suffix = "full" if full else "libre"
-    neurodebian_url = ("http://neuro.debian.net/lists/{}.us-nh.{}"
-                       "".format(os_codename, suffix))
-    if check_urls:
-        check_url(neurodebian_url)
-
-    deps = "dirmngr"
-    cmd = ("{install}\n"
-           "&& {clean}\n"
-           "&& curl -sSL {url} >> "
-           "/etc/apt/sources.list.d/neurodebian.sources.list\n"
-           "&& apt-key adv --recv-keys --keyserver "
-           "hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9\n"
-           "&& apt-get update"
-           "".format(url=neurodebian_url, **manage_pkgs['apt']))
-    cmd = cmd.format(pkgs=deps)
-    return indent("RUN", cmd)
+    logging_levels = {'DEBUG': logging.DEBUG,
+                      'INFO': logging.INFO,
+                      'WARNING': logging.WARNING,
+                      'ERROR': logging.ERROR,
+                      'CRITICAL': logging.CRITICAL}
+    try:
+        level = logging_levels[level.upper()]
+        logging.getLogger(__name__).setLevel(level)
+    except KeyError:
+        raise ValueError("invalid level '{}'".format(level))
