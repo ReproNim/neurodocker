@@ -9,10 +9,10 @@ sudo: required
 services:
   - docker
 env:
-  - IMAGE_TO_BUILD=none
-  - IMAGE_TO_BUILD=ants
-  - IMAGE_TO_BUILD=fsl
-  - IMAGE_TO_BUILD=spm
+  - INTERFACE_TO_BUILD=none
+  - INTERFACE_TO_BUILD=ants
+  - INTERFACE_TO_BUILD=fsl
+  - INTERFACE_TO_BUILD=spm
 before_install:
   - travis_retry sudo apt-get update && sudo apt-get install -yq docker-engine
 install:
@@ -20,10 +20,10 @@ install:
   - travis_retry pip install pytest-cov
 script:
   - function run_tests {
-      if [ "$IMAGE_TO_BUILD" == 'none' ]; then
+      if [ "$INTERFACE_TO_BUILD" == 'none' ]; then
         pytest -v -k "not test_build_image" --cov=./ neurodocker;
       else
-        travis_wait 50 pytest -v -k "test_build_image_$IMAGE_TO_BUILD" --cov=./ neurodocker;
+        travis_wait 50 pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       fi }
   - run_tests
 after_success:
