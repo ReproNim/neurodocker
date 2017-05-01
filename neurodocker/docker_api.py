@@ -92,12 +92,10 @@ class Dockerfile(object):
 
     def _create_cmd(self):
         cmds = [self.add_base()]
-        noninteractive = self.add_debian_noninteractive()
-        if noninteractive is not None:
-            cmds.append(noninteractive)
+        if 'debian' in self.specs['base'] or 'ubuntu' in self.specs['base']:
+            cmds.append("ARG DEBIAN_FRONTEND=noninteractive")
         cmds.append(self.add_common_dependencies())
-        # Separate Miniconda from the other software here to ensure that
-        # Miniconda is always installed before the other software.
+        # Install Miniconda before other software.
         if "miniconda" in self.specs.keys():
             cmds.append(self.add_miniconda())
         cmds.append(self.add_software())
@@ -106,15 +104,6 @@ class Dockerfile(object):
     def add_base(self):
         """Add Dockerfile FROM instruction."""
         return "FROM {}".format(self.specs['base'])
-
-    def add_debian_noninteractive(self):
-        """Add instructions at the beginning of the Dockerfile depending on the
-        base image.
-        """
-        base = self.specs['base'].split(':')[0]
-        if base in ['debian', 'ubuntu']:
-            return "ARG DEBIAN_FRONTEND=noninteractive"
-        return None
 
     def add_common_dependencies(self):
         """Add Dockerfile instructions to download dependencies common to many
@@ -175,24 +164,22 @@ class RawOutputLogger(threading.Thread):
 
     Parameters
     ----------
-    logs : generator
-        Generator of Docker logs. Returned by docker.APIClient.events().
+    generator : generator
+        Generator of Docker logs.
     console : bool
         If true, log to console.
     filepath : str
         Log to file `filepath`.
     """
-    def __init__(self, logs, console=True, filepath=None, **kwargs):
-        self.logs = logs
+    def __init__(self, generator, console=True, filepath=None, **kwargs):
+        self.generator = generator
         self.logger = self.create_logger(console, filepath)
-        self.list_of_logs = []
+        self.logs = []
         super(RawOutputLogger, self).__init__(**kwargs)
 
     @staticmethod
     def create_logger(console=True, filepath=None):
-        """`console` is bool. If `filepath` is specified, saves logs to
-        file.
-        """
+        """`console` is bool. If `filepath` is specified, saves logs to file."""
         import logging
         logger = logging.getLogger("build")
         logger.setLevel(logging.DEBUG)
@@ -207,35 +194,23 @@ class RawOutputLogger(threading.Thread):
         return logger
 
     def run(self):
-        for line in self.logs:
+        for line in self.generator:
             line = line.decode('utf-8')
             self.logger.debug(line)
-            self.list_of_logs.append(line)
-        self.id = self.get_id()
+            self.logs.append(line)
+        self.id = self._get_id()
 
-    def get_id(self):
+    def _get_id(self):
         """Get ID of built image or container."""
         import re
-        last_line = self.list_of_logs[-1]
-        if re.search("error", last_line, re.IGNORECASE):
-            return None
-        elif re.search("successfully built", last_line, re.IGNORECASE):
-            try:
-                return re.findall('[0-9a-f]{12}', last_line)[-1]
-            except IndexError:
-                raise Exception("Docker image ID could not be found but build "
-                                "error was not found.")
 
-    def show_logs(self, first=None, last=None):
-        """Options `first` and `last` can be integers."""
-        if first is not None and last is not None:
-            raise ValueError("Options `first` and `last` cannot both be used.")
-        elif first is not None:
-            return "\n".join(self.list_of_logs[:first])
-        elif last is not None:
-            return "\n".join(self.list_of_logs[-last:])
+        if re.search("successfully built", self.logs[-1], re.IGNORECASE):
+            try:
+                return re.findall('[0-9a-f]{12}', self.logs[-1])[-1]
+            except IndexError:
+                return None
         else:
-            return "\n".join(self.list_of_logs)
+            return None
 
 
 class DockerImage(object):
@@ -245,7 +220,6 @@ class DockerImage(object):
         self.fileobj = fileobj
         self.tag = tag
 
-        # If fileobj is a string, convert to bytes.
         try:
             from io import BytesIO
             self.fileobj = BytesIO(self.fileobj.encode('utf-8'))
@@ -271,16 +245,13 @@ class DockerImage(object):
                                        name="BuildLogger")
         build_logger.daemon = True
         build_logger.start()
-
-        # QUESTION: Is it OK to block here? How else could we do this?
-        # Wait for build to finish.
         while build_logger.is_alive():
             pass
 
         try:
             return client.images.get(build_logger.id)
         except docker.errors.NullResource:
-            error_logs = build_logger.show_logs(last=2)
+            error_logs = build_logger.logs[-2:]
             raise docker.errors.BuildError(error_logs)
 
 
@@ -332,23 +303,3 @@ class DockerContainer(object):
             self.container.remove(**kwargs)
         else:
             self.container.kill(**kwargs)
-
-    def save_archive(self, path_in_container, filepath):
-        """Save a tarball of a file or folder within the Docker container to
-        the local machine.
-
-        Parameters
-        ----------
-        path_in_container : str
-            Absolute path to file or folder in the container.
-        filepath : str
-            Path and name of saved tarball.
-        """
-        if not posixpath.isabs(path_in_container):
-            raise ValueError("`path_in_container` must be absolute.")
-
-        archive = self.container.get_archive(path_in_container)
-        response, _ = archive
-
-        with open(filepath, 'wb') as fp:
-            fp.write(response.data)
