@@ -20,7 +20,7 @@ class TestFSL(object):
         specs = {'base': 'centos:7',
                  'pkg_manager': 'yum',
                  'check_urls': False,
-                 'fsl': {'version': '5.0.10', 'use_installer': True}}
+                 'fsl': {'version': '5.0.9', 'use_installer': True}}
         parser = SpecsParser(specs)
         cmd = Dockerfile(parser.specs).cmd
         image = DockerImage(fileobj=cmd).build_raw()
@@ -31,13 +31,14 @@ class TestFSL(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
+        client.images.remove(image.id)
 
     def test_build_image_fsl_508_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
         specs = {'base': 'ubuntu:xenial',
                  'pkg_manager': 'apt',
                  'check_urls': False,
-                 'fsl': {'version': '5.0.10', 'use_binaries': True}}
+                 'fsl': {'version': '5.0.9', 'use_binaries': True}}
         parser = SpecsParser(specs)
         cmd = Dockerfile(parser.specs).cmd
         image = DockerImage(fileobj=cmd).build_raw()
@@ -48,3 +49,4 @@ class TestFSL(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
+        client.images.remove(image.id)

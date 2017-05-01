@@ -28,6 +28,7 @@ class TestANTs(object):
         container.cleanup(remove=True, force=True)
         client.containers.prune()
         client.images.prune()
+        client.images.remove(image.id)
 
     def test_build_from_source_github(self):
         # TODO: expand on tests for building ANTs from source. It probably
