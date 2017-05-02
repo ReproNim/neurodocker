@@ -5,11 +5,10 @@ from io import BytesIO
 
 import pytest
 
-from neurodocker.docker_api import (client, Dockerfile, DockerImage,
-                                    DockerContainer)
+from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
 from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import FSL
-
+from neurodocker.interfaces.tests import utils
 
 class TestFSL(object):
     """Tests for FSL class."""
@@ -21,16 +20,10 @@ class TestFSL(object):
                  'pkg_manager': 'yum',
                  'check_urls': False,
                  'fsl': {'version': '5.0.9', 'use_installer': True}}
-        parser = SpecsParser(specs)
-        cmd = Dockerfile(parser.specs).cmd
-        image = DockerImage(fileobj=cmd).build_raw()
-        container = DockerContainer(image)
-        container.start()
+        container = utils.get_container_from_specs(specs)
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
+        utils.test_cleanup(container)
 
     def test_build_image_fsl_508_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
@@ -38,13 +31,7 @@ class TestFSL(object):
                  'pkg_manager': 'apt',
                  'check_urls': False,
                  'fsl': {'version': '5.0.9', 'use_binaries': True}}
-        parser = SpecsParser(specs)
-        cmd = Dockerfile(parser.specs).cmd
-        image = DockerImage(fileobj=cmd).build_raw()
-        container = DockerContainer(image)
-        container.start()
+        container = utils.get_container_from_specs(specs)
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
+        utils.test_cleanup(container)

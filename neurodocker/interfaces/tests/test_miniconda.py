@@ -3,10 +3,10 @@
 from __future__ import absolute_import, division, print_function
 from io import BytesIO
 
-from neurodocker.docker_api import (client, Dockerfile, DockerImage,
-                                    DockerContainer)
+from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
 from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import Miniconda
+from neurodocker.interfaces.tests import utils
 
 class TestMiniconda(object):
     """Tests for Miniconda class."""
@@ -22,41 +22,9 @@ class TestMiniconda(object):
                     'python_version': '3.5.1',
                     'conda_install': 'traits',
                     'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}}
-        parser = SpecsParser(specs)
-        cmd = Dockerfile(parser.specs).cmd
-
-        image = DockerImage(fileobj=cmd).build_raw()
-        container = DockerContainer(image)
-        container.start()
+        container = utils.get_container_from_specs(specs)
         output = container.exec_run('python -V')
         assert "3.5.1" in output, "incorrect Python version"
         output = container.exec_run('import nipype')
         assert "ImportError" not in output, "nipype not installed"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
-
-    def test_build_image_miniconda_latest_shellscript_centos7(self):
-        """Install latest version of Miniconda via ContinuumIO's installer
-        script on CentOS 7.
-        """
-        specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum',
-                 'check_urls': False,
-                 'miniconda': {
-                    'python_version': '3.5.1',
-                    'conda_install': ['traits'],
-                    'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}
-        parser = SpecsParser(specs)
-        cmd = Dockerfile(parser.specs).cmd
-
-        image = DockerImage(fileobj=cmd).build_raw()
-        container = DockerContainer(image)
-        container.start()
-        output = container.exec_run('python -V')
-        assert "3.5.1" in output, "incorrect Python version"
-        output = container.exec_run('import nipype')
-        assert "ImportError" not in output, "nipype not installed"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
+        utils.test_cleanup(container)
