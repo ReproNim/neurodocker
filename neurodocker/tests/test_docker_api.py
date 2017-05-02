@@ -105,11 +105,13 @@ class TestBuildOutputLogger(object):
         logger = BuildOutputLogger(logs, console=False, filepath=self.filepath.strpath)
         logger.daemon = True
         logger.start()
-        assert logger.is_alive(), "BuildOutputLogger not alive"
+        living = logger.is_alive()
+        assert living, "BuildOutputLogger not alive"
 
         while logger.is_alive():
             pass
-        assert self.filepath.read(), "log file empty"
+        content = self.filepath.read()
+        assert content, "log file empty"
 
     def test_get_logs(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
@@ -139,12 +141,13 @@ class TestDockerImage(object):
         # Correct instructions.
         cmd = "FROM alpine:latest"
         image = DockerImage(cmd).build()
-        assert isinstance(image, docker.models.images.Image)
+        correct_type = isinstance(image, docker.models.images.Image)
+        assert correct_type
 
         # Incorrect instructions
         cmd = "FROM ubuntu:fake_version_12345"
         with pytest.raises(docker.errors.BuildError):
-            img = DockerImage(cmd).build()
+            DockerImage(cmd).build()
 
 
 class TestDockerContainer(object):
