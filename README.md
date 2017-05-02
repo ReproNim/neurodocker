@@ -14,63 +14,63 @@ This list is growing.
 
 ### ANTs
 
-To install, include `'ants'` (case-insensitive) under `'software'` in the specifications dictionary. Valid keys within `'ants'` are keywords for [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py#L27). Binaries can be installed (compiled on CentOS 5), or ANTs can be compiled from source.
+To install, include `'ants'` (case-insensitive) in the specifications dictionary. Valid keys within `'ants'` are keywords for [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py#L27). Pre-compiled binaries can be installed, or ANTs can be compiled from source.
 
 ### Conda
 
-To install, include `'conda_env'` in the specifications dictionary. Valid keys within `'conda_env'` are keywords for [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py#L12). The `conda-forge` channel is added by default.
+To install, include `'miniconda'` (case-insensitive) in the specifications dictionary. Valid keys within `'miniconda'` are keywords for [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py#L12). The `conda-forge` channel is added by default.
 
 ### FSL
 
-To install, include `'fsl'` (case-insensitive) under `'software'` in the specifications dictionary. Valid keys within `'fsl'` are keywords for [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py#L11). Beware that FSL's Python installer will panic if used on a Debian-based system.
+To install, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid keys within `'fsl'` are keywords for [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py#L11). Beware that FSL's Python installer will panic if used on a Debian-based system.
 
 ### SPM
 
-To install, include `'spm'` (case-insensitive) under `'software'` in the specifications dictionary. Valid keys within `'spm'` are keywords for [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py#L17). Currently, only SPM12 and MATLAB R2017a are supported.
+To install, include `'spm'` (case-insensitive) in the specifications dictionary. Valid keys within `'spm'` are keywords for [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py#L17). Currently, only SPM12 and MATLAB R2017a are supported.
 
 
 
 ## Example
 
 
-In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container can be started from that container, and commands can be run within the running container. When finished, the container is stopped and removed.
+In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
 
 ```python
-from neurodocker import (DockerContainer, Dockerfile, DockerImage,
-                         SpecsParser)
-# Specify the environment.
+from neurodocker import Dockerfile, DockerImage, DockerContainer, SpecsParser
+
 specs = {
-    'base': 'ubuntu:16.04',
+    'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
+    'check_urls': True,  # Verify communication with URLs used in build.
     'miniconda': {
         'python_version': '3.5.1',
         'conda_install': 'traits',
         'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
     'ants': {'version': '2.1.0', 'use_binaries': True},
-    'fsl': {'version': '5.0.8', 'use_binaries': True},
+    'fsl': {'version': '5.0.10', 'use_binaries': True},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
 }
-# Generate the Dockerfile.
-parser = SpecsParser(specs=specs)
-df = Dockerfile(parser.specs, pkg_manager='apt')
 
-# Build the image from the Dockerfile.
-image = DockerImage(fileobj=df.cmd).build()
+parser = SpecsParser(specs)
+df = Dockerfile(parser.specs)
+# df.save('path/to/this/Dockerfile')
+# print(df)
 
-# Start up the container, run commands, and stop+remove container.
-container = DockerContainer(img).start()
+image = DockerImage(df).build()
+
+container = DockerContainer(image).start()
 container.exec_run('python -c "import nipype; print(nipype.__version__)"')
 # Returns '0.13.0-dev\n'
 container.exec_run('ANTS')
 # Returns ' call ANTS -h or ANTS --help \n'
-container.cleanup(remove=True, force=True)
+container.cleanup(remove=True)
 ```
 
 The example above creates this Dockerfile:
 
 ```dockerfile
-FROM ubuntu:16.04
+FROM ubuntu:17.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -107,12 +107,13 @@ ENV ANTSPATH=/opt/ants \
     PATH=/opt/ants:$PATH
 
 #------------------
-# Install FSL 5.0.8
+# Install FSL 5.0.10
 #------------------
-WORKDIR /opt
-ENV SHELL='bash'
-RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos5_64.tar.gz | tar zx \
-    && cp fsl/etc/fslconf/fsl.sh /etc/profile.d/
+RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
+    | tar zx -C /opt \
+    && cp /opt/fsl/etc/fslconf/fsl.sh /etc/profile.d/ \
+    && FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh \
+    && [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true
 ENV FSLDIR=/opt/fsl \
     PATH=/opt/fsl/bin:$PATH
 
@@ -120,27 +121,24 @@ ENV FSLDIR=/opt/fsl \
 # Install MCR and SPM12
 #----------------------
 # Install required libraries
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends libxext6 libxt6
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends libxext6 libxt6 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install MATLAB Compiler Runtime
 WORKDIR /opt
-RUN echo "destinationFolder=/opt/mcr" > mcr_options.txt \
-    && echo "agreeToLicense=yes" >> mcr_options.txt \
-    && echo "outputFile=/tmp/matlabinstall_log" >> mcr_options.txt \
-    && echo "mode=silent" >> mcr_options.txt \
-    && mkdir -p matlab_installer \
-    && curl -sSL -o matlab_installer/installer.zip https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip \
-    && unzip matlab_installer/installer.zip -d matlab_installer/ \
-    && matlab_installer/install -inputFile /opt/mcr_options.txt \
-    && rm -rf matlab_installer mcr_options.txt
+RUN curl -sSL -o mcr.zip https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip \
+    && unzip -q mcr.zip -d mcrtmp \
+    && mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes \
+    && rm -rf mcrtmp mcr.zip /tmp/*
 
 # Install standalone SPM
 WORKDIR /opt
-RUN curl -sSL -o spm12.zip http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2017a.zip \
-    && unzip spm12.zip \
-    && rm -rf spm12.zip /tmp/*
-ENV MATLABCMD="/opt/mcr/v92/toolbox/matlab" \
-    SPMMCRCMD="/opt/spm12/run_spm12.sh /opt/mcr/v92/ script" \
+RUN curl -sSL -o spm.zip http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2017a.zip \
+    && unzip -q spm.zip \
+    && rm -rf spm.zip
+ENV MATLABCMD=/opt/mcr/v*/toolbox/matlab \
+    SPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script" \
     FORCE_SPMMCR=1 \
-    LD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH
 ```
