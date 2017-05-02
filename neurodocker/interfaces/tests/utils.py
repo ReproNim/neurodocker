@@ -8,10 +8,10 @@ def get_container_from_specs(specs, **kwargs):
     """Return started container. `kwargs` are for `container.start()`."""
     parser = SpecsParser(specs)
     df = Dockerfile(parser.specs)
-    image = DockerImage(df).build()
+    image = DockerImage(df).build(log_console=True)
     return DockerContainer(image).start(**kwargs)
 
 def test_cleanup(container):
-    container.cleanup(remove=True, force=True)
+    container.cleanup()
     client.containers.prune()
     client.images.prune()
