@@ -1,7 +1,8 @@
 """Classes to interact with the Docker Engine (using the docker-py package)."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
-from __future__ import absolute_import, division, print_function
-import posixpath
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+import functools
 import threading
 
 import docker
@@ -52,6 +53,7 @@ def require_docker(func):
     wrapper : callable
         Wrapped function.
     """
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if not DOCKER_RUNNING:
             raise Exception("The Docker server is unresponsive. Is Docker "
@@ -149,39 +151,32 @@ class Dockerfile(object):
             fp.write('\n')
 
 
-class RawOutputLogger(threading.Thread):
-    """Log raw output of Docker commands in separate thread.
-
-    The low-level docker-py API must be used to get raw build logs. Those logs
-    are very useful, but they must be combed manually for build errors and
-    the ID of the built image.
-
-    For example:
-    >>> output = client.api.build(path='path/to/context', rm=True)
-    >>> build_logger = RawOutputLogger(output, name="Build-Logger")
-    >>> build_logger.daemon = True
-    >>> build_logger.start()
+class BuildOutputLogger(threading.Thread):
+    """Log raw output of `docker build` command in separate thread. This class
+    is used to capture the output of the build using the generator returned
+    by `docker.APIClient.build()`. Because instances of this class are not in
+    the main thread, error checking is done in the DockerImage class (so errors
+    are raised in the main thread).
 
     Parameters
     ----------
     generator : generator
-        Generator of Docker logs.
+        Generator of build logs.
     console : bool
         If true, log to console.
     filepath : str
-        Log to file `filepath`.
+        Log to file `filepath`. Default is to not log to file.
     """
     def __init__(self, generator, console=True, filepath=None, **kwargs):
         self.generator = generator
         self.logger = self.create_logger(console, filepath)
         self.logs = []
-        super(RawOutputLogger, self).__init__(**kwargs)
+        super(BuildOutputLogger, self).__init__(**kwargs)
 
     @staticmethod
-    def create_logger(console=True, filepath=None):
-        """`console` is bool. If `filepath` is specified, saves logs to file."""
+    def create_logger(console, filepath):
         import logging
-        logger = logging.getLogger("build")
+        logger = logging.getLogger("docker_image_build_logs")
         logger.setLevel(logging.DEBUG)
         if console:
             ch = logging.StreamHandler()
@@ -194,68 +189,83 @@ class RawOutputLogger(threading.Thread):
         return logger
 
     def run(self):
-        for line in self.generator:
-            line = line.decode('utf-8')
+        from docker.utils.json_stream import json_stream
+
+        for line in json_stream(self.generator):
             self.logger.debug(line)
             self.logs.append(line)
-        self.id = self._get_id()
-
-    def _get_id(self):
-        """Get ID of built image or container."""
-        import re
-
-        if re.search("successfully built", self.logs[-1], re.IGNORECASE):
-            try:
-                return re.findall('[0-9a-f]{12}', self.logs[-1])[-1]
-            except IndexError:
-                return None
-        else:
-            return None
 
 
 class DockerImage(object):
     """Build Docker image."""
-    def __init__(self, path=None, fileobj=None, tag=None):
-        self.path = path
-        self.fileobj = fileobj
-        self.tag = tag
+    def __init__(self, dockerfile_obj):
+        if not isinstance(dockerfile_obj, Dockerfile):
+            raise TypeError("`dockerfile_obj` must be an instance of "
+                            "`neurodocker.docker_api.Dockerfile`.")
 
-        try:
-            from io import BytesIO
-            self.fileobj = BytesIO(self.fileobj.encode('utf-8'))
-        except (AttributeError, TypeError):
-            pass
-
-        if self.path is None and self.fileobj is None:
-            raise ValueError("`path` or `fileobj` must be specified.")
+        from io import BytesIO
+        self.fileobj = BytesIO(dockerfile_obj.cmd.encode('utf-8'))
 
     @require_docker
-    def build(self, **kwargs):
-        """Return image object."""
-        return client.images.build(path=self.path, fileobj=self.fileobj,
-                                   tag=self.tag, rm=True, **kwargs)
+    def build(self, log_console=False, log_filepath=None, **kwargs):
+        """Build image, and return it. If specified, log build output.
 
-    @require_docker
-    def build_raw(self, console=True, filepath=None, **kwargs):
-        """Return generator of raw console output."""
-        logs = client.api.build(path=self.path, fileobj=self.fileobj,
-                                tag=self.tag, rm=True, **kwargs)
-        # QUESTION: how do we prevent multiple threads?
-        build_logger = RawOutputLogger(logs, console, filepath,
-                                       name="BuildLogger")
+        See https://docker-py.readthedocs.io/en/stable/images.html.
+
+        Parameters
+        ----------
+        log_console : bool
+            If true, log to console.
+        log_filepath : str
+            Log to file `filepath`. Default is to not log to file.
+        `kwargs` are for `docker.APIClient.build()`.
+
+        Returns
+        -------
+        image : docker.models.images.Image
+            Docker image object.
+        """
+        build_logs = client.api.build(fileobj=self.fileobj, **kwargs)
+
+        build_logger = BuildOutputLogger(build_logs, log_console, log_filepath,
+                                         name='DockerBuildLogger')
         build_logger.daemon = True
         build_logger.start()
         while build_logger.is_alive():
             pass
 
-        try:
-            return client.images.get(build_logger.id)
-        except docker.errors.NullResource:
-            error_logs = build_logger.logs[-2:]
-            raise docker.errors.BuildError(error_logs)
+        self.image = self._get_image(build_logger)
+        return self.image
+
+    @require_docker
+    def _get_image(self, build_logger_obj):
+        """Helper to check for build errors and return image. This method is
+        in the DockerImage class so that errors are raised in the main thread.
+
+        This method borrows from the higher-level API of docker-py.
+        See https://github.com/docker/docker-py/pull/1581.
+        """
+        import re
+        from docker.errors import BuildError
+
+        if isinstance(build_logger_obj.generator, str):
+            return client.images.get(build_logger_obj.generator)
+        if not build_logger_obj.logs:
+            return BuildError('Unknown')
+        for event in build_logger_obj.logs:
+            if 'stream' in event:
+                match = re.search(r'(Successfully built |sha256:)([0-9a-f]+)',
+                                  event.get('stream', ''))
+                if match:
+                    image_id = match.group(2)
+                    return client.images.get(image_id)
+
+        raise BuildError(last_event.get('error') or build_logger_obj.logs[-1])
 
 
 class DockerContainer(object):
+    """Class to interact with Docker container."""
+
     def __init__(self, image):
         self.image = image
         self.container = None
@@ -293,13 +303,23 @@ class DockerContainer(object):
         output = self.container.exec_run(cmd, **kwargs)
         return output.decode('utf-8')
 
-    def cleanup(self, remove=True, **kwargs):
-        """Remove the container. Use `force=True` to remove running container.
+    @require_docker
+    def cleanup(self, remove=True, force=False):
+        """Stop the container, and optionally remove.
+
+        Parameters
+        ----------
+        remove : bool
+            If true, remove container after stopping.
+        force : bool
+            If true, force remove container.
         """
-        # self.container.stop() --> self.container.remove() would be ideal,
-        # but .stop() complains about timing out (even though it stopped the
-        # container).
+        filters = {'status': 'running'}
+        try:
+            self.container.stop()
+        except:
+            if container.container in client.containers.list(filters=filters):
+                raise docker.errors.APIError("Container not stopped properly.")
+
         if remove:
-            self.container.remove(**kwargs)
-        else:
-            self.container.kill(**kwargs)
+            self.container.remove(force=force)
