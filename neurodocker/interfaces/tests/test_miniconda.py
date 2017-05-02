@@ -1,10 +1,7 @@
 """Tests for neurodocker.interfaces.Miniconda"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
-from io import BytesIO
 
-from neurodocker.docker_api import Dockerfile, DockerImage, DockerContainer
-from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import Miniconda
 from neurodocker.interfaces.tests import utils
 
