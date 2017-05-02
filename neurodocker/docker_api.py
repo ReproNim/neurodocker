@@ -215,7 +215,7 @@ class DockerImage(object):
                             "`neurodocker.docker_api.Dockerfile` or a string.")
 
     @require_docker
-    def build(self, log_console=False, log_filepath=None, **kwargs):
+    def build(self, log_console=False, log_filepath=None, rm=True, **kwargs):
         """Build image, and return it. If specified, log build output.
 
         See https://docker-py.readthedocs.io/en/stable/images.html.
@@ -233,7 +233,7 @@ class DockerImage(object):
         image : docker.models.images.Image
             Docker image object.
         """
-        build_logs = client.api.build(fileobj=self.fileobj, **kwargs)
+        build_logs = client.api.build(fileobj=self.fileobj, rm=rm, **kwargs)
 
         build_logger = BuildOutputLogger(build_logs, log_console, log_filepath,
                                          name='DockerBuildLogger')
@@ -245,8 +245,9 @@ class DockerImage(object):
         self.image = self._get_image(build_logger)
         return self.image
 
+    @staticmethod
     @require_docker
-    def _get_image(self, build_logger_obj):
+    def _get_image(build_logger_obj):
         """Helper to check for build errors and return image. This method is
         in the DockerImage class so that errors are raised in the main thread.
 
@@ -323,12 +324,19 @@ class DockerContainer(object):
         force : bool
             If true, force remove container.
         """
-        filters = {'status': 'running'}
+        if remove and force:
+            self.container.remove(force=force)
+            return
+
+        # If user only wants to stop, attempt to stop the container twice.
         try:
             self.container.stop()
-        except requests.exceptions.ReadTimeout:
+        except (docker.errors.APIError, requests.exceptions.ReadTimeout):
+            self.container.stop()
+            filters = {'status': 'running'}
             if self.container in client.containers.list(filters=filters):
                 raise docker.errors.APIError("Container not stopped properly.")
 
+        # If user wants to stop and remove, but not forcefully.
         if remove:
-            self.container.remove(force=force)
+            self.container.remove()
