@@ -198,13 +198,16 @@ class BuildOutputLogger(threading.Thread):
 
 class DockerImage(object):
     """Build Docker image."""
-    def __init__(self, dockerfile_obj):
-        if not isinstance(dockerfile_obj, Dockerfile):
-            raise TypeError("`dockerfile_obj` must be an instance of "
-                            "`neurodocker.docker_api.Dockerfile`.")
-
+    def __init__(self, dockerfile_or_str):
         from io import BytesIO
-        self.fileobj = BytesIO(dockerfile_obj.cmd.encode('utf-8'))
+        try:
+            try:
+                self.fileobj = BytesIO(dockerfile_or_str.cmd.encode('utf-8'))
+            except AttributeError:
+                self.fileobj = BytesIO(dockerfile_or_str.encode('utf-8'))
+        except AttributeError:
+            raise TypeError("`dockerfile_or_str` must be an instance of "
+                            "`neurodocker.docker_api.Dockerfile` or a string.")
 
     @require_docker
     def build(self, log_console=False, log_filepath=None, **kwargs):
@@ -260,7 +263,8 @@ class DockerImage(object):
                     image_id = match.group(2)
                     return client.images.get(image_id)
 
-        raise BuildError(last_event.get('error') or build_logger_obj.logs[-1])
+        last_event = build_logger_obj.logs[-1]
+        raise BuildError(last_event.get('error') or last_event)
 
 
 class DockerContainer(object):
