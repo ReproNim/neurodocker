@@ -78,11 +78,16 @@ class Dockerfile(object):
 
     def __init__(self, specs, pkg_manager=None, check_urls=True):
         self.specs = specs
-        self.pkg_manager = pkg_manager
-        self.check_urls = check_urls
 
-        if self.pkg_manager is None:
+        try:
             self.pkg_manager = self.specs['pkg_manager']
+        except KeyError:
+            self.pkg_manager = pkg_manager
+
+        try:
+            self.check_urls = self.specs['check_urls']
+        except KeyError:
+            self.check_urls = check_urls
 
         self.cmd = self._create_cmd()
 
@@ -143,7 +148,7 @@ class Dockerfile(object):
         return "\n\n".join(cmds)
 
     def save(self, filepath="Dockerfile", **kwargs):
-        """Save `self.cmd` to `filepath`. `kwargs` are for `open()`."""
+        """Save Dockerfile to `filepath`. `kwargs` are for `open()`."""
         if not self.cmd:
             raise Exception("Instructions are empty.")
         with open(filepath, mode='w', **kwargs) as fp:
