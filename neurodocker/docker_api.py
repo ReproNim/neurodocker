@@ -321,8 +321,8 @@ class DockerContainer(object):
         filters = {'status': 'running'}
         try:
             self.container.stop()
-        except:
-            if container.container in client.containers.list(filters=filters):
+        except requests.exceptions.ReadTimeout:
+            if self.container in client.containers.list(filters=filters):
                 raise docker.errors.APIError("Container not stopped properly.")
 
         if remove:
