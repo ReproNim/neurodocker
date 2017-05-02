@@ -10,7 +10,7 @@ import docker
 import pytest
 
 from neurodocker.docker_api import (docker_is_running, Dockerfile, DockerImage,
-                                    DockerContainer, RawOutputLogger,
+                                    DockerContainer, BuildOutputLogger,
                                     require_docker)
 from neurodocker.interfaces import ANTs, FSL, Miniconda, SPM
 
@@ -92,7 +92,7 @@ class TestDockerfile(object):
             df.save(filepath.strpath)
 
 
-class TestRawOutputLogger(object):
+class TestBuildOutputLogger(object):
     @pytest.fixture(autouse=True)
     def setup(self, tmpdir):
         self.tmpdir = tmpdir
@@ -102,21 +102,20 @@ class TestRawOutputLogger(object):
 
     def test_start(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
-        logger = RawOutputLogger(logs, console=False, filepath=self.filepath.strpath)
+        logger = BuildOutputLogger(logs, console=False, filepath=self.filepath.strpath)
         logger.daemon = True
         logger.start()
-        assert logger.is_alive(), "RawOutputLogger not alive!"
+        living = logger.is_alive()
+        assert living, "BuildOutputLogger not alive"
 
         while logger.is_alive():
             pass
-        image = client.images.get(logger.id)
-        assert isinstance(image, docker.models.images.Image), "image is not a Docker image!"
-
-        assert self.filepath.read(), "log file empty"
+        content = self.filepath.read()
+        assert content, "log file empty"
 
     def test_get_logs(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
-        logger = RawOutputLogger(logs, console=True)
+        logger = BuildOutputLogger(logs, console=True)
         logger.daemon = True
         logger.start()
 
@@ -126,48 +125,35 @@ class TestRawOutputLogger(object):
 
 
 class TestDockerImage(object):
-    @pytest.fixture(autouse=True)
-    def setup(self, tmpdir):
-        self.tmpdir = tmpdir
-        self.filepath = self.tmpdir.join("Dockerfile")
 
     def test___init__(self):
-        with pytest.raises(ValueError):
-            DockerImage()
+        with pytest.raises(TypeError):
+            DockerImage(dict())
 
-    def test_build_from_file(self):
-        self.filepath.write("FROM alpine:latest\n")
-        assert DockerImage(path=self.tmpdir.strpath).build()
+        specs = {'base': 'debian:jessie',
+                 'pkg_manager': 'apt'}
+        df = Dockerfile(specs=specs)
+        # Test that fileobj is a file object.
+        image = DockerImage(df)
+        assert image.fileobj.read()
 
     def test_build(self):
         # Correct instructions.
         cmd = "FROM alpine:latest"
-        img = DockerImage(fileobj=cmd)
-        assert isinstance(img.build(), docker.models.images.Image)
+        image = DockerImage(cmd).build()
+        correct_type = isinstance(image, docker.models.images.Image)
+        assert correct_type
 
         # Incorrect instructions
         cmd = "FROM ubuntu:fake_version_12345"
-        img = DockerImage(fileobj=cmd)
         with pytest.raises(docker.errors.BuildError):
-            img.build()
-
-    def test_build_raw(self):
-        # Correct instructions.
-        cmd = "FROM alpine:latest"
-        img = DockerImage(fileobj=cmd)
-        assert isinstance(img.build_raw(), docker.models.images.Image)
-
-        # Incorrect instructions
-        cmd = "FROM ubuntu:fake_version_12345"
-        img = DockerImage(fileobj=cmd)
-        with pytest.raises(docker.errors.BuildError):
-            img.build_raw()
+            DockerImage(cmd).build()
 
 
 class TestDockerContainer(object):
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.image = DockerImage(fileobj='FROM ubuntu:17.04').build()
+        self.image = DockerImage('FROM ubuntu:17.04').build()
 
     def test_start_cleanup(self):
         pre = client.containers.list()

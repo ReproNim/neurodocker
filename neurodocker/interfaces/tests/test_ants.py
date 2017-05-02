@@ -1,12 +1,9 @@
 """Tests for neurodocker.interfaces.ANTs"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 from __future__ import absolute_import, division, print_function
-from io import BytesIO
 
-from neurodocker.docker_api import (client, Dockerfile, DockerImage,
-                                    DockerContainer)
-from neurodocker.parser import SpecsParser
 from neurodocker.interfaces import ANTs
+from neurodocker.interfaces.tests import utils
 
 
 class TestANTs(object):
@@ -18,16 +15,10 @@ class TestANTs(object):
                  'pkg_manager': 'yum',
                  'check_urls': False,
                  'ants': {'version': '2.1.0', 'use_binaries': True}}
-        parser = SpecsParser(specs)
-        cmd = Dockerfile(parser.specs).cmd
-        image = DockerImage(fileobj=cmd).build_raw()
-        container = DockerContainer(image)
-        container.start()
+        container = utils.get_container_from_specs(specs)
         output = container.exec_run('Atropos')
         assert "error" not in output, "error running Atropos"
-        container.cleanup(remove=True, force=True)
-        client.containers.prune()
-        client.images.prune()
+        utils.test_cleanup(container)
 
     def test_build_from_source_github(self):
         # TODO: expand on tests for building ANTs from source. It probably
