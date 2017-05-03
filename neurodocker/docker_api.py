@@ -106,7 +106,7 @@ class Dockerfile(object):
         if "miniconda" in self.specs.keys():
             cmds.append(self.add_miniconda())
         cmds.append(self.add_software())
-        return "\n\n".join(cmds)
+        return "\n\n".join(cmds) + "\n"
 
     def add_base(self):
         """Add Dockerfile FROM instruction."""
@@ -153,7 +153,6 @@ class Dockerfile(object):
             raise Exception("Instructions are empty.")
         with open(filepath, mode='w', **kwargs) as fp:
             fp.write(self.cmd)
-            fp.write('\n')
 
 
 class BuildOutputLogger(threading.Thread):
