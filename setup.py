@@ -7,5 +7,7 @@ setup(name='neurodocker',
       author='Jakub Kaczmarzyk',
       author_email='jakubk@mit.edu',
       packages=find_packages(),
-      install_requires = ['docker>=2.2.0', 'requests>=2.0.0'],
+      install_requires = ['docker', 'requests'],
+      entry_points={'console_scripts':
+                    ['neurodocker=neurodocker.main:main']}
       )
