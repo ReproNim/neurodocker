@@ -91,8 +91,6 @@ class Miniconda(object):
         of Python and desired conda packages.
         """
         orig_conda = posixpath.join(self._install_path, "bin", "conda")
-        new_conda = posixpath.join(self._env_path, "bin", "conda")
-        activate_path = posixpath.join(self._install_path, "bin", "activate")
 
         cmd = ("\n&& {} create -y -q -n default python={}"
                "".format(orig_conda, self.python_version))

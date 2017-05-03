@@ -17,8 +17,8 @@ class TestMiniconda(object):
                  'check_urls': False,
                  'miniconda': {
                     'python_version': '3.5.1',
-                    'conda_install': 'traits',
-                    'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}}
+                    'conda_install': ['traits'],
+                    'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('python -V')
         assert "3.5.1" in output, "incorrect Python version"
