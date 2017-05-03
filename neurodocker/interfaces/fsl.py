@@ -24,7 +24,8 @@ class FSL(object):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     use_binaries : bool
-        If true, use binaries from FSL's website. Defaults to True.
+        If true, use binaries from FSL's website. True by default if
+        use_installer and use_neurodebian are false.
     use_installer : bool
         If true, install FSL using FSL's Python installer. Only works on
         CentOS/RHEL.
@@ -40,7 +41,7 @@ class FSL(object):
     Look into ReproNim/simple_workflow to learn how to install specific versions
     of FSL on Debian (https://github.com/ReproNim/simple_workflow).
     """
-    def __init__(self, version, pkg_manager, use_binaries=False,
+    def __init__(self, version, pkg_manager, use_binaries=None,
                  use_installer=False, use_neurodebian=False, os_codename=None,
                  check_urls=True):
         self.version = LooseVersion(version)
@@ -50,6 +51,10 @@ class FSL(object):
         self.use_neurodebian = use_neurodebian
         self.os_codename = os_codename
         self.check_urls = check_urls
+
+        if (self.use_binaries is None and not self.use_installer
+            and not self.use_neurodebian):
+            self.use_binaries = True
 
         self._check_args()
         self.cmd = self._create_cmd()
