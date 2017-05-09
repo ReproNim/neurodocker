@@ -31,6 +31,7 @@ class SpecsParser(object):
 
     def parse(self):
         self._validate_keys()
+        self.specs = self._remove_nones()
         try:
             self._parse_conda_pip()
         except KeyError:
@@ -50,6 +51,9 @@ class SpecsParser(object):
             valid = ", ".join(self.VALID_TOP_LEVEL_KEYS)
             raise KeyError("Unexpected top-level key(s) in input: {}. Valid "
                            "keys are {}.".format(invalid, valid))
+
+    def _remove_nones(self):
+        return {k:v for k, v in self.specs.items() if v is not None}
 
     def _parse_conda_pip(self):
         """Parse packages to install with `conda` and/or `pip`."""

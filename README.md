@@ -4,29 +4,56 @@
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [example](#example) at the bottom of this page.
+_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [full example](#example) at the bottom of this page.
 
+
+# Command-line interface
+
+A Dockerfile can be generated from the command-line with the `neurodocker` command. Use the `-h` or `--help` flag for more information.
+
+Example:
+
+```bash
+neurodocker -b ubuntu:17.04 -p apt \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls
+```
 
 
 ## Supported Software
 
-This list is growing.
+Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
 
 ### ANTs
 
-To install, include `'ants'` (case-insensitive) in the specifications dictionary. Valid keys within `'ants'` are keywords for [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py#L27). Pre-compiled binaries can be installed, or ANTs can be compiled from source.
+ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.1.0'`) and `'use_binaries'` (if true, use binaries; if false, build from source).
 
-### Conda
-
-To install, include `'miniconda'` (case-insensitive) in the specifications dictionary. Valid keys within `'miniconda'` are keywords for [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py#L12). The `conda-forge` channel is added by default.
+View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
 
 ### FSL
 
-To install, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid keys within `'fsl'` are keywords for [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py#L11). Beware that FSL's Python installer will panic if used on a Debian-based system.
+FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), `'use_installer'` (bool; to use FSL's Python installer), `'use_neurodebian'` (bool), and `'os_codename'` (e.g., `'jessie'` or `'xenial'`; only required if installing with NeuroDebian).
+
+View source: [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py).
+
+
+### Miniconda
+
+Miniconda is installed using Miniconda's BASH installer. The latest version of Python 3 is installed to the root environment, and the `conda-forge` channel is added. A new conda environment is created with the requested specifications, the root environment is removed (to save space), and the new environment is prepended to `PATH`. To install Miniconda, include `'miniconda'` (case-insensitive) in the specifications dictionary Valid options are `'python_version'` (required; e.g., `'3.5.1'`), `'conda_install'` (e.g., `['numpy', 'traits']`), `pip_install` (e.g., `['nipype', 'pytest']`), and `miniconda_version` (`'latest'` by default).
+
+View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py).
+
 
 ### SPM
 
-To install, include `'spm'` (case-insensitive) in the specifications dictionary. Valid keys within `'spm'` are keywords for [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py#L17). Currently, only SPM12 and MATLAB R2017a are supported.
+The standalone version of SPM is installed, along with its dependency Matlab Compiler Runtime (MCR). MCR is installed first, using the [instructions on Matlab's website](https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html). SPM is then installed by downloading and unzipping the standalone SPM package. To install SPM, include `'spm'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'12'`), and `'matlab_version'` (case-sensitive; e.g., `'R2017a'`).
+
+Note: Currently, only SPM12 and MATLAB R2017a are supported.
+
+View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 
 
