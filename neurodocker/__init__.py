@@ -1,6 +1,7 @@
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import
 
-# This has to come first because Dockerfile and SpecsParser import this dict.
 from neurodocker.interfaces import ANTs, FSL, Miniconda, SPM
 
 SUPPORTED_SOFTWARE = {'ants': ANTs,
@@ -9,5 +10,7 @@ SUPPORTED_SOFTWARE = {'ants': ANTs,
                       'spm': SPM,
                       }
 
-from neurodocker.docker_api import DockerContainer, Dockerfile, DockerImage
+from neurodocker.dockerfile import Dockerfile
 from neurodocker.parser import SpecsParser
+
+__version__ = '0.1.0.dev0'

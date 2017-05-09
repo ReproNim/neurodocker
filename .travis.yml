@@ -22,9 +22,9 @@ install:
 script:
   - function run_tests {
       if [ "$INTERFACE_TO_BUILD" == 'none' ]; then
-        pytest -v -k "not test_build_image" --cov=./ neurodocker;
+        python -m pytest -v -k "not test_build_image" --cov=./ neurodocker;
       else
-        travis_wait 50 pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
+        travis_wait 50 python -m pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       fi }
   - run_tests
 after_success:

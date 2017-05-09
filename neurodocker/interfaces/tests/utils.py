@@ -1,8 +1,8 @@
 """Utility functions for `neurodocker.interfaces.tests`."""
 from __future__ import absolute_import
 
-from neurodocker import Dockerfile, DockerImage, DockerContainer, SpecsParser
-from neurodocker.docker_api import client
+from neurodocker import Dockerfile, SpecsParser
+from neurodocker.docker import client, DockerContainer, DockerImage
 
 def get_container_from_specs(specs, **kwargs):
     """Return started container. `kwargs` are for `container.start()`."""
