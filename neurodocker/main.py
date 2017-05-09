@@ -14,9 +14,7 @@ from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import sys
 
-from neurodocker import (DockerContainer, DockerContainer, Dockerfile,
-                         SpecsParser, SUPPORTED_SOFTWARE)
-
+from neurodocker import (Dockerfile, SpecsParser, SUPPORTED_SOFTWARE)
 
 
 def create_parser():
