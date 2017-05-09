@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from setuptools import find_packages, setup
 
 setup(name='neurodocker',
@@ -7,7 +8,7 @@ setup(name='neurodocker',
       author='Jakub Kaczmarzyk',
       author_email='jakubk@mit.edu',
       packages=find_packages(),
-      install_requires = ['docker', 'requests'],
+      install_requires = ['requests'],
       entry_points={'console_scripts':
                     ['neurodocker=neurodocker.main:main']}
       )
