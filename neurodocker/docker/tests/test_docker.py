@@ -10,10 +10,9 @@ import time
 import docker
 import pytest
 
-from neurodocker.dockerfile import Dockerfile
+from neurodocker import Dockerfile
 from neurodocker.docker.docker import (BuildOutputLogger, docker_is_running,
-                                       DockerContainer, DockerImage,
-                                       require_docker)
+                                       DockerContainer, DockerImage)
 
 
 client = docker.from_env()
@@ -35,7 +34,6 @@ class TestBuildOutputLogger(object):
     def test_start(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
         logger = BuildOutputLogger(logs, console=False, filepath=self.filepath.strpath)
-        logger.daemon = True
         logger.start()
         living = logger.is_alive()
         assert living, "BuildOutputLogger not alive"
