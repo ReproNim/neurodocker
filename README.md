@@ -4,8 +4,23 @@
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [example](#example) at the bottom of this page.
+_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [full example](#example) at the bottom of this page.
 
+
+# Command-line interface
+
+A Dockerfile can be generated from the command-line with the `neurodocker` command. Use the `-h` or `--help` flag for more information.
+
+Example:
+
+```bash
+neurodocker -b ubuntu:17.04 -p apt \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls
+```
 
 
 ## Supported Software
