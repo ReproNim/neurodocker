@@ -2,7 +2,7 @@
 from setuptools import find_packages, setup
 
 setup(name='neurodocker',
-      version='dev',
+      version='0.1.0.dev0',
       url='https://github.com/kaczmarj/neurodocker',
       author='Jakub Kaczmarzyk',
       author_email='jakubk@mit.edu',
