@@ -4,23 +4,25 @@
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [full example](#example) at the bottom of this page.
+_Neurodocker_ is a Python project that generates Dockerfiles with specified versions of Python and neuroimaging analysis software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. _Neurodocker_ can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles, and interaction with the Docker Engine is left to the various `docker` commands. Within a script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, and run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)).
+
+See the [examples](#examples) below.
 
 
-# Command-line interface
+# Installation
 
-A Dockerfile can be generated from the command-line with the `neurodocker` command. Use the `-h` or `--help` flag for more information.
+You can install _Neurodocker_ with `pip`, or you can use the project's Docker image.
 
-Example:
+`pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz`
 
-```bash
-neurodocker -b ubuntu:17.04 -p apt \
---ants version=2.1.0 \
---fsl version=5.0.10 \
---miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
---spm version=12 matlab_version=R2017a \
---no-check-urls
-```
+or
+
+`docker run --rm kaczmarj/neurodocker --help`
+
+
+Note: the `docker` Python package must be installed to build images and run containers with _Neurodocker_: `pip install docker`.
+
+
 
 
 ## Supported Software
@@ -57,14 +59,46 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 
 
-## Example
+# Examples
+
+## Docker image
+
+Generate Dockerfile, and print result to stdout.
+
+```bash
+docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls
+```
+
+## Command-line example
+
+Generate Dockerfile, do not print result to stdout, save to file.
+
+Example:
+
+```bash
+neurodocker -b ubuntu:17.04 -p apt \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls --no-print-df -o path/to/Dockerfile
+```
+
+
+## Scripting example
 
 
 In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
 
 ```python
-from neurodocker import Dockerfile, DockerImage, DockerContainer, SpecsParser
+from neurodocker import Dockerfile, SpecsParser
+from neurodocker.docker import DockerImage, DockerContainer
 
 specs = {
     'base': 'ubuntu:17.04',
