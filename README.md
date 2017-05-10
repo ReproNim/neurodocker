@@ -61,7 +61,7 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 # Examples
 
-## Docker image
+## Using the project's Docker image
 
 Generate Dockerfile, and print result to stdout.
 
@@ -76,17 +76,25 @@ docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
 
 ## Command-line example
 
-Generate Dockerfile, do not print result to stdout, save to file.
+Generate Dockerfile, do not print result to stdout, save to file. Build the Docker image with `docker build`.
 
 Example:
 
 ```bash
-neurodocker -b ubuntu:17.04 -p apt \
+# Generate Dockerfile.
+neurodocker -b centos:7 -p yum \
 --ants version=2.1.0 \
 --fsl version=5.0.10 \
 --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
 --spm version=12 matlab_version=R2017a \
---no-check-urls --no-print-df -o path/to/Dockerfile
+--no-check-urls --no-print-df -o path/to/project/Dockerfile
+
+# Build Docker image using the saved Dockerfile.
+docker build -t myimage path/to/project
+
+# Or pipe the Dockerfile to the docker build command. There is no build
+# context in this case.
+neurodocker -b centos:7 -p yum --miniconda python_version=3.5.1 | docker build -
 ```
 
 
@@ -103,7 +111,7 @@ from neurodocker.docker import DockerImage, DockerContainer
 specs = {
     'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
-    'check_urls': True,  # Verify communication with URLs used in build.
+    'check_urls': False,  # Verify communication with URLs used in build.
     'miniconda': {
         'python_version': '3.5.1',
         'conda_install': 'traits',
@@ -115,11 +123,13 @@ specs = {
 
 parser = SpecsParser(specs)
 df = Dockerfile(parser.specs)
-# df.save('path/to/this/Dockerfile')
+# df.save('path/to/Dockerfile')
 # print(df)
 
-image = DockerImage(df).build()
+# Build image.
+image = DockerImage(df).build(log_console=False, log_filepath="build.log")
 
+# Start container, and run commands.
 container = DockerContainer(image).start()
 container.exec_run('python -c "import nipype; print(nipype.__version__)"')
 # Returns '0.13.0-dev\n'
@@ -145,18 +155,18 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends bzip2 ca-c
 #-------------------------------------------------
 # Install Miniconda, and set up Python environment
 #-------------------------------------------------
-WORKDIR /opt
+ENV PATH=/opt/miniconda/envs/default/bin:$PATH
 RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     && bash miniconda.sh -b -p /opt/miniconda \
-    && rm -f miniconda.sh
-RUN /opt/miniconda/bin/conda config --add channels conda-forge \
-    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 traits
-ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN pip install --upgrade -q --no-cache-dir pip \
-    && pip install -q --no-cache-dir https://github.com/nipy/nipype/archive/master.tar.gz \
+    && rm -f miniconda.sh \
+    && /opt/miniconda/bin/conda config --add channels conda-forge \
+    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 \
+    	traits \
     && conda clean -y --all \
-    && cd /opt/miniconda \
-    && rm -rf bin conda-meta include lib pkgs share ssl
+    && pip install -U -q --no-cache-dir pip \
+    && pip install -q --no-cache-dir \
+    	https://github.com/nipy/nipype/archive/master.tar.gz \
+    && rm -rf /opt/miniconda/[!envs]*
 
 #-------------------
 # Install ANTs 2.1.0
