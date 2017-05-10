@@ -4,23 +4,25 @@
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Docker images with specified versions of Python and neuroimaging software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. See the [full example](#example) at the bottom of this page.
+_Neurodocker_ is a Python project that generates Dockerfiles with specified versions of Python and neuroimaging analysis software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. _Neurodocker_ can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles, and interaction with the Docker Engine is left to the various `docker` commands. Within a script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, and run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)).
+
+See the [examples](#examples) below.
 
 
-# Command-line interface
+# Installation
 
-A Dockerfile can be generated from the command-line with the `neurodocker` command. Use the `-h` or `--help` flag for more information.
+You can install _Neurodocker_ with `pip`, or you can use the project's Docker image.
 
-Example:
+`pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz`
 
-```bash
-neurodocker -b ubuntu:17.04 -p apt \
---ants version=2.1.0 \
---fsl version=5.0.10 \
---miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
---spm version=12 matlab_version=R2017a \
---no-check-urls
-```
+or
+
+`docker run --rm kaczmarj/neurodocker --help`
+
+
+Note: the `docker` Python package must be installed to build images and run containers with _Neurodocker_: `pip install docker`.
+
+
 
 
 ## Supported Software
@@ -57,19 +59,59 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 
 
-## Example
+# Examples
+
+## Using the project's Docker image
+
+Generate Dockerfile, and print result to stdout.
+
+```bash
+docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls
+```
+
+## Command-line example
+
+Generate Dockerfile, do not print result to stdout, save to file. Build the Docker image with `docker build`.
+
+Example:
+
+```bash
+# Generate Dockerfile.
+neurodocker -b centos:7 -p yum \
+--ants version=2.1.0 \
+--fsl version=5.0.10 \
+--miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--spm version=12 matlab_version=R2017a \
+--no-check-urls --no-print-df -o path/to/project/Dockerfile
+
+# Build Docker image using the saved Dockerfile.
+docker build -t myimage path/to/project
+
+# Or pipe the Dockerfile to the docker build command. There is no build
+# context in this case.
+neurodocker -b centos:7 -p yum --miniconda python_version=3.5.1 | docker build -
+```
+
+
+## Scripting example
 
 
 In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
 
 ```python
-from neurodocker import Dockerfile, DockerImage, DockerContainer, SpecsParser
+from neurodocker import Dockerfile, SpecsParser
+from neurodocker.docker import DockerImage, DockerContainer
 
 specs = {
     'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
-    'check_urls': True,  # Verify communication with URLs used in build.
+    'check_urls': False,  # Verify communication with URLs used in build.
     'miniconda': {
         'python_version': '3.5.1',
         'conda_install': 'traits',
@@ -81,11 +123,13 @@ specs = {
 
 parser = SpecsParser(specs)
 df = Dockerfile(parser.specs)
-# df.save('path/to/this/Dockerfile')
+# df.save('path/to/Dockerfile')
 # print(df)
 
-image = DockerImage(df).build()
+# Build image.
+image = DockerImage(df).build(log_console=False, log_filepath="build.log")
 
+# Start container, and run commands.
 container = DockerContainer(image).start()
 container.exec_run('python -c "import nipype; print(nipype.__version__)"')
 # Returns '0.13.0-dev\n'
@@ -111,18 +155,18 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends bzip2 ca-c
 #-------------------------------------------------
 # Install Miniconda, and set up Python environment
 #-------------------------------------------------
-WORKDIR /opt
+ENV PATH=/opt/miniconda/envs/default/bin:$PATH
 RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     && bash miniconda.sh -b -p /opt/miniconda \
-    && rm -f miniconda.sh
-RUN /opt/miniconda/bin/conda config --add channels conda-forge \
-    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 traits
-ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN pip install --upgrade -q --no-cache-dir pip \
-    && pip install -q --no-cache-dir https://github.com/nipy/nipype/archive/master.tar.gz \
+    && rm -f miniconda.sh \
+    && /opt/miniconda/bin/conda config --add channels conda-forge \
+    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 \
+    	traits \
     && conda clean -y --all \
-    && cd /opt/miniconda \
-    && rm -rf bin conda-meta include lib pkgs share ssl
+    && pip install -U -q --no-cache-dir pip \
+    && pip install -q --no-cache-dir \
+    	https://github.com/nipy/nipype/archive/master.tar.gz \
+    && rm -rf /opt/miniconda/[!envs]*
 
 #-------------------
 # Install ANTs 2.1.0
