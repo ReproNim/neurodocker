@@ -73,8 +73,3 @@ class TestDockerfile(object):
         df.save(filepath.strpath)
         assert len(self.tmpdir.listdir()) == 1, "file not saved"
         assert df.cmd in filepath.read(), "file content not correct"
-
-        with pytest.raises(Exception):
-            df = Dockerfile(self.specs)
-            df.cmd = ""
-            df.save(filepath.strpath)
