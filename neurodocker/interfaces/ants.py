@@ -38,6 +38,7 @@ class ANTs(object):
         status code greater than 400.
     """
     VERSION_HASHES = {"latest": None,
+                      "2.2.0": "0740f9111e5a9cd4768323dc5dfaa7c29481f9ef",
                       "2.1.0": "78931aa6c4943af25e0ee0644ac611d27127a01e",
                       "2.1.0rc3": "465cc8cdf0f8cc958edd2d298e05cc2d7f8a48d8",
                       "2.1.0rc2": "17160f72f5e1c9d6759dd32b7f2dc0b36ded338b",
