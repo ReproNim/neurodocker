@@ -4,8 +4,12 @@ commands within containers, and get command ouptut.
 
 Example:
 
-    neurodocker -b ubuntu:17.04 -p apt --ants version=2.1.0 --fsl version=5.0.10
-    --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype
+    neurodocker -b ubuntu:17.04 -p apt \
+    --ants version=2.1.0 \
+    --fsl version=5.0.10 \
+    --miniconda python_version=3.5.1 \
+                conda_install=traits,pandas \
+                pip_install=nipype \
     --spm version=12 matlab_version=R2017a
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -105,7 +109,10 @@ def convert_args_to_specs(namespace):
 
             for kv_pair in list_of_kv:
                 if len(kv_pair) != 2:
-                    raise ValueError("Error in arguments: {}".format(kv_pair))
+                    raise ValueError("Error in arguments '{}'. Did you forget "
+                                     "the equals sign?".format(kv_pair[0]))
+                if not kv_pair[-1]:
+                    raise ValueError("Option required for '{}'".format(kv_pair[0]))
 
             return {k: v for k, v in list_of_kv}
 
