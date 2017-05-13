@@ -62,8 +62,10 @@ class ANTs(object):
                       "2.0.0": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",
                       "HoneyPot": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",}
 
-    VERSION_TARBALLS = {"2.1.0": "https://www.dropbox.com/s/x7eyk125bhwiisu/ants-2.1.0_centos-5.tar.gz?dl=1",
-                        "2.0.3": "https://www.dropbox.com/s/09yd0jbohcwl24z/ants-2.0.3_centos-5.tar.gz?dl=1",}
+    VERSION_TARBALLS = {"2.2.0": "https://www.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz?dl=1",
+                        "2.1.0": "https://www.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz?dl=1",
+                        "2.0.3": "https://www.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz?dl=1",
+                        "2.0.0": "https://www.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz?dl=1",}
 
     def __init__(self, version, pkg_manager, use_binaries=True, git_hash=None,
                  check_urls=True):
@@ -105,7 +107,7 @@ class ANTs(object):
         if self.check_urls:
             check_url(url)
 
-        cmd = ("RUN curl -sSL {} | tar zx -C /opt".format(url))
+        cmd = ("RUN curl -sSL --retry 5 {} | tar zx -C /opt".format(url))
 
         env_cmd = ("ANTSPATH=/opt/ants"
                    "\nPATH=/opt/ants:$PATH")
@@ -121,7 +123,11 @@ class ANTs(object):
                 'yum': 'cmake gcc-c++ git make zlib-devel'}
 
         if self.git_hash is None:
-            self.git_hash = ANTs.VERSION_HASHES[self.version]
+            try:
+                self.git_hash = ANTs.VERSION_HASHES[self.version]
+            except KeyError:
+                raise ValueError("git hash not known for version {}"
+                                 "".format(self.version))
 
         if self.version == "latest":
             checkout = ""
