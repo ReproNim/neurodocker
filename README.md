@@ -31,7 +31,9 @@ Valid options for each software package are the keyword arguments for the class 
 
 ### ANTs
 
-ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.1.0'`) and `'use_binaries'` (if true, use binaries; if false, build from source).
+ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.1.0'`), `'use_binaries'` (if true, use binaries; if false, build from source, if str, must be URL with tarball of binaries that extracts to a directory `ants`), and `'git_hash'` (build from source from specific hash).
+
+Repository with pre-compiled binaries: [kaczmarj/ANTs-builds](https://github.com/kaczmarj/ANTs-builds)
 
 View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
 
