@@ -28,14 +28,10 @@ class TestANTs(object):
             ANTs(version='fakeversion', pkg_manager='apt', check_urls=False)
 
     def test_install_with_custom_url(self):
-        url = 'http://fakesite'
+        url = 'http://fakesite.com'
         ants = ANTs(version='2.2.0', pkg_manager='apt', use_binaries=url,
                     check_urls=False)
         assert url in ants.cmd
-
-        with pytest.raises(ValueError):
-            ants = ANTs(version='2.2.0', pkg_manager='apt',
-                        use_binaries='fakesite', check_urls=False)
 
     def test_build_from_source_github(self):
         # TODO: expand on tests for building ANTs from source. It probably
