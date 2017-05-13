@@ -31,7 +31,7 @@ def docker_is_running(client):
 
 
 # Check whether Docker server is running.
-client = docker.from_env()
+client = docker.from_env(timeout=60)
 DOCKER_RUNNING = docker_is_running(client)
 
 
