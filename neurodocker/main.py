@@ -36,10 +36,12 @@ def create_parser():
                 "key=value pairs.\nWhere applicable, the default installation "
                 "behavior is to install by\ndownloading and uncompressing "
                 "binaries."),
-        "ants": ("Install ANTs. Valid keys are version (required) and "
-                "use_binaries (default true). If use_binaries=true, installs "
-                "pre-compiled binaries; if use_binaries=false, builds ANTs "
-                "from source."),
+        "ants": ("Install ANTs. Valid keys are version (required), "
+                "use_binaries (default true), and git_hash. If use_binaries="
+                "true, installs pre-compiled binaries; if use_binaries=false, "
+                "builds ANTs from source. If use_binaries is a URL, download "
+                "tarball of ANTs binaries from that URL. If git_hash is "
+                "specified, build from source from that commit."),
         "fsl": ("Install FSL. Valid keys are version (required), use_binaries "
                 "(default true), use_installer, use_neurodebian, and "
                 "os_codename (eg, jessie)."),
