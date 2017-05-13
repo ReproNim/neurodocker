@@ -23,8 +23,6 @@ script:
   - function run_tests {
       if [ "$INTERFACE_TO_BUILD" == 'none' ]; then
         python -m pytest -v -k "not test_build_image" --cov=./ neurodocker;
-      elif [ "$INTERFACE_TO_BUILD" == 'ants' ]; then
-        python -m pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       else
         travis_wait 50 python -m pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       fi }
