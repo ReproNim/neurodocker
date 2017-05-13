@@ -15,7 +15,8 @@ class Dockerfile(object):
     Parameters
     ----------
     specs : dict
-        Dictionary with keys 'base', etc.
+        Dictionary of specifications. Recommended to pass the dictionary
+        through neurodocker.SpecsParser first.
     pkg_manager : {'apt', 'yum'}
         Linux package manager. If None, uses the value of `specs['pkg_manager']`.
     check_urls : bool
@@ -46,13 +47,20 @@ class Dockerfile(object):
 
     def _create_cmd(self):
         cmds = [self.add_base()]
+
         if 'debian' in self.specs['base'] or 'ubuntu' in self.specs['base']:
             cmds.append("ARG DEBIAN_FRONTEND=noninteractive")
+
         cmds.append(self.add_common_dependencies())
+
         # Install Miniconda before other software.
         if "miniconda" in self.specs.keys():
             cmds.append(self.add_miniconda())
-        cmds.append(self.add_software())
+
+        software_cmds = self.add_software()
+        if software_cmds:
+            cmds.append(software_cmds)
+
         return "\n\n".join(cmds) + "\n"
 
     def add_base(self):
@@ -70,6 +78,7 @@ class Dockerfile(object):
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         cmd = cmd.format(pkgs=deps)
         cmd = indent("RUN", cmd)
+
         return "\n".join((comment, cmd))
 
     def add_miniconda(self):
@@ -77,6 +86,7 @@ class Dockerfile(object):
         kwargs = self.specs['miniconda']
         obj = Miniconda(pkg_manager=self.pkg_manager,
                         check_urls=self.check_urls, **kwargs)
+
         return obj.cmd
 
     def add_software(self):
@@ -85,18 +95,15 @@ class Dockerfile(object):
         for pkg, kwargs in self.specs.items():
             if pkg == 'miniconda':
                 continue
-            try:
+            if pkg in SUPPORTED_SOFTWARE.keys():
                 obj = SUPPORTED_SOFTWARE[pkg](pkg_manager=self.pkg_manager,
                                               check_urls=self.check_urls,
                                               **kwargs)
                 cmds.append(obj.cmd)
-            except KeyError:
-                pass
+
         return "\n\n".join(cmds)
 
     def save(self, filepath="Dockerfile", **kwargs):
         """Save Dockerfile to `filepath`. `kwargs` are for `open()`."""
-        if not self.cmd:
-            raise Exception("Instructions are empty.")
         with open(filepath, mode='w', **kwargs) as fp:
             fp.write(self.cmd)

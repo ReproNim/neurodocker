@@ -1,6 +1,9 @@
 """Class to parse specifications for Dockerfile."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import
+
+import inspect
+
 
 from neurodocker import SUPPORTED_SOFTWARE
 from neurodocker.utils import load_json
@@ -32,6 +35,7 @@ class SpecsParser(object):
     def parse(self):
         self._validate_keys()
         self.specs = self._remove_nones()
+        self._validate_software_opts()
         try:
             self._parse_conda_pip()
         except KeyError:
@@ -51,6 +55,20 @@ class SpecsParser(object):
             valid = ", ".join(self.VALID_TOP_LEVEL_KEYS)
             raise KeyError("Unexpected top-level key(s) in input: {}. Valid "
                            "keys are {}.".format(invalid, valid))
+
+    def _validate_software_opts(self):
+        """Raise ValueError if a key is present that does not belong in a
+        functions signature.
+        """
+        for pkg, opts in self.specs.items():
+            if pkg in SUPPORTED_SOFTWARE.keys():
+                func = SUPPORTED_SOFTWARE[pkg]
+                params = inspect.signature(func).parameters
+                bad_opts = [opt for opt in opts if opt not in params]
+                if bad_opts:
+                    bad_opts = ', '.join(bad_opts)
+                    raise ValueError("Invalid option(s) found in key '{}': {}"
+                                     "".format(pkg, bad_opts))
 
     def _remove_nones(self):
         return {k:v for k, v in self.specs.items() if v is not None}

@@ -4,8 +4,12 @@ commands within containers, and get command ouptut.
 
 Example:
 
-    neurodocker -b ubuntu:17.04 -p apt --ants version=2.1.0 --fsl version=5.0.10
-    --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype
+    neurodocker -b ubuntu:17.04 -p apt \
+    --ants version=2.1.0 \
+    --fsl version=5.0.10 \
+    --miniconda python_version=3.5.1 \
+                conda_install=traits,pandas \
+                pip_install=nipype \
     --spm version=12 matlab_version=R2017a
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -104,15 +108,20 @@ def convert_args_to_specs(namespace):
         # Flatten list.
         if list_of_kv is not None:
             list_of_kv = [item for sublist in list_of_kv for item in sublist]
+
+            for kv_pair in list_of_kv:
+                if len(kv_pair) != 2:
+                    raise ValueError("Error in arguments '{}'. Did you forget "
+                                     "the equals sign?".format(kv_pair[0]))
+                if not kv_pair[-1]:
+                    raise ValueError("Option required for '{}'".format(kv_pair[0]))
+
             return {k: v for k, v in list_of_kv}
 
     specs = vars(deepcopy(namespace))
 
     for pkg in SUPPORTED_SOFTWARE.keys():
-        # try:
         specs[pkg] = _list_to_dict(specs[pkg])
-        #except KeyError:
-        #    pass
 
     try:
         specs['miniconda']['conda_install'] = \
@@ -138,8 +147,8 @@ def main(args=None):
 
     # Create dictionary of specifications.
     specs = convert_args_to_specs(namespace)
-    KEYS_TO_REMOVE = ['verbose', 'no_print_df', 'output', 'build']
-    for key in KEYS_TO_REMOVE:
+    keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
+    for key in keys_to_remove:
         specs.pop(key, None)
 
     # Parse to double-check that keys are correct.
@@ -152,7 +161,6 @@ def main(args=None):
 
     if namespace.output:
         df.save(namespace.output)
-
 
 
 if __name__ == "__main__":  # pragma: no cover

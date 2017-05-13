@@ -73,6 +73,18 @@ def test_convert_args_to_specs():
 
     assert "," not in specs['miniconda']['conda_install']
 
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'option']
+    namespace = parse_args(args)
+    with pytest.raises(ValueError):
+        convert_args_to_specs(namespace)
+
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'option=']
+    namespace = parse_args(args)
+    with pytest.raises(ValueError):
+        convert_args_to_specs(namespace)
+
 
 def test_main():
     args = ['-b', 'ubuntu:17.04', '-p', 'apt',
@@ -93,16 +105,21 @@ def test_main():
     with pytest.raises(SystemExit):
         main()
 
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'option=value']
+    with pytest.raises(ValueError):
+        main(args)
+
 
 def test_no_print(capsys):
     args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
     main(args)
-    out, err = capsys.readouterr()
+    out, _ = capsys.readouterr()
     assert "FROM" in out and "RUN" in out
 
     args.append('--no-print-df')
     main(args)
-    out, err = capsys.readouterr()
+    out, _ = capsys.readouterr()
     assert not out
 
 
