@@ -63,7 +63,13 @@ class SpecsParser(object):
         for pkg, opts in self.specs.items():
             if pkg in SUPPORTED_SOFTWARE.keys():
                 func = SUPPORTED_SOFTWARE[pkg]
-                params = inspect.signature(func).parameters
+                try:
+                    params = list(inspect.signature(func).parameters)
+                # Python 2.7 does not have inspect.signature
+                except AttributeError:
+                    params = inspect.getargspec(func.__init__)[0]
+                    params.remove('self')
+
                 bad_opts = [opt for opt in opts if opt not in params]
                 if bad_opts:
                     bad_opts = ', '.join(bad_opts)
