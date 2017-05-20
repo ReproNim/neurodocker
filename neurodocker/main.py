@@ -55,6 +55,10 @@ def create_parser():
                       "conda_install and pip_install take an arbitrary number "
                       "of comma-separated values (no white-space). "
                       "Example: conda_install=pandas,pytest,traits)."),
+        "mrtrix3" : ("Install MRtrix3. Valid keys are use_binaries (default "
+                     "true) and git_hash. If git_hash is specified and "
+                     "use_binaries is false, will checkout to that commit "
+                     "before building."),
         "spm": ("Install SPM (and its dependency, Matlab Compiler Runtime). "
                 "Valid keys are version and matlab_version."),
     }
@@ -66,6 +70,13 @@ def create_parser():
 
     for p in SUPPORTED_SOFTWARE.keys():
         flag = "--{}".format(p)
+
+        # MRtrix3 does not need any arguments by default.
+        if p == "mrtrix3":
+            pkgs.add_argument(flag, dest=p, action="append", nargs="*",
+                              metavar="", type=list_of_kv, help=pkgs_help[p])
+            continue
+
         pkgs.add_argument(flag, dest=p, action="append", nargs="+", metavar="",
                           type=list_of_kv, help=pkgs_help[p])
 

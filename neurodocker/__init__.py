@@ -2,12 +2,13 @@
 
 from __future__ import absolute_import
 
-from neurodocker.interfaces import ANTs, FSL, Miniconda, SPM
+from neurodocker import interfaces
 
-SUPPORTED_SOFTWARE = {'ants': ANTs,
-                      'fsl': FSL,
-                      'miniconda': Miniconda,
-                      'spm': SPM,
+SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
+                      'fsl': interfaces.FSL,
+                      'miniconda': interfaces.Miniconda,
+                      'mrtrix3': interfaces.MRtrix3,
+                      'spm': interfaces.SPM,
                       }
 
 from neurodocker.dockerfile import Dockerfile

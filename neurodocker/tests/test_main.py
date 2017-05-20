@@ -63,6 +63,7 @@ def test_convert_args_to_specs():
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
             '--miniconda', 'conda_install=pandas,traits',
+            '--mrtrix3',
             '--spm', 'version=12',
             '--no-check-urls']
     namespace = parse_args(args)
@@ -91,6 +92,7 @@ def test_main():
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
             '--miniconda', 'python_version=3.5.1',
+            '--mrtrix3',
             '--spm', 'version=12', 'matlab_version=R2017a',
             '--no-check-urls']
     main(args)

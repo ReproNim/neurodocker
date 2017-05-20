@@ -51,6 +51,11 @@ Miniconda is installed using Miniconda's BASH installer. The latest version of P
 View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py).
 
 
+### MRtrix3
+
+MRtrix3 can be installed using pre-compiled binaries (default behavior), or the package can be built from source. To install MRtrix3, include `'mrtrix3'` (case-insensitive) in the specifications dictionary. Valid options are `'use_binaries'` (bool) and `'git_hash'` (str). If `'git_hash'` is specified, will checkout to that commit before building.
+
+
 ### SPM
 
 The standalone version of SPM is installed, along with its dependency Matlab Compiler Runtime (MCR). MCR is installed first, using the [instructions on Matlab's website](https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html). SPM is then installed by downloading and unzipping the standalone SPM package. To install SPM, include `'spm'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'12'`), and `'matlab_version'` (case-sensitive; e.g., `'R2017a'`).
@@ -72,6 +77,7 @@ docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
 --ants version=2.1.0 \
 --fsl version=5.0.10 \
 --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--mrtrix3 \
 --spm version=12 matlab_version=R2017a \
 --no-check-urls
 ```
@@ -88,6 +94,7 @@ neurodocker -b centos:7 -p yum \
 --ants version=2.1.0 \
 --fsl version=5.0.10 \
 --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--mrtrix3 \
 --spm version=12 matlab_version=R2017a \
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
@@ -100,11 +107,44 @@ neurodocker -b centos:7 -p yum --miniconda python_version=3.5.1 | docker build -
 ```
 
 
-## Scripting example
+## Minimal scripting example
+
+In this example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
 
-In the following example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
+```python
+from neurodocker import Dockerfile, SpecsParser
+from neurodocker.docker import DockerImage, DockerContainer
 
+specs = {
+    'base': 'ubuntu:17.04',
+    'pkg_manager': 'apt',
+    'check_urls': False,
+    'miniconda': {
+        'python_version': '3.5.1',
+        'conda_install': 'traits',
+        'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}
+}
+# Create Dockerfile.
+parser = SpecsParser(specs)
+df = Dockerfile(parser.specs)
+
+# Build image.
+image = DockerImage(df).build(log_console=False, log_filepath="build.log")
+
+# Start container, and run commands.
+container = DockerContainer(image).start()
+container.exec_run('python -c "import nipype; print(nipype.__version__)"')
+# Returns '1.0.0-dev\n'
+container.exec_run('python -V')
+# Returns 'Python 3.5.1\n'
+container.cleanup(remove=True)
+```
+
+
+## Full scripting example
+
+This example creates a Dockerfile with all of the software that _Neurodocker_ supports.
 
 ```python
 from neurodocker import Dockerfile, SpecsParser
@@ -118,29 +158,19 @@ specs = {
         'python_version': '3.5.1',
         'conda_install': 'traits',
         'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
-    'ants': {'version': '2.1.0', 'use_binaries': True},
+    'mrtrix3': {'use_binaries': False},
+    'ants': {'version': '2.2.0', 'use_binaries': True},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
 }
 
 parser = SpecsParser(specs)
 df = Dockerfile(parser.specs)
-# df.save('path/to/Dockerfile')
-# print(df)
-
-# Build image.
-image = DockerImage(df).build(log_console=False, log_filepath="build.log")
-
-# Start container, and run commands.
-container = DockerContainer(image).start()
-container.exec_run('python -c "import nipype; print(nipype.__version__)"')
-# Returns '0.13.0-dev\n'
-container.exec_run('ANTS')
-# Returns ' call ANTS -h or ANTS --help \n'
-container.cleanup(remove=True)
+df.save('path/to/Dockerfile')
+print(df)
 ```
 
-The example above creates this Dockerfile:
+The code above creates this Dockerfile:
 
 ```dockerfile
 FROM ubuntu:17.04
@@ -170,12 +200,26 @@ RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-lat
     	https://github.com/nipy/nipype/archive/master.tar.gz \
     && rm -rf /opt/miniconda/[!envs]*
 
-#-------------------
-# Install ANTs 2.1.0
-#-------------------
+#----------------
+# Install MRtrix3
+#----------------
 WORKDIR /opt
-RUN URL=https://www.dropbox.com/s/x7eyk125bhwiisu/ants-2.1.0_centos-5.tar.gz?dl=1 \
-    && curl -sSL $URL | tar zx
+RUN deps='g++ git libeigen3-dev zlib1g-dev' \
+    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && git clone https://github.com/MRtrix3/mrtrix3.git \
+    && cd mrtrix3 \
+    && ./configure -nogui \
+    && ./build \
+    && rm -rf tmp/* /tmp/* \
+    && apt-get purge -y --auto-remove $deps
+ENV PATH=/opt/mrtrix3/bin:$PATH
+
+#-------------------
+# Install ANTs 2.2.0
+#-------------------
+RUN curl -sSL --retry 5 https://www.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz?dl=1 | tar zx -C /opt
 ENV ANTSPATH=/opt/ants \
     PATH=/opt/ants:$PATH
 
