@@ -62,10 +62,10 @@ class ANTs(object):
                       "2.0.0": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",
                       "HoneyPot": "7ae1107c102f7c6bcffa4df0355b90c323fcde92",}
 
-    VERSION_TARBALLS = {"2.2.0": "https://www.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz?dl=1",
-                        "2.1.0": "https://www.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz?dl=1",
-                        "2.0.3": "https://www.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz?dl=1",
-                        "2.0.0": "https://www.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz?dl=1",}
+    VERSION_TARBALLS = {"2.2.0": "https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz",
+                        "2.1.0": "https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz",
+                        "2.0.3": "https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz",
+                        "2.0.0": "https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz",}
 
     def __init__(self, version, pkg_manager, use_binaries=True, git_hash=None,
                  check_urls=True):

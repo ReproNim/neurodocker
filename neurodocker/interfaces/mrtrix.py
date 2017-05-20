@@ -61,8 +61,8 @@ class MRtrix3(object):
 
     def install_binaries(self):
         """Return command to download and install MRtrix3 binaries."""
-        url = ("https://www.dropbox.com/s/2g008aaaeht3m45/"
-               "mrtrix3-Linux-centos6.tar.gz?dl=0")
+        url = ("https://dl.dropbox.com/s/2g008aaaeht3m45/"
+               "mrtrix3-Linux-centos6.tar.gz")
 
         if self.check_urls:
             check_url(url)
