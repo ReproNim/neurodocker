@@ -1,5 +1,10 @@
 """Add Dockerfile instructions to install MRtrix.
 
+MRtrix GitHub repository: https://github.com/MRtrix3/mrtrix3
+
+MRtrix recommends building from source. Binaries for MRtrix3 were compiled on
+CentOS 6.6 and uploaded to Dropbox. This file uses those binaries if the user
+wants to use pre-compiled binaries.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -9,10 +14,9 @@ from neurodocker.utils import check_url, indent, manage_pkgs
 
 
 class MRtrix3(object):
-    """Add Dockerfile instructions to install MRtrix. Version 3 is supported.
-    Pre-compiled binaries can be downloaded, or MRtrix can be
-    built from source. The pre-compiled binaries were compiled on a CentOS 6.6
-    Docker image.
+    """Add Dockerfile instructions to install MRtrix3. Pre-compiled binaries
+    can be downloaded, or MRtrix can be built from source. The pre-compiled
+    binaries were compiled on a CentOS 6.6 Docker image.
 
     Parameters
     ----------
@@ -37,7 +41,7 @@ class MRtrix3(object):
         self.check_urls = check_urls
 
         if not self.use_binaries and self.pkg_manager == "yum":
-            raise ValueError("Building MRtrix on CentOS/Fedora is not "
+            raise ValueError("Building MRtrix3 on CentOS/Fedora is not "
                              "supported yet.")
 
         self.cmd = self._create_cmd()
