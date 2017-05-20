@@ -13,6 +13,7 @@ env:
   - INTERFACE_TO_BUILD=ants
   - INTERFACE_TO_BUILD=fsl
   - INTERFACE_TO_BUILD=miniconda
+  - INTERFACE_TO_BUILD=mrtrix3
   - INTERFACE_TO_BUILD=spm
 before_install:
   - travis_retry sudo apt-get update && sudo apt-get install -yq docker-engine
