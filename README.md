@@ -219,7 +219,7 @@ ENV PATH=/opt/mrtrix3/bin:$PATH
 #-------------------
 # Install ANTs 2.2.0
 #-------------------
-RUN curl -sSL --retry 5 https://www.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz?dl=1 | tar zx -C /opt
+RUN curl -sSL --retry 5 https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz | tar zx -C /opt
 ENV ANTSPATH=/opt/ants \
     PATH=/opt/ants:$PATH
 
