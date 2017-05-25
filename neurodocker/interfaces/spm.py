@@ -92,7 +92,7 @@ class SPM(object):
 
     @staticmethod
     def install_mcr(url):
-        """Return Dockerfile insructions to install MATLAB Compiler Runtime."""
+        """Return Dockerfile instructions to install MATLAB Compiler Runtime."""
         comment = "# Install MATLAB Compiler Runtime"
         workdir_cmd = "WORKDIR /opt"
         cmd = ("curl -sSL -o mcr.zip {}"
