@@ -10,6 +10,7 @@ Example:
     --miniconda python_version=3.5.1 \
                 conda_install=traits,pandas \
                 pip_install=nipype \
+    --mrtrix3 use_binaries=false \
     --spm version=12 matlab_version=R2017a
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -108,31 +109,50 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
+def _list_to_dict(list_of_kv):
+    """Convert list of [key, value] pairs to a dictionary."""
+    if list_of_kv is not None:
+        list_of_kv = [item for sublist in list_of_kv for item in sublist]
+
+        for kv_pair in list_of_kv:
+            if len(kv_pair) != 2:
+                raise ValueError("Error in arguments '{}'. Did you forget "
+                                 "the equals sign?".format(kv_pair[0]))
+            if not kv_pair[-1]:
+                raise ValueError("Option required for '{}'".format(kv_pair[0]))
+
+        return {k: v for k, v in list_of_kv}
+
+def _string_vals_to_bool(dictionary):
+    """Convert string values to bool."""
+    import re
+
+    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian']
+
+    if dictionary is None:
+        return
+
+    for key in dictionary.keys():
+        if key in bool_vars:
+            if re.search('false', dictionary[key], re.IGNORECASE):
+                dictionary[key] = False
+            elif re.search('true', dictionary[key], re.IGNORECASE):
+                dictionary[key] = True
+            else:
+                dictionary[key] = bool(int(dictionary[key]))
+
+
 def convert_args_to_specs(namespace):
     """Convert namespace of command-line arguments to dictionary compatible
     with `neurodocker.parser.SpecsParser`.
     """
     from copy import deepcopy
 
-    def _list_to_dict(list_of_kv):
-        """Convert list of [key, value] pairs to a dictionary."""
-        # Flatten list.
-        if list_of_kv is not None:
-            list_of_kv = [item for sublist in list_of_kv for item in sublist]
-
-            for kv_pair in list_of_kv:
-                if len(kv_pair) != 2:
-                    raise ValueError("Error in arguments '{}'. Did you forget "
-                                     "the equals sign?".format(kv_pair[0]))
-                if not kv_pair[-1]:
-                    raise ValueError("Option required for '{}'".format(kv_pair[0]))
-
-            return {k: v for k, v in list_of_kv}
-
     specs = vars(deepcopy(namespace))
 
     for pkg in SUPPORTED_SOFTWARE.keys():
         specs[pkg] = _list_to_dict(specs[pkg])
+        _string_vals_to_bool(specs[pkg])
 
     try:
         specs['miniconda']['conda_install'] = \
@@ -158,6 +178,7 @@ def main(args=None):
 
     # Create dictionary of specifications.
     specs = convert_args_to_specs(namespace)
+
     keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
     for key in keys_to_remove:
         specs.pop(key, None)
