@@ -37,11 +37,7 @@ class ANTs(object):
         Linux package manager.
     use_binaries : bool, str
         If true, uses pre-compiled ANTs binaries. If false, attempts to build
-        from source. Can also be URL of tarball containing binaries. If this is
-        specified, overrides the default binaries for the specified version.
-        The binaries must be in the folder `ants`, as ANTSPATH=`/opt/ants` and
-        the tarball will be decompressed in /opt. URL must begin with http or
-        ftp.
+        from source.
     git_hash : str
         If this is specified and use_binaries is false, build from source from
         this commit. If this is not specified and use_binaries is false, will
@@ -94,15 +90,11 @@ class ANTs(object):
         """Return command to download and install ANTs binaries. Supports
         custom URL with tarball of binaries.
         """
-        bin_str = str(self.use_binaries)
-        if bin_str.startswith("http") or bin_str.startswith("ftp"):
-            url = self.use_binaries
-        else:
-            try:
-                url = ANTs.VERSION_TARBALLS[self.version]
-            except KeyError:
-                raise ValueError("Tarball not available for version {}."
-                                 "".format(self.version))
+        try:
+            url = ANTs.VERSION_TARBALLS[self.version]
+        except KeyError:
+            raise ValueError("Tarball not available for version {}."
+                             "".format(self.version))
 
         if self.check_urls:
             check_url(url)
