@@ -14,9 +14,4 @@ SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
 from neurodocker.dockerfile import Dockerfile
 from neurodocker.parser import SpecsParser
 
-try:
-    import neurodocker.docker
-except ImportError:
-    pass
-
 __version__ = '0.1.0.dev0'
