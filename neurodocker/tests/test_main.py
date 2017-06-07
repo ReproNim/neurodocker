@@ -58,7 +58,6 @@ def test_parse_args():
 
 
 def test_convert_args_to_specs():
-
     args = ['-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
@@ -85,6 +84,22 @@ def test_convert_args_to_specs():
     namespace = parse_args(args)
     with pytest.raises(ValueError):
         convert_args_to_specs(namespace)
+
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'use_binaries=false',
+            '--mrtrix3', 'use_binaries=0']
+    namespace = parse_args(args)
+    specs = convert_args_to_specs(namespace)
+    assert specs['ants']['use_binaries'] is False
+    assert specs['mrtrix3']['use_binaries'] is False
+
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'use_binaries=true',
+            '--mrtrix3', 'use_binaries=1']
+    namespace = parse_args(args)
+    specs = convert_args_to_specs(namespace)
+    assert specs['ants']['use_binaries'] is True
+    assert specs['mrtrix3']['use_binaries'] is True
 
 
 def test_main():
@@ -125,10 +140,11 @@ def test_no_print(capsys):
     assert not out
 
 
-
 def test_save(tmpdir):
     outfile = tmpdir.join("test.txt")
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--no-print-df', '-o',
-            outfile.strpath, '--no-check-urls']
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--mrtrix3',
+            'use_binaries=false', '--no-print-df', '-o', outfile.strpath,
+            '--no-check-urls']
     main(args)
-    assert outfile.read()
+    assert outfile.read(), "saved Dockerfile is empty"
+    assert "git clone https://github.com/MRtrix3/mrtrix3.git" in outfile.read()
