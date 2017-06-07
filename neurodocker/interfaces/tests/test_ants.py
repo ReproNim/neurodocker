@@ -27,12 +27,6 @@ class TestANTs(object):
         with pytest.raises(ValueError):
             ANTs(version='fakeversion', pkg_manager='apt', check_urls=False)
 
-    def test_install_with_custom_url(self):
-        url = 'http://fakesite.com'
-        ants = ANTs(version='2.2.0', pkg_manager='apt', use_binaries=url,
-                    check_urls=False)
-        assert url in ants.cmd
-
     def test_build_from_source_github(self):
         # TODO: expand on tests for building ANTs from source. It probably
         # will not be possible to build ANTs in Travic because of the 50 min
