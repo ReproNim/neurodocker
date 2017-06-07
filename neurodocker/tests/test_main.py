@@ -58,7 +58,6 @@ def test_parse_args():
 
 
 def test_convert_args_to_specs():
-
     args = ['-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
@@ -93,6 +92,14 @@ def test_convert_args_to_specs():
     specs = convert_args_to_specs(namespace)
     assert specs['ants']['use_binaries'] is False
     assert specs['mrtrix3']['use_binaries'] is False
+
+    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+            '--ants', 'use_binaries=true',
+            '--mrtrix3', 'use_binaries=1']
+    namespace = parse_args(args)
+    specs = convert_args_to_specs(namespace)
+    assert specs['ants']['use_binaries'] is True
+    assert specs['mrtrix3']['use_binaries'] is True
 
 
 def test_main():
