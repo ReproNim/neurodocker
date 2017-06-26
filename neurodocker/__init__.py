@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from neurodocker import interfaces
 
 SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
+                      'freesurfer': interfaces.FreeSurfer,
                       'fsl': interfaces.FSL,
                       'miniconda': interfaces.Miniconda,
                       'mrtrix3': interfaces.MRtrix3,

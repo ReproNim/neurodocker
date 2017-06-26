@@ -37,6 +37,13 @@ Repository with pre-compiled binaries: [kaczmarj/ANTs-builds](https://github.com
 
 View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
 
+
+### FreeSurfer
+
+FreeSurfer can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install FreeSurfer, include `'freesurfer'` (case-insensitive) in the specifications dictionary. The only option is `'version'` (e.g., `'6.0.0'`). A license is required to run FreeSurfer, but Neurodocker does not provide this license. Add a valid `license.txt` file to the $FREESURFER_HOME directory (always /opt/freesurfer) before running FreeSurfer.
+
+View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesurfer.py).
+
 ### FSL
 
 FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), `'use_installer'` (bool; to use FSL's Python installer), `'use_neurodebian'` (bool), and `'os_codename'` (e.g., `'jessie'` or `'xenial'`; only required if installing with NeuroDebian).
