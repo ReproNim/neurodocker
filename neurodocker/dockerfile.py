@@ -8,7 +8,6 @@ from neurodocker import SUPPORTED_SOFTWARE
 from neurodocker.interfaces import Miniconda
 from neurodocker.utils import indent, manage_pkgs
 
-
 class Dockerfile(object):
     """Class to create Dockerfile.
 
@@ -61,6 +60,9 @@ class Dockerfile(object):
         if software_cmds:
             cmds.append(software_cmds)
 
+        # adding entrypoint
+        cmds.append(self.add_entrypoint())
+
         return "\n\n".join(cmds) + "\n"
 
     def add_base(self):
@@ -102,6 +104,18 @@ class Dockerfile(object):
                 cmds.append(obj.cmd)
 
         return "\n\n".join(cmds)
+
+    def add_entrypoint(self):
+        # creating an entry point to run an fsl startup script in order to get environmenta var
+        if "fsl" in self.specs.keys():
+            startup_cmd = '#!/bin/bash\n\nsource /etc/profile.d/fsl.sh\n\n"$@"'
+            with open("startup_fsl.sh", mode='w') as ffsl:
+                ffsl.write(startup_cmd)
+
+            command_lists = ["RUN mkdir /opt/scripts/", "WORKDIR /opt/scripts", "COPY startup_fsl.sh ./",
+                             "RUN chmod +x startup_fsl.sh",
+                             'ENTRYPOINT ["/opt/scripts/startup_fsl.sh"]']
+            return "\n".join(command_lists)
 
     def save(self, filepath="Dockerfile", **kwargs):
         """Save Dockerfile to `filepath`. `kwargs` are for `open()`."""
