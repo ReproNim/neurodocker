@@ -163,7 +163,8 @@ specs = {
     'ants': {'version': '2.2.0', 'use_binaries': True},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
-    'instruction': ['RUN echo "Hello, World"' 'ENTRYPOINT ["run.sh"]']
+    'instruction': ['RUN echo "Hello, World"',
+                    'ENTRYPOINT ["run.sh"]']
 }
 
 parser = SpecsParser(specs)
