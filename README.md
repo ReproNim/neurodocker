@@ -84,7 +84,7 @@ docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
 
 ## Command-line example
 
-Generate Dockerfile, do not print result to stdout, save to file. Build the Docker image with `docker build`.
+Generate Dockerfile, do not print result to stdout, save to file. Build the Docker image with `docker build`. Arbitrary Dockerfile instructions can be added to the end of the Dockerfile.
 
 Example:
 
@@ -96,6 +96,7 @@ neurodocker -b centos:7 -p yum \
 --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
 --mrtrix3 \
 --spm version=12 matlab_version=R2017a \
+--instruction='ENTRYPOINT ["run.sh"]'
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
 # Build Docker image using the saved Dockerfile.
@@ -144,7 +145,7 @@ container.cleanup(remove=True)
 
 ## Full scripting example
 
-This example creates a Dockerfile with all of the software that _Neurodocker_ supports.
+This example creates a Dockerfile with all of the software that _Neurodocker_ supports and with arbitrary, user-defined Dockerfile instructions.
 
 ```python
 from neurodocker import Dockerfile, SpecsParser
@@ -162,6 +163,7 @@ specs = {
     'ants': {'version': '2.2.0', 'use_binaries': True},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
+    'instruction': ['RUN echo "Hello, World"' 'ENTRYPOINT ["run.sh"]']
 }
 
 parser = SpecsParser(specs)
@@ -258,4 +260,13 @@ ENV MATLABCMD=/opt/mcr/v*/toolbox/matlab \
     SPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script" \
     FORCE_SPMMCR=1 \
     LD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH
+
+
+#--------------------------
+# User-defined instructions
+#--------------------------
+
+RUN echo "Hello, World"
+
+ENTRYPOINT ["run.sh"]
 ```

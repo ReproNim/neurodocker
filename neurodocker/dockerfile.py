@@ -61,6 +61,16 @@ class Dockerfile(object):
         if software_cmds:
             cmds.append(software_cmds)
 
+        # Add arbitrary Dockerfile instructions.
+        try:
+            comment = ("\n#--------------------------"
+                       "\n# User-defined instructions"
+                       "\n#--------------------------")
+            cmds.append(comment)
+            cmds.extend(self.specs['instruction'])
+        except KeyError:
+            pass
+
         return "\n\n".join(cmds) + "\n"
 
     def add_base(self):
