@@ -1,3 +1,9 @@
+sudo: required
+dist: trusty
+group: edge
+
+services:
+  - docker
 language: python
 python:
   # - 2.7
@@ -5,9 +11,7 @@ python:
 branches:
   only:
     - master
-sudo: required
-services:
-  - docker
+
 env:
   - INTERFACE_TO_BUILD=none
   - INTERFACE_TO_BUILD=ants
@@ -15,8 +19,6 @@ env:
   - INTERFACE_TO_BUILD=miniconda
   - INTERFACE_TO_BUILD=mrtrix3
   - INTERFACE_TO_BUILD=spm
-before_install:
-  - travis_retry sudo apt-get update && sudo apt-get install -yq docker-engine
 install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install pytest-cov
