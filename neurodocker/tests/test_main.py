@@ -52,6 +52,11 @@ def test_parse_args():
     namespace = parse_args(args)
     assert namespace.spm
 
+    args = base_args + ['--instruction', 'RUN ls']
+    namespace = parse_args(args)
+    assert namespace.instruction
+    assert isinstance(namespace.instruction, list)
+
     args = base_args + ['--no-check-urls']
     namespace = parse_args(args)
     assert not namespace.check_urls
@@ -64,6 +69,8 @@ def test_convert_args_to_specs():
             '--miniconda', 'conda_install=pandas,traits',
             '--mrtrix3',
             '--spm', 'version=12',
+            '--instruction', 'RUN ls',
+            '--instruction', 'WORKDIR /home',
             '--no-check-urls']
     namespace = parse_args(args)
     assert namespace

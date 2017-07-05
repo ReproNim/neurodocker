@@ -11,7 +11,9 @@ Example:
                 conda_install=traits,pandas \
                 pip_install=nipype \
     --mrtrix3 use_binaries=false \
-    --spm version=12 matlab_version=R2017a
+    --spm version=12 matlab_version=R2017a \
+    --instruction='RUN echo "Hello, World!"' \
+    --instruction='ENTRYPOINT ["entrypoint.sh"]'
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -88,6 +90,9 @@ def create_parser():
 
     # Docker-related arguments.
     dkr = parser.add_argument_group(title="Docker-related arguments")
+    dkr.add_argument('-i', '--instruction', action="append",
+                     help=("Arbitrary Dockerfile instruction. Can be used "
+                           "multiple times."))
     dkr.add_argument('--no-print-df', dest='no_print_df', action="store_true",
                      help="Do not print the Dockerfile")
     dkr.add_argument('-o', '--output', dest="output",
