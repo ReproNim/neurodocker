@@ -66,8 +66,7 @@ class Dockerfile(object):
             comment = ("\n#--------------------------"
                        "\n# User-defined instructions"
                        "\n#--------------------------")
-            cmds.append(comment)
-            cmds.extend(self.specs['instruction'])
+            cmds.extend((comment, *self.specs['instruction']))
         except KeyError:
             pass
 
