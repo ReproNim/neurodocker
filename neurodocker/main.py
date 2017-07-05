@@ -50,9 +50,10 @@ def create_parser():
                 "tarball of ANTs binaries from that URL. If git_hash is "
                 "specified, build from source from that commit."),
         "freesurfer": ("Install FreeSurfer. Valid keys are version (required),"
-                       "and use_binaries (default true). A FreeSurfer license "
-                       "is required to run the software and is not provided "
-                       "by NeuroDocker."),
+                       "license_path (relative path to license), and "
+                       "use_binaries (default true). A FreeSurfer license is "
+                       "required to run the software and is not provided by "
+                       "Neurodocker."),
         "fsl": ("Install FSL. Valid keys are version (required), use_binaries "
                 "(default true), use_installer, use_neurodebian, and "
                 "os_codename (eg, jessie)."),

@@ -20,11 +20,6 @@ or
 `docker run --rm kaczmarj/neurodocker --help`
 
 
-Note: the `docker` Python package must be installed to build images and run containers with _Neurodocker_: `pip install docker`.
-
-
-
-
 ## Supported Software
 
 Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
@@ -40,7 +35,7 @@ View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
 
 ### FreeSurfer
 
-FreeSurfer can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install FreeSurfer, include `'freesurfer'` (case-insensitive) in the specifications dictionary. The only option is `'version'` (e.g., `'6.0.0'`). A license is required to run FreeSurfer, but Neurodocker does not provide this license. Add a valid `license.txt` file to the $FREESURFER_HOME directory (always /opt/freesurfer) before running FreeSurfer.
+FreeSurfer can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install FreeSurfer, include `'freesurfer'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'6.0.0'`) and `'license_path'` (relative path to license.txt). A license is required to run FreeSurfer, but Neurodocker does not provide this license. Add a valid `license.txt` file to the `$FREESURFER_HOME` directory (always /opt/freesurfer) before running FreeSurfer. If `'license_path'` is specified, that file will be copied into the image (note: the relative path to the license file must be within the build context).
 
 View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesurfer.py).
 
