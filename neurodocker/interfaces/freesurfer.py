@@ -25,6 +25,9 @@ class FreeSurfer(object):
         version='dev'.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
+    license_path : str
+        Relative path to license.txt file. If provided, adds a COPY instruction
+        to copy the file into $FREESURFER_HOME.
     use_binaries : bool, str
         If true, uses pre-compiled FreeSurfer binaries. Building from source
         is not yet supported.
@@ -33,10 +36,11 @@ class FreeSurfer(object):
         code greater than 400.
     """
 
-    def __init__(self, version, pkg_manager, use_binaries=True,
-                 check_urls=True):
+    def __init__(self, version, pkg_manager, license_path=None,
+                 use_binaries=True, check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
+        self.license_path = license_path
         self.use_binaries = use_binaries
         self.check_urls = check_urls
 
@@ -53,6 +57,9 @@ class FreeSurfer(object):
         else:
             raise ValueError("Installation via binaries is the only available "
                              "installation method for now.")
+
+        if self.license_path is not None:
+            chunks.append(self._copy_license())
 
         return "\n".join(chunks)
 
@@ -87,6 +94,16 @@ class FreeSurfer(object):
 
         return urljoin(base, rel_url).format(ver=self.version)
 
+    def _install_binaries_deps(self):
+        """Return command to install FreeSurfer dependencies. Use this for
+        FreeSurfer binaries, not if attempting to build FreeSurfer from source.
+        """
+        pkgs = {'apt': "libgomp1 tcsh",
+                'yum': "libgomp tcsh"}
+
+        return (manage_pkgs[self.pkg_manager]['install']
+                .format(pkgs=pkgs[self.pkg_manager]))
+
     def install_binaries(self):
         """Return command to download and install FreeSurfer binaries."""
         url = self._get_binaries_url()
@@ -97,11 +114,32 @@ class FreeSurfer(object):
         elif self.check_urls:
             check_url(url)
 
-        env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
+        env_cmd = ("FREESURFER_HOME=/opt/freesurfer"
+                   "\nPATH=/opt/freesurfer/bin:$PATH")
+        env_cmd = indent("ENV", env_cmd)
 
-        cmd = ("curl -sSL --retry 5 {url}"
-               "\n| tar xz -C /opt"
-               "\n&& . $FREESURFER_HOME/SetUpFreeSurfer.sh".format(url=url))
+        sh_file = "$FREESURFER_HOME/SetUpFreeSurfer.sh"
+        cmd = self._install_binaries_deps()
+        cmd += ("\n&& curl -sSL --retry 5 {url}"
+                "\n| tar xz -C /opt"
+                '\n&& /usr/bin/env bash -c ". {sh_file}"'
+                "".format(url=url, sh_file=sh_file))
         cmd = indent("RUN", cmd)
 
         return "\n".join((env_cmd, cmd))
+
+    def _copy_license(self):
+        """Return command to copy local license file into the container. Path
+        must be a relative path within the build context.
+        """
+        import os
+
+        if os.path.isabs(self.license_path):
+            raise ValueError("Path to license file must be relative, but "
+                             "absolute path was given.")
+
+        comment = ("# Copy license file into image. "
+                   "Must be relative path within build context.")
+        cmd = ('COPY ["{file}", "/opt/freesurfer/license.txt"]'
+               ''.format(file=self.license_path))
+        return '\n'.join((comment, cmd))
