@@ -22,7 +22,8 @@ class TestDockerfile(object):
                                     'pip_install': 'pandas'},
                       'ants': {'version': '2.1.0', 'use_binaries': True},
                       'fsl': {'version': '5.0.10', 'use_binaries': True},
-                      'spm': {'version': 12, 'matlab_version': 'R2017a'},}
+                      'spm': {'version': 12, 'matlab_version': 'R2017a'},
+                      'instruction': ['RUN ls', 'WORKDIR /home'],}
 
         self.base = "FROM {}".format(self.specs['base'])
         self.noninteractive = "ARG DEBIAN_FRONTEND=noninteractive"
@@ -46,6 +47,8 @@ class TestDockerfile(object):
         assert self.ants in cmd
         assert self.fsl in cmd
         assert self.spm in cmd
+        assert self.specs['instruction'][0] in cmd
+        assert self.specs['instruction'][1] in cmd
 
     def test_add_base(self):
         assert "FROM" in Dockerfile(self.specs).add_base()
