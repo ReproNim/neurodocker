@@ -18,6 +18,7 @@ env:
   - INTERFACE_TO_BUILD=fsl
   - INTERFACE_TO_BUILD=miniconda
   - INTERFACE_TO_BUILD=mrtrix3
+  - INTERFACE_TO_BUILD=neurodebian
   - INTERFACE_TO_BUILD=spm
 install:
   - travis_retry pip install -r requirements.txt

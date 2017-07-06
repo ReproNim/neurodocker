@@ -12,6 +12,7 @@ Example:
                 pip_install=nipype \
     --mrtrix3 use_binaries=false \
     --spm version=12 matlab_version=R2017a \
+    --neurodebian os_codename=zesty download_server=usa-nh pkgs="dcm2niix" \
     --instruction='RUN echo "Hello, World!"' \
     --instruction='ENTRYPOINT ["entrypoint.sh"]'
 """
@@ -36,6 +37,7 @@ def create_parser():
     reqs.add_argument("-p", "--pkg-manager", required=True,
                       help="Linux package manager {apt, yum}")
 
+    _neuro_servers = ", ".join(SUPPORTED_SOFTWARE['neurodebian'].SERVERS.keys())
 
     # Software package options.
     pkgs_help = {
@@ -55,18 +57,24 @@ def create_parser():
                        "required to run the software and is not provided by "
                        "Neurodocker."),
         "fsl": ("Install FSL. Valid keys are version (required), use_binaries "
-                "(default true), use_installer, use_neurodebian, and "
-                "os_codename (eg, jessie)."),
+                "(default true) and use_installer."),
         "miniconda": ("Install Miniconda. Valid keys are python_version "
                       "(required), conda_install, pip_install, and "
                       "miniconda_version (defaults to latest). The keys "
                       "conda_install and pip_install take an arbitrary number "
                       "of comma-separated values (no white-space). "
                       "Example: conda_install=pandas,pytest,traits)."),
-        "mrtrix3" : ("Install MRtrix3. Valid keys are use_binaries (default "
-                     "true) and git_hash. If git_hash is specified and "
-                     "use_binaries is false, will checkout to that commit "
-                     "before building."),
+        "mrtrix3": ("Install MRtrix3. Valid keys are use_binaries (default "
+                    "true) and git_hash. If git_hash is specified and "
+                    "use_binaries is false, will checkout to that commit "
+                    "before building."),
+        "neurodebian": ("Add NeuroDebian repository and optionally install "
+                        "NeuroDebian packages. Valid keys are os_codename "
+                        "(required; e.g., 'zesty'), download_server "
+                        "(required), full (if false, default, use libre "
+                        "packages), and pkgs (list of packages to install). "
+                        "Valid download servers are {}."
+                        "".format(_neuro_servers)),
         "spm": ("Install SPM (and its dependency, Matlab Compiler Runtime). "
                 "Valid keys are version and matlab_version."),
     }

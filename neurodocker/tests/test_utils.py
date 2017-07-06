@@ -21,23 +21,6 @@ def test_manage_pkgs():
     assert "apt" not in utils.manage_pkgs['yum'].values()
 
 
-def test_add_neurodebian():
-    os = "xenial"
-    full = ("RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \\\n"
-            "    && apt-get clean \\\n"
-            "    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \\\n"
-            "    && curl -sSL http://neuro.debian.net/lists/xenial.us-nh.full >> /etc/apt/sources.list.d/neurodebian.sources.list \\\n"
-            "    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \\\n"
-            "    && apt-get update")
-    assert utils.add_neurodebian(os, full=True), "error adding full neurodebian on xenial"
-
-    with pytest.raises(RequestException):
-        utils.add_neurodebian('fake_codename', full=False, check_urls=True)
-
-    assert "fake_codename" in utils.add_neurodebian('fake_codename',
-                                                    check_urls=False)
-
-
 def test_check_url():
     urls = {'good': 'https://www.google.com/',
             '404': 'http://httpstat.us/404',

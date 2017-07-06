@@ -26,7 +26,7 @@ Valid options for each software package are the keyword arguments for the class 
 
 ### ANTs
 
-ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, build from source), and `'git_hash'` (build from source from specific hash). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source
+ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, build from source), and `'git_hash'` (build from source from specific hash). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source. To install ANTs from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
 
 Repository with pre-compiled binaries: [kaczmarj/ANTs-builds](https://github.com/kaczmarj/ANTs-builds)
 
@@ -41,7 +41,7 @@ View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesu
 
 ### FSL
 
-FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), `'use_installer'` (bool; to use FSL's Python installer), `'use_neurodebian'` (bool), and `'os_codename'` (e.g., `'jessie'` or `'xenial'`; only required if installing with NeuroDebian).
+FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), and `'use_installer'` (bool; to use FSL's Python installer). To install FSL from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
 
 View source: [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py).
 
@@ -56,6 +56,13 @@ View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/minicon
 ### MRtrix3
 
 MRtrix3 can be installed using pre-compiled binaries (default behavior), or the package can be built from source. To install MRtrix3, include `'mrtrix3'` (case-insensitive) in the specifications dictionary. Valid options are `'use_binaries'` (bool) and `'git_hash'` (str). If `'git_hash'` is specified, will checkout to that commit before building.
+
+
+### NeuroDebian
+
+The NeuroDebian repository can be added, and NeuroDebian packages can optionally be installed. Valid keys are os_codename (required; e.g., 'zesty'), download_server (required), full (if false, default, use libre packages), and pkgs (list of NeuroDebian packages to install).
+
+View source: [`neurodocker.interfaces.NeuroDebian`](neurodocker/interfaces/neurodebian.py).
 
 
 ### SPM
@@ -80,6 +87,7 @@ docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
 --fsl version=5.0.10 \
 --miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
 --mrtrix3 \
+--neurodebian os_codename=zesty download_server=usa-nh pkgs="afni dcm2niix" \
 --spm version=12 matlab_version=R2017a \
 --no-check-urls
 ```
@@ -164,6 +172,8 @@ specs = {
     'mrtrix3': {'use_binaries': False},
     'ants': {'version': '2.2.0', 'use_binaries': True},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
+    'neurodebian': {'os_codename': 'zesty', 'download_server': 'usa-nh',
+                    'pkgs': ['afni', 'dcm2niix']},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
     'instruction': ['RUN echo "Hello, World"',
                     'ENTRYPOINT ["run.sh"]']
@@ -193,7 +203,7 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends bzip2 ca-c
 # Install Miniconda, and set up Python environment
 #-------------------------------------------------
 ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+RUN curl -sSL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     && bash miniconda.sh -b -p /opt/miniconda \
     && rm -f miniconda.sh \
     && /opt/miniconda/bin/conda config --add channels conda-forge \
@@ -233,11 +243,28 @@ ENV ANTSPATH=/opt/ants \
 #------------------
 RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
     | tar zx -C /opt \
-    && cp /opt/fsl/etc/fslconf/fsl.sh /etc/profile.d/ \
+    && . /opt/fsl/etc/fslconf/fsl.sh \
     && FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh \
     && [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true
 ENV FSLDIR=/opt/fsl \
     PATH=/opt/fsl/bin:$PATH
+
+#---------------------------
+# Add NeuroDebian repository
+#---------------------------
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && curl -sSL http://neuro.debian.net/lists/zesty.us-nh.libre \
+    > /etc/apt/sources.list.d/neurodebian.sources.list \
+    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \
+    && apt-get update \
+    && apt-get purge -y --auto-remove dirmngr
+
+# Install NeuroDebian packages
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends afni dcm2niix \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #----------------------
 # Install MCR and SPM12
