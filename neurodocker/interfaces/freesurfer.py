@@ -27,13 +27,13 @@ class FreeSurfer(object):
         Linux package manager.
     license_path : str
         Relative path to license.txt file. If provided, adds a COPY instruction
-        to copy the file into $FREESURFER_HOME.
+        to copy the file into $FREESURFER_HOME (always /opt/freesurfer/).
     use_binaries : bool, str
         If true, uses pre-compiled FreeSurfer binaries. Building from source
         is not yet supported.
     check_urls : bool
         If true, raise error if a URL used by this class responds with a status
-        code greater than 400.
+        code greater than or equal to 400.
     """
 
     def __init__(self, version, pkg_manager, license_path=None,
@@ -101,8 +101,8 @@ class FreeSurfer(object):
         pkgs = {'apt': "libgomp1 tcsh",
                 'yum': "libgomp tcsh"}
 
-        return (manage_pkgs[self.pkg_manager]['install']
-                .format(pkgs=pkgs[self.pkg_manager]))
+        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
+        return cmd.format(pkgs=pkgs[self.pkg_manager])
 
     def install_binaries(self):
         """Return command to download and install FreeSurfer binaries."""
