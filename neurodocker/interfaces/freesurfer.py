@@ -53,7 +53,8 @@ class FreeSurfer(object):
                    "#--------------------------".format(self.version))
 
         if self.use_binaries:
-            chunks = [comment, self.install_binaries()]
+            chunks = [comment, self.install_binaries(),
+                      self.add_env_instruction()]
         else:
             raise ValueError("Installation via binaries is the only available "
                              "installation method for now.")
@@ -114,19 +115,53 @@ class FreeSurfer(object):
         elif self.check_urls:
             check_url(url)
 
-        env_cmd = ("FREESURFER_HOME=/opt/freesurfer"
-                   "\nPATH=/opt/freesurfer/bin:$PATH")
-        env_cmd = indent("ENV", env_cmd)
+        # https://github.com/nipy/workshops/blob/master/170327-nipype/docker/Dockerfile.complete#L8-L20
 
-        sh_file = "$FREESURFER_HOME/SetUpFreeSurfer.sh"
+        excluded_dirs = ("--exclude='freesurfer/trctrain'"
+                         "\n--exclude='freesurfer/subjects/fsaverage_sym'"
+                         "\n--exclude='freesurfer/subjects/fsaverage3'"
+                         "\n--exclude='freesurfer/subjects/fsaverage4'"
+                         "\n--exclude='freesurfer/subjects/fsaverage5'"
+                         "\n--exclude='freesurfer/subjects/fsaverage6'"
+                         "\n--exclude='freesurfer/subjects/cvs_avg35'"
+                         "\n--exclude='freesurfer/subjects/cvs_avg35_inMNI152'"
+                         "\n--exclude='freesurfer/subjects/bert'"
+                         "\n--exclude='freesurfer/subjects/V1_average'"
+                         "\n--exclude='freesurfer/average/mult-comp-cor'"
+                         # "\n--exclude='freesurfer/lib/cuda'"
+                         "\n--exclude='freesurfer/lib/qt'")
+
         cmd = self._install_binaries_deps()
         cmd += ("\n&& curl -sSL --retry 5 {url}"
-                "\n| tar xz -C /opt"
-                '\n&& /usr/bin/env bash -c ". {sh_file}"'
-                "".format(url=url, sh_file=sh_file))
-        cmd = indent("RUN", cmd)
+                "\n| tar xz -C /opt\n{excluded}"
+                "".format(url=url, excluded=excluded_dirs))
+        return indent("RUN", cmd)
 
-        return "\n".join((env_cmd, cmd))
+    @staticmethod
+    def add_env_instruction():
+        """Return Dockerfile instructions to add FreeSurfer environment
+        variables.
+        """
+        # https://github.com/freesurfer/freesurfer/issues/70#issuecomment-300488805
+        cmd1 = ("FS_OVERRIDE=0"
+                "\nOS=Linux"
+                "\nFSF_OUTPUT_FORMAT=nii.gz"
+                "\nFIX_VERTEX_AREA="
+                "\nFREESURFER_HOME=/opt/freesurfer"
+                "\nMNI_DIR=/opt/freesurfer/mni"
+                "\nSUBJECTS_DIR=/subjects")
+        cmd1 = indent("ENV", cmd1)
+
+        cmd2 = ("PERL5LIB=$MNI_DIR/share/perl5"
+                "\nMNI_PERL5LIB=$MNI_DIR/share/perl5"
+                "\nMINC_BIN_DIR=$MNI_DIR/bin"
+                "\nMINC_LIB_DIR=$MNI_DIR/lib"
+                "\nMNI_DATAPATH=$MNI_DIR/data"
+                "\nPATH=$FREESURFER_HOME/bin:$FREESURFER_HOME/tktools"
+                ":$MNI_DIR/bin:$PATH")
+        cmd2 = indent("ENV", cmd2)
+        return "\n".join((cmd1, cmd2))
+
 
     def _copy_license(self):
         """Return command to copy local license file into the container. Path
