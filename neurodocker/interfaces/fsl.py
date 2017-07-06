@@ -9,7 +9,7 @@ try:
 except ImportError:
     from urlparse import urljoin  # Python 2
 
-from neurodocker.utils import add_neurodebian, check_url, indent
+from neurodocker.utils import check_url, indent
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,6 @@ class FSL(object):
     use_installer : bool
         If true, install FSL using FSL's Python installer. Only works on
         CentOS/RHEL.
-    use_neurodebian : bool
-        If true, install FSL from NeuroDebian.
     os_codename : str
         Operating system codename (e.g., 'zesty', 'jessie'.) Only required if
         `pkg_manager` is 'apt'. Corresponds to the NeuroDebian url:
