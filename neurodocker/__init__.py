@@ -8,6 +8,7 @@ SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
                       'fsl': interfaces.FSL,
                       'miniconda': interfaces.Miniconda,
                       'mrtrix3': interfaces.MRtrix3,
+                      'neurodebian': interfaces.NeuroDebian,
                       'spm': interfaces.SPM,
                       }
 
