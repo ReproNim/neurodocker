@@ -42,8 +42,8 @@ def create_parser():
     # Software package options.
     pkgs_help = {
         "all": ("Install software packages. Each argument takes a list of "
-                "key=value pairs.\nWhere applicable, the default installation "
-                "behavior is to install by\ndownloading and uncompressing "
+                "key=value pairs. Where applicable, the default installation "
+                "behavior is to install by downloading and uncompressing "
                 "binaries."),
         "ants": ("Install ANTs. Valid keys are version (required), "
                 "use_binaries (default true), and git_hash. If use_binaries="
@@ -51,6 +51,11 @@ def create_parser():
                 "builds ANTs from source. If use_binaries is a URL, download "
                 "tarball of ANTs binaries from that URL. If git_hash is "
                 "specified, build from source from that commit."),
+        "freesurfer": ("Install FreeSurfer. Valid keys are version (required),"
+                       "license_path (relative path to license), and "
+                       "use_binaries (default true). A FreeSurfer license is "
+                       "required to run the software and is not provided by "
+                       "Neurodocker."),
         "fsl": ("Install FSL. Valid keys are version (required), use_binaries "
                 "(default true) and use_installer."),
         "miniconda": ("Install Miniconda. Valid keys are python_version "
