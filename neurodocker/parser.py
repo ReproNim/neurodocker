@@ -1,5 +1,6 @@
 """Class to parse specifications for Dockerfile."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import
 
 import inspect

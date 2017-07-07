@@ -1,5 +1,6 @@
 """Class to add Miniconda and create Conda environment."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import, division, print_function
 import logging
 import posixpath
@@ -31,9 +32,10 @@ class Miniconda(object):
         Version of Miniconda to install. Defaults to 'latest'. This does not
         correspond to Python version.
     check_urls : bool
-        If true, throw warning if a URL used by this class responds with a
-        status code greater than 400.
+        If true, raise error if a URL used by this class responds with an error
+        code.
     """
+
     def __init__(self, python_version, pkg_manager, conda_install=None,
                  pip_install=None, miniconda_verion='latest', check_urls=True):
         self.python_version = python_version

@@ -3,7 +3,7 @@
 Project repository: https://github.com/stnava/ANTs/
 
 ANTs recommends building from source. Jakub Kaczmarzyk build several versions
-on CentOS 6 Docker images. Those Docker images are located at
+on CentOS 5 Docker images. Those Docker images are located at
 https://hub.docker.com/r/kaczmarj/ants/ and the binaries are on Dropbox. See
 the ANTs class definition for the Dropbox URLs.
 
@@ -23,10 +23,10 @@ from neurodocker.utils import check_url, indent, manage_pkgs
 class ANTs(object):
     """Add Dockerfile instructions to install ANTs. Versions 2.0.0 and newer
     are supported. Pre-compiled binaries can be downloaded, or ANTs can be
-    built from source. The pre-compiled binaries were compiled on a CentOS 6
-    Docker image. The build log file is present in the ANTs tarball.
+    built from source. The pre-compiled binaries were compiled on a CentOS 5
+    Docker image.
 
-    Inspired by the Dockerfile at https://hub.docker.com/r/nipype/workshops/
+    Adapted from the Dockerfile at https://hub.docker.com/r/nipype/workshops/
     `docker pull nipype/workshops:latest-nofsspm`
 
     Parameters
@@ -43,8 +43,8 @@ class ANTs(object):
         this commit. If this is not specified and use_binaries is false, will
         use git hash of the specified version.
     check_urls : bool
-        If true, raise error if a URL used by this class responds with a status
-        code greater than 400.
+        If true, raise error if a URL used by this class responds with an error
+        code.
     """
     VERSION_HASHES = {"latest": None,
                       "2.2.0": "0740f9111e5a9cd4768323dc5dfaa7c29481f9ef",

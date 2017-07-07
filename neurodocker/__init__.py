@@ -13,7 +13,17 @@ SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
                       'spm': interfaces.SPM,
                       }
 
+from neurodocker.docker import DockerContainer, DockerImage
 from neurodocker.dockerfile import Dockerfile
 from neurodocker.parser import SpecsParser
 
-__version__ = '0.1.0.dev0'
+
+def _get_version():
+    """Return version string."""
+    import os
+
+    BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(BASE_PATH, "VERSION"), 'r') as fp:
+        return fp.read().strip()
+
+__version__ = _get_version()

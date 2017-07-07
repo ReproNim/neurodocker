@@ -1,5 +1,6 @@
 """Package utility functions."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import, division, print_function
 import json
 import logging
@@ -22,15 +23,19 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                                  '&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*'),},
                 }
 
-# Create logger.
-# TODO: move this to main program.
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)  # Print to console.
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+def create_logger():
+    """Return logger."""
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)  # Print to console.
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    return logger
+
+
+logger = create_logger()
 
 
 def check_url(url, timeout=5, **kwargs):

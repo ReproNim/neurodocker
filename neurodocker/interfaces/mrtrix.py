@@ -29,8 +29,8 @@ class MRtrix3(object):
         If this is specified and use_binaries is false, checkout to this commit
         before building.
     check_urls : bool
-        If true, raise error if a URL used by this class responds with a status
-        code greater than 400.
+        If true, raise error if a URL used by this class responds with an error
+        code.
     """
 
     def __init__(self, pkg_manager, use_binaries=True, git_hash=None,

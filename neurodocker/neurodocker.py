@@ -4,16 +4,16 @@ commands within containers, and get command ouptut.
 
 Example:
 
-    neurodocker -b ubuntu:17.04 -p apt \
-    --ants version=2.1.0 \
-    --fsl version=5.0.10 \
-    --miniconda python_version=3.5.1 \
-                conda_install=traits,pandas \
-                pip_install=nipype \
-    --mrtrix3 use_binaries=false \
-    --spm version=12 matlab_version=R2017a \
-    --neurodebian os_codename=zesty download_server=usa-nh pkgs="dcm2niix" \
-    --instruction='RUN echo "Hello, World!"' \
+    neurodocker -b ubuntu:17.04 -p apt \\
+    --ants version=2.1.0 \\
+    --freesurfer version=6.0.0 license_path="./license.txt" \\
+    --fsl version=5.0.10 \\
+    --miniconda python_version=3.5.1 \\
+                conda_install="traits pandas" \\
+                pip_install="nipype" \\
+    --mrtrix3 use_binaries=false \\
+    --spm version=12 matlab_version=R2017a \\
+    --neurodebian os_codename=zesty download_server=usa-nh pkgs="dcm2niix" \\
     --instruction='ENTRYPOINT ["entrypoint.sh"]'
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -22,7 +22,8 @@ from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import sys
 
-from neurodocker import (Dockerfile, SpecsParser, SUPPORTED_SOFTWARE)
+from neurodocker import (__version__, Dockerfile, SpecsParser,
+                         SUPPORTED_SOFTWARE)
 
 
 def create_parser():
@@ -60,10 +61,9 @@ def create_parser():
                 "(default true) and use_installer."),
         "miniconda": ("Install Miniconda. Valid keys are python_version "
                       "(required), conda_install, pip_install, and "
-                      "miniconda_version (defaults to latest). The keys "
-                      "conda_install and pip_install take an arbitrary number "
-                      "of comma-separated values (no white-space). "
-                      "Example: conda_install=pandas,pytest,traits)."),
+                      "miniconda_version (defaults to latest). The options "
+                      "conda_install and pip_install accept strings of "
+                      'packages: conda_install="traits numpy".'),
         "mrtrix3": ("Install MRtrix3. Valid keys are use_binaries (default "
                     "true) and git_hash. If git_hash is specified and "
                     "use_binaries is false, will checkout to that commit "
@@ -98,25 +98,28 @@ def create_parser():
 
 
     # Docker-related arguments.
-    dkr = parser.add_argument_group(title="Docker-related arguments")
-    dkr.add_argument('-i', '--instruction', action="append",
+    other = parser.add_argument_group(title="other options")
+    other.add_argument('-i', '--instruction', action="append",
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times."))
-    dkr.add_argument('--no-print-df', dest='no_print_df', action="store_true",
+    other.add_argument('--no-print-df', dest='no_print_df', action="store_true",
                      help="Do not print the Dockerfile")
-    dkr.add_argument('-o', '--output', dest="output",
+    other.add_argument('-o', '--output', dest="output",
                      help="If specified, save Dockerfile to file with this name.")
-    # dkr.add_argument('--build', dest="build", action="store_true")
+    # other.add_argument('--build', dest="build", action="store_true")
 
 
-    # Other arguments.
+    # Other options.
     parser.add_argument("--check-urls", dest="check_urls", action="store_true",
                         help=("Verify communication with URLs used in "
                               "the build."), default=True,)
     parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
-    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-V", "--version", action="version",
+                        version=('neurodocker version {version}'
+                                 .format(version=__version__)))
 
     return parser
 
