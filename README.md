@@ -1,12 +1,17 @@
-# neurodocker
+# Neurodocker
 
 [![Build Status](https://travis-ci.org/kaczmarj/neurodocker.svg?branch=master)](https://travis-ci.org/kaczmarj/neurodocker)
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Dockerfiles with specified versions of Python and neuroimaging analysis software. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces. _Neurodocker_ can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles, and interaction with the Docker Engine is left to the various `docker` commands. Within a script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, and run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)).
+_Neurodocker_ is a Python project that generates Dockerfiles with specified versions of Python and neuroimaging analysis software. _Neurodocker_ can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles, and interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, and run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)). The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
 
 See the [examples](#examples) below.
+
+
+# Note to users
+
+This software is still in the early stages of development. If you come across an issue or a way to improve _Neurodocker_, please submit an issue or a pull request.
 
 
 # Installation
@@ -20,43 +25,53 @@ or
 `docker run --rm kaczmarj/neurodocker --help`
 
 
-Note: the `docker` Python package must be installed to build images and run containers with _Neurodocker_: `pip install docker`.
-
-
-
-
-## Supported Software
+# Supported Software
 
 Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
 
-### ANTs
+## ANTs
 
-ANTs can be installed using pre-compiled binaries (default behavior), or it can be built from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, build from source), and `'git_hash'` (build from source from specific hash). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source
+ANTs can be installed using pre-compiled binaries (default behavior), or it can be compiled from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, compiles from source), and `'git_hash'` (checks out to specific hash before compiling). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source. To install ANTs from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
 
 Repository with pre-compiled binaries: [kaczmarj/ANTs-builds](https://github.com/kaczmarj/ANTs-builds)
 
 View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
 
-### FSL
 
-FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), `'use_installer'` (bool; to use FSL's Python installer), `'use_neurodebian'` (bool), and `'os_codename'` (e.g., `'jessie'` or `'xenial'`; only required if installing with NeuroDebian).
+## FreeSurfer
 
+FreeSurfer can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install FreeSurfer, include `'freesurfer'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'6.0.0'`) and `'license_path'` (relative path to license.txt). A license is required to run FreeSurfer, but Neurodocker does not provide this license. Add a valid `license.txt` file to the `$FREESURFER_HOME` directory (always /opt/freesurfer) before running FreeSurfer. If `'license_path'` is specified, that file will be copied into the image (note: the relative path to the license file must be within the build context).
+
+View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesurfer.py).
+
+## FSL
+
+FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), and `'use_installer'` (bool; to use FSL's Python installer). To install FSL from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
+
+[FSL license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence)  
 View source: [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py).
 
 
-### Miniconda
+## Miniconda
 
 Miniconda is installed using Miniconda's BASH installer. The latest version of Python 3 is installed to the root environment, and the `conda-forge` channel is added. A new conda environment is created with the requested specifications, the root environment is removed (to save space), and the new environment is prepended to `PATH`. To install Miniconda, include `'miniconda'` (case-insensitive) in the specifications dictionary Valid options are `'python_version'` (required; e.g., `'3.5.1'`), `'conda_install'` (e.g., `['numpy', 'traits']`), `pip_install` (e.g., `['nipype', 'pytest']`), and `miniconda_version` (`'latest'` by default).
 
 View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py).
 
 
-### MRtrix3
+## MRtrix3
 
 MRtrix3 can be installed using pre-compiled binaries (default behavior), or the package can be built from source. To install MRtrix3, include `'mrtrix3'` (case-insensitive) in the specifications dictionary. Valid options are `'use_binaries'` (bool) and `'git_hash'` (str). If `'git_hash'` is specified, will checkout to that commit before building.
 
 
-### SPM
+## NeuroDebian
+
+The NeuroDebian repository can be added, and NeuroDebian packages can optionally be installed. Valid keys are os_codename (required; e.g., 'zesty'), download_server (required), full (if false, default, use libre packages), and pkgs (list of NeuroDebian packages to install).
+
+View source: [`neurodocker.interfaces.NeuroDebian`](neurodocker/interfaces/neurodebian.py).
+
+
+## SPM
 
 The standalone version of SPM is installed, along with its dependency Matlab Compiler Runtime (MCR). MCR is installed first, using the [instructions on Matlab's website](https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html). SPM is then installed by downloading and unzipping the standalone SPM package. To install SPM, include `'spm'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'12'`), and `'matlab_version'` (case-sensitive; e.g., `'R2017a'`).
 
@@ -72,30 +87,24 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 Generate Dockerfile, and print result to stdout.
 
-```bash
-docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt \
---ants version=2.1.0 \
---fsl version=5.0.10 \
---miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
---mrtrix3 \
---spm version=12 matlab_version=R2017a \
---no-check-urls
+```shell
+docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt --ants version=2.1.0
 ```
 
 ## Command-line example
 
-Generate Dockerfile, do not print result to stdout, save to file. Build the Docker image with `docker build`.
+In the following example, generate a Dockerfile with all of the software that _Neurodocker_ supports and save it to disk. You can build the Docker image with `docker build` (separate from Neurodocker).
 
-Example:
-
-```bash
+```shell
 # Generate Dockerfile.
 neurodocker -b centos:7 -p yum \
 --ants version=2.1.0 \
+--freesurfver version=6.0.0 \
 --fsl version=5.0.10 \
---miniconda python_version=3.5.1 conda_install=traits,pandas pip_install=nipype \
+--miniconda python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
 --mrtrix3 \
 --spm version=12 matlab_version=R2017a \
+--instruction='ENTRYPOINT ["run.sh"]'
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
 # Build Docker image using the saved Dockerfile.
@@ -107,7 +116,7 @@ neurodocker -b centos:7 -p yum --miniconda python_version=3.5.1 | docker build -
 ```
 
 
-## Minimal scripting example
+## Scripting example
 
 In this example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
@@ -135,16 +144,14 @@ image = DockerImage(df).build(log_console=False, log_filepath="build.log")
 # Start container, and run commands.
 container = DockerContainer(image).start()
 container.exec_run('python -c "import nipype; print(nipype.__version__)"')
-# Returns '1.0.0-dev\n'
 container.exec_run('python -V')
-# Returns 'Python 3.5.1\n'
 container.cleanup(remove=True)
 ```
 
 
 ## Full scripting example
 
-This example creates a Dockerfile with all of the software that _Neurodocker_ supports.
+In this example, we create a Dockerfile with all of the software that _Neurodocker_ supports, and we supply arbitrary Dockerfile instructions.
 
 ```python
 from neurodocker import Dockerfile, SpecsParser
@@ -153,15 +160,20 @@ from neurodocker.docker import DockerImage, DockerContainer
 specs = {
     'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
-    'check_urls': False,  # Verify communication with URLs used in build.
+    'check_urls': False,
     'miniconda': {
         'python_version': '3.5.1',
         'conda_install': 'traits',
         'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
-    'mrtrix3': {'use_binaries': False},
     'ants': {'version': '2.2.0', 'use_binaries': True},
+    'freesurfer': {'version': '6.0.0', 'license_path': 'rel/path/license.txt'},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
+    'mrtrix3': {'use_binaries': False},
+    'neurodebian': {'os_codename': 'zesty', 'download_server': 'usa-nh',
+                    'pkgs': ['afni', 'dcm2niix']},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
+    'instruction': ['RUN echo "Hello, World"',
+                    'ENTRYPOINT ["run.sh"]']
 }
 
 parser = SpecsParser(specs)
@@ -188,7 +200,7 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends bzip2 ca-c
 # Install Miniconda, and set up Python environment
 #-------------------------------------------------
 ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+RUN curl -sSL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     && bash miniconda.sh -b -p /opt/miniconda \
     && rm -f miniconda.sh \
     && /opt/miniconda/bin/conda config --add channels conda-forge \
@@ -199,6 +211,69 @@ RUN curl -ssL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-lat
     && pip install -q --no-cache-dir \
     	https://github.com/nipy/nipype/archive/master.tar.gz \
     && rm -rf /opt/miniconda/[!envs]*
+
+#-------------------
+# Install ANTs 2.2.0
+#-------------------
+RUN curl -sSL --retry 5 https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz | tar zx -C /opt
+ENV ANTSPATH=/opt/ants \
+    PATH=/opt/ants:$PATH
+
+#--------------------------
+# Install FreeSurfer v6.0.0
+#--------------------------
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends libgomp1 tcsh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && curl -sSL --retry 5 https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz \
+    | tar xz -C /opt \
+    --exclude='freesurfer/trctrain' \
+    --exclude='freesurfer/subjects/fsaverage_sym' \
+    --exclude='freesurfer/subjects/fsaverage3' \
+    --exclude='freesurfer/subjects/fsaverage4' \
+    --exclude='freesurfer/subjects/fsaverage5' \
+    --exclude='freesurfer/subjects/fsaverage6' \
+    --exclude='freesurfer/subjects/cvs_avg35' \
+    --exclude='freesurfer/subjects/cvs_avg35_inMNI152' \
+    --exclude='freesurfer/subjects/bert' \
+    --exclude='freesurfer/subjects/V1_average' \
+    --exclude='freesurfer/average/mult-comp-cor' \
+    --exclude='freesurfer/lib/qt'
+ENV FS_OVERRIDE=0 \
+    OS=Linux \
+    FSF_OUTPUT_FORMAT=nii.gz \
+    FIX_VERTEX_AREA= \
+    FREESURFER_HOME=/opt/freesurfer \
+    MNI_DIR=/opt/freesurfer/mni \
+    SUBJECTS_DIR=/subjects
+ENV PERL5LIB=$MNI_DIR/share/perl5 \
+    MNI_PERL5LIB=$MNI_DIR/share/perl5 \
+    MINC_BIN_DIR=$MNI_DIR/bin \
+    MINC_LIB_DIR=$MNI_DIR/lib \
+    MNI_DATAPATH=$MNI_DIR/data \
+    PATH=$FREESURFER_HOME/bin:$FREESURFER_HOME/tktools:$MNI_DIR/bin:$PATH
+# Copy license file into image. Must be relative path within build context.
+COPY ["rel/path/license.txt", "/opt/freesurfer/license.txt"]
+
+#-----------------------------------------------
+# Install FSL 5.0.10
+# Please review FSL's license:
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+#-----------------------------------------------
+RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
+    | tar zx -C /opt \
+    && FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh \
+    && [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true
+ENV FSLDIR=/opt/fsl \
+    PATH=/opt/fsl/bin:$PATH \
+    FSLLOCKDIR= \
+    FSLMACHINELIST= \
+    FSLMULTIFILEQUIT=TRUE \
+    FSLOUTPUTTYPE=NIFTI_GZ \
+    FSLTCLSH=/opt/fsl/bin/fsltclsh \
+    FSLWISH=/opt/fsl/bin/fslwish \
+    LD_LIBRARY_PATH=/opt/fsl/lib/lib:$LD_LIBRARY_PATH \
+    POSSUMDIR=/opt/fsl
 
 #----------------
 # Install MRtrix3
@@ -216,23 +291,22 @@ RUN deps='g++ git libeigen3-dev zlib1g-dev' \
     && apt-get purge -y --auto-remove $deps
 ENV PATH=/opt/mrtrix3/bin:$PATH
 
-#-------------------
-# Install ANTs 2.2.0
-#-------------------
-RUN curl -sSL --retry 5 https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz | tar zx -C /opt
-ENV ANTSPATH=/opt/ants \
-    PATH=/opt/ants:$PATH
+#---------------------------
+# Add NeuroDebian repository
+#---------------------------
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && curl -sSL http://neuro.debian.net/lists/zesty.us-nh.libre \
+    > /etc/apt/sources.list.d/neurodebian.sources.list \
+    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \
+    && apt-get update \
+    && apt-get purge -y --auto-remove dirmngr
 
-#------------------
-# Install FSL 5.0.10
-#------------------
-RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
-    | tar zx -C /opt \
-    && cp /opt/fsl/etc/fslconf/fsl.sh /etc/profile.d/ \
-    && FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh \
-    && [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true
-ENV FSLDIR=/opt/fsl \
-    PATH=/opt/fsl/bin:$PATH
+# Install NeuroDebian packages
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends afni dcm2niix \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #----------------------
 # Install MCR and SPM12
@@ -258,4 +332,12 @@ ENV MATLABCMD=/opt/mcr/v*/toolbox/matlab \
     SPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script" \
     FORCE_SPMMCR=1 \
     LD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH
-```
+
+
+#--------------------------
+# User-defined instructions
+#--------------------------
+
+RUN echo "Hello, World"
+
+ENTRYPOINT ["run.sh"]```

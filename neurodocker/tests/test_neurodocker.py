@@ -5,8 +5,8 @@ import sys
 
 import pytest
 
-from neurodocker.main import (create_parser, parse_args, convert_args_to_specs,
-                              main)
+from neurodocker.neurodocker import (create_parser, parse_args,
+                                     convert_args_to_specs, main)
 
 
 def test_parse_args():
@@ -48,9 +48,19 @@ def test_parse_args():
     namespace = parse_args(args)
     assert namespace.miniconda
 
+    args = base_args + ['--neurodebian', 'os_codename=zesty',
+                        'download_server=usa-nh']
+    namespace = parse_args(args)
+    assert namespace.neurodebian
+
     args = base_args + ['--spm', 'version=12']
     namespace = parse_args(args)
     assert namespace.spm
+
+    args = base_args + ['--instruction', 'RUN ls']
+    namespace = parse_args(args)
+    assert namespace.instruction
+    assert isinstance(namespace.instruction, list)
 
     args = base_args + ['--no-check-urls']
     namespace = parse_args(args)
@@ -63,7 +73,10 @@ def test_convert_args_to_specs():
             '--fsl', 'version=5.0.10',
             '--miniconda', 'conda_install=pandas,traits',
             '--mrtrix3',
+            '--neurodebian', 'os_codename=zesty', 'download_server=usa-nh',
             '--spm', 'version=12',
+            '--instruction', 'RUN ls',
+            '--instruction', 'WORKDIR /home',
             '--no-check-urls']
     namespace = parse_args(args)
     assert namespace
@@ -108,6 +121,7 @@ def test_main():
             '--fsl', 'version=5.0.10',
             '--miniconda', 'python_version=3.5.1',
             '--mrtrix3',
+            '--neurodebian', 'os_codename=zesty', 'download_server=usa-nh',
             '--spm', 'version=12', 'matlab_version=R2017a',
             '--no-check-urls']
     main(args)

@@ -1,5 +1,6 @@
 """Class to parse specifications for Dockerfile."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import
 
 import inspect
@@ -18,7 +19,7 @@ class SpecsParser(object):
         The dictionary of specifications, or the name of the JSON file with the
         specifications.
     """
-    VALID_TOP_LEVEL_KEYS = ['base', 'pkg_manager', 'check_urls']
+    VALID_TOP_LEVEL_KEYS = ['base', 'pkg_manager', 'check_urls', 'instruction']
     VALID_TOP_LEVEL_KEYS.extend(SUPPORTED_SOFTWARE.keys())
 
     def __init__(self, dict_or_filepath):
