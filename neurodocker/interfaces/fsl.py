@@ -1,5 +1,10 @@
-"""Class to add FSL installation to Dockerfile."""
+"""Class to add FSL installation to Dockerfile.
+
+FSL wiki: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
+FSL license: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import, division, print_function
 from distutils.version import LooseVersion
 import logging
@@ -24,58 +29,49 @@ class FSL(object):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     use_binaries : bool
-        If true, use binaries from FSL's website. True by default if
-        use_installer and use_neurodebian are false.
+        If true, use binaries from FSL's website (default true).
     use_installer : bool
         If true, install FSL using FSL's Python installer. Only works on
-        CentOS/RHEL.
-    os_codename : str
-        Operating system codename (e.g., 'zesty', 'jessie'.) Only required if
-        `pkg_manager` is 'apt'. Corresponds to the NeuroDebian url:
-        http://neuro.debian.net/lists/<OS_CODENAME>.us-nh.full.
+        CentOS/RHEL (default false).
+    check_urls : bool
+        If true, raise error if a URL used by this class responds with an error
+        code.
 
     Notes
     -----
     Look into ReproNim/simple_workflow to learn how to install specific versions
     of FSL on Debian (https://github.com/ReproNim/simple_workflow).
     """
-    def __init__(self, version, pkg_manager, use_binaries=None,
-                 use_installer=False, use_neurodebian=False, os_codename=None,
-                 check_urls=True):
+    def __init__(self, version, pkg_manager, use_binaries=True,
+                 use_installer=False, check_urls=True):
         self.version = LooseVersion(version)
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
         self.use_installer = use_installer
-        self.use_neurodebian = use_neurodebian
-        self.os_codename = os_codename
         self.check_urls = check_urls
-
-        if (self.use_binaries is None and not self.use_installer
-            and not self.use_neurodebian):
-            self.use_binaries = True
 
         self._check_args()
         self.cmd = self._create_cmd()
 
     def _check_args(self):
         """Raise `ValueError` if combinations of arguments are invalid."""
-        if not self.use_binaries + self.use_installer + self.use_neurodebian:
+        if not self.use_binaries + self.use_installer:
             raise ValueError("Please specify installation method.")
-        if self.use_binaries + self.use_installer + self.use_neurodebian > 1:
+        if self.use_binaries and self.use_installer:
             raise ValueError("More than one installation method specified.")
         if self.use_installer and self.pkg_manager != 'yum':
-            raise ValueError("FSL's Python installer does not work on "
-                             "Debian-based systems.")
-        if self.use_neurodebian and self.os_codename is None:
-            raise ValueError("`os_codename` must be defined to install FSL "
-                             "through NeuroDebian.")
+            raise ValueError("FSL's Python installer works only on "
+                             "CentOS/RHEL-based systems.")
         return True
 
     def _create_cmd(self):
         """Return full Dockerfile instructions to install FSL."""
-        comment = ("#------------------\n"
-                   "# Install FSL {}\n"
-                   "#------------------".format(self.version))
+        comment = ("#-----------------------------------------------"
+                   "\n# Install FSL {}"
+                   "\n# Please review FSL's license:"
+                   "\n# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence"
+                   "\n#-----------------------------------------------"
+                   "".format(self.version))
         if self.use_binaries:
             url = self._get_binaries_url()
             cmd = self.install_binaries(url)
@@ -87,7 +83,7 @@ class FSL(object):
     def install_with_pyinstaller(check_urls=False):
         """Return Dockerfile instructions to install FSL using FSL's Python
         installer. This will install the latest version and only works on
-        Centos/RHEL.
+        CentOS/RHEL.
         """
         workdir_cmd = "WORKDIR /opt"
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
@@ -107,6 +103,7 @@ class FSL(object):
         return "\n".join((workdir_cmd, cmd, path_cmd))
 
     def _get_binaries_url(self):
+        """Return URL to binaries for requested version."""
         base = "https://fsl.fmrib.ox.ac.uk/fsldownloads/"
         if self.version >= LooseVersion('5.0.9'):
             url = urljoin(base, "fsl-{ver}-centos6_64.tar.gz")
@@ -120,17 +117,25 @@ class FSL(object):
     @staticmethod
     def install_binaries(url):
         """Return Dockerfile instructions to install FSL using binaries hosted
-        on FSL's website."""
+        on FSL's website.
+        """
         cmd = ('curl -sSL {url}'
                '\n| tar zx -C /opt'
-               '\n&& . /opt/fsl/etc/fslconf/fsl.sh'
                '\n&& FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh'
                '\n&& [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true'
                ''.format(url=url))
         cmd = indent("RUN", cmd)
 
         env_cmd = ("FSLDIR=/opt/fsl"
-                   "\nPATH=/opt/fsl/bin:$PATH")
+                   "\nPATH=/opt/fsl/bin:$PATH"
+                   "\nFSLLOCKDIR="
+                   "\nFSLMACHINELIST="
+                   "\nFSLMULTIFILEQUIT=TRUE"
+                   "\nFSLOUTPUTTYPE=NIFTI_GZ"
+                   "\nFSLTCLSH=/opt/fsl/bin/fsltclsh"
+                   "\nFSLWISH=/opt/fsl/bin/fslwish"
+                   "\nLD_LIBRARY_PATH=/opt/fsl/lib/lib:$LD_LIBRARY_PATH"
+                   "\nPOSSUMDIR=/opt/fsl")
         env_cmd = indent("ENV", env_cmd)
 
         return "\n".join((cmd, env_cmd))
