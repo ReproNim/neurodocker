@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import find_packages, setup
 
-import neurodocker
+BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+
+def _get_version():
+    """Return version string."""
+    with open(os.path.join(BASE_PATH, "neurodocker", "VERSION"), 'r') as fp:
+        return fp.read().strip()
+
+__version__ = _get_version()
+
 
 setup(name='neurodocker',
-      version=neurodocker.__version__,
+      version=__version__,
       url='https://github.com/kaczmarj/neurodocker',
       author='Jakub Kaczmarzyk',
       author_email='jakubk@mit.edu',
