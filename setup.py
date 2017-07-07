@@ -2,16 +2,18 @@
 
 from setuptools import find_packages, setup
 
+import neurodocker
+
 setup(name='neurodocker',
-      version='0.1.0.dev0',
+      version=neurodocker.__version__,
       url='https://github.com/kaczmarj/neurodocker',
       author='Jakub Kaczmarzyk',
       author_email='jakubk@mit.edu',
       packages=find_packages(),
       install_requires = [
-         'requests',
+         'requests>=2.0',
          'docker>=2.3'
       ],
       entry_points={'console_scripts':
-                    ['neurodocker=neurodocker.main:main']}
+                    ['neurodocker=neurodocker.neurodocker:main']}
       )
