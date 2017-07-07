@@ -13,6 +13,7 @@ SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
                       'spm': interfaces.SPM,
                       }
 
+from neurodocker.docker import DockerContainer, DockerImage
 from neurodocker.dockerfile import Dockerfile
 from neurodocker.parser import SpecsParser
 
