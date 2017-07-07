@@ -5,8 +5,8 @@ import sys
 
 import pytest
 
-from neurodocker.main import (create_parser, parse_args, convert_args_to_specs,
-                              main)
+from neurodocker.neurodocker import (create_parser, parse_args,
+                                     convert_args_to_specs, main)
 
 
 def test_parse_args():
