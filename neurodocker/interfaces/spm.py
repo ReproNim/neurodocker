@@ -36,8 +36,8 @@ class SPM(object):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     check_urls : bool
-        If true, throw warning if URLs relevant to the installation cannot be
-        reached.
+        If true, raise error if a URL used by this class responds with an error
+        code.
 
     Notes
     -----

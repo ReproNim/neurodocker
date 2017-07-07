@@ -24,7 +24,8 @@ class NeuroDebian(object):
     pkg_manager : {'apt'}
         Linux package manager.
     check_urls : bool
-        If true, raise error if URLs used by this class return an error code.
+        If true, raise error if a URL used by this class responds with an error
+        code.
     """
 
     SERVERS = {'australia': 'au',

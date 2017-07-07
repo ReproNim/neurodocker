@@ -32,8 +32,8 @@ class FreeSurfer(object):
         If true, uses pre-compiled FreeSurfer binaries. Building from source
         is not yet supported.
     check_urls : bool
-        If true, raise error if a URL used by this class responds with a status
-        code greater than or equal to 400.
+        If true, raise error if a URL used by this class responds with an error
+        code.
     """
 
     def __init__(self, version, pkg_manager, license_path=None,
