@@ -9,6 +9,8 @@ import threading
 import docker
 import requests
 
+client = docker.from_env(timeout=30)
+
 
 def docker_is_running(client):
     """Return true if Docker server is responsive.
@@ -30,10 +32,6 @@ def docker_is_running(client):
         return False
 
 
-client = docker.from_env(timeout=30)
-DOCKER_RUNNING = docker_is_running(client)
-
-
 def require_docker(func):
     """Raise Exception if Docker server is unresponsive (Docker might not be
     installed or not running). Decorate any function that requires the Docker
@@ -51,7 +49,7 @@ def require_docker(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if not DOCKER_RUNNING:
+        if not docker_is_running(client):
             raise Exception("The Docker server is unresponsive. Is Docker "
                             "installed and running?")
         return func(*args, **kwargs)
