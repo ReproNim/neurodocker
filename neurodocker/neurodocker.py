@@ -31,8 +31,25 @@ def create_parser():
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
 
+    subparsers = parser.add_subparsers()
+    gen_parser = subparsers.add_parser('generate', description=__doc__,
+                                       formatter_class=RawDescriptionHelpFormatter)
+
+    description = """
+Trace an arbitrary number of commands in a running container using ReproZip,
+and save pack file to host.
+
+Example:
+    $> cmd1="echo Hello World"
+    $> cmd2="antsRegistration --help"
+    $> neurodocker reprozip --dir=~/pack_files f101b18bf98c $cmd1 $cmd2
+"""
+
+    reprozip_parser = subparsers.add_parser('reprozip', description=description,
+                                            formatter_class=RawDescriptionHelpFormatter)
+
     # Global requirements.
-    reqs = parser.add_argument_group(title="global requirements")
+    reqs = gen_parser.add_argument_group(title="global requirements")
     reqs.add_argument("-b", "--base", required=True,
                       help="Base Docker image. Eg, ubuntu:17.04")
     reqs.add_argument("-p", "--pkg-manager", required=True,
@@ -79,7 +96,7 @@ def create_parser():
                 "Valid keys are version and matlab_version."),
     }
 
-    pkgs = parser.add_argument_group(title="software package arguments",
+    pkgs = gen_parser.add_argument_group(title="software package arguments",
                                      description=pkgs_help['all'])
 
     list_of_kv = lambda kv: kv.split("=")
@@ -98,7 +115,7 @@ def create_parser():
 
 
     # Docker-related arguments.
-    other = parser.add_argument_group(title="other options")
+    other = gen_parser.add_argument_group(title="other options")
     other.add_argument('-i', '--instruction', action="append",
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times."))
@@ -109,11 +126,24 @@ def create_parser():
     # other.add_argument('--build', dest="build", action="store_true")
 
 
+    # ReproZip sub-command
+    reprozip_parser = subparsers.add_parser('reprozip', description=description,
+                                            formatter_class=RawDescriptionHelpFormatter)
+    reprozip_parser.add_argument('container',
+                                 help=("Running container in which to trace "
+                                       "commands."))
+    reprozip_parser.add_argument('commands', nargs='+',
+                                 help="Command(s) to trace.")
+    reprozip_parser.add_argument('--dir', '-d', default=".",
+                                 help=("Directory in which to save pack file. "
+                                       "Default is current directory."))
+
+
     # Other options.
-    parser.add_argument("--check-urls", dest="check_urls", action="store_true",
+    gen_parser.add_argument("--check-urls", dest="check_urls", action="store_true",
                         help=("Verify communication with URLs used in "
-                              "the build."), default=True,)
-    parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
+                              "the build."), default=True)
+    gen_parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
     parser.add_argument("-v", "--verbose", action="store_true")
