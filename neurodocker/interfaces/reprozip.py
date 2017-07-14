@@ -5,16 +5,38 @@ Project repository: https://github.com/ViDA-NYU/reprozip/
 See https://github.com/freesurfer/freesurfer/issues/70 for an example of using
 ReproZip to minimize Freesurfer's recon-all command.
 
-To use the reprozip trace, Docker images must be built with
-`--security-opt seccomp:unconfined` to allow ReproZip trace to work.
 
-Docker's use of layers means that even if a smaller container is committed from
-a larger image there will be no reduction in size (the previous layers are
-preserved). Look into the `--squash` option in `docker build`. One idea is to
-use the command `docker build --squash ...` when minifying images.
+Current implementation
+----------------------
+A bash script (utils/reprozip_trace_runner.sh) implements items 1-3 below.
 
-See https://github.com/moby/moby/issues/332 and
-https://github.com/moby/moby/pull/22641.
+1. Install a dedicated Miniconda with ReproZip (not added to $PATH).
+2. Run `reprozip trace ...` on an arbitrary number of commands.
+3. Pack the experiment (`reprozip pack ...`)
+4. Copy the pack file onto the host (done with `docker-py`).
+    - at this point, the user is free to do anything with the pack file.
+    - QUESTION: should this implementation do anything with this pack file
+                after it is copied onto the host? eg, `reprounzip-docker setup`
+
+Potential implementations
+-------------------------
+See https://github.com/kaczmarj/neurodocker/issues/23#issuecomment-307863219.
+
+Notes
+-----
+1. To use the reprozip trace within a Docker container, the image/container must
+   be built/run with `--security-opt seccomp:unconfined`.
+      A. `docker build` does not allow --security-opt seccomp:unconfined on
+          macOS.
+2. Docker's use of layers means that even if a smaller container is committed
+   from a larger image there will be no reduction in size (the previous layers
+   are preserved). There is a `--squash` option in `docker build` that will
+   merge all layers at the end of the build and remove files that were deleted
+   in previous layers.
+      A. The `--squash` option is experimental and might be changed or removed
+         in the future.
+      B. See https://github.com/moby/moby/issues/332
+      C. See https://github.com/moby/moby/pull/22641
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -22,109 +44,114 @@ from __future__ import absolute_import, division, print_function
 
 import os
 import posixpath
+import tarfile
 
-from neurodocker.utils import indent, manage_pkgs
-
-# TODO: it seems that ReproZip can only be used when running a container, not
-#       when building from a Dockerfile (at least on macOS).
-#
-# An option:
-# 1. Build image as usual.
-# 2. Run container.
-# 3. Within running container, install dedicated miniconda with reprozip.
-# 4. Within running container, run reprozip (with security-opt) on command(s),
-#    and remove files not caught by the trace.
-# 5. Export that container, and import it as a new, minified image.
-#    https://stackoverflow.com/a/22714556/5666087
+BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-class Reprozip(object):
-    """Add Dockerfile instructions to minimize a container based on a command
-    or a list of commands.
+# TODO: move the copy functions to the docker module.
 
-    First, reprozip trace is run on a command or a list of commands, and then
-    all files are deleted except those in the reprozip trace output.
+def copy_file_to_container(container, src, dest):
+    """Copy `local_filepath` into `container`:`container_path`.
 
     Parameters
     ----------
-    cmds : str or list
-        Command(s) to run to minimize the image.
-    pkg_manager : {'apt', 'yum'}
-        Linux package manager.
+    container : str or container object
+        Container to which file is copied.
+    src : str
+        Filepath on the host.
+    dest : str
+        Directory inside container. Original filename is preserved.
+
+    Returns
+    -------
+    success : bool
+        True if copy was a success. False otherwise.
     """
-    CONDA_ROOT = "/opt/.reprozip-miniconda"
+    # https://gist.github.com/zbyte64/6800eae10ce082bb78f0b7a2cca5cbc2
 
-    def __init__(self, cmds, pkg_manager, trace_dir="/.reprozip-trace"):
-        # TODO: add option for various methods of minifying:
-        # 1. remove all files in container except those found by reprozip.
-        # 2. save reprozip pack file and create new docker image with
-        #    reprounzip-docker.
+    # TODO: make python2 compatible.
+    from io import BytesIO
 
+    with BytesIO() as tar_stream:
+        with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
+            filename = os.path.split(src)[-1]
+            tar.add(src, arcname=filename, recursive=False)
+        tar_stream.seek(0)
+        return container.put_archive(dest, tar_stream)
+
+
+def copy_file_from_container(container, src, dest='.'):
+    """Copy file `filepath` from a running Docker `container`, and save it on
+    the host to `save_path` with the original filename.
+
+    Parameters
+    ----------
+    container : str or container object
+        Container from which file is copied.
+    src : str
+        Filepath within container.
+    dest : str
+        Directory on the host in which to save file.
+
+    Returns
+    -------
+    local_filepath : str
+        Relative path to saved file on the host.
+    """
+    import tempfile
+    import traceback
+
+    tar_stream, tar_info = container.get_archive(src)
+    try:
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(tar_stream.data)
+            tmp.flush()
+            with tarfile.TarFile(tmp.name) as tar:
+                tar.extractall(path=dest)
+        return os.path.join(dest, tar_info['name'])
+    except Exception as e:
+        raise
+    finally:
+        tar_stream.close()
+
+
+class Reprozip(object):
+    """Minimize a container based on arbitrary number of commands. Can only be
+    used at runtime (not while building a Docker image).
+
+    Parameters
+    ----------
+
+    """
+
+    def __init__(self, container, cmds, packfile_save_dir='.'):
+        self.container = container
+        if isinstance(cmds, str):
+            cmds = [cmds]
         self.cmds = cmds
-        self.pkg_manager = pkg_manager
-        self.trace_dir = trace_dir
+        self.packfile_save_dir = packfile_save_dir
 
-        if isinstance(self.cmds, str):
-            self.cmds = [self.cmds]
+        self.shell_filepath = os.path.join(BASE_PATH, 'utils',
+                                           'reprozip_trace_runner.sh')
 
-        self.cmd = self._create_cmd()
-
-    def _create_cmd(self):
-        """Return full command to install and run ReproZip."""
-        comment = ("#-----------------------------\n"
-                   "# Install and run ReproZip\n"
-                   "# (build with --squash option)\n"
-                   "#-----------------------------\n")
-        cmds = (self.install_miniconda(), self.install_reprozip(),
-                self.trace(), self.remove_untraced_files())
-        cmds = indent("RUN", ''.join(cmds))
-        return comment + cmds
-
-    def install_miniconda(self):
-        """Install Miniconda solely for reprozip. Do not add this installation
-        to PATH.
+    def run(self):
+        """Install ReproZip, run `reprozip trace`, and copy pack file to host.
         """
-        url = ("https://repo.continuum.io/miniconda/"
-               "Miniconda3-latest-Linux-x86_64.sh")
-        return ("curl -ssL -o miniconda.sh {}"
-                "\n&& bash miniconda.sh -b -p {}"
-                "\n&& rm -f miniconda.sh".format(url, Reprozip.CONDA_ROOT))
+        copy_file_to_container(self.container, self.shell_filepath, '/tmp/')
 
-    def install_reprozip(self):
-        """Conda install reprozip from the vida-nyu channel."""
-        conda = posixpath.join(Reprozip.CONDA_ROOT, 'bin', 'conda')
-        return ("\n&& {conda} install -y -q python=3.5 pyyaml"
-                "\n&& {conda} install -y -q -c vida-nyu reprozip"
-                "".format(conda=conda))
+        trace_env = {'_ND_CMD{}'.format(i): cmd
+                     for i, cmd in enumerate(self.cmds)}
+        trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + " ".join(trace_env.keys())
 
-    def trace(self):
-        """Run reprozip trace on the specified commands."""
-        reprozip = posixpath.join(Reprozip.CONDA_ROOT, 'bin', 'reprozip')
-        trace_cmds = []
-        base = ('\n&& {reprozip} trace -d {trace_dir} --dont-identify-packages'
-                ' {continue_}\n\t{cmd}')
+        # TODO: optionally, get log output.
+        for log in self.container.exec_run(trace_cmd, environment=trace_env,
+                                           stream=True):
+            log = log.decode().strip()
+            print(log)
 
-        for i, cmd in enumerate(self.cmds):
-            if not cmd:
-                raise ValueError("Command to trace is empty.")
-            continue_ = "--continue " if i else ""
-            trace_cmds.append(base.format(cmd=cmd, reprozip=reprozip,
-                                          trace_dir=self.trace_dir,
-                                          continue_=continue_))
-
-        return "".join(trace_cmds)
-
-    def remove_untraced_files(self):
-        """Return command to remove files that were not caught by reprozip
-        trace.
-        """
-        kwargs = {'python': posixpath.join(Reprozip.CONDA_ROOT, 'bin',
-                                           'python'),
-                  'script_url': 'https://dl.dropbox.com/s/tuar1ykz7wly1yy/_reprozip_rm_files.py',
-                  'save_path': '/tmp/rm_untraced_files.py',
-                  'config_path': os.path.join(self.trace_dir, 'config.yml'),
-                  'miniconda': Reprozip.CONDA_ROOT,}
-
-        return ("\n&& curl -sSL -o {save_path} {script_url}"
-                "\n&& {python} {save_path} --rm {config_path} {miniconda}"
-                "\n&& rm -rf {miniconda}".format(**kwargs))
+        self.pack_filepath = log.split()[-1].strip()
+        rel_pack_filepath = copy_file_from_container(self.container,
+                                                     self.pack_filepath,
+                                                     self.packfile_save_dir)
+        return os.path.abspath(os.path.join(BASE_PATH, rel_pack_filepath))
