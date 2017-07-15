@@ -116,20 +116,34 @@ def copy_file_from_container(container, src, dest='.'):
         tar_stream.close()
 
 
-class Reprozip(object):
+class ReproZip(object):
     """Minimize a container based on arbitrary number of commands. Can only be
     used at runtime (not while building a Docker image).
 
     Parameters
     ----------
-
+    container : str or container object
+        The container in which to trace commands.
+    commands : str or list or tuple
+        If str, one command to trace. If list or tuple, sequence of commands
+        to trace in order.
+    packfile_save_dir : str
+        Directory on the host to save ReproZip pack file. Saves to current
+        directory by default.
     """
 
-    def __init__(self, container, cmds, packfile_save_dir='.'):
-        self.container = container
-        if isinstance(cmds, str):
-            cmds = [cmds]
-        self.cmds = cmds
+    def __init__(self, container, commands, packfile_save_dir='.', **kwargs):
+
+        try:
+            container.put_archive
+            self.container = container
+        except AttributeError:
+            from neurodocker.docker import client
+            self.container = client.containers.get(container)
+
+        if isinstance(commands, str):
+            commands = [commands]
+        self.commands = commands
         self.packfile_save_dir = packfile_save_dir
 
         self.shell_filepath = os.path.join(BASE_PATH, 'utils',
@@ -137,11 +151,20 @@ class Reprozip(object):
 
     def run(self):
         """Install ReproZip, run `reprozip trace`, and copy pack file to host.
+
+        Returns
+        -------
+        pack_filepath : str
+            Absolute path to the saved pack file on the host.
+
+        Raises
+        ------
+        RuntimeError : error occurs while running shell script within container.
         """
         copy_file_to_container(self.container, self.shell_filepath, '/tmp/')
 
         trace_env = {'_ND_CMD{}'.format(i): cmd
-                     for i, cmd in enumerate(self.cmds)}
+                     for i, cmd in enumerate(self.commands)}
         trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + " ".join(trace_env.keys())
 
         # TODO: optionally, get log output.
@@ -149,6 +172,8 @@ class Reprozip(object):
                                            stream=True):
             log = log.decode().strip()
             print(log)
+            if "NEURODOCKER: Error" in log:
+                raise RuntimeError("Error: {}".format(log))
 
         self.pack_filepath = log.split()[-1].strip()
         rel_pack_filepath = copy_file_from_container(self.container,
