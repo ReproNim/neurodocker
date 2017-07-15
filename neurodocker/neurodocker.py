@@ -31,7 +31,7 @@ def create_parser():
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
 
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest="subparser_name")
     gen_parser = subparsers.add_parser('generate', description=__doc__,
                                        formatter_class=RawDescriptionHelpFormatter)
 
@@ -228,23 +228,28 @@ def main(args=None):
         namespace = parse_args(args)
 
     # Create dictionary of specifications.
-    specs = convert_args_to_specs(namespace)
 
-    keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
-    for key in keys_to_remove:
-        specs.pop(key, None)
+    if namespace.subparser_name == "generate":
+        specs = convert_args_to_specs(namespace)
+        specs.pop('subparser_name', None)
 
-    # Parse to double-check that keys are correct.
-    parser = SpecsParser(specs)
+        keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
+        for key in keys_to_remove:
+            specs.pop(key, None)
 
-    # Generate Dockerfile.
-    df = Dockerfile(parser.specs)
-    if not namespace.no_print_df:
-        print(df.cmd)
+        # Parse to double-check that keys are correct.
+        parser = SpecsParser(specs)
 
-    if namespace.output:
-        df.save(namespace.output)
+        # Generate Dockerfile.
+        df = Dockerfile(parser.specs)
+        if not namespace.no_print_df:
+            print(df.cmd)
 
+        if namespace.output:
+            df.save(namespace.output)
+
+    elif namespace.subparser_name == "reprozip":
+        print("ReproZip support coming soon ...")
 
 if __name__ == "__main__":  # pragma: no cover
     main()
