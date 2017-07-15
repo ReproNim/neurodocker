@@ -163,13 +163,14 @@ class ReproZip(object):
         """
         copy_file_to_container(self.container, self.shell_filepath, '/tmp/')
 
-        trace_env = {'_ND_CMD{}'.format(i): cmd
-                     for i, cmd in enumerate(self.commands)}
-        trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + " ".join(trace_env.keys())
+        cmds = ' '.join('"{}"'.format(c) for c in self.commands)
+
+        trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + cmds
+        # TODO: user logger
+        print(trace_cmd)
 
         # TODO: optionally, get log output.
-        for log in self.container.exec_run(trace_cmd, environment=trace_env,
-                                           stream=True):
+        for log in self.container.exec_run(trace_cmd, stream=True):
             log = log.decode().strip()
             print(log)
             if "NEURODOCKER: Error" in log:
