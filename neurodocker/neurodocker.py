@@ -174,6 +174,7 @@ def _list_to_dict(list_of_kv):
 
         return {k: v for k, v in list_of_kv}
 
+
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     import re
@@ -220,36 +221,46 @@ def convert_args_to_specs(namespace):
     return specs
 
 
-def main(args=None):
+def generate(namespace):
+    """Run `neurodocker generate`."""
+    specs = convert_args_to_specs(namespace)
+    keys_to_remove = ['verbose', 'no_print_df', 'output', 'build',
+                      'subparser_name']
+    for key in keys_to_remove:
+        specs.pop(key, None)
 
+    # Parse to double-check that keys are correct.
+    parser = SpecsParser(specs)
+    df = Dockerfile(parser.specs)
+    if not namespace.no_print_df:
+        print(df.cmd)
+    if namespace.output:
+        df.save(namespace.output)
+
+
+def reprozip(namespace):
+    """Run `neurodocker reprozip`."""
+    from neurodocker.interfaces.reprozip import ReproZip
+
+    local_packfile_path = ReproZip(**vars(namespace)).run()
+    print("Saved pack file on the local host:\n{}".format(local_packfile_path))
+
+
+def main(args=None):
+    """Main program function."""
     if args is None:
         namespace = parse_args(sys.argv[1:])
     else:
         namespace = parse_args(args)
 
-    # Create dictionary of specifications.
+    subparser_functions = {'generate': generate,
+                           'reprozip': reprozip,}
 
-    if namespace.subparser_name == "generate":
-        specs = convert_args_to_specs(namespace)
-        specs.pop('subparser_name', None)
+    try:
+        subparser_functions[namespace.subparser_name](namespace)
+    except KeyError:
+        print(__doc__)
 
-        keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
-        for key in keys_to_remove:
-            specs.pop(key, None)
-
-        # Parse to double-check that keys are correct.
-        parser = SpecsParser(specs)
-
-        # Generate Dockerfile.
-        df = Dockerfile(parser.specs)
-        if not namespace.no_print_df:
-            print(df.cmd)
-
-        if namespace.output:
-            df.save(namespace.output)
-
-    elif namespace.subparser_name == "reprozip":
-        print("ReproZip support coming soon ...")
 
 if __name__ == "__main__":  # pragma: no cover
     main()
