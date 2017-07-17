@@ -42,78 +42,15 @@ Notes
 
 from __future__ import absolute_import, division, print_function
 
+import logging
 import os
-import posixpath
-import tarfile
+
+import docker
+
+from neurodocker.docker import copy_file_to_container, copy_file_from_container
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
-
-
-# TODO: move the copy functions to the docker module.
-
-def copy_file_to_container(container, src, dest):
-    """Copy `local_filepath` into `container`:`container_path`.
-
-    Parameters
-    ----------
-    container : str or container object
-        Container to which file is copied.
-    src : str
-        Filepath on the host.
-    dest : str
-        Directory inside container. Original filename is preserved.
-
-    Returns
-    -------
-    success : bool
-        True if copy was a success. False otherwise.
-    """
-    # https://gist.github.com/zbyte64/6800eae10ce082bb78f0b7a2cca5cbc2
-
-    # TODO: make python2 compatible.
-    from io import BytesIO
-
-    with BytesIO() as tar_stream:
-        with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
-            filename = os.path.split(src)[-1]
-            tar.add(src, arcname=filename, recursive=False)
-        tar_stream.seek(0)
-        return container.put_archive(dest, tar_stream)
-
-
-def copy_file_from_container(container, src, dest='.'):
-    """Copy file `filepath` from a running Docker `container`, and save it on
-    the host to `save_path` with the original filename.
-
-    Parameters
-    ----------
-    container : str or container object
-        Container from which file is copied.
-    src : str
-        Filepath within container.
-    dest : str
-        Directory on the host in which to save file.
-
-    Returns
-    -------
-    local_filepath : str
-        Relative path to saved file on the host.
-    """
-    import tempfile
-    import traceback
-
-    tar_stream, tar_info = container.get_archive(src)
-    try:
-        with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(tar_stream.data)
-            tmp.flush()
-            with tarfile.TarFile(tmp.name) as tar:
-                tar.extractall(path=dest)
-        return os.path.join(dest, tar_info['name'])
-    except Exception as e:
-        raise
-    finally:
-        tar_stream.close()
+logger = logging.getLogger(__name__)
 
 
 class ReproZip(object):
@@ -166,18 +103,22 @@ class ReproZip(object):
         cmds = ' '.join('"{}"'.format(c) for c in self.commands)
 
         trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + cmds
-        # TODO: user logger
-        print(trace_cmd)
+        logger.debug("running command within container {}: {}"
+                     "".format(self.container.id, trace_cmd))
 
-        # TODO: optionally, get log output.
         for log in self.container.exec_run(trace_cmd, stream=True):
             log = log.decode().strip()
-            print(log)
-            if "NEURODOCKER: Error" in log:
+            logging.info(log)
+            if "NEURODOCKER" in log and "Error" in log:
                 raise RuntimeError("Error: {}".format(log))
 
         self.pack_filepath = log.split()[-1].strip()
-        rel_pack_filepath = copy_file_from_container(self.container,
-                                                     self.pack_filepath,
-                                                     self.packfile_save_dir)
+        try:
+            rel_pack_filepath = copy_file_from_container(self.container,
+                                                         self.pack_filepath,
+                                                         self.packfile_save_dir)
+        except docker.errors.NotFound:
+            raise RuntimeError("ReproZip pack file was not found in the "
+                               "container. `reprozip trace` might have failed.")
+
         return os.path.abspath(os.path.join(BASE_PATH, rel_pack_filepath))
