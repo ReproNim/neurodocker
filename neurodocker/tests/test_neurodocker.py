@@ -13,21 +13,23 @@ def test_parse_args():
     parser = create_parser()
     assert parser
 
-    with pytest.raises(SystemExit):
-        parse_args([''])
+    base_args = "generate {}"
 
     with pytest.raises(SystemExit):
-        parse_args(['-b'])
+        parse_args(base_args.format('').split())
 
     with pytest.raises(SystemExit):
-        parse_args(['-p'])
+        parse_args(base_args.format('-b').split())
+
+    with pytest.raises(SystemExit):
+        parse_args(base_args.format('-p').split())
 
     iter_args = ['--ants', '--fsl', '--miniconda', '--spm']
     for a in iter_args:
         with pytest.raises(SystemExit):
-            parse_args([a])
+            parse_args(base_args.format(a).split())
 
-    base_args = "-b ubuntu:17.04 -p apt --no-check-urls".split()
+    base_args = "generate -b ubuntu:17.04 -p apt --no-check-urls".split()
     namespace = parse_args(base_args)
     assert namespace.base
     assert namespace.pkg_manager
@@ -68,7 +70,7 @@ def test_parse_args():
 
 
 def test_convert_args_to_specs():
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
             '--miniconda', 'conda_install=pandas,traits',
@@ -86,19 +88,19 @@ def test_convert_args_to_specs():
 
     assert "," not in specs['miniconda']['conda_install']
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'option']
     namespace = parse_args(args)
     with pytest.raises(ValueError):
         convert_args_to_specs(namespace)
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'option=']
     namespace = parse_args(args)
     with pytest.raises(ValueError):
         convert_args_to_specs(namespace)
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'use_binaries=false',
             '--mrtrix3', 'use_binaries=0']
     namespace = parse_args(args)
@@ -106,7 +108,7 @@ def test_convert_args_to_specs():
     assert specs['ants']['use_binaries'] is False
     assert specs['mrtrix3']['use_binaries'] is False
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'use_binaries=true',
             '--mrtrix3', 'use_binaries=1']
     namespace = parse_args(args)
@@ -116,7 +118,7 @@ def test_convert_args_to_specs():
 
 
 def test_main():
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
             '--miniconda', 'python_version=3.5.1',
@@ -126,7 +128,7 @@ def test_main():
             '--no-check-urls']
     main(args)
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
     main(args)
 
     with pytest.raises(SystemExit):
@@ -136,14 +138,14 @@ def test_main():
     with pytest.raises(SystemExit):
         main()
 
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'option=value']
     with pytest.raises(ValueError):
         main(args)
 
 
 def test_no_print(capsys):
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
     main(args)
     out, _ = capsys.readouterr()
     assert "FROM" in out and "RUN" in out
@@ -156,7 +158,7 @@ def test_no_print(capsys):
 
 def test_save(tmpdir):
     outfile = tmpdir.join("test.txt")
-    args = ['-b', 'ubuntu:17.04', '-p', 'apt', '--mrtrix3',
+    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--mrtrix3',
             'use_binaries=false', '--no-print-df', '-o', outfile.strpath,
             '--no-check-urls']
     main(args)
