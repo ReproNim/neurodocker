@@ -60,6 +60,9 @@ def test_save_load_json(tmpdir):
 
 
 def test_set_log_level(tmpdir):
-    utils.set_log_level('info')
+    import logging
+
+    logger = logging.getLogger(__name__)
+    utils.set_log_level(logger, 'info')
     with pytest.raises(ValueError):
-        utils.set_log_level('fake_level')
+        utils.set_log_level(logger 'fake_level')
