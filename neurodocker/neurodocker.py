@@ -228,7 +228,7 @@ def convert_args_to_specs(namespace):
 def generate(namespace):
     """Run `neurodocker generate`."""
     specs = convert_args_to_specs(namespace)
-    keys_to_remove = ['verbose', 'no_print_df', 'output', 'build',
+    keys_to_remove = ['verbosity', 'no_print_df', 'output', 'build',
                       'subparser_name']
     for key in keys_to_remove:
         specs.pop(key, None)
@@ -264,10 +264,13 @@ def main(args=None):
     if namespace.verbosity is not None:
         utils.set_log_level(logger, namespace.verbosity)
 
-    try:
-        subparser_functions[namespace.subparser_name](namespace)
-    except KeyError:
+
+    if namespace.subparser_name not in subparser_functions.keys():
         print(__doc__)
+        return
+    subparser_functions[namespace.subparser_name](namespace)
+
+
 
 
 if __name__ == "__main__":  # pragma: no cover
