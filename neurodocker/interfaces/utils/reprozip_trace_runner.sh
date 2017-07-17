@@ -14,7 +14,7 @@ set -e
 REPROZIP_CONDA=/opt/reprozip-miniconda
 REPROZIP_TRACE_DIR=/neurodocker-reprozip-trace
 CONDA_URL=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-NEURODOCKER_LOG_PREFIX="NEURODOCKER"
+NEURODOCKER_LOG_PREFIX="NEURODOCKER (in container)"
 
 
 function program_exists()
@@ -22,15 +22,35 @@ function program_exists()
   hash "$1" 2>/dev/null;
 }
 
+
+function install_missing_dependencies()
+{
+  if program_exists "apt-get"; then
+    echo "${NEURODOCKER_LOG_PREFIX}: installing $1 with apt-get"
+    apt-get update -qq
+    apt-get install -yq $1
+  elif program_exists "yum"; then
+    echo "${NEURODOCKER_LOG_PREFIX}: installing $1 with yum"
+    yum install -y -q $1
+  else
+    echo "${NEURODOCKER_LOG_PREFIX}: cannot install $1 (error using apt-get and then yum)."
+    exit 1;
+  fi;
+}
+
+
 function install_conda_reprozip()
 {
   TMP_CONDA_INSTALLER=/tmp/miniconda.sh
-
-  curl -ssL -o $TMP_CONDA_INSTALLER $CONDA_URL
+  ls /tmp
+  curl -sSL -o "$TMP_CONDA_INSTALLER" "$CONDA_URL"
+  ls /tmp
   bash $TMP_CONDA_INSTALLER -b -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
-  ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.5 reprozip;
+  ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.5 reprozip
+  return 0;
 }
+
 
 function run_reprozip_trace()
 {
@@ -51,25 +71,7 @@ function run_reprozip_trace()
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
     $reprozip_cmd
   done
-}
-
-
-function install_bzip2()
-{
-  # cmd_debian="apt-get update && apt-get install -yq --no-install-recommends bzip2"
-  # cmd_centos="yum install -y -q bzip2"
-
-  if program_exists "apt-get"; then
-    echo "${NEURODOCKER_LOG_PREFIX}: installing bzip2 with apt-get"
-    apt-get update
-    apt-get install -yq --no-install-recommends bzip2
-  elif program_exists "yum"; then
-    echo "${NEURODOCKER_LOG_PREFIX}: installing bzip2 with yum"
-    yum install -y -q bzip2
-  else
-    echo "${NEURODOCKER_LOG_PREFIX}: cannot install bzip2 (error using apt-get and then yum)."
-    exit 1;
-  fi;
+  return 0;
 }
 
 
@@ -83,9 +85,17 @@ if [ -d $REPROZIP_TRACE_DIR ]; then
   exit 1
 fi
 
+MISSING_DEPENDENCIES=""
 if ! program_exists "bzip2"; then
-  echo "${NEURODOCKER_LOG_PREFIX}: installing bzip2 (required for miniconda installation)"
-  install_bzip2
+  MISSING_DEPENDENCIES="$MISSING_DEPENDENCIES bzip2"
+fi
+if ! program_exists "curl"; then
+  MISSING_DEPENDENCIES="$MISSING_DEPENDENCIES curl"
+fi
+
+echo $MISSING_DEPENDENCIES
+if [[ ! -z $MISSING_DEPENDENCIES ]]; then
+  install_missing_dependencies "$MISSING_DEPENDENCIES"
 fi
 
 if [ ! -f "${REPROZIP_CONDA}/bin/reprozip" ]; then
