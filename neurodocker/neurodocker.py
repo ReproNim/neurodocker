@@ -4,7 +4,7 @@ commands within containers, and get command ouptut.
 
 Example:
 
-    neurodocker -b ubuntu:17.04 -p apt \\
+    neurodocker generate -b ubuntu:17.04 -p apt \\
     --ants version=2.1.0 \\
     --freesurfer version=6.0.0 license_path="./license.txt" \\
     --fsl version=5.0.10 \\
@@ -20,10 +20,13 @@ Example:
 
 from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+import logging
 import sys
 
 from neurodocker import (__version__, Dockerfile, SpecsParser,
-                         SUPPORTED_SOFTWARE)
+                         SUPPORTED_SOFTWARE, utils)
+
+logger = logging.getLogger(__name__)
 
 
 def create_parser():
@@ -146,7 +149,8 @@ Example:
     gen_parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
-    parser.add_argument("-v", "--verbose", action="store_true")
+    verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
+    parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
     parser.add_argument("-V", "--version", action="version",
                         version=('neurodocker version {version}'
                                  .format(version=__version__)))
@@ -243,7 +247,8 @@ def reprozip(namespace):
     from neurodocker.interfaces.reprozip import ReproZip
 
     local_packfile_path = ReproZip(**vars(namespace)).run()
-    print("Saved pack file on the local host:\n{}".format(local_packfile_path))
+    logger.info("Saved pack file on the local host:\n{}"
+                "".format(local_packfile_path))
 
 
 def main(args=None):
@@ -255,6 +260,9 @@ def main(args=None):
 
     subparser_functions = {'generate': generate,
                            'reprozip': reprozip,}
+
+    if namespace.verbosity is not None:
+        utils.set_log_level(logger, namespace.verbosity)
 
     try:
         subparser_functions[namespace.subparser_name](namespace)
