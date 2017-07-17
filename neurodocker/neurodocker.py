@@ -4,7 +4,7 @@ commands within containers, and get command ouptut.
 
 Example:
 
-    neurodocker -b ubuntu:17.04 -p apt \\
+    neurodocker generate -b ubuntu:17.04 -p apt \\
     --ants version=2.1.0 \\
     --freesurfer version=6.0.0 license_path="./license.txt" \\
     --fsl version=5.0.10 \\
@@ -20,10 +20,13 @@ Example:
 
 from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+import logging
 import sys
 
 from neurodocker import (__version__, Dockerfile, SpecsParser,
-                         SUPPORTED_SOFTWARE)
+                         SUPPORTED_SOFTWARE, utils)
+
+logger = logging.getLogger(__name__)
 
 
 def create_parser():
@@ -31,8 +34,25 @@ def create_parser():
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
 
+    subparsers = parser.add_subparsers(dest="subparser_name")
+    gen_parser = subparsers.add_parser('generate', description=__doc__,
+                                       formatter_class=RawDescriptionHelpFormatter)
+
+    description = """
+Trace an arbitrary number of commands in a running container using ReproZip,
+and save pack file to host.
+
+Example:
+    $> cmd1="echo Hello World"
+    $> cmd2="antsRegistration --help"
+    $> neurodocker reprozip --dir=~/pack_files f101b18bf98c $cmd1 $cmd2
+"""
+
+    reprozip_parser = subparsers.add_parser('reprozip', description=description,
+                                            formatter_class=RawDescriptionHelpFormatter)
+
     # Global requirements.
-    reqs = parser.add_argument_group(title="global requirements")
+    reqs = gen_parser.add_argument_group(title="global requirements")
     reqs.add_argument("-b", "--base", required=True,
                       help="Base Docker image. Eg, ubuntu:17.04")
     reqs.add_argument("-p", "--pkg-manager", required=True,
@@ -79,7 +99,7 @@ def create_parser():
                 "Valid keys are version and matlab_version."),
     }
 
-    pkgs = parser.add_argument_group(title="software package arguments",
+    pkgs = gen_parser.add_argument_group(title="software package arguments",
                                      description=pkgs_help['all'])
 
     list_of_kv = lambda kv: kv.split("=")
@@ -98,7 +118,7 @@ def create_parser():
 
 
     # Docker-related arguments.
-    other = parser.add_argument_group(title="other options")
+    other = gen_parser.add_argument_group(title="other options")
     other.add_argument('-i', '--instruction', action="append",
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times."))
@@ -109,14 +129,28 @@ def create_parser():
     # other.add_argument('--build', dest="build", action="store_true")
 
 
+    # ReproZip sub-command
+    reprozip_parser = subparsers.add_parser('reprozip', description=description,
+                                            formatter_class=RawDescriptionHelpFormatter)
+    reprozip_parser.add_argument('container',
+                                 help=("Running container in which to trace "
+                                       "commands."))
+    reprozip_parser.add_argument('commands', nargs='+',
+                                 help="Command(s) to trace.")
+    reprozip_parser.add_argument('--dir', '-d', default=".",
+                                 help=("Directory in which to save pack file. "
+                                       "Default is current directory."))
+
+
     # Other options.
-    parser.add_argument("--check-urls", dest="check_urls", action="store_true",
+    gen_parser.add_argument("--check-urls", dest="check_urls", action="store_true",
                         help=("Verify communication with URLs used in "
-                              "the build."), default=True,)
-    parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
+                              "the build."), default=True)
+    gen_parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
-    parser.add_argument("-v", "--verbose", action="store_true")
+    verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
+    parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
     parser.add_argument("-V", "--version", action="version",
                         version=('neurodocker version {version}'
                                  .format(version=__version__)))
@@ -143,6 +177,7 @@ def _list_to_dict(list_of_kv):
                 raise ValueError("Option required for '{}'".format(kv_pair[0]))
 
         return {k: v for k, v in list_of_kv}
+
 
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
@@ -190,30 +225,52 @@ def convert_args_to_specs(namespace):
     return specs
 
 
-def main(args=None):
-
-    if args is None:
-        namespace = parse_args(sys.argv[1:])
-    else:
-        namespace = parse_args(args)
-
-    # Create dictionary of specifications.
+def generate(namespace):
+    """Run `neurodocker generate`."""
     specs = convert_args_to_specs(namespace)
-
-    keys_to_remove = ['verbose', 'no_print_df', 'output', 'build']
+    keys_to_remove = ['verbosity', 'no_print_df', 'output', 'build',
+                      'subparser_name']
     for key in keys_to_remove:
         specs.pop(key, None)
 
     # Parse to double-check that keys are correct.
     parser = SpecsParser(specs)
-
-    # Generate Dockerfile.
     df = Dockerfile(parser.specs)
     if not namespace.no_print_df:
         print(df.cmd)
-
     if namespace.output:
         df.save(namespace.output)
+
+
+def reprozip(namespace):
+    """Run `neurodocker reprozip`."""
+    from neurodocker.interfaces.reprozip import ReproZip
+
+    local_packfile_path = ReproZip(**vars(namespace)).run()
+    logger.info("Saved pack file on the local host:\n{}"
+                "".format(local_packfile_path))
+
+
+def main(args=None):
+    """Main program function."""
+    if args is None:
+        namespace = parse_args(sys.argv[1:])
+    else:
+        namespace = parse_args(args)
+
+    subparser_functions = {'generate': generate,
+                           'reprozip': reprozip,}
+
+    if namespace.verbosity is not None:
+        utils.set_log_level(logger, namespace.verbosity)
+
+
+    if namespace.subparser_name not in subparser_functions.keys():
+        print(__doc__)
+        return
+    subparser_functions[namespace.subparser_name](namespace)
+
+
 
 
 if __name__ == "__main__":  # pragma: no cover
