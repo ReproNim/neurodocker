@@ -4,8 +4,6 @@
 from __future__ import absolute_import, division, print_function
 import json
 import logging
-import sys
-import warnings
 
 import requests
 
@@ -22,20 +20,6 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                        'clean': ('yum clean packages\n'
                                  '&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*'),},
                 }
-
-def create_logger():
-    """Return logger."""
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler(sys.stdout)  # Print to console.
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-    return logger
-
-
-logger = create_logger()
 
 
 def check_url(url, timeout=5, **kwargs):
@@ -108,7 +92,7 @@ def save_json(obj, filepath, indent=4, **kwargs):
         fp.write('\n')
 
 
-def set_log_level(level):
+def set_log_level(logger, level):
     """Set logger verbosity.
 
     Parameters
@@ -116,6 +100,8 @@ def set_log_level(level):
     level: {'debug', 'info', 'warning', 'error', 'critical}
         The level at which to print messages. Case-insensitive.
     """
+    import logging
+
     logging_levels = {'DEBUG': logging.DEBUG,
                       'INFO': logging.INFO,
                       'WARNING': logging.WARNING,
@@ -123,6 +109,6 @@ def set_log_level(level):
                       'CRITICAL': logging.CRITICAL}
     try:
         level = logging_levels[level.upper()]
-        logging.getLogger(__name__).setLevel(level)
+        logger.setLevel(level)
     except KeyError:
         raise ValueError("invalid level '{}'".format(level))
