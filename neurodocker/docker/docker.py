@@ -4,6 +4,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import functools
+import os
 import threading
 
 import docker
@@ -242,3 +243,69 @@ class DockerContainer(object):
         # If user wants to stop and remove, but not forcefully.
         if remove:
             self.container.remove()
+
+
+def copy_file_to_container(container, src, dest):
+    """Copy `local_filepath` into `container`:`container_path`.
+
+    Parameters
+    ----------
+    container : str or container object
+        Container to which file is copied.
+    src : str
+        Filepath on the host.
+    dest : str
+        Directory inside container. Original filename is preserved.
+
+    Returns
+    -------
+    success : bool
+        True if copy was a success. False otherwise.
+    """
+    # https://gist.github.com/zbyte64/6800eae10ce082bb78f0b7a2cca5cbc2
+
+    from io import BytesIO
+    import tarfile
+
+    with BytesIO() as tar_stream:
+        with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
+            filename = os.path.split(src)[-1]
+            tar.add(src, arcname=filename, recursive=False)
+        tar_stream.seek(0)
+        return container.put_archive(dest, tar_stream)
+
+
+def copy_file_from_container(container, src, dest='.'):
+    """Copy file `filepath` from a running Docker `container`, and save it on
+    the host to `save_path` with the original filename.
+
+    Parameters
+    ----------
+    container : str or container object
+        Container from which file is copied.
+    src : str
+        Filepath within container.
+    dest : str
+        Directory on the host in which to save file.
+
+    Returns
+    -------
+    local_filepath : str
+        Relative path to saved file on the host.
+    """
+    import tarfile
+    import tempfile
+    import traceback
+
+    tar_stream, tar_info = container.get_archive(src)
+    try:
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(tar_stream.data)
+            tmp.flush()
+            with tarfile.TarFile(tmp.name) as tar:
+                tar.extractall(path=dest)
+        return os.path.join(dest, tar_info['name'])
+    except Exception as e:
+        raise
+    finally:
+        tar_stream.close()
