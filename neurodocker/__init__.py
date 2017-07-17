@@ -2,6 +2,14 @@
 
 from __future__ import absolute_import
 
+import logging
+import sys
+
+LOG_FORMAT = '[NEURODOCKER %(asctime)s %(levelname)s]: %(message)s'
+logging.basicConfig(stream=sys.stdout, datefmt='%H:%M:%S', level=logging.INFO,
+                    format=LOG_FORMAT)
+
+
 from neurodocker import interfaces
 
 SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
