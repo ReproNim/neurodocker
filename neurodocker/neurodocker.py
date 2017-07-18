@@ -1,20 +1,6 @@
 #!/usr/bin/env python
-"""Command-line utility to generate Dockerfiles, build Docker images, run
-commands within containers, and get command ouptut.
-
-Example:
-
-    neurodocker generate -b ubuntu:17.04 -p apt \\
-    --ants version=2.1.0 \\
-    --freesurfer version=6.0.0 license_path="./license.txt" \\
-    --fsl version=5.0.10 \\
-    --miniconda python_version=3.5.1 \\
-                conda_install="traits pandas" \\
-                pip_install="nipype" \\
-    --mrtrix3 use_binaries=false \\
-    --spm version=12 matlab_version=R2017a \\
-    --neurodebian os_codename=zesty download_server=usa-nh pkgs="dcm2niix" \\
-    --instruction='ENTRYPOINT ["entrypoint.sh"]'
+"""Neurodocker command-line interface to generate Dockerfiles and minify
+existing containers.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -29,36 +15,29 @@ from neurodocker import (__version__, Dockerfile, SpecsParser,
 logger = logging.getLogger(__name__)
 
 
-def create_parser():
-    """Return command-line argument parser."""
-    parser = ArgumentParser(description=__doc__,
-                            formatter_class=RawDescriptionHelpFormatter)
+def _add_generate_arguments(parser):
+    """Add arguments to `parser` for sub-command `generate`."""
+    parser.add_argument("-b", "--base", required=True,
+                            help="Base Docker image. Eg, ubuntu:17.04")
+    parser.add_argument("-p", "--pkg-manager", required=True,
+                            choices=utils.manage_pkgs.keys(),
+                            help="Linux package manager.")
+    parser.add_argument('-i', '--instruction', action="append",
+                     help=("Arbitrary Dockerfile instruction. Can be used "
+                           "multiple times. Added to end of Dockerfile."))
+    parser.add_argument('--no-print-df', dest='no_print_df', action="store_true",
+                     help="Do not print the Dockerfile")
+    parser.add_argument('-o', '--output', dest="output",
+                     help="If specified, save Dockerfile to file with this name.")
 
-    subparsers = parser.add_subparsers(dest="subparser_name")
-    gen_parser = subparsers.add_parser('generate', description=__doc__,
-                                       formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--check-urls", dest="check_urls", action="store_true",
+                        help=("Verify communication with URLs used in "
+                              "the build."), default=True)
+    parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
+                        help=("Do not verify communication with URLs used in "
+                              "the build."))
 
-    description = """
-Trace an arbitrary number of commands in a running container using ReproZip,
-and save pack file to host.
-
-Example:
-    $> cmd1="echo Hello World"
-    $> cmd2="antsRegistration --help"
-    $> neurodocker reprozip --dir=~/pack_files f101b18bf98c $cmd1 $cmd2
-"""
-
-    reprozip_parser = subparsers.add_parser('reprozip', description=description,
-                                            formatter_class=RawDescriptionHelpFormatter)
-
-    # Global requirements.
-    reqs = gen_parser.add_argument_group(title="global requirements")
-    reqs.add_argument("-b", "--base", required=True,
-                      help="Base Docker image. Eg, ubuntu:17.04")
-    reqs.add_argument("-p", "--pkg-manager", required=True,
-                      help="Linux package manager {apt, yum}")
-
-    _neuro_servers = ", ".join(SUPPORTED_SOFTWARE['neurodebian'].SERVERS.keys())
+    _ndeb_servers = ", ".join(SUPPORTED_SOFTWARE['neurodebian'].SERVERS.keys())
 
     # Software package options.
     pkgs_help = {
@@ -94,66 +73,60 @@ Example:
                         "(required), full (if false, default, use libre "
                         "packages), and pkgs (list of packages to install). "
                         "Valid download servers are {}."
-                        "".format(_neuro_servers)),
+                        "".format(_ndeb_servers)),
         "spm": ("Install SPM (and its dependency, Matlab Compiler Runtime). "
                 "Valid keys are version and matlab_version."),
     }
 
-    pkgs = gen_parser.add_argument_group(title="software package arguments",
-                                     description=pkgs_help['all'])
-
+    pkgs = parser.add_argument_group(title="software package arguments",
+                                         description=pkgs_help['all'])
     list_of_kv = lambda kv: kv.split("=")
 
     for p in SUPPORTED_SOFTWARE.keys():
         flag = "--{}".format(p)
-
         # MRtrix3 does not need any arguments by default.
         if p == "mrtrix3":
             pkgs.add_argument(flag, dest=p, action="append", nargs="*",
                               metavar="", type=list_of_kv, help=pkgs_help[p])
             continue
-
         pkgs.add_argument(flag, dest=p, action="append", nargs="+", metavar="",
                           type=list_of_kv, help=pkgs_help[p])
 
 
-    # Docker-related arguments.
-    other = gen_parser.add_argument_group(title="other options")
-    other.add_argument('-i', '--instruction', action="append",
-                     help=("Arbitrary Dockerfile instruction. Can be used "
-                           "multiple times."))
-    other.add_argument('--no-print-df', dest='no_print_df', action="store_true",
-                     help="Do not print the Dockerfile")
-    other.add_argument('-o', '--output', dest="output",
-                     help="If specified, save Dockerfile to file with this name.")
-    # other.add_argument('--build', dest="build", action="store_true")
+def _add_reprozip_arguments(parser):
+    """Add arguments to `parser` for sub-command `reprozip`."""
+    parser.add_argument('container',
+                        help="Running container in which to trace commands.")
+    parser.add_argument('commands', nargs='+', help="Command(s) to trace.")
+    parser.add_argument('--dir', '-d', dest="packfile_save_dir", default=".",
+                        help=("Directory in which to save pack file. Default "
+                              "is current directory."))
 
 
-    # ReproZip sub-command
-    reprozip_parser = subparsers.add_parser('reprozip', description=description,
-                                            formatter_class=RawDescriptionHelpFormatter)
-    reprozip_parser.add_argument('container',
-                                 help=("Running container in which to trace "
-                                       "commands."))
-    reprozip_parser.add_argument('commands', nargs='+',
-                                 help="Command(s) to trace.")
-    reprozip_parser.add_argument('--dir', '-d', default=".",
-                                 help=("Directory in which to save pack file. "
-                                       "Default is current directory."))
+def create_parser():
+    """Return command-line argument parser."""
+    parser = ArgumentParser(description=__doc__, #add_help=False,
+                            formatter_class=RawDescriptionHelpFormatter)
 
-
-    # Other options.
-    gen_parser.add_argument("--check-urls", dest="check_urls", action="store_true",
-                        help=("Verify communication with URLs used in "
-                              "the build."), default=True)
-    gen_parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
-                        help=("Do not verify communication with URLs used in "
-                              "the build."))
     verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
     parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
     parser.add_argument("-V", "--version", action="version",
-                        version=('neurodocker version {version}'
-                                 .format(version=__version__)))
+                        version=('neurodocker version {}'.format(__version__)))
+
+    subparsers = parser.add_subparsers(dest="subparser_name",
+                                       title="subcommands",
+                                       description="valid subcommands")
+    generate_parser = subparsers.add_parser('generate',
+                                            help="generate dockerfiles")
+    reprozip_parser = subparsers.add_parser('reprozip',
+                                            help="reprozip trace commands")
+
+    _add_generate_arguments(generate_parser)
+    _add_reprozip_arguments(reprozip_parser)
+
+    # Add verbosity option to both parsers. How can this be done with parents?
+    generate_parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
+    reprozip_parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
 
     return parser
 
@@ -162,40 +135,6 @@ def parse_args(args):
     """Return namespace of command-line arguments."""
     parser = create_parser()
     return parser.parse_args(args)
-
-
-def _list_to_dict(list_of_kv):
-    """Convert list of [key, value] pairs to a dictionary."""
-    if list_of_kv is not None:
-        list_of_kv = [item for sublist in list_of_kv for item in sublist]
-
-        for kv_pair in list_of_kv:
-            if len(kv_pair) != 2:
-                raise ValueError("Error in arguments '{}'. Did you forget "
-                                 "the equals sign?".format(kv_pair[0]))
-            if not kv_pair[-1]:
-                raise ValueError("Option required for '{}'".format(kv_pair[0]))
-
-        return {k: v for k, v in list_of_kv}
-
-
-def _string_vals_to_bool(dictionary):
-    """Convert string values to bool."""
-    import re
-
-    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian']
-
-    if dictionary is None:
-        return
-
-    for key in dictionary.keys():
-        if key in bool_vars:
-            if re.search('false', dictionary[key], re.IGNORECASE):
-                dictionary[key] = False
-            elif re.search('true', dictionary[key], re.IGNORECASE):
-                dictionary[key] = True
-            else:
-                dictionary[key] = bool(int(dictionary[key]))
 
 
 def convert_args_to_specs(namespace):
@@ -207,8 +146,8 @@ def convert_args_to_specs(namespace):
     specs = vars(deepcopy(namespace))
 
     for pkg in SUPPORTED_SOFTWARE.keys():
-        specs[pkg] = _list_to_dict(specs[pkg])
-        _string_vals_to_bool(specs[pkg])
+        specs[pkg] = utils._list_to_dict(specs[pkg])
+        utils._string_vals_to_bool(specs[pkg])
 
     try:
         specs['miniconda']['conda_install'] = \
@@ -233,7 +172,7 @@ def generate(namespace):
     for key in keys_to_remove:
         specs.pop(key, None)
 
-    # Parse to double-check that keys are correct.
+
     parser = SpecsParser(specs)
     df = Dockerfile(parser.specs)
     if not namespace.no_print_df:
@@ -258,19 +197,19 @@ def main(args=None):
     else:
         namespace = parse_args(args)
 
-    subparser_functions = {'generate': generate,
-                           'reprozip': reprozip,}
-
     if namespace.verbosity is not None:
         utils.set_log_level(logger, namespace.verbosity)
 
+    logger.debug(vars(namespace))
+
+    subparser_functions = {'generate': generate,
+                           'reprozip': reprozip,}
 
     if namespace.subparser_name not in subparser_functions.keys():
         print(__doc__)
         return
+
     subparser_functions[namespace.subparser_name](namespace)
-
-
 
 
 if __name__ == "__main__":  # pragma: no cover
