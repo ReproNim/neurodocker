@@ -89,8 +89,7 @@ class FSL(object):
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
         if check_urls:
             check_url(url)
-        cmd = ('echo "Downloading FSL ..."'
-               "\n&&curl -sSL -o fslinstaller.py {url}"
+        cmd = ("curl -sSL -o fslinstaller.py {url}"
                "\n&& python fslinstaller.py --dest=/opt --quiet"
                "\n&& . /opt/fsl/etc/fslconf/fsl.sh"
                "\n&& rm -f fslinstaller.py"
@@ -120,7 +119,8 @@ class FSL(object):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
-        cmd = ('curl -sSL {url}'
+        cmd = ('echo "Downloading FSL ..."'
+               '\n&& curl -sSL {url}'
                '\n| tar zx -C /opt'
                '\n&& FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh'
                '\n&& [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true'

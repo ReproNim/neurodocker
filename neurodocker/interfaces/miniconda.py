@@ -83,7 +83,7 @@ class Miniconda(object):
             check_url(install_url)
 
         miniconda_cmd = ('echo "Downloading Miniconda installer ..."'
-                         "\n&&curl -sSL -o miniconda.sh {}"
+                         "\n&& curl -sSL -o miniconda.sh {}"
                          "\n&& bash miniconda.sh -b -p {}"
                          "\n&& rm -f miniconda.sh"
                          "".format(install_url, self._install_path))
