@@ -11,8 +11,8 @@ Examples:
     - [Generate Dockerfile (with project's Docker image)](#generate-dockerfile-with-projects-docker-image)
     - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-without-projects-docker-image)
   - In a Python script
-    - [Generate Dockerfile, buid Docker image, run commands in image (minimal)](#generate-dockerfile-buid-docker-image-run-commands-in-image-minimal)
-    - [Generate Dockerfile, buid Docker image, run commands in image (full)](#generate-dockerfile-buid-docker-image-run-commands-in-image-full)
+    - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
+    - [Generate Dockerfile, build Docker image, run commands in image (full)](#generate-dockerfile-build-docker-image-run-commands-in-image-full)
       - [Generated Dockerfile](examples/generated-full.Dockerfile)
   - "Minify" Docker image
     - [Minify existing Docker image](#minify-existing-docker-image)
@@ -132,7 +132,7 @@ neurodocker generate -b centos:7 -p yum --ants version=2.2.0 | docker build -
 ```
 
 
-## Generate Dockerfile, buid Docker image, run commands in image (minimal)
+## Generate Dockerfile, build Docker image, run commands in image (minimal)
 
 In this example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
@@ -162,7 +162,7 @@ container.cleanup(remove=True)
 ```
 
 
-## Generate Dockerfile, buid Docker image, run commands in image (full)
+## Generate Dockerfile, build Docker image, run commands in image (full)
 
 In this example, we create a Dockerfile with all of the software that _Neurodocker_ supports, and we supply arbitrary Dockerfile instructions.
 
