@@ -89,7 +89,8 @@ class FSL(object):
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
         if check_urls:
             check_url(url)
-        cmd = ("curl -sSL -o fslinstaller.py {url}"
+        cmd = ('echo "Downloading FSL ..."'
+               "\n&&curl -sSL -o fslinstaller.py {url}"
                "\n&& python fslinstaller.py --dest=/opt --quiet"
                "\n&& . /opt/fsl/etc/fslconf/fsl.sh"
                "\n&& rm -f fslinstaller.py"

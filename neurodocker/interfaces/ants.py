@@ -99,7 +99,9 @@ class ANTs(object):
         if self.check_urls:
             check_url(url)
 
-        cmd = ("RUN curl -sSL --retry 5 {} | tar zx -C /opt".format(url))
+        cmd = ('RUN echo "Downloading ANTs ..."'
+               "\n&& curl -sSL --retry 5 {}"
+               "\n| tar zx -C /opt".format(url))
 
         env_cmd = ("ANTSPATH=/opt/ants"
                    "\nPATH=/opt/ants:$PATH")

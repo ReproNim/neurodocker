@@ -67,7 +67,9 @@ class MRtrix3(object):
         if self.check_urls:
             check_url(url)
 
-        cmd = ('RUN curl -sSL --retry 5 {} | tar zx -C /opt'.format(url))
+        cmd = ('RUN echo "Downloading MRtrix3 ..."'
+               '\n&& curl -sSL --retry 5 {}'
+               '\n| tar zx -C /opt'.format(url))
         env_cmd = ("ENV PATH=/opt/mrtrix3/bin:$PATH")
 
         return "\n".join((cmd, env_cmd))
