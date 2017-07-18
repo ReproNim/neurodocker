@@ -22,6 +22,40 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                 }
 
 
+def _list_to_dict(list_of_kv):
+    """Convert list of [key, value] pairs to a dictionary."""
+    if list_of_kv is not None:
+        list_of_kv = [item for sublist in list_of_kv for item in sublist]
+
+        for kv_pair in list_of_kv:
+            if len(kv_pair) != 2:
+                raise ValueError("Error in arguments '{}'. Did you forget "
+                                 "the equals sign?".format(kv_pair[0]))
+            if not kv_pair[-1]:
+                raise ValueError("Option required for '{}'".format(kv_pair[0]))
+
+        return {k: v for k, v in list_of_kv}
+
+
+def _string_vals_to_bool(dictionary):
+    """Convert string values to bool."""
+    import re
+
+    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian']
+
+    if dictionary is None:
+        return
+
+    for key in dictionary.keys():
+        if key in bool_vars:
+            if re.search('false', dictionary[key], re.IGNORECASE):
+                dictionary[key] = False
+            elif re.search('true', dictionary[key], re.IGNORECASE):
+                dictionary[key] = True
+            else:
+                dictionary[key] = bool(int(dictionary[key]))
+
+
 def check_url(url, timeout=5, **kwargs):
     """Return true if `url` is returns a status code < 400. Otherwise, raise an
     error. `kwargs` are arguments for `requests.head()`.
