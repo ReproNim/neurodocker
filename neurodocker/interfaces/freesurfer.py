@@ -99,8 +99,8 @@ class FreeSurfer(object):
         """Return command to install FreeSurfer dependencies. Use this for
         FreeSurfer binaries, not if attempting to build FreeSurfer from source.
         """
-        pkgs = {'apt': "libgomp1 tcsh",
-                'yum': "libgomp tcsh"}
+        pkgs = {'apt': "bc libgomp1 libxmu6 libxt6 tcsh",
+                'yum': "bc libgomp libXmu libXt tcsh"}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         return cmd.format(pkgs=pkgs[self.pkg_manager])
@@ -128,11 +128,12 @@ class FreeSurfer(object):
                          "\n--exclude='freesurfer/subjects/bert'"
                          "\n--exclude='freesurfer/subjects/V1_average'"
                          "\n--exclude='freesurfer/average/mult-comp-cor'"
-                         # "\n--exclude='freesurfer/lib/cuda'"
+                         "\n--exclude='freesurfer/lib/cuda'"
                          "\n--exclude='freesurfer/lib/qt'")
 
         cmd = self._install_binaries_deps()
-        cmd += ("\n&& curl -sSL --retry 5 {url}"
+        cmd += ('\n&& echo "Downloading FreeSurfer ..."'
+                "\n&& curl -sSL --retry 5 {url}"
                 "\n| tar xz -C /opt\n{excluded}"
                 "".format(url=url, excluded=excluded_dirs))
         return indent("RUN", cmd)

@@ -121,4 +121,4 @@ class ReproZip(object):
             raise RuntimeError("ReproZip pack file was not found in the "
                                "container. `reprozip trace` might have failed.")
 
-        return os.path.abspath(os.path.join(BASE_PATH, rel_pack_filepath))
+        return os.path.abspath(rel_pack_filepath)

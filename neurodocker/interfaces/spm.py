@@ -95,7 +95,8 @@ class SPM(object):
         """Return Dockerfile instructions to install MATLAB Compiler Runtime."""
         comment = "# Install MATLAB Compiler Runtime"
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("curl -sSL -o mcr.zip {}"
+        cmd = ('echo "Downloading MATLAB Compiler Runtime ..."'
+               "\n&& curl -sSL -o mcr.zip {}"
                "\n&& unzip -q mcr.zip -d mcrtmp"
                "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
                "\n&& rm -rf mcrtmp mcr.zip /tmp/*".format(url))
@@ -115,7 +116,8 @@ class SPM(object):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
         workdir_cmd = "WORKDIR /opt"
-        cmd = ("curl -sSL -o spm.zip {}"
+        cmd = ('echo "Downloading standalone SPM ..."'
+               "\n&& curl -sSL -o spm.zip {}"
                "\n&& unzip -q spm.zip"
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)

@@ -119,7 +119,8 @@ class FSL(object):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
-        cmd = ('curl -sSL {url}'
+        cmd = ('echo "Downloading FSL ..."'
+               '\n&& curl -sSL {url}'
                '\n| tar zx -C /opt'
                '\n&& FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh'
                '\n&& [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true'

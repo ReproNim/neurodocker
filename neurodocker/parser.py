@@ -74,8 +74,10 @@ class SpecsParser(object):
                 bad_opts = [opt for opt in opts if opt not in params]
                 if bad_opts:
                     bad_opts = ', '.join(bad_opts)
-                    raise ValueError("Invalid option(s) found in key '{}': {}"
-                                     "".format(pkg, bad_opts))
+                    good_opts = ', '.join(params)
+                    raise ValueError("Invalid option(s) found in key '{}': {}. "
+                                     "Valid options are {}"
+                                     "".format(pkg, bad_opts, params))
 
     def _remove_nones(self):
         return {k:v for k, v in self.specs.items() if v is not None}
