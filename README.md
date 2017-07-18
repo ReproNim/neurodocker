@@ -4,9 +4,18 @@
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 
-_Neurodocker_ is a Python project that generates Dockerfiles with specified versions of Python and neuroimaging analysis software. _Neurodocker_ can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles, and interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, and run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)). The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
+_Neurodocker_ is a Python project that generates custom Dockerfiles for neuroimaging and minifies existing Docker images (using [ReproZip](https://www.reprozip.org/)). The package can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles and minifies Docker images, but interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)), and minify Docker images. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
 
-See the [examples](#examples) below.
+Examples:
+  - Command-line
+    - [Generate Dockerfile (with project's Docker image)](#generate-dockerfile-with-projects-docker-image)
+    - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-without-projects-docker-image)
+  - In a Python script
+    - [Generate Dockerfile, buid Docker image, run commands in image (minimal)](#generate-dockerfile-buid-docker-image-run-commands-in-image-minimal)
+    - [Generate Dockerfile, buid Docker image, run commands in image (full)](#generate-dockerfile-buid-docker-image-run-commands-in-image-full)
+      - [Generated Dockerfile](examples/generated-full.Dockerfile)
+  - "Minify" Docker image
+    - [Minify existing Docker image](#minify-existing-docker-image)
 
 
 # Note to users
@@ -23,6 +32,8 @@ You can install _Neurodocker_ with `pip`, or you can use the project's Docker im
 or
 
 `docker run --rm kaczmarj/neurodocker --help`
+
+Note that building and minifying Docker images is not possible with the _Neurodocker_ Docker image.
 
 
 # Supported Software
@@ -68,6 +79,8 @@ MRtrix3 can be installed using pre-compiled binaries (default behavior), or the 
 
 The NeuroDebian repository can be added, and NeuroDebian packages can optionally be installed. Valid keys are os_codename (required; e.g., 'zesty'), download_server (required), full (if false, default, use libre packages), and pkgs (list of NeuroDebian packages to install).
 
+The [NeuroDebian Docker image](https://hub.docker.com/_/neurodebian/) can also be specified as the base image.
+
 View source: [`neurodocker.interfaces.NeuroDebian`](neurodocker/interfaces/neurodebian.py).
 
 
@@ -83,28 +96,31 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 
 # Examples
 
-## Using the project's Docker image
+## Generate Dockerfile (with project's Docker image)
 
-Generate Dockerfile, and print result to stdout.
+Generate Dockerfile, and print result to stdout. The result can be piped to `docker build` to build the Docker image.
 
 ```shell
-docker run --rm kaczmarj/neurodocker -b ubuntu:17.04 -p apt --ants version=2.1.0
+docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.1.0
+
+docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.1.0 | docker build -
 ```
 
-## Command-line example
+## Generate Dockerfile (without project's Docker image)
 
-In the following example, generate a Dockerfile with all of the software that _Neurodocker_ supports and save it to disk. You can build the Docker image with `docker build` (separate from Neurodocker).
+In this example, a Dockerfile is generated with all of the software that _Neurodocker_ supports, and the Dockerfile is saved to disk. The saved Dockerfile can be passed to `docker build`.
 
 ```shell
 # Generate Dockerfile.
-neurodocker -b centos:7 -p yum \
+neurodocker generate -b debian:jessie -p yum \
 --ants version=2.1.0 \
---freesurfver version=6.0.0 \
+--freesurfer version=6.0.0 \
 --fsl version=5.0.10 \
 --miniconda python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
 --mrtrix3 \
+--neurodebian os_codename="jessie" download_server="usa-nh" pkgs="dcm2niix" \
 --spm version=12 matlab_version=R2017a \
---instruction='ENTRYPOINT ["run.sh"]'
+--instruction='ENTRYPOINT ["python"]'
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
 # Build Docker image using the saved Dockerfile.
@@ -112,11 +128,11 @@ docker build -t myimage path/to/project
 
 # Or pipe the Dockerfile to the docker build command. There is no build
 # context in this case.
-neurodocker -b centos:7 -p yum --miniconda python_version=3.5.1 | docker build -
+neurodocker generate -b centos:7 -p yum --ants version=2.2.0 | docker build -
 ```
 
 
-## Scripting example
+## Generate Dockerfile, buid Docker image, run commands in image (minimal)
 
 In this example, a dictionary of specifications is used to generate a Dockerfile. A Docker image is built from the string representation of the Dockerfile. A container is started from that container, and commands are run within the running container. When finished, the container is stopped and removed.
 
@@ -129,10 +145,7 @@ specs = {
     'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
     'check_urls': False,
-    'miniconda': {
-        'python_version': '3.5.1',
-        'conda_install': 'traits',
-        'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}
+    'ants': {'version': '2.2.0'}}
 }
 # Create Dockerfile.
 parser = SpecsParser(specs)
@@ -143,13 +156,13 @@ image = DockerImage(df).build(log_console=False, log_filepath="build.log")
 
 # Start container, and run commands.
 container = DockerContainer(image).start()
-container.exec_run('python -c "import nipype; print(nipype.__version__)"')
-container.exec_run('python -V')
+container.exec_run('antsRegistration --help')
+container.exec_run('ls /')
 container.cleanup(remove=True)
 ```
 
 
-## Full scripting example
+## Generate Dockerfile, buid Docker image, run commands in image (full)
 
 In this example, we create a Dockerfile with all of the software that _Neurodocker_ supports, and we supply arbitrary Dockerfile instructions.
 
@@ -178,166 +191,31 @@ specs = {
 
 parser = SpecsParser(specs)
 df = Dockerfile(parser.specs)
-df.save('path/to/Dockerfile')
+df.save('examples/generated-full.Dockerfile')
 print(df)
 ```
 
-The code above creates this Dockerfile:
-
-```dockerfile
-FROM ubuntu:17.04
-
-ARG DEBIAN_FRONTEND=noninteractive
-
-#----------------------------
-# Install common dependencies
-#----------------------------
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends bzip2 ca-certificates curl unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-#-------------------------------------------------
-# Install Miniconda, and set up Python environment
-#-------------------------------------------------
-ENV PATH=/opt/miniconda/envs/default/bin:$PATH
-RUN curl -sSL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && bash miniconda.sh -b -p /opt/miniconda \
-    && rm -f miniconda.sh \
-    && /opt/miniconda/bin/conda config --add channels conda-forge \
-    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 \
-    	traits \
-    && conda clean -y --all \
-    && pip install -U -q --no-cache-dir pip \
-    && pip install -q --no-cache-dir \
-    	https://github.com/nipy/nipype/archive/master.tar.gz \
-    && rm -rf /opt/miniconda/[!envs]*
-
-#-------------------
-# Install ANTs 2.2.0
-#-------------------
-RUN curl -sSL --retry 5 https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz | tar zx -C /opt
-ENV ANTSPATH=/opt/ants \
-    PATH=/opt/ants:$PATH
-
-#--------------------------
-# Install FreeSurfer v6.0.0
-#--------------------------
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends libgomp1 tcsh \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && curl -sSL --retry 5 https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz \
-    | tar xz -C /opt \
-    --exclude='freesurfer/trctrain' \
-    --exclude='freesurfer/subjects/fsaverage_sym' \
-    --exclude='freesurfer/subjects/fsaverage3' \
-    --exclude='freesurfer/subjects/fsaverage4' \
-    --exclude='freesurfer/subjects/fsaverage5' \
-    --exclude='freesurfer/subjects/fsaverage6' \
-    --exclude='freesurfer/subjects/cvs_avg35' \
-    --exclude='freesurfer/subjects/cvs_avg35_inMNI152' \
-    --exclude='freesurfer/subjects/bert' \
-    --exclude='freesurfer/subjects/V1_average' \
-    --exclude='freesurfer/average/mult-comp-cor' \
-    --exclude='freesurfer/lib/qt'
-ENV FS_OVERRIDE=0 \
-    OS=Linux \
-    FSF_OUTPUT_FORMAT=nii.gz \
-    FIX_VERTEX_AREA= \
-    FREESURFER_HOME=/opt/freesurfer \
-    MNI_DIR=/opt/freesurfer/mni \
-    SUBJECTS_DIR=/subjects
-ENV PERL5LIB=$MNI_DIR/share/perl5 \
-    MNI_PERL5LIB=$MNI_DIR/share/perl5 \
-    MINC_BIN_DIR=$MNI_DIR/bin \
-    MINC_LIB_DIR=$MNI_DIR/lib \
-    MNI_DATAPATH=$MNI_DIR/data \
-    PATH=$FREESURFER_HOME/bin:$FREESURFER_HOME/tktools:$MNI_DIR/bin:$PATH
-# Copy license file into image. Must be relative path within build context.
-COPY ["rel/path/license.txt", "/opt/freesurfer/license.txt"]
-
-#-----------------------------------------------
-# Install FSL 5.0.10
-# Please review FSL's license:
-# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
-#-----------------------------------------------
-RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
-    | tar zx -C /opt \
-    && FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh \
-    && [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true
-ENV FSLDIR=/opt/fsl \
-    PATH=/opt/fsl/bin:$PATH \
-    FSLLOCKDIR= \
-    FSLMACHINELIST= \
-    FSLMULTIFILEQUIT=TRUE \
-    FSLOUTPUTTYPE=NIFTI_GZ \
-    FSLTCLSH=/opt/fsl/bin/fsltclsh \
-    FSLWISH=/opt/fsl/bin/fslwish \
-    LD_LIBRARY_PATH=/opt/fsl/lib/lib:$LD_LIBRARY_PATH \
-    POSSUMDIR=/opt/fsl
-
-#----------------
-# Install MRtrix3
-#----------------
-WORKDIR /opt
-RUN deps='g++ git libeigen3-dev zlib1g-dev' \
-    && apt-get update -qq && apt-get install -yq --no-install-recommends $deps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && git clone https://github.com/MRtrix3/mrtrix3.git \
-    && cd mrtrix3 \
-    && ./configure -nogui \
-    && ./build \
-    && rm -rf tmp/* /tmp/* \
-    && apt-get purge -y --auto-remove $deps
-ENV PATH=/opt/mrtrix3/bin:$PATH
-
-#---------------------------
-# Add NeuroDebian repository
-#---------------------------
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && curl -sSL http://neuro.debian.net/lists/zesty.us-nh.libre \
-    > /etc/apt/sources.list.d/neurodebian.sources.list \
-    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \
-    && apt-get update \
-    && apt-get purge -y --auto-remove dirmngr
-
-# Install NeuroDebian packages
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends afni dcm2niix \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-#----------------------
-# Install MCR and SPM12
-#----------------------
-# Install required libraries
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends libxext6 libxt6 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Install MATLAB Compiler Runtime
-WORKDIR /opt
-RUN curl -sSL -o mcr.zip https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip \
-    && unzip -q mcr.zip -d mcrtmp \
-    && mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes \
-    && rm -rf mcrtmp mcr.zip /tmp/*
-
-# Install standalone SPM
-WORKDIR /opt
-RUN curl -sSL -o spm.zip http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2017a.zip \
-    && unzip -q spm.zip \
-    && rm -rf spm.zip
-ENV MATLABCMD=/opt/mcr/v*/toolbox/matlab \
-    SPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script" \
-    FORCE_SPMMCR=1 \
-    LD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH
+Here is the [Dockerfile](examples/generated-full.Dockerfile) generated by the code above.
 
 
-#--------------------------
-# User-defined instructions
-#--------------------------
+## Minify existing Docker image
 
-RUN echo "Hello, World"
+In the following example, a Docker image is built with ANTs version 2.2.0 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
 
-ENTRYPOINT ["run.sh"]```
+```shell
+# Create a Docker image with ANTs, and download a functional scan.
+download_cmd="RUN curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
+neurodocker generate -b centos:7 -p yum --ants version=2.2.0 --instruction="$download_cmd" | docker build -t ants:2.2.0 -
+
+# Run the container.
+docker run --rm -it --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
+
+# (in a new terminal window)
+# Output a ReproZip pack file in ~/neurodocker-reprozip-output with the files
+# necessary to run antsMotionCorr.
+# See https://github.com/stnava/ANTs/blob/master/Scripts/antsMotionCorrExample
+cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
+neurodocker reprozip ants-reprozip-container "$cmd"
+
+reprozip docker setup neurodocker-reprozip.rpz test
+```
