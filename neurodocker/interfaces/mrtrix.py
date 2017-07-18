@@ -67,7 +67,7 @@ class MRtrix3(object):
         if self.check_urls:
             check_url(url)
 
-        cmd = ('RUN echo "Downloading MRtrix3 ..."'
+        cmd = ('echo "Downloading MRtrix3 ..."'
                '\n&& curl -sSL --retry 5 {}'
                '\n| tar zx -C /opt'.format(url))
         cmd = indent("RUN", cmd)
