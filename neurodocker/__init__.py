@@ -12,7 +12,8 @@ logging.basicConfig(stream=sys.stdout, datefmt='%H:%M:%S', level=logging.INFO,
 
 from neurodocker import interfaces
 
-SUPPORTED_SOFTWARE = {'ants': interfaces.ANTs,
+SUPPORTED_SOFTWARE = {'afni': interfaces.AFNI,
+                      'ants': interfaces.ANTs,
                       'freesurfer': interfaces.FreeSurfer,
                       'fsl': interfaces.FSL,
                       'miniconda': interfaces.Miniconda,

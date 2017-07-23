@@ -81,6 +81,9 @@ class Dockerfile(object):
         software packages.
         """
         deps = "bzip2 ca-certificates curl unzip"
+        if self.pkg_manager == "yum":
+            deps += "epel-release"
+
         comment = ("#----------------------------\n"
                    "# Install common dependencies\n"
                    "#----------------------------")
