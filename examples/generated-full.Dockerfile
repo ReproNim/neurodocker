@@ -26,6 +26,27 @@ RUN echo "Downloading Miniconda installer ..." \
     	https://github.com/nipy/nipype/archive/master.tar.gz \
     && rm -rf /opt/miniconda/[!envs]*
 
+#--------------------
+# Install AFNI latest
+#--------------------
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1 \
+    libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb \
+    && ln /usr/lib/x86_64-linux-gnu/libgsl.so.19 /usr/lib/x86_64-linux-gnu/libgsl.so.0 \
+    || true \
+    && apt-get install -yq libxp6 \
+    || /bin/bash -c " \
+       curl -o /tmp/libxp6.deb -sSL http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb \
+       && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb" \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && echo "Downloading AFNI ..." \
+    && mkdir -p /opt/afni \
+    && curl -sSL --retry 5 https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz \
+    | tar zx -C /opt/afni --strip-components=1 \
+    && cp /opt/afni/AFNI.afnirc $HOME/.afnirc \
+    && cp /opt/afni/AFNI.sumarc $HOME/.sumarc
+ENV PATH=/opt/afni:$PATH
+
 #-------------------
 # Install ANTs 2.2.0
 #-------------------
@@ -161,4 +182,4 @@ ENV MATLABCMD=/opt/mcr/v*/toolbox/matlab \
 
 RUN echo "Hello, World"
 
-ENTRYPOINT ["run.sh"]
+ENTRYPOINT ["python"]
