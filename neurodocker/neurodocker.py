@@ -17,23 +17,27 @@ logger = logging.getLogger(__name__)
 
 def _add_generate_arguments(parser):
     """Add arguments to `parser` for sub-command `generate`."""
-    parser.add_argument("-b", "--base", required=True,
+    p = parser
+    p.add_argument("-b", "--base", required=True,
                             help="Base Docker image. Eg, ubuntu:17.04")
-    parser.add_argument("-p", "--pkg-manager", required=True,
+    p.add_argument("-p", "--pkg-manager", required=True,
                             choices=utils.manage_pkgs.keys(),
                             help="Linux package manager.")
-    parser.add_argument('-i', '--instruction', action="append",
+    p.add_argument('-i', '--instruction', action="append",
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times. Added to end of Dockerfile."))
-    parser.add_argument('--no-print-df', dest='no_print_df', action="store_true",
+    p.add_argument('-e', '--env', action="append",
+                   help="Environment variables to set in Docker image. Use the "
+                        "format KEY=VALUE.")
+    p.add_argument('-u', '--user',
+                   help="Set the user. If not set, user is root.")
+    p.add_argument('--port', dest="exposed_ports", nargs="+",
+                   help="Port(s) to expose.")
+    p.add_argument('--no-print-df', dest='no_print_df', action="store_true",
                      help="Do not print the Dockerfile")
-    parser.add_argument('-o', '--output', dest="output",
+    p.add_argument('-o', '--output', dest="output",
                      help="If specified, save Dockerfile to file with this name.")
-
-    parser.add_argument("--check-urls", dest="check_urls", action="store_true",
-                        help=("Verify communication with URLs used in "
-                              "the build."), default=True)
-    parser.add_argument("--no-check-urls", action="store_false", dest="check_urls",
+    p.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
 
@@ -80,27 +84,28 @@ def _add_generate_arguments(parser):
                 "Valid keys are version and matlab_version."),
     }
 
-    pkgs = parser.add_argument_group(title="software package arguments",
-                                         description=pkgs_help['all'])
+    pkgs = p.add_argument_group(title="software package arguments",
+                                description=pkgs_help['all'])
     list_of_kv = lambda kv: kv.split("=")
 
-    for p in SUPPORTED_SOFTWARE.keys():
-        flag = "--{}".format(p)
+    for pkg in SUPPORTED_SOFTWARE.keys():
+        flag = "--{}".format(pkg)
         # MRtrix3 does not need any arguments by default.
-        if p == "mrtrix3":
-            pkgs.add_argument(flag, dest=p, action="append", nargs="*",
-                              metavar="", type=list_of_kv, help=pkgs_help[p])
+        if pkg == "mrtrix3":
+            pkgs.add_argument(flag, dest=pkg, action="append", nargs="*",
+                              metavar="", type=list_of_kv, help=pkgs_help[pkg])
             continue
-        pkgs.add_argument(flag, dest=p, action="append", nargs="+", metavar="",
-                          type=list_of_kv, help=pkgs_help[p])
+        pkgs.add_argument(flag, dest=pkg, action="append", nargs="+",
+                          metavar="", type=list_of_kv, help=pkgs_help[pkg])
 
 
 def _add_reprozip_arguments(parser):
     """Add arguments to `parser` for sub-command `reprozip`."""
-    parser.add_argument('container',
+    p = parser
+    p.add_argument('container',
                         help="Running container in which to trace commands.")
-    parser.add_argument('commands', nargs='+', help="Command(s) to trace.")
-    parser.add_argument('--dir', '-d', dest="packfile_save_dir", default=".",
+    p.add_argument('commands', nargs='+', help="Command(s) to trace.")
+    p.add_argument('--dir', '-d', dest="packfile_save_dir", default=".",
                         help=("Directory in which to save pack file. Default "
                               "is current directory."))
 
@@ -150,6 +155,13 @@ def convert_args_to_specs(namespace):
     for pkg in SUPPORTED_SOFTWARE.keys():
         specs[pkg] = utils._list_to_dict(specs[pkg])
         utils._string_vals_to_bool(specs[pkg])
+
+
+    if specs.get('env') is not None:
+        for i, ee in enumerate(specs['env']):
+            specs['env'][i] = ee.split('=')
+        # Nest the env specs in another list to work with.
+        specs['env'] = utils._list_to_dict([specs['env']])
 
     try:
         specs['miniconda']['conda_install'] = \
