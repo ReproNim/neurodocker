@@ -40,6 +40,14 @@ Note that building and minifying Docker images is not possible with the _Neurodo
 
 Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
 
+
+## AFNI
+
+AFNI can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install AFNI, include `'afni'` (case-insensitive) in the specifications dictionary. The only valid option is `'version'` (either 'latest' or '17.2.02' at this time).
+
+View source: [`neurodocker.interfaces.AFNI`](neurodocker/interfaces/afni.py)
+
+
 ## ANTs
 
 ANTs can be installed using pre-compiled binaries (default behavior), or it can be compiled from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, compiles from source), and `'git_hash'` (checks out to specific hash before compiling). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source. To install ANTs from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
