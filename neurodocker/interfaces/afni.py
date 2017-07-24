@@ -90,17 +90,10 @@ class AFNI(object):
         pkgs = self._get_binaries_dependencies()
 
         cmd = ("{install}"
-               "\n&& {clean}"
-               '\n&& echo "Downloading AFNI ..."'
-               "\n&& mkdir -p /opt/afni"
-               "\n&& curl -sSL --retry 5 {}"
-               "\n| tar zx -C /opt/afni --strip-components=1"
-               "\n&& cp /opt/afni/AFNI.afnirc $HOME/.afnirc"
-               "\n&& cp /opt/afni/AFNI.sumarc $HOME/.sumarc"
                "\n&& ln /usr/lib/x86_64-linux-gnu/libgsl.so.19"
                " /usr/lib/x86_64-linux-gnu/libgsl.so.0"
                "\n|| true"
-               "".format(url, **manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
+               "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
 
         if self.pkg_manager == "apt":
             # libxp was removed after ubuntu trusty.
@@ -108,10 +101,17 @@ class AFNI(object):
                        'libxp/libxp6_1.0.2-2_amd64.deb')
             cmd += ("\n&& apt-get install -yq libxp6"
                     '\n|| /bin/bash -c "'
-                    '\ncurl -o /tmp/libxp6.deb -sSL {}'
-                    '\n&& dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
-                    "\n&& {clean}"
-                    ''.format(deb_url, **manage_pkgs[self.pkg_manager]))
+                    '\n   curl -o /tmp/libxp6.deb -sSL {}'
+                    '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
+                    ''.format(deb_url))
+
+        cmd += ('\n&& echo "Downloading AFNI ..."'
+                "\n&& mkdir -p /opt/afni"
+                "\n&& curl -sSL --retry 5 {}"
+                "\n| tar zx -C /opt/afni --strip-components=1"
+                "\n&& cp /opt/afni/AFNI.afnirc $HOME/.afnirc"
+                "\n&& cp /opt/afni/AFNI.sumarc $HOME/.sumarc"
+                "\n&& {clean}".format(url, **manage_pkgs[self.pkg_manager]))
         cmd = indent("RUN", cmd)
 
         env_cmd = "PATH=/opt/afni:$PATH"
