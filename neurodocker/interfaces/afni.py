@@ -105,13 +105,14 @@ class AFNI(object):
                     '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
                     ''.format(deb_url))
 
-        cmd += ('\n&& echo "Downloading AFNI ..."'
+        cmd += ("\n&& {clean}"
+                '\n&& echo "Downloading AFNI ..."'
                 "\n&& mkdir -p /opt/afni"
                 "\n&& curl -sSL --retry 5 {}"
                 "\n| tar zx -C /opt/afni --strip-components=1"
                 "\n&& cp /opt/afni/AFNI.afnirc $HOME/.afnirc"
                 "\n&& cp /opt/afni/AFNI.sumarc $HOME/.sumarc"
-                "\n&& {clean}".format(url, **manage_pkgs[self.pkg_manager]))
+                "".format(url, **manage_pkgs[self.pkg_manager]))
         cmd = indent("RUN", cmd)
 
         env_cmd = "PATH=/opt/afni:$PATH"
