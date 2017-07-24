@@ -155,7 +155,7 @@ specs = {
     'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
     'check_urls': False,
-    'ants': {'version': '2.2.0'}}
+    'ants': {'version': '2.2.0'}
 }
 # Create Dockerfile.
 parser = SpecsParser(specs)

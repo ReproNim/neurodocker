@@ -61,6 +61,13 @@ class Dockerfile(object):
         if software_cmds:
             cmds.append(software_cmds)
 
+        if self.specs.get('user'):
+            cmds.append(self.add_user())
+        if self.specs.get('env'):
+            cmds.append(self.add_env_vars())
+        if self.specs.get('exposed_ports'):
+            cmds.append(self.add_exposed_ports())
+
         # Add arbitrary Dockerfile instructions.
         try:
             comment = ("\n#--------------------------"
@@ -114,6 +121,31 @@ class Dockerfile(object):
                 cmds.append(obj.cmd)
 
         return "\n\n".join(cmds)
+
+    def add_user(self):
+        """Return Dockerfile instruction to add new user."""
+        # https://stackoverflow.com/a/27703359/5666087
+        user = self.specs['user']
+        return ("RUN useradd --create-home --shell /bin/bash {0}"
+                "\nUSER {0}".format(user))
+
+    def add_env_vars(self):
+        """Return Dockerfile ENV instruction to set environment variables."""
+        out = ""
+        for k, v in self.specs['env'].items():
+            if out:
+                out += "\n{}={}".format(k, v)
+            else:
+                out += "{}={}".format(k, v)
+        return indent("ENV", out)
+
+    def add_exposed_ports(self):
+        """Return Dockerfile EXPOSE instruction to expose ports."""
+        import copy
+        ports = copy.deepcopy(self.specs['exposed_ports'])
+        if not isinstance(ports, (list, tuple)):
+            ports = [ports]
+        return "EXPOSE " + " ".join((str(p) for p in ports))
 
     def save(self, filepath="Dockerfile", **kwargs):
         """Save Dockerfile to `filepath`. `kwargs` are for `open()`."""

@@ -64,6 +64,21 @@ def test_parse_args():
     assert namespace.instruction
     assert isinstance(namespace.instruction, list)
 
+    args = base_args + ['--user', 'neuro']
+    namespace = parse_args(args)
+    assert namespace.user
+    assert isinstance(namespace.user, str)
+
+    args = base_args + ['--env', 'KEY=VALUE']
+    namespace = parse_args(args)
+    assert namespace.env
+    assert isinstance(namespace.env, list)
+
+    args = base_args + ['--port', '1234 1235']
+    namespace = parse_args(args)
+    assert namespace.exposed_ports
+    assert isinstance(namespace.exposed_ports, list)
+
     args = base_args + ['--no-check-urls']
     namespace = parse_args(args)
     assert not namespace.check_urls
@@ -143,6 +158,20 @@ def test_main():
     with pytest.raises(ValueError):
         main(args)
 
+def test_dockerfile_opts(capsys):
+    args = "generate -b ubuntu:17.04 -p apt --no-check-urls {}"
+    main(args.format('--user=neuro').split())
+    out, _ = capsys.readouterr()
+    assert "USER neuro" in out
+
+    main(args.format('--env KEY=VAL --env KEY2=VAL').split())
+    out, _ = capsys.readouterr()
+    assert "ENV KEY=VAL \\" in out
+    assert "  KEY2=VAL" in out
+
+    main(args.format('--port 1230 1231').split())
+    out, _ = capsys.readouterr()
+    assert "EXPOSE 1230 1231" in out
 
 def test_no_print(capsys):
     args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
