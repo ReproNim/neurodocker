@@ -12,10 +12,11 @@ Examples:
     - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-without-projects-docker-image)
   - In a Python script
     - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
-    - [Generate Dockerfile, build Docker image, run commands in image (full)](#generate-dockerfile-build-docker-image-run-commands-in-image-full)
+    - [Generate full Dockerfile](#generate-full-dockerfile)
       - [Generated Dockerfile](examples/generated-full.Dockerfile)
   - "Minify" Docker image
     - [Minify existing Docker image](#minify-existing-docker-image)
+    - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 
 
 # Note to users
@@ -39,6 +40,14 @@ Note that building and minifying Docker images is not possible with the _Neurodo
 # Supported Software
 
 Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
+
+
+## AFNI
+
+AFNI can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install AFNI, include `'afni'` (case-insensitive) in the specifications dictionary. The only valid option is `'version'` (either 'latest' or '17.2.02' at this time).
+
+View source: [`neurodocker.interfaces.AFNI`](neurodocker/interfaces/afni.py)
+
 
 ## ANTs
 
@@ -113,6 +122,7 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 ```shell
 # Generate Dockerfile.
 neurodocker generate -b debian:jessie -p yum \
+--afni version=latest \
 --ants version=2.1.0 \
 --freesurfer version=6.0.0 \
 --fsl version=5.0.10 \
@@ -162,13 +172,12 @@ container.cleanup(remove=True)
 ```
 
 
-## Generate Dockerfile, build Docker image, run commands in image (full)
+## Generate full Dockerfile
 
 In this example, we create a Dockerfile with all of the software that _Neurodocker_ supports, and we supply arbitrary Dockerfile instructions.
 
 ```python
 from neurodocker import Dockerfile, SpecsParser
-from neurodocker.docker import DockerImage, DockerContainer
 
 specs = {
     'base': 'ubuntu:17.04',
@@ -178,7 +187,8 @@ specs = {
         'python_version': '3.5.1',
         'conda_install': 'traits',
         'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
-    'ants': {'version': '2.2.0', 'use_binaries': True},
+    'afni': {'version': 'latest'},
+    'ants': {'version': '2.2.0'},
     'freesurfer': {'version': '6.0.0', 'license_path': 'rel/path/license.txt'},
     'fsl': {'version': '5.0.10', 'use_binaries': True},
     'mrtrix3': {'use_binaries': False},
@@ -186,7 +196,7 @@ specs = {
                     'pkgs': ['afni', 'dcm2niix']},
     'spm': {'version': '12', 'matlab_version': 'R2017a'},
     'instruction': ['RUN echo "Hello, World"',
-                    'ENTRYPOINT ["run.sh"]']
+                    'ENTRYPOINT ["python"]']
 }
 
 parser = SpecsParser(specs)

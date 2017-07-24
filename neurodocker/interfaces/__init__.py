@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from neurodocker.interfaces.afni import AFNI
 from neurodocker.interfaces.ants import ANTs
 from neurodocker.interfaces.freesurfer import FreeSurfer
 from neurodocker.interfaces.fsl import FSL

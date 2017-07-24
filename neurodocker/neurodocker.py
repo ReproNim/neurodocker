@@ -45,6 +45,8 @@ def _add_generate_arguments(parser):
                 "key=value pairs. Where applicable, the default installation "
                 "behavior is to install by downloading and uncompressing "
                 "binaries."),
+        "afni": ("Install AFNI. Valid keys are version (required). Only the "
+                 "latest version is supported at this time."),
         "ants": ("Install ANTs. Valid keys are version (required), "
                 "use_binaries (default true), and git_hash. If use_binaries="
                 "true, installs pre-compiled binaries; if use_binaries=false, "
