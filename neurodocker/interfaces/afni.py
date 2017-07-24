@@ -6,8 +6,9 @@ Documentation: https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/index.html
 
 Notes
 -----
-- AFNI uses semantic versioning starting from 15.3.00, released on GitHub on
-  January 4, 2016. Before this, it is unclear how AFNI was versioned.
+- AFNI uses something like semantic versioning starting from 15.3.00, released
+  on GitHub on January 4, 2016. Before this, it is unclear how AFNI was
+  versioned.
 - Only the latest binaries exist on AFNI's website.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -16,8 +17,6 @@ from __future__ import absolute_import, division, print_function
 
 from neurodocker.utils import check_url, indent, manage_pkgs
 
-# find -type f -executable -exec /bin/bash -c "file -i '{}' | grep -q 'x-executable; charset=binary'" \; -print | xargs ldd | sed -n '/not\ found/p' | sed 's/=>.*//' | xargs -n1 | sort | uniq
-# docker run --rm -it -e DISPLAY=$(hostname):0 -v /private/tmp/.X11-unix:/tmp/.X11-unix -v ~/Downloads/linux_openmp_64:/opt/afni:ro kaczmarj/ants-deps
 
 class AFNI(object):
     """Add Dockerfile instructions to install AFNI.
