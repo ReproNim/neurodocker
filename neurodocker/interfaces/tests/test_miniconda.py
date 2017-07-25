@@ -16,7 +16,7 @@ class TestMiniconda(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('user', 'neuro')
+                    ('user', 'neuro'),
                     ('miniconda', {
                         'python_version': '3.5.1',
                         'conda_install': ['traits'],
