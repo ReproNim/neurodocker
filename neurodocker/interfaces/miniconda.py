@@ -45,10 +45,10 @@ class Miniconda(object):
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
-        self._install_path = "/opt/miniconda"
+        self._install_path = "~/miniconda"
         self._env_name = "default"
         self._env_path = posixpath.join(self._install_path, "envs",
-                                             self._env_name)
+                                        self._env_name)
         self.cmd = self._create_cmd()
 
     def _create_cmd(self):
@@ -57,7 +57,8 @@ class Miniconda(object):
                    "#-------------------------------------------------")
 
         bin_path = posixpath.join(self._env_path, "bin")
-        env_cmd = "ENV PATH={}:$PATH".format(bin_path)
+        root_path = posixpath.join(self._install_path, "bin")
+        env_cmd = "ENV PATH={}:{}:$PATH".format(bin_path, root_path)
 
         cmd_kwargs = {'install_miniconda': self._install_miniconda(),
                       'conda': self._create_conda_env(),
@@ -65,10 +66,8 @@ class Miniconda(object):
                       'miniconda_dir': self._install_path,}
 
         cmd = ("{install_miniconda}"
-               "\n&& {miniconda_dir}/bin/conda config --add channels conda-forge"
-               "{conda}"
-               "{pip}"
-               "\n&& rm -rf {miniconda_dir}/[!envs]*"
+               "\n&& {conda}"
+               "\n&& {pip}"
                "".format(**cmd_kwargs))
         cmd = indent("RUN", cmd)
 
@@ -82,11 +81,14 @@ class Miniconda(object):
         if self.check_urls:
             check_url(install_url)
 
+        sh_file = "$HOME/miniconda.sh"
+
         miniconda_cmd = ('echo "Downloading Miniconda installer ..."'
-                         "\n&& curl -sSL -o miniconda.sh {}"
-                         "\n&& bash miniconda.sh -b -p {}"
-                         "\n&& rm -f miniconda.sh"
-                         "".format(install_url, self._install_path))
+                         "\n&& curl -sSL -o {sh_file} {}"
+                         "\n&& /bin/bash {sh_file} -b -p {}"
+                         "\n&& rm -f {sh_file}"
+                         "".format(install_url, self._install_path,
+                                   sh_file=sh_file))
         return miniconda_cmd
 
     def _create_conda_env(self):
@@ -94,8 +96,10 @@ class Miniconda(object):
         of Python and desired conda packages.
         """
         orig_conda = posixpath.join(self._install_path, "bin", "conda")
+        orig_conda = "conda"
 
-        cmd = ("\n&& {} create -y -q -n default python={}"
+        cmd = ("conda config --add channels conda-forge"
+               "\n&& {} create -y -q -n default python={}"
                "".format(orig_conda, self.python_version))
 
         if self.conda_install is not None and self.conda_install:
@@ -104,7 +108,8 @@ class Miniconda(object):
             cmd = "\n\t".join((cmd, self.conda_install))
 
         cmd += "\n&& conda clean -y --all"
-        return cmd
+        cmd = "".join(("\n\t{}".format(c) for c in cmd.split('\n')))
+        return '/bin/bash -c "{}"'.format(cmd)
 
     def _install_pip_pkgs(self):
         """Return command to install desired pip packages."""
@@ -113,8 +118,9 @@ class Miniconda(object):
             if isinstance(self.pip_install, (list, tuple)):
                 self.pip_install = " ".join(self.pip_install)
 
-            cmd = ("\n&& pip install -U -q --no-cache-dir pip"
+            cmd = ("pip install -U -q --no-cache-dir pip"
                    "\n&& pip install -q --no-cache-dir\n\t{}"
                    "".format(self.pip_install))
-            return cmd
+            cmd = "".join(("\n\t{}".format(c) for c in cmd.split('\n')))
+            return '/bin/bash -c "{}"'.format(cmd)
         return ""
