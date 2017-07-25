@@ -56,9 +56,9 @@ class Miniconda(object):
                    "# Install Miniconda, and set up Python environment\n"
                    "#-------------------------------------------------")
 
-        bin_path = posixpath.join(self._env_path, "bin")
+        # bin_path = posixpath.join(self._env_path, "bin")
         root_path = posixpath.join(self._install_path, "bin")
-        env_cmd = "ENV PATH={}:{}:$PATH".format(bin_path, root_path)
+        env_cmd = "ENV PATH={}:$PATH".format(root_path)
 
         cmd_kwargs = {'install_miniconda': self._install_miniconda(),
                       'conda': self._create_conda_env(),
@@ -66,8 +66,8 @@ class Miniconda(object):
                       'miniconda_dir': self._install_path,}
 
         cmd = ("{install_miniconda}"
-               "\n&& {conda}"
-               "\n&& {pip}"
+               "{conda}"
+               "{pip}"
                "".format(**cmd_kwargs))
         cmd = indent("RUN", cmd)
 
@@ -96,10 +96,9 @@ class Miniconda(object):
         of Python and desired conda packages.
         """
         orig_conda = posixpath.join(self._install_path, "bin", "conda")
-        orig_conda = "conda"
 
-        cmd = ("conda config --add channels conda-forge"
-               "\n&& {} create -y -q -n default python={}"
+        cmd = ("\n&& {0} config --add channels conda-forge"
+               "\n&& {0} create -y -q -n default python={1}"
                "".format(orig_conda, self.python_version))
 
         if self.conda_install is not None and self.conda_install:
@@ -107,20 +106,18 @@ class Miniconda(object):
                 self.conda_install = " ".join(self.conda_install)
             cmd = "\n\t".join((cmd, self.conda_install))
 
-        cmd += "\n&& conda clean -y --all"
-        cmd = "".join(("\n\t{}".format(c) for c in cmd.split('\n')))
-        return '/bin/bash -c "{}"'.format(cmd)
+        cmd += "\n&& {} clean -y --all".format(orig_conda)
+        return cmd
 
     def _install_pip_pkgs(self):
         """Return command to install desired pip packages."""
-
+        orig_pip = posixpath.join(self._env_path, "bin", "pip")
         if self.pip_install is not None and self.pip_install:
             if isinstance(self.pip_install, (list, tuple)):
                 self.pip_install = " ".join(self.pip_install)
 
-            cmd = ("pip install -U -q --no-cache-dir pip"
-                   "\n&& pip install -q --no-cache-dir\n\t{}"
-                   "".format(self.pip_install))
-            cmd = "".join(("\n\t{}".format(c) for c in cmd.split('\n')))
-            return '/bin/bash -c "{}"'.format(cmd)
+            cmd = ("\n&& {pip} install -U -q --no-cache-dir pip"
+                   "\n&& {pip} install -q --no-cache-dir\n\t{}"
+                   "".format(self.pip_install, pip=orig_pip))
+            return cmd
         return ""
