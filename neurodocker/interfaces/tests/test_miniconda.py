@@ -16,6 +16,7 @@ class TestMiniconda(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
+                    ('user', 'neuro')
                     ('miniconda', {
                         'python_version': '3.5.1',
                         'conda_install': ['traits'],
@@ -25,6 +26,6 @@ class TestMiniconda(object):
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('python -V')
         assert "3.5.1" in output, "incorrect Python version"
-        output = container.exec_run('import nipype')
+        output = container.exec_run("python -c 'import nipype'")
         assert "ImportError" not in output, "nipype not installed"
         utils.test_cleanup(container)
