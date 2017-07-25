@@ -14,10 +14,12 @@ class TestANTs(object):
 
     def test_build_image_ants_210_binaries_centos7(self):
         """Install ANTs 2.1.0 binaries on CentOS 7."""
-        specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum',
+        specs = {'pkg_manager': 'yum',
                  'check_urls': True,
-                 'ants': {'version': '2.1.0', 'use_binaries': True}}
+                 'instructions': [
+                    ('base', 'centos:7'),
+                    ('ants', {'version': '2.2.0', 'use_binaries': True})
+                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('Atropos')
         assert "error" not in output, "error running Atropos"

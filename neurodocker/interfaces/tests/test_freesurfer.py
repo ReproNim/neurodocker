@@ -14,10 +14,12 @@ class TestFreeSurfer(object):
     @pytest.mark.skip(reason="requirements exceed available resources")
     def test_build_image_freesurfer_600_binaries_xenial(self):
         """Install FSL binaries on Ubuntu Xenial."""
-        specs = {'base': 'ubuntu:xenial',
-                 'pkg_manager': 'apt',
-                 'check_urls': False,
-                 'freesurfer': {'version': '6.0.0', 'use_binaries': True}}
+        specs = {'pkg_manager': 'apt',
+                 'check_urls': True,
+                 'instructions': [
+                    ('base', 'ubuntu:xenial'),
+                    ('freesurfer', {'version': '6.0.0', 'use_binaries': True})
+                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('recon-all')
         assert "error" not in output, "error running recon-all"

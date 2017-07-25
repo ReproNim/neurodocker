@@ -12,13 +12,16 @@ class TestMiniconda(object):
         """Install latest version of Miniconda via ContinuumIO's installer
         script on Ubuntu Xenial.
         """
-        specs = {'base': 'ubuntu:xenial',
-                 'pkg_manager': 'apt',
-                 'check_urls': False,
-                 'miniconda': {
-                    'python_version': '3.5.1',
-                    'conda_install': ['traits'],
-                    'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']}}
+        specs = {'pkg_manager': 'yum',
+                 'check_urls': True,
+                 'instructions': [
+                    ('base', 'centos:7'),
+                    ('miniconda', {
+                        'python_version': '3.5.1',
+                        'conda_install': ['traits'],
+                        'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']
+                    })
+                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('python -V')
         assert "3.5.1" in output, "incorrect Python version"

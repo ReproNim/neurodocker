@@ -14,10 +14,12 @@ class TestMRtrix3(object):
 
     def test_build_image_mrtrix3_binaries_centos7(self):
         """Install MRtrix3 binaries on CentOS 7."""
-        specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum',
+        specs = {'pkg_manager': 'yum',
                  'check_urls': True,
-                 'mrtrix3': {'use_binaries': True}}
+                 'instructions': [
+                    ('base', 'centos:7'),
+                    ('mrtrix3', {'use_binaries': True})
+                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('mrinfo')
         assert "error" not in output, "error running mrinfo"
