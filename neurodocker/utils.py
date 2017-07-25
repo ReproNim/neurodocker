@@ -22,21 +22,6 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                 }
 
 
-def _list_to_dict(list_of_kv):
-    """Convert list of [key, value] pairs to a dictionary."""
-    if list_of_kv is not None:
-        list_of_kv = [item for sublist in list_of_kv for item in sublist]
-
-        for kv_pair in list_of_kv:
-            if len(kv_pair) != 2:
-                raise ValueError("Error in arguments '{}'. Did you forget "
-                                 "the equals sign?".format(kv_pair[0]))
-            if not kv_pair[-1]:
-                raise ValueError("Option required for '{}'".format(kv_pair[0]))
-
-        return {k: v for k, v in list_of_kv}
-
-
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     import re
@@ -54,6 +39,39 @@ def _string_vals_to_bool(dictionary):
                 dictionary[key] = True
             else:
                 dictionary[key] = bool(int(dictionary[key]))
+
+
+
+def _count_key_occurence_list_of_tuples(list_of_tuples, key):
+    """Return the number of times `key` occurs as a key in `list_of_tuples`."""
+    return sum(1 for i, _ in list_of_tuples if i == key)
+
+
+def _namespace_to_specs(namespace):
+    """Return dictionary of specifications from namespace."""
+    from neurodocker.dockerfile import dockerfile_implementations
+    instructions = [('base', namespace.base)]
+
+    try:
+        for arg in namespace.ordered_args:
+            try:
+                ii = (arg[0], {k: v for k, v in arg[1]})
+            except ValueError:
+                ii = arg
+            instructions.append(ii)
+    except AttributeError:
+        pass
+
+    # Convert string options that should be booleans to booleans.
+    for instruction, options in instructions:
+        if instruction in dockerfile_implementations['software'].keys():
+            _string_vals_to_bool(options)
+
+    specs = {'pkg_manager': namespace.pkg_manager,
+             'check_urls': namespace.check_urls,
+             'instructions': instructions,}
+
+    return specs
 
 
 def check_url(url, timeout=5, **kwargs):
