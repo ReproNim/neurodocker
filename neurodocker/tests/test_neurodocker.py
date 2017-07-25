@@ -43,8 +43,8 @@ def test_dockerfile_opts(capsys):
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert "ENV KEY=VAL \\" in out
-    assert "  KEY2=VAL" in out
+    assert 'ENV KEY="VAL" \\' in out
+    assert '  KEY2="VAL"' in out
 
     main(args.format('--port 1230 1231').split())
     out, _ = capsys.readouterr()
