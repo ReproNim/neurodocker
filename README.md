@@ -74,7 +74,7 @@ View source: [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py).
 
 ## Miniconda
 
-Miniconda is installed using Miniconda's BASH installer. The latest version of Python 3 is installed to the root environment, and the `conda-forge` channel is added. A new conda environment is created with the requested specifications, the root environment is removed (to save space), and the new environment is prepended to `PATH`. To install Miniconda, include `'miniconda'` (case-insensitive) in the specifications dictionary Valid options are `'python_version'` (required; e.g., `'3.5.1'`), `'conda_install'` (e.g., `['numpy', 'traits']`), `pip_install` (e.g., `['nipype', 'pytest']`), and `miniconda_version` (`'latest'` by default).
+Miniconda is installed using Miniconda's BASH installer in `/opt/conda`. The latest version of Python 3 is installed to the root environment, and the `conda-forge` channel is added. A new conda environment is created with the requested specifications. To install Miniconda and create an environment, include `'miniconda'` (case-insensitive) in the specifications dictionary Valid options are `'env_name'` (required), `'python_version'` (required; e.g., `'3.5.1'`), `'conda_install'` (e.g., `['numpy', 'traits']`), `pip_install` (e.g., `['nipype', 'pytest']`), `'add_to_path'` (default true), and `miniconda_version` (`'latest'` by default). Multiple conda environments can be created with multiple `'miniconda'` items in the specifications dictionary. Miniconda is installed prior to the creation of the first environment.
 
 View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py).
 
@@ -127,7 +127,7 @@ neurodocker generate -b debian:jessie -p yum \
 --freesurfer version=6.0.0 \
 --fsl version=5.0.10 \
 --user=neuro \
---miniconda python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
+--miniconda env_name=default python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
 --user=root \
 --mrtrix3 \
 --neurodebian os_codename="jessie" download_server="usa-nh" pkgs="dcm2niix" \
@@ -192,6 +192,7 @@ specs = {
         ('base', 'ubuntu:17.04'),
         ('user', 'neuro'),
         ('miniconda', {
+            'env_name': 'my_env',
             'python_version': '3.5.1',
             'conda_install': 'traits',
             'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}),

@@ -23,6 +23,7 @@ class TestDockerfile(object):
                       'instructions': [
                         ('base', 'ubuntu:17.04'),
                         ('miniconda', {'python_version': '3.5.1',
+                                       'env_name': 'default',
                                        'conda_install': 'numpy',
                                        'pip_install': 'pandas'}),
                         ('ants', {'version': '2.1.0', 'use_binaries': True}),

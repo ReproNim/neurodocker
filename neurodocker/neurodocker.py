@@ -63,43 +63,47 @@ def _add_generate_arguments(parser):
 
     # Software package options.
     pkgs_help = {
-        "all": ("Install software packages. Each argument takes a list of "
-                "key=value pairs. Where applicable, the default installation "
-                "behavior is to install by downloading and uncompressing "
-                "binaries."),
-        "afni": ("Install AFNI. Valid keys are version (required). Only the "
-                 "latest version is supported at this time."),
-        "ants": ("Install ANTs. Valid keys are version (required), "
-                "use_binaries (default true), and git_hash. If use_binaries="
-                "true, installs pre-compiled binaries; if use_binaries=false, "
-                "builds ANTs from source. If use_binaries is a URL, download "
-                "tarball of ANTs binaries from that URL. If git_hash is "
-                "specified, build from source from that commit."),
-        "freesurfer": ("Install FreeSurfer. Valid keys are version (required),"
-                       "license_path (relative path to license), and "
-                       "use_binaries (default true). A FreeSurfer license is "
-                       "required to run the software and is not provided by "
-                       "Neurodocker."),
-        "fsl": ("Install FSL. Valid keys are version (required), use_binaries "
-                "(default true) and use_installer."),
-        "miniconda": ("Install Miniconda. Valid keys are python_version "
-                      "(required), conda_install, pip_install, and "
-                      "miniconda_version (defaults to latest). The options "
-                      "conda_install and pip_install accept strings of "
-                      'packages: conda_install="traits numpy".'),
-        "mrtrix3": ("Install MRtrix3. Valid keys are use_binaries (default "
-                    "true) and git_hash. If git_hash is specified and "
-                    "use_binaries is false, will checkout to that commit "
-                    "before building."),
-        "neurodebian": ("Add NeuroDebian repository and optionally install "
-                        "NeuroDebian packages. Valid keys are os_codename "
-                        "(required; e.g., 'zesty'), download_server "
-                        "(required), full (if false, default, use libre "
-                        "packages), and pkgs (list of packages to install). "
-                        "Valid download servers are {}."
-                        "".format(_ndeb_servers)),
-        "spm": ("Install SPM (and its dependency, Matlab Compiler Runtime). "
-                "Valid keys are version and matlab_version."),
+        "all": (
+            "Install software packages. Each argument takes a list of"
+            " key=value pairs. Where applicable, the default installation"
+            " behavior is to install by downloading and uncompressing"
+            " binaries."),
+        "afni": (
+            "Install AFNI. Valid keys are version (required). Only the latest"
+            " version is supported at this time."),
+        "ants": (
+            "Install ANTs. Valid keys are version (required), use_binaries"
+            " (default true), and git_hash. If use_binaries=true, installs"
+            " pre-compiled binaries; if use_binaries=false, builds ANTs from"
+            " source. If git_hash is specified, build from source from that"
+            " commit."),
+        "freesurfer": (
+            "Install FreeSurfer. Valid keys are version (required),"
+            " license_path (relative path to license), and use_binaries"
+            " (default true). A FreeSurfer license is required to run the"
+            " software and is not provided by Neurodocker."),
+        "fsl": (
+            "Install FSL. Valid keys are version (required), use_binaries"
+            " (default true) and use_installer."),
+        "miniconda": (
+            "Install Miniconda. Valid keys are env_name (required),"
+            " python_version (required), conda_install, pip_install,"
+            " add_to_path (default true) and miniconda_version (defaults to"
+            " latest). The options conda_install and pip_install accept"
+            ' strings of packages: conda_install="traits numpy".'),
+        "mrtrix3": (
+            "Install MRtrix3. Valid keys are use_binaries (default true) and"
+            " git_hash. If git_hash is specified and use_binaries is false,"
+            " will checkout to that commit before building."),
+        "neurodebian": (
+            "Add NeuroDebian repository and optionally install NeuroDebian"
+            " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
+            " download_server (required), full (if false, default, use libre"
+            " packages), and pkgs (list of packages to install). Valid"
+            " download servers are {}.".format(_ndeb_servers)),
+        "spm": (
+            "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
+            " keys are version and matlab_version."),
     }
 
     pkgs = p.add_argument_group(title="software package arguments",
