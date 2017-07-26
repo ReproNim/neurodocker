@@ -5,38 +5,56 @@ existing containers.
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
 from __future__ import absolute_import, unicode_literals
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import sys
 
-from neurodocker import (__version__, Dockerfile, SpecsParser,
-                         SUPPORTED_SOFTWARE, utils)
+from neurodocker import __version__, Dockerfile, utils
+from neurodocker.dockerfile import dockerfile_implementations
 
 logger = logging.getLogger(__name__)
+
+SUPPORTED_SOFTWARE = dockerfile_implementations['software']
+
+
+# https://stackoverflow.com/a/9028031/5666087
+class OrderedArgs(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if not 'ordered_args' in namespace:
+            setattr(namespace, 'ordered_args', [])
+        previous = namespace.ordered_args
+        previous.append((self.dest, values))
+        setattr(namespace, 'ordered_args', previous)
 
 
 def _add_generate_arguments(parser):
     """Add arguments to `parser` for sub-command `generate`."""
     p = parser
+    list_of_kv = lambda kv: kv.split("=")
+
     p.add_argument("-b", "--base", required=True,
                             help="Base Docker image. Eg, ubuntu:17.04")
     p.add_argument("-p", "--pkg-manager", required=True,
                             choices=utils.manage_pkgs.keys(),
                             help="Linux package manager.")
-    p.add_argument('-i', '--instruction', action="append",
+
+    # Arguments that should be ordered.
+    p.add_argument('-i', '--instruction', action=OrderedArgs,
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times. Added to end of Dockerfile."))
-    p.add_argument('-e', '--env', action="append",
+    p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
                    help="Environment variables to set in Docker image. Use the "
-                        "format KEY=VALUE.")
-    p.add_argument('-u', '--user',
+                        "format KEY=VALUE.", type=list_of_kv)
+    p.add_argument('-u', '--user', action=OrderedArgs,
                    help="Set the user. If not set, user is root.")
-    p.add_argument('--port', dest="exposed_ports", nargs="+",
-                   help="Port(s) to expose.")
-    p.add_argument('--no-print-df', dest='no_print_df', action="store_true",
-                     help="Do not print the Dockerfile")
+    p.add_argument('--ports', dest="expose", nargs="+",
+                   help="Port(s) to expose.", action=OrderedArgs)
+
+    # Other arguments (no order).
     p.add_argument('-o', '--output', dest="output",
                      help="If specified, save Dockerfile to file with this name.")
+    p.add_argument('--no-print-df', dest='no_print_df', action="store_true",
+                     help="Do not print the Dockerfile")
     p.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                         help=("Do not verify communication with URLs used in "
                               "the build."))
@@ -86,16 +104,12 @@ def _add_generate_arguments(parser):
 
     pkgs = p.add_argument_group(title="software package arguments",
                                 description=pkgs_help['all'])
-    list_of_kv = lambda kv: kv.split("=")
 
     for pkg in SUPPORTED_SOFTWARE.keys():
         flag = "--{}".format(pkg)
         # MRtrix3 does not need any arguments by default.
-        if pkg == "mrtrix3":
-            pkgs.add_argument(flag, dest=pkg, action="append", nargs="*",
-                              metavar="", type=list_of_kv, help=pkgs_help[pkg])
-            continue
-        pkgs.add_argument(flag, dest=pkg, action="append", nargs="+",
+        nargs = "*" if pkg == "mrtrix3" else "+"
+        pkgs.add_argument(flag, dest=pkg, nargs=nargs, action=OrderedArgs,
                           metavar="", type=list_of_kv, help=pkgs_help[pkg])
 
 
@@ -144,51 +158,10 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def convert_args_to_specs(namespace):
-    """Convert namespace of command-line arguments to dictionary compatible
-    with `neurodocker.parser.SpecsParser`.
-    """
-    from copy import deepcopy
-
-    specs = vars(deepcopy(namespace))
-
-    for pkg in SUPPORTED_SOFTWARE.keys():
-        specs[pkg] = utils._list_to_dict(specs[pkg])
-        utils._string_vals_to_bool(specs[pkg])
-
-
-    if specs.get('env') is not None:
-        for i, ee in enumerate(specs['env']):
-            specs['env'][i] = ee.split('=')
-        # Nest the env specs in another list to work with.
-        specs['env'] = utils._list_to_dict([specs['env']])
-
-    try:
-        specs['miniconda']['conda_install'] = \
-            specs['miniconda']['conda_install'].replace(',', ' ')
-    except (KeyError, TypeError):
-        pass
-
-    try:
-        specs['miniconda']['pip_install'] = \
-            specs['miniconda']['pip_install'].replace(',', ' ')
-    except (KeyError, TypeError):
-        pass
-
-    return specs
-
-
 def generate(namespace):
     """Run `neurodocker generate`."""
-    specs = convert_args_to_specs(namespace)
-    keys_to_remove = ['verbosity', 'no_print_df', 'output', 'build',
-                      'subparser_name']
-    for key in keys_to_remove:
-        specs.pop(key, None)
-
-
-    parser = SpecsParser(specs)
-    df = Dockerfile(parser.specs)
+    specs = utils._namespace_to_specs(namespace)
+    df = Dockerfile(specs)
     if not namespace.no_print_df:
         print(df.cmd)
     if namespace.output:

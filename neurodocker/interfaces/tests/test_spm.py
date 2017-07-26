@@ -10,10 +10,12 @@ class TestSPM(object):
 
     def test_build_image_spm_12_standalone_centos7(self):
         """Install standalone SPM12 and MATLAB MCR R2017a."""
-        specs = {'base': 'ubuntu:17.04',
-                 'pkg_manager': 'apt',
-                 'check_urls': False,
-                 'spm': {'version': '12', 'matlab_version': 'R2017a'}}
+        specs = {'pkg_manager': 'yum',
+                 'check_urls': True,
+                 'instructions': [
+                    ('base', 'centos:7'),
+                    ('spm', {'version': '12', 'matlab_version': 'R2017a'})
+                 ]}
         container = utils.get_container_from_specs(specs, working_dir='/home')
 
         cmd = ["/bin/sh", "-c", """echo 'fprintf("desired output")' > test.m """]

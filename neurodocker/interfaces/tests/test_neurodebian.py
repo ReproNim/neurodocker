@@ -13,13 +13,15 @@ class TestNeuroDebian(object):
         """Install latest version of Miniconda via ContinuumIO's installer
         script on Ubuntu Xenial.
         """
-        specs = {'base': 'ubuntu:xenial',
-                 'pkg_manager': 'apt',
+        specs = {'pkg_manager': 'apt',
                  'check_urls': False,
-                 'neurodebian': {'os_codename': 'xenial',
-                                 'download_server': 'usa-nh',
-                                 'full': False,
-                                 'pkgs': ['dcm2niix'],}}
+                 'instructions': [
+                    ('base', 'ubuntu:xenial'),
+                    ('neurodebian', {'os_codename': 'xenial',
+                                    'download_server': 'usa-nh',
+                                    'full': False,
+                                    'pkgs': ['dcm2niix']})
+                ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('dcm2niix -h')
         assert "usage: dcm2niix" in output, "dcm2niix not working"

@@ -5,132 +5,9 @@ import sys
 
 import pytest
 
-from neurodocker.neurodocker import (create_parser, parse_args,
-                                     convert_args_to_specs, main)
+from neurodocker.neurodocker import create_parser, parse_args, main
 
-
-def test_parse_args():
-    parser = create_parser()
-    assert parser
-
-    base_args = "generate {}"
-
-    with pytest.raises(SystemExit):
-        parse_args(base_args.format('').split())
-
-    with pytest.raises(SystemExit):
-        parse_args(base_args.format('-b').split())
-
-    with pytest.raises(SystemExit):
-        parse_args(base_args.format('-p').split())
-
-    iter_args = ['--ants', '--fsl', '--miniconda', '--spm']
-    for a in iter_args:
-        with pytest.raises(SystemExit):
-            parse_args(base_args.format(a).split())
-
-    base_args = "generate -b ubuntu:17.04 -p apt --no-check-urls".split()
-    namespace = parse_args(base_args)
-    assert namespace.base
-    assert namespace.pkg_manager
-    assert not namespace.check_urls
-    pkgs_present = (namespace.ants or namespace.fsl
-                    or namespace.miniconda or namespace.spm)
-    assert not pkgs_present
-
-    args = base_args + ['--ants', 'version=2.1.0']
-    namespace = parse_args(args)
-    assert namespace.ants
-
-    args = base_args + ['--fsl', 'version=5.0.10']
-    namespace = parse_args(args)
-    assert namespace.fsl
-
-    args = base_args + ['--miniconda', 'conda_install=pandas,traits']
-    namespace = parse_args(args)
-    assert namespace.miniconda
-
-    args = base_args + ['--neurodebian', 'os_codename=zesty',
-                        'download_server=usa-nh']
-    namespace = parse_args(args)
-    assert namespace.neurodebian
-
-    args = base_args + ['--spm', 'version=12']
-    namespace = parse_args(args)
-    assert namespace.spm
-
-    args = base_args + ['--instruction', 'RUN ls']
-    namespace = parse_args(args)
-    assert namespace.instruction
-    assert isinstance(namespace.instruction, list)
-
-    args = base_args + ['--user', 'neuro']
-    namespace = parse_args(args)
-    assert namespace.user
-    assert isinstance(namespace.user, str)
-
-    args = base_args + ['--env', 'KEY=VALUE']
-    namespace = parse_args(args)
-    assert namespace.env
-    assert isinstance(namespace.env, list)
-
-    args = base_args + ['--port', '1234 1235']
-    namespace = parse_args(args)
-    assert namespace.exposed_ports
-    assert isinstance(namespace.exposed_ports, list)
-
-    args = base_args + ['--no-check-urls']
-    namespace = parse_args(args)
-    assert not namespace.check_urls
-
-
-def test_convert_args_to_specs():
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'version=2.1.0',
-            '--fsl', 'version=5.0.10',
-            '--miniconda', 'conda_install=pandas,traits',
-            '--mrtrix3',
-            '--neurodebian', 'os_codename=zesty', 'download_server=usa-nh',
-            '--spm', 'version=12',
-            '--instruction', 'RUN ls',
-            '--instruction', 'WORKDIR /home',
-            '--no-check-urls']
-    namespace = parse_args(args)
-    assert namespace
-
-    specs = convert_args_to_specs(namespace)
-    assert vars(namespace).keys() == specs.keys()
-
-    assert "," not in specs['miniconda']['conda_install']
-
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'option']
-    namespace = parse_args(args)
-    with pytest.raises(ValueError):
-        convert_args_to_specs(namespace)
-
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'option=']
-    namespace = parse_args(args)
-    with pytest.raises(ValueError):
-        convert_args_to_specs(namespace)
-
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'use_binaries=false',
-            '--mrtrix3', 'use_binaries=0']
-    namespace = parse_args(args)
-    specs = convert_args_to_specs(namespace)
-    assert specs['ants']['use_binaries'] is False
-    assert specs['mrtrix3']['use_binaries'] is False
-
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'use_binaries=true',
-            '--mrtrix3', 'use_binaries=1']
-    namespace = parse_args(args)
-    specs = convert_args_to_specs(namespace)
-    assert specs['ants']['use_binaries'] is True
-    assert specs['mrtrix3']['use_binaries'] is True
-
+# TODO: write tests for parse_args
 
 def test_main():
     args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
@@ -164,10 +41,10 @@ def test_dockerfile_opts(capsys):
     out, _ = capsys.readouterr()
     assert "USER neuro" in out
 
-    main(args.format('--env KEY=VAL --env KEY2=VAL').split())
+    main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert "ENV KEY=VAL \\" in out
-    assert "  KEY2=VAL" in out
+    assert 'ENV KEY="VAL" \\' in out
+    assert '  KEY2="VAL"' in out
 
     main(args.format('--port 1230 1231').split())
     out, _ = capsys.readouterr()

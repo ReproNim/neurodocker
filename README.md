@@ -46,7 +46,7 @@ Valid options for each software package are the keyword arguments for the class 
 
 AFNI can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install AFNI, include `'afni'` (case-insensitive) in the specifications dictionary. The only valid option is `'version'` (either 'latest' or '17.2.02' at this time).
 
-View source: [`neurodocker.interfaces.AFNI`](neurodocker/interfaces/afni.py)
+View source: [`neurodocker.interfaces.AFNI`](neurodocker/interfaces/afni.py).
 
 
 ## ANTs
@@ -117,7 +117,7 @@ docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants vers
 
 ## Generate Dockerfile (without project's Docker image)
 
-In this example, a Dockerfile is generated with all of the software that _Neurodocker_ supports, and the Dockerfile is saved to disk. The saved Dockerfile can be passed to `docker build`.
+In this example, a Dockerfile is generated with all of the software that _Neurodocker_ supports, and the Dockerfile is saved to disk. The order in which the arguments are given is preserved in the Dockerfile. The saved Dockerfile can be passed to `docker build`.
 
 ```shell
 # Generate Dockerfile.
@@ -126,11 +126,16 @@ neurodocker generate -b debian:jessie -p yum \
 --ants version=2.1.0 \
 --freesurfer version=6.0.0 \
 --fsl version=5.0.10 \
+--user=neuro \
 --miniconda python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
+--user=root \
 --mrtrix3 \
 --neurodebian os_codename="jessie" download_server="usa-nh" pkgs="dcm2niix" \
 --spm version=12 matlab_version=R2017a \
---instruction='ENTRYPOINT ["python"]'
+--user=neuro \
+--env KEY_A=VAL_A KEY_B=VAL_B \
+--env KEY_C="base on \$KEY_A" \
+--instruction='ENTRYPOINT ["python"]' \
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
 # Build Docker image using the saved Dockerfile.
@@ -138,7 +143,7 @@ docker build -t myimage path/to/project
 
 # Or pipe the Dockerfile to the docker build command. There is no build
 # context in this case.
-neurodocker generate -b centos:7 -p yum --ants version=2.2.0 | docker build -
+neurodocker generate -b centos:7 -p yum --ants version=2.2.0 --user=neuro | docker build -
 ```
 
 
@@ -148,18 +153,19 @@ In this example, a dictionary of specifications is used to generate a Dockerfile
 
 
 ```python
-from neurodocker import Dockerfile, SpecsParser
+from neurodocker import Dockerfile
 from neurodocker.docker import DockerImage, DockerContainer
 
 specs = {
-    'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
     'check_urls': False,
-    'ants': {'version': '2.2.0'}
+    'instructions': [
+        ('base', 'ubuntu:17.04'),
+        ('ants', {'version': '2.2.0'})
+    ]
 }
 # Create Dockerfile.
-parser = SpecsParser(specs)
-df = Dockerfile(parser.specs)
+df = Dockerfile(specs)
 
 # Build image.
 image = DockerImage(df).build(log_console=False, log_filepath="build.log")
@@ -177,30 +183,35 @@ container.cleanup(remove=True)
 In this example, we create a Dockerfile with all of the software that _Neurodocker_ supports, and we supply arbitrary Dockerfile instructions.
 
 ```python
-from neurodocker import Dockerfile, SpecsParser
+from neurodocker import Dockerfile
 
 specs = {
-    'base': 'ubuntu:17.04',
     'pkg_manager': 'apt',
     'check_urls': False,
-    'miniconda': {
-        'python_version': '3.5.1',
-        'conda_install': 'traits',
-        'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'},
-    'afni': {'version': 'latest'},
-    'ants': {'version': '2.2.0'},
-    'freesurfer': {'version': '6.0.0', 'license_path': 'rel/path/license.txt'},
-    'fsl': {'version': '5.0.10', 'use_binaries': True},
-    'mrtrix3': {'use_binaries': False},
-    'neurodebian': {'os_codename': 'zesty', 'download_server': 'usa-nh',
-                    'pkgs': ['afni', 'dcm2niix']},
-    'spm': {'version': '12', 'matlab_version': 'R2017a'},
-    'instruction': ['RUN echo "Hello, World"',
-                    'ENTRYPOINT ["python"]']
+    'instructions': [
+        ('base', 'ubuntu:17.04'),
+        ('user', 'neuro'),
+        ('miniconda', {
+            'python_version': '3.5.1',
+            'conda_install': 'traits',
+            'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}),
+        ('user', 'root'),
+        ('afni', {'version': 'latest'}),
+        ('ants', {'version': '2.2.0'}),
+        ('freesurfer', {'version': '6.0.0', 'license_path': 'rel/path/license.txt'}),
+        ('fsl', {'version': '5.0.10', 'use_binaries': True}),
+        ('mrtrix3', {'use_binaries': False}),
+        ('neurodebian', {'os_codename': 'zesty', 'download_server': 'usa-nh',
+                         'pkgs': ['afni', 'dcm2niix']}),
+        ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
+        ('instruction', 'RUN echo "Hello, World"'),
+        ('user', 'neuro'),
+        ('env', {'KEY_A': 'VAL_A', 'KEY_B': 'VAL_B is "hello"'}),
+        ('env', {'KEY_C': 'based on $KEY_A'}),
+    ]
 }
 
-parser = SpecsParser(specs)
-df = Dockerfile(parser.specs)
+df = Dockerfile(specs)
 df.save('examples/generated-full.Dockerfile')
 print(df)
 ```

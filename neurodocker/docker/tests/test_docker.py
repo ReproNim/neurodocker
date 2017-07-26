@@ -60,8 +60,10 @@ class TestDockerImage(object):
         with pytest.raises(TypeError):
             DockerImage(dict())
 
-        specs = {'base': 'debian:jessie',
-                 'pkg_manager': 'apt'}
+        specs = {'pkg_manager': 'apt',
+                 'instructions': [
+                    ('base', 'debian:jessie',)],
+                 }
         df = Dockerfile(specs=specs)
         # Test that fileobj is a file object.
         image = DockerImage(df)

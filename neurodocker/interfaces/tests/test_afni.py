@@ -14,10 +14,13 @@ class TestAFNI(object):
 
     def test_build_image_afni_latest_binaries_centos7(self):
         """Install latest AFNI binaries on CentOS 7."""
-        specs = {'base': 'centos:7',
-                 'pkg_manager': 'yum',
+        specs = {'pkg_manager': 'yum',
                  'check_urls': True,
-                 'afni': {'version': 'latest', 'use_binaries': True}}
+                 'instructions': [
+                    ('base', 'centos:7'),
+                    ('afni', {'version': 'latest', 'use_binaries': True})
+                 ]}
+
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('3dSkullStrip')
         assert "error" not in output, "error running 3dSkullStrip"
