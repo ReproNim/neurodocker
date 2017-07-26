@@ -26,7 +26,8 @@ def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     import re
 
-    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian']
+    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian',
+                 'add_to_path']
 
     if dictionary is None:
         return
