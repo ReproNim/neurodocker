@@ -10,7 +10,7 @@ from neurodocker.interfaces.tests import utils
 class TestMiniconda(object):
     """Tests for Miniconda class."""
 
-    @pytest.mark.skip(reason="running container in background does not find correct Python")
+    #@pytest.mark.skip(reason="running container in background does not find correct Python")
     def test_build_image_miniconda_latest_shellscript_xenial(self):
         """Install latest version of Miniconda via ContinuumIO's installer
         script on Ubuntu Xenial.
@@ -21,9 +21,10 @@ class TestMiniconda(object):
                     ('base', 'centos:7'),
                     ('user', 'neuro'),
                     ('miniconda', {
-                        'python_version': '3.6.1',
-                        # 'conda_install': ['traits'],
-                        # 'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']
+                        'env_name': 'default',
+                        'python_version': '3.5.1',
+                        'conda_install': ['traits'],
+                        'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']
                     })
                  ]}
         container = utils.get_container_from_specs(specs)
