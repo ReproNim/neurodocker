@@ -45,6 +45,8 @@ class Miniconda(object):
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
+        # ENV instruction does not expand $HOME.
+        # https://github.com/moby/moby/issues/28971
         self._install_path = "~/miniconda"
         self._env_name = "default"
         self._env_path = posixpath.join(self._install_path, "envs",
@@ -56,9 +58,8 @@ class Miniconda(object):
                    "# Install Miniconda, and set up Python environment\n"
                    "#-------------------------------------------------")
 
-        # bin_path = posixpath.join(self._env_path, "bin")
-        root_path = posixpath.join(self._install_path, "bin")
-        env_cmd = "ENV PATH={}:$PATH".format(root_path)
+        bin_path = posixpath.join(self._env_path, "bin")
+        env_cmd = 'ENV PATH="{}:$PATH"'.format(bin_path)
 
         cmd_kwargs = {'install_miniconda': self._install_miniconda(),
                       'conda': self._create_conda_env(),
@@ -71,7 +72,7 @@ class Miniconda(object):
                "".format(**cmd_kwargs))
         cmd = indent("RUN", cmd)
 
-        return "\n".join((comment, env_cmd, cmd))
+        return "\n".join((comment, cmd, env_cmd))
 
     def _install_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
