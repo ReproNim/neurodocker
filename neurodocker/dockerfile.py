@@ -99,9 +99,9 @@ def _add_common_dependencies(pkg_manager):
     cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
     cmd = cmd.format(pkgs=deps)
     # Create directory for Miniconda as route and modify permissions so
-    # non-root users can create their environments there.
-    cmd += ("\n&& mkdir {0} && chgrp -R users {0}"
-            " && chmod 770 {0}".format(interfaces.Miniconda.INSTALL_PATH))
+    # non-root users can create their conda environments there.
+    cmd += ("\n&& mkdir {0} && chmod 777 {0}"
+            "".format(interfaces.Miniconda.INSTALL_PATH))
     cmd = indent("RUN", cmd)
 
     return "\n".join((comment, cmd))
