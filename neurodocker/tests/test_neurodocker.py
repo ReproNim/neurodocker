@@ -13,7 +13,7 @@ def test_main():
     args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
             '--ants', 'version=2.1.0',
             '--fsl', 'version=5.0.10',
-            '--miniconda', 'python_version=3.5.1',
+            '--miniconda', 'env_name=default', 'python_version=3.5.1',
             '--mrtrix3',
             '--neurodebian', 'os_codename=zesty', 'download_server=usa-nh',
             '--spm', 'version=12', 'matlab_version=R2017a',
