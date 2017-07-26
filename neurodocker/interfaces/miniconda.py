@@ -1,6 +1,9 @@
 """Class to add Miniconda and create Conda environment."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
+# Refer to the jupyter base-notebook Dockerfile for good practices:
+# https://github.com/jupyter/docker-stacks/blob/master/base-notebook/Dockerfile
+
 from __future__ import absolute_import, division, print_function
 import logging
 import posixpath
@@ -11,10 +14,13 @@ logger = logging.getLogger(__name__)
 
 
 class Miniconda(object):
-    """Add Dockerfile instructions to install Miniconda and requested packages.
+    """Add Dockerfile instructions to install Miniconda and create a new
+    environment with packages installed with conda and pip.
 
     Parameters
     ----------
+    env_name : str
+        Name to give this environment.
     python_version : str
         Version of Python to install. For example, '3.6.1'.
     pkg_manager : {'apt', 'yum'}
@@ -22,103 +28,132 @@ class Miniconda(object):
     conda_install : str or list or tuple
         Packages to install using `conda`. Follow the syntax for
         `conda install`. For example, the input ['numpy=1.12', 'scipy'] is
-        interpreted as `conda install numpy=1.12 scipy`. The conda-forge channel
-        is added by default.
+        interpreted as `conda install numpy=1.12 scipy`. The conda-forge
+        channel is added by default.
     pip_install : str or list or tuple
         Packages to install using `pip`. Follow the syntax for `pip install`.
         For example, the input "https://github.com/nipy/nipype/" is interpreted
         as `pip install https://github.com/nipy/nipype/`.
+    add_to_path : bool
+        If true, prepend the new environment to $PATH.
     miniconda_verion : str
         Version of Miniconda to install. Defaults to 'latest'. This does not
         correspond to Python version.
     check_urls : bool
         If true, raise error if a URL used by this class responds with an error
         code.
+
+    Notes
+    -----
+    Miniconda is installed once by the root user in /opt/conda. Separate conda
+    environments can be created by non-root users.
     """
 
-    def __init__(self, python_version, pkg_manager, conda_install=None,
-                 pip_install=None, miniconda_verion='latest', check_urls=True):
+    installed = False
+    INSTALL_PATH = "/opt/conda"
+
+    def __init__(self, env_name, python_version, pkg_manager,
+                 conda_install=None, pip_install=None, add_to_path=True,
+                 miniconda_verion='latest', check_urls=True):
+        self.env_name = env_name
         self.python_version = python_version
         self.pkg_manager = pkg_manager
         self.conda_install = conda_install
         self.pip_install = pip_install
+        self.add_to_path = add_to_path
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
         # ENV instruction does not expand $HOME.
         # https://github.com/moby/moby/issues/28971
-        self._install_path = "~/miniconda"
-        self._env_name = "default"
-        self._env_path = posixpath.join(self._install_path, "envs",
-                                        self._env_name)
+
+        # self._env_name = "default"
+        # self._env_path = posixpath.join(self._install_path, "envs",
+        #                                 self._env_name)
         self.cmd = self._create_cmd()
 
     def _create_cmd(self):
-        comment = ("#-------------------------------------------------\n"
-                   "# Install Miniconda, and set up Python environment\n"
-                   "#-------------------------------------------------")
+        cmds = []
+        comment = ("#------------------"
+                   "\n# Install Miniconda"
+                   "\n#------------------")
+        if not Miniconda.installed:
+            cmds.append(comment)
+            cmds.append(self.install_miniconda())
+            cmds.append('')
 
-        bin_path = posixpath.join(self._env_path, "bin")
-        env_cmd = 'ENV PATH="{}:$PATH"'.format(bin_path)
+        comment = ("#-------------------------"
+                   "\n# Create conda environment"
+                   "\n#-------------------------")
+        cmds.append(comment)
+        cmds.append(self.create_conda_env())
 
-        cmd_kwargs = {'install_miniconda': self._install_miniconda(),
-                      'conda': self._create_conda_env(),
-                      'pip': self._install_pip_pkgs(),
-                      'miniconda_dir': self._install_path,}
+        return "\n".join(cmds)
 
-        cmd = ("{install_miniconda}"
-               "{conda}"
-               "{pip}"
-               "".format(**cmd_kwargs))
-        cmd = indent("RUN", cmd)
-
-        return "\n".join((comment, cmd, env_cmd))
-
-    def _install_miniconda(self):
+    def install_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
+
         install_url = ("https://repo.continuum.io/miniconda/"
                        "Miniconda3-{}-Linux-x86_64.sh"
                        "".format(self.miniconda_verion))
         if self.check_urls:
             check_url(install_url)
 
-        sh_file = "$HOME/miniconda.sh"
+        env_cmd = ("CONDA_DIR={0}"
+                   "\nPATH={0}/bin:$PATH".format(Miniconda.INSTALL_PATH))
+        env_cmd = indent("ENV", env_cmd)
 
-        miniconda_cmd = ('echo "Downloading Miniconda installer ..."'
-                         "\n&& curl -sSL -o {sh_file} {}"
-                         "\n&& /bin/bash {sh_file} -b -p {}"
-                         "\n&& rm -f {sh_file}"
-                         "".format(install_url, self._install_path,
-                                   sh_file=sh_file))
-        return miniconda_cmd
+        cmd = ('echo "Downloading Miniconda installer ..."'
+               "\n&& miniconda_installer=/tmp/miniconda.sh"
+               "\n&& curl -sSL -o $miniconda_installer {url}"
+               "\n&& /bin/bash $miniconda_installer -f -b -p $CONDA_DIR"
+               "\n&& rm -f $miniconda_installer"
+               "\n&& conda config --system --prepend channels conda-forge"
+               "\n&& conda config --system --set auto_update_conda false"
+               "\n&& conda config --system --set show_channel_urls true"
+               "\n&& conda update -y --all"
+               "\n&& conda clean -tipsy"
+               "".format(url=install_url))
+        cmd = indent("RUN", cmd)
 
-    def _create_conda_env(self):
-        """Return command to create conda environment with desired version
-        of Python and desired conda packages.
+        Miniconda.installed = True
+
+        return "\n".join((env_cmd, cmd))
+
+    def create_conda_env(self):
+        """Return Dockerfile instructions to create conda environment with
+        desired version of Python and desired conda and pip packages.
         """
-        orig_conda = posixpath.join(self._install_path, "bin", "conda")
-
-        cmd = ("\n&& {0} config --add channels conda-forge"
-               "\n&& {0} create -y -q -n default python={1}"
-               "".format(orig_conda, self.python_version))
-
-        if self.conda_install is not None and self.conda_install:
+        cmd = ("conda create -y -q --name {} python={}"
+               "".format(self.env_name, self.python_version))
+        if self.conda_install:
             if isinstance(self.conda_install, (list, tuple)):
                 self.conda_install = " ".join(self.conda_install)
-            cmd = "\n\t".join((cmd, self.conda_install))
+            cmd += "\n\t{}".format(self.conda_install)
 
-        cmd += "\n&& {} clean -y --all".format(orig_conda)
+        cmd += "\n&& conda clean -tipsy"
+
+        if self.pip_install:
+            cmd += self._install_pip_pkgs()
+
+        cmd = indent("RUN", cmd)
+
+        if self.add_to_path:
+            bin_path = posixpath.join(Miniconda.INSTALL_PATH, 'envs',
+                                      self.env_name, 'bin')
+            env_cmd = "ENV PATH={}:$PATH".format(bin_path)
+            return "\n".join((cmd, env_cmd))
         return cmd
 
     def _install_pip_pkgs(self):
-        """Return command to install desired pip packages."""
-        orig_pip = posixpath.join(self._env_path, "bin", "pip")
-        if self.pip_install is not None and self.pip_install:
-            if isinstance(self.pip_install, (list, tuple)):
-                self.pip_install = " ".join(self.pip_install)
+        """Return Dockerfile instruction to install desired pip packages."""
+        if isinstance(self.pip_install, (list, tuple)):
+            self.pip_install = " ".join(self.pip_install)
+        cmd = ('\n&& /bin/bash -c "source activate {}'
+               '\n\t&& pip install -q --no-cache-dir\n\t{}"'
+               "".format(self.env_name, self.pip_install))
+        return cmd
 
-            cmd = ("\n&& {pip} install -U -q --no-cache-dir pip"
-                   "\n&& {pip} install -q --no-cache-dir\n\t{}"
-                   "".format(self.pip_install, pip=orig_pip))
-            return cmd
-        return ""
+    @classmethod
+    def clear_memory(cls):
+        cls.installed = False
