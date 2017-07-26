@@ -114,6 +114,20 @@ def _add_env_vars(env_vars, **kwargs):
     return indent("ENV", out)
 
 
+def _add_install(kwargs):
+    """Return Dockerfile RUN instruction that installs system packages.
+
+    Parameters
+    ----------
+    kwargs : dict
+        Must contain key 'pkgs' with list of packages to install, and key
+        'pkg_manager' with a string of the package manager (apt or yum).
+    """
+    pkgs = ' '.join(kwargs['pkgs'])
+    cmd = "{install}\n&& {clean}".format(**manage_pkgs[kwargs['pkg_manager']])
+    cmd = cmd.format(pkgs=pkgs)
+    return indent("RUN", cmd)
+
 def _add_arbitrary_instruction(instruction, **kwargs):
     """Return `instruction`."""
     comment = "# User-defined instruction\n"
@@ -204,6 +218,7 @@ dockerfile_implementations = {
         'entrypoint': _add_entrypoint,
         'expose': _add_exposed_ports,
         'env': _add_env_vars,
+        'install': _add_install,
         'instruction': _add_arbitrary_instruction,
         'user': _DockerfileUsers.add,
     },
@@ -223,6 +238,9 @@ def _get_dockerfile_chunk(instruction, options, specs):
         callable_ = dockerfile_implementations['software'][instruction]
         chunk = callable_(**options).cmd
     elif instruction in other_keys:
+        if instruction == "install":
+            options = {'pkgs': options, 'pkg_manager': specs['pkg_manager']}
+            print(options)
         chunk = dockerfile_implementations['other'][instruction](options)
     else:
         raise ValueError("Instruction not understood: {}"

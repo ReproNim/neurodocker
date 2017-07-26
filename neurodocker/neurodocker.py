@@ -47,6 +47,9 @@ def _add_generate_arguments(parser):
                    help=("Copy file or directory within build context to"
                          " Docker container filesystem. Use form"
                          " <src> ... <dest>"))
+    p.add_argument('--install', action=OrderedArgs, nargs="+",
+                   help=("Install system packages with apt-get or yum,"
+                         " depending on the base image."))
     p.add_argument('-i', '--instruction', action=OrderedArgs,
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times. Added to end of Dockerfile."))
