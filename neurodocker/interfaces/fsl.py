@@ -114,29 +114,24 @@ class FSL(object):
             check_url(url)
         return url
 
-    @staticmethod
-    def install_binaries(url):
+    def install_binaries(self, url):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
         cmd = ('echo "Downloading FSL ..."'
-               '\n&& curl -sSL {url}'
-               '\n| tar zx -C /opt'
-               '\n&& FSLPYFILE=/opt/fsl/etc/fslconf/fslpython_install.sh'
-               '\n&& [ -f $FSLPYFILE ] && $FSLPYFILE -f /opt/fsl -q || true'
-               ''.format(url=url))
+               '\n&& curl -sSL {}'
+               '\n| tar zx -C /opt'.format(url))
+
+        if self.version >= LooseVersion('5.0.10'):
+            fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
+            cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
         cmd = indent("RUN", cmd)
 
+        # The FSL environment can be set up with this command:
+        # source $FSL_ENV_FILE
         env_cmd = ("FSLDIR=/opt/fsl"
                    "\nPATH=/opt/fsl/bin:$PATH"
-                   "\nFSLLOCKDIR="
-                   "\nFSLMACHINELIST="
-                   "\nFSLMULTIFILEQUIT=TRUE"
-                   "\nFSLOUTPUTTYPE=NIFTI_GZ"
-                   "\nFSLTCLSH=/opt/fsl/bin/fsltclsh"
-                   "\nFSLWISH=/opt/fsl/bin/fslwish"
-                   "\nLD_LIBRARY_PATH=/opt/fsl/lib/lib:$LD_LIBRARY_PATH"
-                   "\nPOSSUMDIR=/opt/fsl")
+                   "\nFSL_ENV_FILE=/opt/fsl/etc/fslconf/fsl.sh")
         env_cmd = indent("ENV", env_cmd)
 
         return "\n".join((cmd, env_cmd))
