@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-07-25 16:49:22
+# Timestamp: 2017-07-25 21:11:55
 
 FROM ubuntu:17.04
 
@@ -25,19 +25,18 @@ USER neuro
 #-------------------------------------------------
 # Install Miniconda, and set up Python environment
 #-------------------------------------------------
-ENV PATH=/opt/miniconda/envs/default/bin:$PATH
 RUN echo "Downloading Miniconda installer ..." \
-    && curl -sSL -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && bash miniconda.sh -b -p /opt/miniconda \
-    && rm -f miniconda.sh \
-    && /opt/miniconda/bin/conda config --add channels conda-forge \
-    && /opt/miniconda/bin/conda create -y -q -n default python=3.5.1 \
+    && curl -sSL -o $HOME/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && /bin/bash $HOME/miniconda.sh -b -p ~/miniconda \
+    && rm -f $HOME/miniconda.sh \
+    && ~/miniconda/bin/conda config --add channels conda-forge \
+    && ~/miniconda/bin/conda create -y -q -n default python=3.5.1 \
     	traits \
-    && conda clean -y --all \
-    && pip install -U -q --no-cache-dir pip \
-    && pip install -q --no-cache-dir \
-    	https://github.com/nipy/nipype/archive/master.tar.gz \
-    && rm -rf /opt/miniconda/[!envs]*
+    && ~/miniconda/bin/conda clean -y --all \
+    && ~/miniconda/envs/default/bin/pip install -U -q --no-cache-dir pip \
+    && ~/miniconda/envs/default/bin/pip install -q --no-cache-dir \
+    	https://github.com/nipy/nipype/archive/master.tar.gz
+ENV PATH="~/miniconda/envs/default/bin:$PATH"
 
 USER root
 
