@@ -110,23 +110,27 @@ def _add_env_vars(env_vars, **kwargs):
         newline = "\n" if out else ""
         v = json.dumps(v)  # Escape double quotes and other things.
         out += '{}{}={}'.format(newline, k, v)
-        print(out)
     return indent("ENV", out)
 
 
-def _add_install(kwargs):
+def _add_install(pkgs, pkg_manager):
     """Return Dockerfile RUN instruction that installs system packages.
 
     Parameters
     ----------
-    kwargs : dict
-        Must contain key 'pkgs' with list of packages to install, and key
-        'pkg_manager' with a string of the package manager (apt or yum).
+    pkgs : list
+        List of system packages to install.
+    pkg_manager : {'apt', 'yum'}
+        Linux package manager.
     """
-    pkgs = ' '.join(kwargs['pkgs'])
-    cmd = "{install}\n&& {clean}".format(**manage_pkgs[kwargs['pkg_manager']])
+    comment = ("#------------------------"
+               "\n# Install system packages"
+               "\n#------------------------")
+    pkgs = ' '.join(pkgs)
+    cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
     cmd = cmd.format(pkgs=pkgs)
     return indent("RUN", cmd)
+
 
 def _add_arbitrary_instruction(instruction, **kwargs):
     """Return `instruction`."""
@@ -238,10 +242,11 @@ def _get_dockerfile_chunk(instruction, options, specs):
         callable_ = dockerfile_implementations['software'][instruction]
         chunk = callable_(**options).cmd
     elif instruction in other_keys:
+        func = dockerfile_implementations['other'][instruction]
         if instruction == "install":
-            options = {'pkgs': options, 'pkg_manager': specs['pkg_manager']}
-            print(options)
-        chunk = dockerfile_implementations['other'][instruction](options)
+            chunk = func(options, specs['pkg_manager'])
+        else:
+            chunk = func(options)
     else:
         raise ValueError("Instruction not understood: {}"
                          "".format(instruction))
