@@ -125,13 +125,20 @@ class FSL(object):
         if self.version >= LooseVersion('5.0.10'):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
+
+        entrypoint = "/opt/fsl/neurodocker_fsl_startup.sh"
+        cmd += ("\n&& entrypoint={}"
+                "\n&& echo '#!/usr/bin/env bash' > $entrypoint"
+                "\n&& echo 'set +x' > $entrypoint"
+                "\n&& echo 'source ${{FSLDIR}}/etc/fslconf/fsl.sh' >> $entrypoint"
+                "\n&& echo '$*' >> $entrypoint"
+                "\n&& chmod 755 $entrypoint").format(entrypoint)
         cmd = indent("RUN", cmd)
 
-        # The FSL environment can be set up with this command:
-        # source $FSL_ENV_FILE
         env_cmd = ("FSLDIR=/opt/fsl"
-                   "\nPATH=/opt/fsl/bin:$PATH"
-                   "\nFSL_ENV_FILE=/opt/fsl/etc/fslconf/fsl.sh")
+                   "\nPATH=/opt/fsl/bin:$PATH")
         env_cmd = indent("ENV", env_cmd)
 
-        return "\n".join((cmd, env_cmd))
+        entrypoint_cmd = 'ENTRYPOINT ["/bin/bash", "{}"]'.format(entrypoint)
+
+        return "\n".join((cmd, env_cmd, entrypoint_cmd))
