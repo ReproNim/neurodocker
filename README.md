@@ -122,6 +122,7 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 ```shell
 # Generate Dockerfile.
 neurodocker generate -b debian:jessie -p yum \
+--install git vim \
 --afni version=latest \
 --ants version=2.1.0 \
 --freesurfer version=6.0.0 \
@@ -136,6 +137,8 @@ neurodocker generate -b debian:jessie -p yum \
 --env KEY_A=VAL_A KEY_B=VAL_B \
 --env KEY_C="base on \$KEY_A" \
 --instruction='ENTRYPOINT ["python"]' \
+--copy rel/path/to/startup.sh /path/in/container/ \
+--entrypoint /path/in/container/startup.sh \
 --no-check-urls --no-print-df -o path/to/project/Dockerfile
 
 # Build Docker image using the saved Dockerfile.
@@ -190,6 +193,7 @@ specs = {
     'check_urls': False,
     'instructions': [
         ('base', 'ubuntu:17.04'),
+        ('install', ['git', 'vim']),
         ('user', 'neuro'),
         ('miniconda', {
             'env_name': 'my_env',
@@ -206,6 +210,7 @@ specs = {
                          'pkgs': ['afni', 'dcm2niix']}),
         ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
         ('instruction', 'RUN echo "Hello, World"'),
+        ('copy', ['rel/path/to/startup.sh', '/path/in/container/']),
         ('user', 'neuro'),
         ('env', {'KEY_A': 'VAL_A', 'KEY_B': 'VAL_B is "hello"'}),
         ('env', {'KEY_C': 'based on $KEY_A'}),

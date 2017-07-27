@@ -85,7 +85,7 @@ class NeuroDebian(object):
 
     def _add_neurodebian(self):
         """Return instruction to add NeuroDebian repository."""
-        pkgs = "dirmngr"
+        pkgs = "dirmngr gnupg"
         cmd = ("{install}"
                "\n&& {clean}"
                "\n&& curl -sSL {url}"
@@ -93,7 +93,6 @@ class NeuroDebian(object):
                "\n&& apt-key adv --recv-keys --keyserver"
                " hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9"
                "\n&& apt-get update"
-               "\n&& {remove}"
                "".format(url=self.url, **manage_pkgs['apt']).format(pkgs=pkgs))
         return indent("RUN", cmd)
 

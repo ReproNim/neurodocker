@@ -47,7 +47,7 @@ class _SpecsParser(object):
     from neurodocker.dockerfile import dockerfile_implementations
 
     VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager']
-    VALID_INSTRUCTIONS_KEYS = ['base', 'env', 'expose', 'instruction', 'user']
+    VALID_INSTRUCTIONS_KEYS = list(dockerfile_implementations['other'].keys())
 
     SUPPORTED_SOFTWARE = dockerfile_implementations['software'].keys()
     VALID_INSTRUCTIONS_KEYS.extend(SUPPORTED_SOFTWARE)

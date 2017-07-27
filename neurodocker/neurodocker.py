@@ -39,9 +39,22 @@ def _add_generate_arguments(parser):
                             help="Linux package manager.")
 
     # Arguments that should be ordered.
+    p.add_argument('--add', action=OrderedArgs, nargs="+",
+                   help=("Add file or directory within build context or a URL"
+                         " to Docker container filesystem. Use form"
+                         " <src> ... <dest>"))
+    p.add_argument('--copy', action=OrderedArgs, nargs="+",
+                   help=("Copy file or directory within build context to"
+                         " Docker container filesystem. Use form"
+                         " <src> ... <dest>"))
+    p.add_argument('--install', action=OrderedArgs, nargs="+",
+                   help=("Install system packages with apt-get or yum,"
+                         " depending on the base image."))
     p.add_argument('-i', '--instruction', action=OrderedArgs,
                      help=("Arbitrary Dockerfile instruction. Can be used "
                            "multiple times. Added to end of Dockerfile."))
+    p.add_argument('--entrypoint', action=OrderedArgs,
+                   help="Entrypoint for the Docker image.")
     p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
                    help="Environment variables to set in Docker image. Use the "
                         "format KEY=VALUE.", type=list_of_kv)

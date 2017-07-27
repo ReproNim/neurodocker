@@ -4,9 +4,40 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import os
+
 import neurodocker
 from neurodocker import interfaces
 from neurodocker.utils import indent, manage_pkgs
+
+
+def _base_add_copy(list_srcs_dest, cmd):
+    srcs = list_srcs_dest[:-1]
+    dest = list_srcs_dest[-1]
+
+    for src in srcs:
+        if os.path.isabs(src):
+            raise ValueError("Path for {} cannot be absolute: {}"
+                             "".format(cmd, src))
+    srcs = '", "'.join(srcs)
+    return '{} ["{}", "{}"]'.format(cmd, srcs, dest)
+
+
+def _add_add(list_srcs_dest, **kwargs):
+    """Return Dockerfile ADD instruction to add file or directory to Docker
+    image.
+
+    See https://docs.docker.com/engine/reference/builder/#add.
+
+    Parameters
+    ----------
+    list_srcs_dest : list of str
+        All of the items except the last one are paths on local machine or a
+        URL to a file to be copied into the Docker container. Paths on the
+        local machine must be within the build context. The last item is the
+        destination in the Docker image for these file or directories.
+    """
+    return _base_add_copy(list_srcs_dest, "ADD")
 
 
 def _add_base(base, **kwargs):
@@ -20,6 +51,23 @@ def _add_base(base, **kwargs):
     return "FROM {}".format(base)
 
 
+def _add_copy(list_srcs_dest, **kwargs):
+    """Return Dockerfile COPY instruction to add files or directories to Docker
+    image.
+
+    See https://docs.docker.com/engine/reference/builder/#add.
+
+    Parameters
+    ----------
+    list_srcs_dest : list of str
+        All of the items except the last one are paths on local machine to be
+        copied into the Docker container. These paths must be within the build
+        context. The last item is the destination in the Docker image for these
+        file or directories.
+    """
+    return _base_add_copy(list_srcs_dest, "COPY")
+
+
 def _add_exposed_ports(exposed_ports, **kwargs):
     """Return Dockerfile EXPOSE instruction to expose ports.
 
@@ -31,6 +79,20 @@ def _add_exposed_ports(exposed_ports, **kwargs):
     if not isinstance(exposed_ports, (list, tuple)):
         exposed_ports = [exposed_ports]
     return "EXPOSE " + " ".join((str(p) for p in exposed_ports))
+
+
+def _add_entrypoint(entrypoint, **kwargs):
+    """Return Dockerfile ENTRYPOINT instruction to set image entrypoint.
+
+    Parameters
+    ----------
+    entrypoint : str
+        The entrypoint.
+    """
+    import json
+
+    escaped = json.dumps(entrypoint)
+    return "ENTRYPOINT [{}]".format('", "'.join(escaped.split()))
 
 
 def _add_env_vars(env_vars, **kwargs):
@@ -48,8 +110,26 @@ def _add_env_vars(env_vars, **kwargs):
         newline = "\n" if out else ""
         v = json.dumps(v)  # Escape double quotes and other things.
         out += '{}{}={}'.format(newline, k, v)
-        print(out)
     return indent("ENV", out)
+
+
+def _add_install(pkgs, pkg_manager):
+    """Return Dockerfile RUN instruction that installs system packages.
+
+    Parameters
+    ----------
+    pkgs : list
+        List of system packages to install.
+    pkg_manager : {'apt', 'yum'}
+        Linux package manager.
+    """
+    comment = ("#------------------------"
+               "\n# Install system packages"
+               "\n#------------------------")
+    pkgs = ' '.join(pkgs)
+    cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
+    cmd = cmd.format(pkgs=pkgs)
+    return indent("RUN", cmd)
 
 
 def _add_arbitrary_instruction(instruction, **kwargs):
@@ -136,9 +216,13 @@ dockerfile_implementations = {
         'spm': interfaces.SPM,
     },
     'other': {
+        'add': _add_add,
         'base': _add_base,
+        'copy': _add_copy,
+        'entrypoint': _add_entrypoint,
         'expose': _add_exposed_ports,
         'env': _add_env_vars,
+        'install': _add_install,
         'instruction': _add_arbitrary_instruction,
         'user': _DockerfileUsers.add,
     },
@@ -158,7 +242,11 @@ def _get_dockerfile_chunk(instruction, options, specs):
         callable_ = dockerfile_implementations['software'][instruction]
         chunk = callable_(**options).cmd
     elif instruction in other_keys:
-        chunk = dockerfile_implementations['other'][instruction](options)
+        func = dockerfile_implementations['other'][instruction]
+        if instruction == "install":
+            chunk = func(options, specs['pkg_manager'])
+        else:
+            chunk = func(options)
     else:
         raise ValueError("Instruction not understood: {}"
                          "".format(instruction))
