@@ -104,6 +104,14 @@ class AFNI(object):
                     '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
                     ''.format(deb_url))
 
+            deb_url = ('http://mirrors.kernel.org/debian/pool/main/libp/'
+                       'libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb')
+            cmd += ("\n&& apt-get install -yq libpng12"
+                    '\n|| /bin/bash -c "'
+                    '\n   curl -o /tmp/libpng12.deb -sSL {}'
+                    '\n   && dpkg -i /tmp/libpng12.deb && rm -f /tmp/libpng12.deb"'
+                    ''.format(deb_url))
+
         cmd += ("\n&& {clean}"
                 '\n&& echo "Downloading AFNI ..."'
                 "\n&& mkdir -p /opt/afni"
