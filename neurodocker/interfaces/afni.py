@@ -89,16 +89,18 @@ class AFNI(object):
         pkgs = self._get_binaries_dependencies()
 
         cmd = ("{install}"
-               "\n&& ln /usr/lib/x86_64-linux-gnu/libgsl.so.19"
-               " /usr/lib/x86_64-linux-gnu/libgsl.so.0"
-               "\n|| true"
+               '\n&& libs_path=/usr/lib/x86_64-linux-gnu'
+               '\n&& if [ -f $libs_path/libgsl.so.19 ]; then'
+               '\n       ln $libs_path/libgsl.so.19 $libs_path/libgsl.so.0;'
+               '\n   fi'
                "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
 
         if self.pkg_manager == "apt":
             # libxp was removed after ubuntu trusty.
             deb_url = ('http://mirrors.kernel.org/debian/pool/main/libx/'
                        'libxp/libxp6_1.0.2-2_amd64.deb')
-            cmd += ("\n&& apt-get install -yq libxp6"
+            cmd += ("\n# Install libxp (not in all ubuntu/debian repositories)"
+                    "\n&& apt-get install -yq --no-install-recommends libxp6"
                     '\n|| /bin/bash -c "'
                     '\n   curl -o /tmp/libxp6.deb -sSL {}'
                     '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
@@ -106,19 +108,31 @@ class AFNI(object):
 
             deb_url = ('http://mirrors.kernel.org/debian/pool/main/libp/'
                        'libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb')
-            cmd += ("\n&& apt-get install -yq libpng12"
+            cmd += ("\n# Install libpng12 (not in all ubuntu/debian repositories)"
+                    "\n&& apt-get install -yq --no-install-recommends libpng12-0"
                     '\n|| /bin/bash -c "'
                     '\n   curl -o /tmp/libpng12.deb -sSL {}'
                     '\n   && dpkg -i /tmp/libpng12.deb && rm -f /tmp/libpng12.deb"'
                     ''.format(deb_url))
+
+            sh_url = ("https://gist.githubusercontent.com/kaczmarj/"
+                      "8e3792ae1af70b03788163c44f453b43/raw/"
+                      "f6036cb55cd9252e46c34f109ba933a3215a0264/"
+                      "R_installer_debian_ubuntu.sh")
+            cmd += ("\n# Install R"
+                    "\n&& apt-get install -yq --no-install-recommends"
+                    "\n\tr-base-dev r-cran-rmpi"
+                    '\n || /bin/bash -c "'
+                    '\n    curl -o /tmp/install_R.sh -sSL {}'
+                    '\n    && /bin/bash /tmp/install_R.sh"'
+                    ''.format(sh_url))
 
         cmd += ("\n&& {clean}"
                 '\n&& echo "Downloading AFNI ..."'
                 "\n&& mkdir -p /opt/afni"
                 "\n&& curl -sSL --retry 5 {}"
                 "\n| tar zx -C /opt/afni --strip-components=1"
-                "\n&& cp /opt/afni/AFNI.afnirc $HOME/.afnirc"
-                "\n&& cp /opt/afni/AFNI.sumarc $HOME/.sumarc"
+                "\n&& /opt/afni/rPkgsInstall -pkgs ALL -check"
                 "".format(url, **manage_pkgs[self.pkg_manager]))
         cmd = indent("RUN", cmd)
 
