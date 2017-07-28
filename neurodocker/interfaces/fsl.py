@@ -66,11 +66,12 @@ class FSL(object):
 
     def _create_cmd(self):
         """Return full Dockerfile instructions to install FSL."""
-        comment = ("#-----------------------------------------------"
-                   "\n# Install FSL {}"
-                   "\n# Please review FSL's license:"
+        comment = ("#-----------------------------------------------------------"
+                   "\n# Install FSL v{}"
+                   "\n# FSL is non-free. If you are considering commerical use"
+                   "\n# of this Docker image, please consult the relevant license:"
                    "\n# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence"
-                   "\n#-----------------------------------------------"
+                   "\n#-----------------------------------------------------------"
                    "".format(self.version))
         if self.use_binaries:
             url = self._get_binaries_url()
@@ -130,9 +131,13 @@ class FSL(object):
         cmd += ("\n&& entrypoint={}"
                 "\n&& echo '#!/usr/bin/env bash' > $entrypoint"
                 "\n&& echo 'set +x' > $entrypoint"
+                "\n&& echo 'echo \"Some packages in this Docker container are non-free.\"' >> $entrypoint"
+                "\n&& echo 'echo \"If you are considering commercial use of"
+                " this container, please consult the relevant license:\"' >> $entrypoint"
+                "\n&& echo 'echo https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' >> $entrypoint"
                 "\n&& echo 'source ${{FSLDIR}}/etc/fslconf/fsl.sh' >> $entrypoint"
                 "\n&& echo '$*' >> $entrypoint"
-                "\n&& chmod 755 $entrypoint").format(entrypoint)
+                "").format(entrypoint)
         cmd = indent("RUN", cmd)
 
         env_cmd = ("FSLDIR=/opt/fsl"
