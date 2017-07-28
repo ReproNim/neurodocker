@@ -111,7 +111,7 @@ def _add_generate_arguments(parser):
         "neurodebian": (
             "Add NeuroDebian repository and optionally install NeuroDebian"
             " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
-            " download_server (required), full (if false, default, use libre"
+            " download_server (required), full (if true, default, use non-free"
             " packages), and pkgs (list of packages to install). Valid"
             " download servers are {}.".format(_ndeb_servers)),
         "spm": (
