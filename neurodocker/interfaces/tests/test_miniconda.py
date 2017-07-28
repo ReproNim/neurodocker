@@ -25,7 +25,8 @@ class TestMiniconda(object):
                         'python_version': '3.5.1',
                         'conda_install': ['traits'],
                         'pip_install': ['https://github.com/nipy/nipype/archive/master.tar.gz']
-                    })
+                    }),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('python -V')

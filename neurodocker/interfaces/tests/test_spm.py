@@ -14,7 +14,8 @@ class TestSPM(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('spm', {'version': '12', 'matlab_version': 'R2017a'})
+                    ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs, working_dir='/home')
 

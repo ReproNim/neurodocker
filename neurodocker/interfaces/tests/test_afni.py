@@ -18,7 +18,8 @@ class TestAFNI(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('afni', {'version': 'latest', 'use_binaries': True})
+                    ('afni', {'version': 'latest', 'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
 
         container = utils.get_container_from_specs(specs)

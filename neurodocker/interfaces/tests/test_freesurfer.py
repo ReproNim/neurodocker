@@ -18,7 +18,8 @@ class TestFreeSurfer(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'ubuntu:xenial'),
-                    ('freesurfer', {'version': '6.0.0', 'use_binaries': True})
+                    ('freesurfer', {'version': '6.0.0', 'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('recon-all')

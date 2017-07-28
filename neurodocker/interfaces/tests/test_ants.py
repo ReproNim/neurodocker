@@ -18,7 +18,8 @@ class TestANTs(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('ants', {'version': '2.2.0', 'use_binaries': True})
+                    ('ants', {'version': '2.2.0', 'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('Atropos')

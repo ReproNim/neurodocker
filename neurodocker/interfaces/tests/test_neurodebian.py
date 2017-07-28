@@ -20,7 +20,8 @@ class TestNeuroDebian(object):
                     ('neurodebian', {'os_codename': 'xenial',
                                     'download_server': 'usa-nh',
                                     'full': False,
-                                    'pkgs': ['dcm2niix']})
+                                    'pkgs': ['dcm2niix']}),
+                    ('user', 'neuro'),
                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('dcm2niix -h')

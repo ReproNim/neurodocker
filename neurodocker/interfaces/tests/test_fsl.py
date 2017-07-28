@@ -17,20 +17,21 @@ class TestFSL(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('fsl', {'version': '5.0.10', 'use_binaries': True})
+                    ('fsl', {'version': '5.0.10', 'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('bet')
         assert "error" not in output, "error running bet"
         utils.test_cleanup(container)
 
-    def test_build_image_fsl_509_binaries_xenial(self):
-        """Install FSL binaries on Ubuntu Xenial."""
+    def test_build_image_fsl_509_binaries_stretch(self):
+        """Install FSL binaries on Debian Stretch."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
-                    ('base', 'ubuntu:xenial'),
-                    ('fsl', {'version': '5.0.9', 'use_binaries': True})
+                    ('base', 'debian:stretch'),
+                    ('fsl', {'version': '5.0.10', 'use_binaries': True})
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('bet')
