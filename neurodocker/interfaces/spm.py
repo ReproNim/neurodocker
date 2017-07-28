@@ -94,14 +94,13 @@ class SPM(object):
     def install_mcr(url):
         """Return Dockerfile instructions to install MATLAB Compiler Runtime."""
         comment = "# Install MATLAB Compiler Runtime"
-        workdir_cmd = "WORKDIR /opt"
         cmd = ('echo "Downloading MATLAB Compiler Runtime ..."'
-               "\n&& curl -sSL -o mcr.zip {}"
-               "\n&& unzip -q mcr.zip -d mcrtmp"
-               "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
-               "\n&& rm -rf mcrtmp mcr.zip /tmp/*".format(url))
+               "\n&& curl -sSL -o /tmp/mcr.zip {}"
+               "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
+               "\n&& /tmp/mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
+               "\n&& rm -rf /tmp/*".format(url))
         cmd = indent("RUN", cmd)
-        return '\n'.join((comment, workdir_cmd, cmd))
+        return '\n'.join((comment, cmd))
 
     def _get_spm_url(self):
         url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
@@ -115,10 +114,9 @@ class SPM(object):
     def install_spm(url):
         """Return Dockerfile instructions to install standalone SPM."""
         comment = "# Install standalone SPM"
-        workdir_cmd = "WORKDIR /opt"
         cmd = ('echo "Downloading standalone SPM ..."'
                "\n&& curl -sSL -o spm.zip {}"
-               "\n&& unzip -q spm.zip"
+               "\n&& unzip -q spm.zip -d /opt/spm"
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
@@ -127,4 +125,4 @@ class SPM(object):
                    "\nFORCE_SPMMCR=1"
                    "\nLD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH")
         env_cmd = indent("ENV", env_cmd)
-        return '\n'.join((comment, workdir_cmd, cmd, env_cmd))
+        return '\n'.join((comment, cmd, env_cmd))
