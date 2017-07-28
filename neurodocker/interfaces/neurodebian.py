@@ -17,8 +17,8 @@ class NeuroDebian(object):
         The server to use to download NeuroDebian packages. Choose the one
         closest to you.
     full : bool
-        If false (default), use the libre sources. If true, use the full
-        NeuroDebian sources.
+        If true (default), use the full NeuroDebian sources. If false, use the
+        libre sources.
     pkgs : str or list or tuple
         Packages to install from NeuroDebian.
     pkg_manager : {'apt'}
@@ -40,7 +40,7 @@ class NeuroDebian(object):
                'usa-nh': 'us-nh',
                'usa-tn': 'us-tn',}
 
-    def __init__(self, os_codename, download_server, full=False, pkgs=None,
+    def __init__(self, os_codename, download_server, full=True, pkgs=None,
                  pkg_manager='apt', check_urls=True):
         self.pkgs = pkgs
         self.check_urls = check_urls
@@ -54,9 +54,11 @@ class NeuroDebian(object):
         self.cmd = self._create_cmd()
 
     def _create_cmd(self):
-        comment = ("#---------------------------"
+        comment = ("#--------------------------------------------------"
                    "\n# Add NeuroDebian repository"
-                   "\n#---------------------------")
+                   "\n# Please note that some packages downloaded through"
+                   "\n# NeuroDebian may have restrictive licenses."
+                   "\n#--------------------------------------------------")
 
         chunks = [comment, self._add_neurodebian()]
         if self.pkgs is not None and self.pkgs:
