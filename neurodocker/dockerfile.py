@@ -169,7 +169,7 @@ def _add_common_dependencies(pkg_manager):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     """
-    deps = "\n\tacl bzip2 ca-certificates curl unzip"
+    deps = "\n\tbzip2 ca-certificates curl unzip"
     if pkg_manager == "yum":
         deps += " epel-release"
 
@@ -179,9 +179,10 @@ def _add_common_dependencies(pkg_manager):
     cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
     cmd = cmd.format(pkgs=deps)
     # Allow all users to read, write, and execute in /opt.
-    # https://superuser.com/a/151920
-    cmd += ("\n# Allow non-root users to read, write, execute in /opt."
-            "\n&& chmod g+s /opt && setfacl -Rd -m g::rwx,o::rwx /opt")
+    # Docker supports {} but AUFS, which does not support ACL, is the default.
+    # setfacl should not be used.
+    # cmd += ("\n# Allow non-root users to read, write, execute in /opt."
+    #         "\n&& chmod g+s /opt && setfacl -Rd -m g::rwx,o::rwx /opt")
     cmd = indent("RUN", cmd)
 
     return "\n".join((comment, cmd))
