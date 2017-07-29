@@ -60,23 +60,17 @@ class SPM(object):
         comment = ("#----------------------\n"
                    "# Install MCR and SPM{}\n"
                    "#----------------------".format(self.version))
-        mcr_url = self._get_mcr_url()
-        spm_url = self._get_spm_url()
-        chunks = [comment, self.install_libs(), '', self.install_mcr(mcr_url),
-                  '', self.install_spm(spm_url)]
+        chunks = [comment, self.install_mcr(), '', self.install_spm()]
         return "\n".join(chunks)
 
-    def install_libs(self):
+    def _install_libs(self):
         """Return Dockerfile instructions to install libxext6 and libxt6.
         Without these libraries, SPM encounters segmentation fault."""
         libs = {'apt': 'libxext6 libxt6',
                 'yum': 'libXext.x86_64 libXt.x86_64'}
-        comment = "# Install required libraries"
         cmd = ("{install}"
                "\n&& {clean}").format(**manage_pkgs[self.pkg_manager])
-        cmd = cmd.format(pkgs=libs[self.pkg_manager])
-        cmd = indent("RUN", cmd)
-        return "\n".join((comment, cmd))
+        return cmd.format(pkgs=libs[self.pkg_manager])
 
     def _get_mcr_url(self):
         base = 'https://www.mathworks.com/supportfiles/'
@@ -90,11 +84,13 @@ class SPM(object):
             check_url(url)
         return url
 
-    @staticmethod
-    def install_mcr(url):
+    def install_mcr(self):
         """Return Dockerfile instructions to install MATLAB Compiler Runtime."""
+        url = self._get_mcr_url()
         comment = "# Install MATLAB Compiler Runtime"
-        cmd = ('echo "Downloading MATLAB Compiler Runtime ..."'
+        cmd = self._install_libs()
+        cmd += ("\n# Install MATLAB Compiler Runtime"
+               '\n&& echo "Downloading MATLAB Compiler Runtime ..."'
                "\n&& curl -sSL -o /tmp/mcr.zip {}"
                "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
                "\n&& /tmp/mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
@@ -110,13 +106,13 @@ class SPM(object):
             check_url(url)
         return url
 
-    @staticmethod
-    def install_spm(url):
+    def install_spm(self):
         """Return Dockerfile instructions to install standalone SPM."""
+        url = self._get_spm_url()
         comment = "# Install standalone SPM"
         cmd = ('echo "Downloading standalone SPM ..."'
                "\n&& curl -sSL -o spm.zip {}"
-               "\n&& unzip -q spm.zip -d /opt/spm"
+               "\n&& unzip -q spm.zip -d /opt"
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
