@@ -17,11 +17,11 @@ class TestSPM(object):
                     ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
                     ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs, working_dir='/home')
+        container = utils.get_container_from_specs(specs)
 
-        cmd = ["/bin/sh", "-c", """echo 'fprintf("desired output")' > test.m """]
+        cmd = ["/bin/bash", "-c", """echo 'fprintf("desired output")' > /tmp/test.m """]
         container.exec_run(cmd)
-        cmd = ["/bin/sh", "-c", "$SPMMCRCMD test.m"]
+        cmd = ["/bin/bash", "-c", "$SPMMCRCMD /tmp/test.m"]
         output = container.exec_run(cmd)
         assert "error" not in output.lower(), "error running SPM command"
         assert "desired output" in output, "expected output not found"
