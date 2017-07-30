@@ -113,6 +113,7 @@ class SPM(object):
         cmd = ('echo "Downloading standalone SPM ..."'
                "\n&& curl -sSL -o spm.zip {}"
                "\n&& unzip -q spm.zip -d /opt"
+               "\n&& chmod -R 777 /opt/spm*"
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
