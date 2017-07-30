@@ -184,8 +184,7 @@ def _add_common_dependencies(pkg_manager):
             "\n&& mkdir /neurodocker"
             "\n&& echo '#!/usr/bin/env bash' >> /neurodocker/startup.sh"
             "\n&& echo 'set +x' >> /neurodocker/startup.sh"
-            "\n&& echo '$*' >> /neurodocker/startup.sh"
-            # "\n&& echo 'umask 002' >> /neurodocker/startup.sh"
+            "\n&& echo 'if [ -z \"$*\" ]; then /usr/bin/env bash; else $*; fi' >> /neurodocker/startup.sh"
             "\n&& chmod -R 777 /neurodocker && chmod a+s /neurodocker")
     cmd = indent("RUN", cmd)
     entrypoint = 'ENTRYPOINT ["/neurodocker/startup.sh"]'
