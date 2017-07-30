@@ -127,16 +127,13 @@ class FSL(object):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
 
-        entrypoint = "/opt/fsl/neurodocker_fsl_startup.sh"
+        entrypoint = "/neurodocker/startup.sh"
         cmd += ("\n&& entrypoint={}"
-                "\n&& echo '#!/usr/bin/env bash' > $entrypoint"
-                "\n&& echo 'set +x' > $entrypoint"
-                "\n&& echo 'echo \"Some packages in this Docker container are non-free.\"' >> $entrypoint"
-                "\n&& echo 'echo \"If you are considering commercial use of"
-                " this container, please consult the relevant license:\"' >> $entrypoint"
-                "\n&& echo 'echo https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' >> $entrypoint"
-                "\n&& echo 'source ${{FSLDIR}}/etc/fslconf/fsl.sh' >> $entrypoint"
-                "\n&& echo '$*' >> $entrypoint"
+                "\n&& sed -i '$iecho Some packages in this Docker container are non-free' $entrypoint"
+                "\n&& sed -i '$iecho If you are considering commercial use of"
+                " this container, please consult the relevant license:\"' $entrypoint"
+                "\n&& sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $entrypoint"
+                "\n&& sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $entrypoint"
                 "").format(entrypoint)
         cmd = indent("RUN", cmd)
 
@@ -144,6 +141,4 @@ class FSL(object):
                    "\nPATH=/opt/fsl/bin:$PATH")
         env_cmd = indent("ENV", env_cmd)
 
-        entrypoint_cmd = 'ENTRYPOINT ["/bin/bash", "{}"]'.format(entrypoint)
-
-        return "\n".join((cmd, env_cmd, entrypoint_cmd))
+        return "\n".join((cmd, env_cmd))
