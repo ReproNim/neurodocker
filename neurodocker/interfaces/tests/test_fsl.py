@@ -25,7 +25,7 @@ class TestFSL(object):
         assert "error" not in output, "error running bet"
         utils.test_cleanup(container)
 
-    def test_build_image_fsl_509_binaries_stretch(self):
+    def test_build_image_fsl_5010_binaries_stretch(self):
         """Install FSL binaries on Debian Stretch."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
