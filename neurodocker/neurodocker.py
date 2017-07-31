@@ -65,8 +65,10 @@ def _add_generate_arguments(parser):
                         "format KEY=VALUE.", type=list_of_kv)
     p.add_argument('-u', '--user', action=OrderedArgs,
                    help="Set the user. If not set, user is root.")
-    p.add_argument('--ports', dest="expose", nargs="+",
-                   help="Port(s) to expose.", action=OrderedArgs)
+    p.add_argument('--expose', nargs="+", action=OrderedArgs,
+                   help="Port(s) to expose.")
+    p.add_argument('--workdir', action=OrderedArgs,
+                   help="Working directory in container")
 
     # Other arguments (no order).
     p.add_argument('-o', '--output', dest="output",
