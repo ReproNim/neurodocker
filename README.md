@@ -14,8 +14,8 @@ Examples:
     - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
     - [Generate full Dockerfile](#generate-full-dockerfile)
       - [Generated Dockerfile](examples/generated-full.Dockerfile)
-  - "Minify" Docker image
-    - [Minify existing Docker image](#minify-existing-docker-image)
+  - Minimize Docker image
+    - [Minimize existing Docker image](#minimize-existing-docker-image)
     - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 
 
@@ -34,7 +34,7 @@ or
 
 `docker run --rm kaczmarj/neurodocker --help`
 
-Note that building and minifying Docker images is not possible with the _Neurodocker_ Docker image.
+Note that building and minifying Docker images is not possible within the _Neurodocker_ Docker image.
 
 
 # Supported Software
@@ -42,67 +42,35 @@ Note that building and minifying Docker images is not possible with the _Neurodo
 Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
 
 
-## AFNI
-
-AFNI can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install AFNI, include `'afni'` (case-insensitive) in the specifications dictionary. The only valid option is `'version'` (either 'latest' or '17.2.02' at this time).
-
-View source: [`neurodocker.interfaces.AFNI`](neurodocker/interfaces/afni.py).
-
-
-## ANTs
-
-ANTs can be installed using pre-compiled binaries (default behavior), or it can be compiled from source (takes about 45 minutes). To install ANTs, include `'ants'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'2.2.0'`), `'use_binaries'` (if true, use binaries; if false, compiles from source), and `'git_hash'` (checks out to specific hash before compiling). If `'version'` is latest and `'use_binaries'` is false, builds master branch from source. To install ANTs from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
-
-Repository with pre-compiled binaries: [kaczmarj/ANTs-builds](https://github.com/kaczmarj/ANTs-builds)
-
-View source: [`neurodocker.interfaces.ANTs`](neurodocker/interfaces/ants.py).
-
-
-## FreeSurfer
-
-FreeSurfer can only be installed using pre-compiled binaries (compiling from source might come in a future update). To install FreeSurfer, include `'freesurfer'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'6.0.0'`) and `'license_path'` (relative path to license.txt). A license is required to run FreeSurfer, but Neurodocker does not provide this license. Add a valid `license.txt` file to the `$FREESURFER_HOME` directory (always /opt/freesurfer) before running FreeSurfer. If `'license_path'` is specified, that file will be copied into the image (note: the relative path to the license file must be within the build context).
-
-View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesurfer.py).
-
-## FSL
-
-FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
-
-FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), and `'use_installer'` (bool; to use FSL's Python installer). To install FSL from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
-
-[FSL license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence)  
-View source: [`neurodocker.interfaces.FSL`](neurodocker/interfaces/fsl.py).
+| software | argument | description |
+| -------- | -------- | ----------- |
+| **AFNI** | version* | Either 17.2.02 or latest. |
+| **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0 |
+|          | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
+|          | git_hash  | Git hash to checkout to before building from source (only used if use_binaries is false). |
+| **FreeSurfer** | version* | Any version for which binaries are provided. |
+|                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
+|                | min | If true, install a version of FreeSurfer minimized for recon-all. See [freesurfer/freesurfer#70](https://github.com/freesurfer/freesurfer/issues/70). False by default. |
+| **FSL**** | version* | Any version for which binaries are provided. |
+|           | use_binaries | If true (default), use pre-compiled binaries. Building from source is not available now but might be added in the future. |
+|           | use_installer | If true, use FSL's Python installer. Only valid on CentOS images. |
+| **Miniconda** | env_name* | Name of this conda environment. |
+|               | python_version* | Version of Python. |
+|               | conda_install | Packages to install with conda. e.g., `conda_install="numpy traits"` |
+|               | pip_install | Packages to install with pip. |
+|               | add_to_path | If true (default), add this environment to $PATH. |
+|               | miniconda_version | Version of Miniconda. Latest by default. |
+| **MRtrix3** | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
+|             | git_hash | Git hash to checkout to before building from source (only used if use_binaries is false). |
+| **NeuroDebian** | os_codename* | Codename of the operating system (e.g., stretch, zesty). |
+|                 | download_server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate --help` for the full list of servers. |
+|                 | pkgs | Packages to download from NeuroDebian. |
+|                 | full | If true (default), use non-free sources. If false, use libre sources. |
 
 
-## Miniconda
+\* denotes required argument.
 
-Miniconda is installed using Miniconda's BASH installer in `/opt/conda`. The latest version of Python 3 is installed to the root environment, and the `conda-forge` channel is added. A new conda environment is created with the requested specifications. To install Miniconda and create an environment, include `'miniconda'` (case-insensitive) in the specifications dictionary Valid options are `'env_name'` (required), `'python_version'` (required; e.g., `'3.5.1'`), `'conda_install'` (e.g., `['numpy', 'traits']`), `pip_install` (e.g., `['nipype', 'pytest']`), `'add_to_path'` (default true), and `miniconda_version` (`'latest'` by default). Multiple conda environments can be created with multiple `'miniconda'` items in the specifications dictionary. Miniconda is installed prior to the creation of the first environment.
-
-View source: [`neurodocker.interfaces.Miniconda`](neurodocker/interfaces/miniconda.py).
-
-
-## MRtrix3
-
-MRtrix3 can be installed using pre-compiled binaries (default behavior), or the package can be built from source. To install MRtrix3, include `'mrtrix3'` (case-insensitive) in the specifications dictionary. Valid options are `'use_binaries'` (bool) and `'git_hash'` (str). If `'git_hash'` is specified, will checkout to that commit before building.
-
-
-## NeuroDebian
-
-The NeuroDebian repository can be added, and NeuroDebian packages can optionally be installed. Valid keys are os_codename (required; e.g., 'zesty'), download_server (required), full (if false, default, use libre packages), and pkgs (list of NeuroDebian packages to install).
-
-The [NeuroDebian Docker image](https://hub.docker.com/_/neurodebian/) can also be specified as the base image.
-
-View source: [`neurodocker.interfaces.NeuroDebian`](neurodocker/interfaces/neurodebian.py).
-
-
-## SPM
-
-The standalone version of SPM is installed, along with its dependency Matlab Compiler Runtime (MCR). MCR is installed first, using the [instructions on Matlab's website](https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html). SPM is then installed by downloading and unzipping the standalone SPM package. To install SPM, include `'spm'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'12'`), and `'matlab_version'` (case-sensitive; e.g., `'R2017a'`).
-
-Note: Currently, only SPM12 and MATLAB R2017a are supported.
-
-View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
-
+** FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
 
 
 # Examples
@@ -112,9 +80,9 @@ View source: [`neurodocker.interfaces.SPM`](neurodocker/interfaces/spm.py).
 Generate Dockerfile, and print result to stdout. The result can be piped to `docker build` to build the Docker image.
 
 ```shell
-docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.1.0
+docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.2.0
 
-docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.1.0 | docker build -
+docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
 ```
 
 ## Generate Dockerfile (without project's Docker image)
@@ -123,33 +91,32 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 
 ```shell
 # Generate Dockerfile.
-neurodocker generate -b debian:jessie -p yum \
+docker run --rm kaczmarj/neurodocker generate \
+--base debian:stretch --pkg-manager apt \
 --install git vim \
 --afni version=latest \
---ants version=2.1.0 \
---freesurfer version=6.0.0 \
+--ants version=2.2.0 \
+--freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
 --user=neuro \
 --miniconda env_name=default python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
+--miniconda env_name=py27 python_version=2.7 add_to_path=false \
 --user=root \
 --mrtrix3 \
 --neurodebian os_codename="jessie" download_server="usa-nh" pkgs="dcm2niix" \
 --spm version=12 matlab_version=R2017a \
 --user=neuro \
 --env KEY_A=VAL_A KEY_B=VAL_B \
---env KEY_C="base on \$KEY_A" \
---instruction='ENTRYPOINT ["python"]' \
---copy rel/path/to/startup.sh /path/in/container/ \
---entrypoint /path/in/container/startup.sh \
---no-check-urls --no-print-df -o path/to/project/Dockerfile
+--env KEY_C="based on \$KEY_A" \
+--instruction='RUN echo hello world' \
+--workdir /home/neuro \
+--no-check-urls -o examples/generated-full.Dockerfile
 
 # Build Docker image using the saved Dockerfile.
-docker build -t myimage path/to/project
-
-# Or pipe the Dockerfile to the docker build command. There is no build
-# context in this case.
-neurodocker generate -b centos:7 -p yum --ants version=2.2.0 --user=neuro | docker build -
+docker build -t myimage -f generated-full.Dockerfile examples
 ```
+
+Here is the [Dockerfile](examples/generated-full.Dockerfile) generated by the command above.
 
 
 ## Generate Dockerfile, build Docker image, run commands in image (minimal)
@@ -220,14 +187,12 @@ specs = {
 }
 
 df = Dockerfile(specs)
-df.save('examples/generated-full.Dockerfile')
+df.save('path/to/Dockerfile')
 print(df)
 ```
 
-Here is the [Dockerfile](examples/generated-full.Dockerfile) generated by the code above.
 
-
-## Minify existing Docker image
+## Minimize existing Docker image
 
 In the following example, a Docker image is built with ANTs version 2.2.0 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
 
