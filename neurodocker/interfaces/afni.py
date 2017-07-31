@@ -70,8 +70,8 @@ class AFNI(object):
 
     def _get_binaries_dependencies(self):
         base_deps = {
-            'apt': 'gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1'
-                   '\nlibjpeg62 libxm4 netpbm tcsh xfonts-base xvfb',
+            'apt': 'ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa'
+                    '\nlibgomp1 libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb',
             'yum': 'ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs'
                    '\nopenmotif R-devel tcsh xorg-x11-fonts-misc'
                    ' xorg-x11-server-Xvfb',
@@ -132,11 +132,11 @@ class AFNI(object):
                 "\n&& mkdir -p /opt/afni"
                 "\n&& curl -sSL --retry 5 {}"
                 "\n| tar zx -C /opt/afni --strip-components=1"
-                "\n&& /opt/afni/rPkgsInstall -pkgs ALL -check"
+                "\n&& /opt/afni/rPkgsInstall -pkgs ALL"
                 "".format(url, **manage_pkgs[self.pkg_manager]))
         cmd = indent("RUN", cmd)
 
         env_cmd = "PATH=/opt/afni:$PATH"
         env_cmd = indent("ENV", env_cmd)
 
-        return "\n".join((cmd, env_cmd))
+        return "\n".join((env_cmd, cmd))
