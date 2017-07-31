@@ -133,6 +133,7 @@ class AFNI(object):
                 "\n&& curl -sSL --retry 5 {}"
                 "\n| tar zx -C /opt/afni --strip-components=1"
                 "\n&& /opt/afni/rPkgsInstall -pkgs ALL"
+                "\n&& rm -rf /tmp/*"
                 "".format(url, **manage_pkgs[self.pkg_manager]))
         cmd = indent("RUN", cmd)
 
