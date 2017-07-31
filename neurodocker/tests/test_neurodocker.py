@@ -46,7 +46,7 @@ def test_dockerfile_opts(capsys):
     assert 'ENV KEY="VAL" \\' in out
     assert '  KEY2="VAL"' in out
 
-    main(args.format('--port 1230 1231').split())
+    main(args.format('--expose 1230 1231').split())
     out, _ = capsys.readouterr()
     assert "EXPOSE 1230 1231" in out
 
