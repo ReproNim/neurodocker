@@ -92,8 +92,11 @@ class NeuroDebian(object):
                "\n&& {clean}"
                "\n&& curl -sSL {url}"
                "\n> /etc/apt/sources.list.d/neurodebian.sources.list"
-               "\n&& apt-key adv --recv-keys --keyserver"
-               " hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9"
+               "\n&& apt-key adv --fetch-keys https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg"
+               # Syntax from
+               # https://github.com/poldracklab/fmriprep/blob/master/Dockerfile#L21
+               "\n&& (apt-key adv --refresh-keys --keyserver"
+               " hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)"
                "\n&& apt-get update"
                "".format(url=self.url, **manage_pkgs['apt']).format(pkgs=pkgs))
         return indent("RUN", cmd)

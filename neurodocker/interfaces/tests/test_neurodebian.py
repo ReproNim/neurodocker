@@ -16,10 +16,10 @@ class TestNeuroDebian(object):
         specs = {'pkg_manager': 'apt',
                  'check_urls': False,
                  'instructions': [
-                    ('base', 'ubuntu:xenial'),
-                    ('neurodebian', {'os_codename': 'xenial',
+                    ('base', 'debian:stretch'),
+                    ('neurodebian', {'os_codename': 'stretch',
                                     'download_server': 'usa-nh',
-                                    'full': False,
+                                    'full': True,
                                     'pkgs': ['dcm2niix']}),
                     ('user', 'neuro'),
                 ]}
