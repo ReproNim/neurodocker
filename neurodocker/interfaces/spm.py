@@ -52,6 +52,8 @@ class SPM(object):
 
         if self.version not in ['12']:
             raise ValueError("Only SPM12 is supported (for now).")
+        if self.matlab_version != "R2017a":
+            raise ValueError("Only MATLAB R2017a is supported (for now).")
 
         self.cmd = self._create_cmd()
 
@@ -117,9 +119,10 @@ class SPM(object):
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
-        env_cmd = ("MATLABCMD=/opt/mcr/v*/toolbox/matlab"
-                   '\nSPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script"'
+        # TODO: look into the different MCR versions and find their path.
+        env_cmd = ("MATLABCMD=/opt/mcr/v92/toolbox/matlab"
+                   '\nSPMMCRCMD="/opt/spm12/run_spm12.sh /opt/mcr/v92/ script"'
                    "\nFORCE_SPMMCR=1"
-                   "\nLD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH")
+                   "\nLD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH")
         env_cmd = indent("ENV", env_cmd)
         return '\n'.join((comment, cmd, env_cmd))
