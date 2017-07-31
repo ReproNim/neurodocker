@@ -21,7 +21,7 @@ class TestFSL(object):
                     ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
-        output = container.exec_run('bet')
+        output = container.exec_run('bash -c "bet"')
         assert "error" not in output, "error running bet"
         utils.test_cleanup(container)
 
@@ -34,6 +34,6 @@ class TestFSL(object):
                     ('fsl', {'version': '5.0.9', 'use_binaries': True})
                  ]}
         container = utils.get_container_from_specs(specs)
-        output = container.exec_run('bet')
+        output = container.exec_run('bash -c "bet"')
         assert "error" not in output, "error running bet"
         utils.test_cleanup(container)
