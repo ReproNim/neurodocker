@@ -11,18 +11,18 @@ from neurodocker.interfaces.tests import utils
 class TestFreeSurfer(object):
     """Tests for FreeSurfer class."""
 
-    @pytest.mark.skip(reason="requirements exceed available resources")
-    def test_build_image_freesurfer_600_binaries_xenial(self):
-        """Install FSL binaries on Ubuntu Xenial."""
+    def test_build_image_freesurfer_600_min_binaries_xenial(self):
+        """Install minimized FreeSurfer binaries on Ubuntu Xenial."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
                     ('base', 'ubuntu:xenial'),
-                    ('freesurfer', {'version': '6.0.0', 'use_binaries': True}),
+                    ('freesurfer', {'version': '6.0.0', 'use_binaries': True,
+                                    'min': True}),
                     ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
-        output = container.exec_run('recon-all')
+        output = container.exec_run('bash -c "recon-all"')
         assert "error" not in output, "error running recon-all"
         utils.test_cleanup(container)
 
