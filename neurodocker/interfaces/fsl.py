@@ -127,14 +127,11 @@ class FSL(object):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
 
-        entrypoint = "/neurodocker/startup.sh"
-        cmd += ("\n&& entrypoint={}"
-                "\n&& sed -i '$iecho Some packages in this Docker container are non-free' $entrypoint"
+        cmd += ("\n&& sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT"
                 "\n&& sed -i '$iecho If you are considering commercial use of"
-                " this container, please consult the relevant license:\"' $entrypoint"
-                "\n&& sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $entrypoint"
-                "\n&& sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $entrypoint"
-                "").format(entrypoint)
+                " this container, please consult the relevant license:' $ND_ENTRYPOINT"
+                "\n&& sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT"
+                "\n&& sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT")
         cmd = indent("RUN", cmd)
 
         env_cmd = ("FSLDIR=/opt/fsl"
