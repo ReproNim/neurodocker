@@ -66,11 +66,12 @@ class FSL(object):
 
     def _create_cmd(self):
         """Return full Dockerfile instructions to install FSL."""
-        comment = ("#-----------------------------------------------"
-                   "\n# Install FSL {}"
-                   "\n# Please review FSL's license:"
+        comment = ("#-----------------------------------------------------------"
+                   "\n# Install FSL v{}"
+                   "\n# FSL is non-free. If you are considering commerical use"
+                   "\n# of this Docker image, please consult the relevant license:"
                    "\n# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence"
-                   "\n#-----------------------------------------------"
+                   "\n#-----------------------------------------------------------"
                    "".format(self.version))
         if self.use_binaries:
             url = self._get_binaries_url()
@@ -126,19 +127,15 @@ class FSL(object):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
 
-        entrypoint = "/opt/fsl/neurodocker_fsl_startup.sh"
-        cmd += ("\n&& entrypoint={}"
-                "\n&& echo '#!/usr/bin/env bash' > $entrypoint"
-                "\n&& echo 'set +x' > $entrypoint"
-                "\n&& echo 'source ${{FSLDIR}}/etc/fslconf/fsl.sh' >> $entrypoint"
-                "\n&& echo '$*' >> $entrypoint"
-                "\n&& chmod 755 $entrypoint").format(entrypoint)
+        cmd += ("\n&& sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT"
+                "\n&& sed -i '$iecho If you are considering commercial use of"
+                " this container, please consult the relevant license:' $ND_ENTRYPOINT"
+                "\n&& sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT"
+                "\n&& sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT")
         cmd = indent("RUN", cmd)
 
         env_cmd = ("FSLDIR=/opt/fsl"
                    "\nPATH=/opt/fsl/bin:$PATH")
         env_cmd = indent("ENV", env_cmd)
 
-        entrypoint_cmd = 'ENTRYPOINT ["/bin/bash", "{}"]'.format(entrypoint)
-
-        return "\n".join((cmd, env_cmd, entrypoint_cmd))
+        return "\n".join((cmd, env_cmd))

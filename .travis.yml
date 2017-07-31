@@ -6,7 +6,6 @@ services:
   - docker
 language: python
 python:
-  # - 2.7
   - 3.6
 branches:
   only:
@@ -16,6 +15,7 @@ env:
   - INTERFACE_TO_BUILD=none
   - INTERFACE_TO_BUILD=afni
   - INTERFACE_TO_BUILD=ants
+  - INTERFACE_TO_BUILD=freesurfer
   - INTERFACE_TO_BUILD=fsl
   - INTERFACE_TO_BUILD=miniconda
   - INTERFACE_TO_BUILD=mrtrix3

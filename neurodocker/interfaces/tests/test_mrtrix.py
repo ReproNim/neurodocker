@@ -18,7 +18,8 @@ class TestMRtrix3(object):
                  'check_urls': True,
                  'instructions': [
                     ('base', 'centos:7'),
-                    ('mrtrix3', {'use_binaries': True})
+                    ('mrtrix3', {'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('mrinfo')

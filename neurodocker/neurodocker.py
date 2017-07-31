@@ -30,7 +30,12 @@ class OrderedArgs(Action):
 def _add_generate_arguments(parser):
     """Add arguments to `parser` for sub-command `generate`."""
     p = parser
-    list_of_kv = lambda kv: kv.split("=")
+
+    def list_of_kv(kv):
+        """Split string `kv` at first equals sign."""
+        l = kv.split("=")
+        l[1:] = ["=".join(l[1:])]
+        return l
 
     p.add_argument("-b", "--base", required=True,
                             help="Base Docker image. Eg, ubuntu:17.04")
@@ -60,8 +65,10 @@ def _add_generate_arguments(parser):
                         "format KEY=VALUE.", type=list_of_kv)
     p.add_argument('-u', '--user', action=OrderedArgs,
                    help="Set the user. If not set, user is root.")
-    p.add_argument('--ports', dest="expose", nargs="+",
-                   help="Port(s) to expose.", action=OrderedArgs)
+    p.add_argument('--expose', nargs="+", action=OrderedArgs,
+                   help="Port(s) to expose.")
+    p.add_argument('--workdir', action=OrderedArgs,
+                   help="Working directory in container")
 
     # Other arguments (no order).
     p.add_argument('-o', '--output', dest="output",
@@ -92,9 +99,10 @@ def _add_generate_arguments(parser):
             " commit."),
         "freesurfer": (
             "Install FreeSurfer. Valid keys are version (required),"
-            " license_path (relative path to license), and use_binaries"
-            " (default true). A FreeSurfer license is required to run the"
-            " software and is not provided by Neurodocker."),
+            " license_path (relative path to license), min (if true, install"
+            " binaries minimized for recon-all) and use_binaries (default true"
+            "). A FreeSurfer license is required to run the software and is not"
+            " provided by Neurodocker."),
         "fsl": (
             "Install FSL. Valid keys are version (required), use_binaries"
             " (default true) and use_installer."),
@@ -111,7 +119,7 @@ def _add_generate_arguments(parser):
         "neurodebian": (
             "Add NeuroDebian repository and optionally install NeuroDebian"
             " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
-            " download_server (required), full (if false, default, use libre"
+            " download_server (required), full (if true, default, use non-free"
             " packages), and pkgs (list of packages to install). Valid"
             " download servers are {}.".format(_ndeb_servers)),
         "spm": (

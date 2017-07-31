@@ -12,13 +12,14 @@ from neurodocker.interfaces.tests import utils
 class TestAFNI(object):
     """Tests for AFNI class."""
 
-    def test_build_image_afni_latest_binaries_centos7(self):
-        """Install latest AFNI binaries on CentOS 7."""
-        specs = {'pkg_manager': 'yum',
+    def test_build_image_afni_latest_binaries_stretch(self):
+        """Install latest AFNI binaries on Debian stretch."""
+        specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
-                    ('base', 'centos:7'),
-                    ('afni', {'version': 'latest', 'use_binaries': True})
+                    ('base', 'debian:stretch'),
+                    ('afni', {'version': 'latest', 'use_binaries': True}),
+                    ('user', 'neuro'),
                  ]}
 
         container = utils.get_container_from_specs(specs)

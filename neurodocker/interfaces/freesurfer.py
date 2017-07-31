@@ -25,6 +25,8 @@ class FreeSurfer(object):
         version='dev'.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
+    min : bool
+        If true, install FreeSurfer minimized for recon-all.
     license_path : str
         Relative path to license.txt file. If provided, adds a COPY instruction
         to copy the file into $FREESURFER_HOME (always /opt/freesurfer/).
@@ -36,10 +38,11 @@ class FreeSurfer(object):
         code.
     """
 
-    def __init__(self, version, pkg_manager, license_path=None,
+    def __init__(self, version, pkg_manager, min=False, license_path=None,
                  use_binaries=True, check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
+        self.min = min
         self.license_path = license_path
         self.use_binaries = use_binaries
         self.check_urls = check_urls
@@ -52,9 +55,18 @@ class FreeSurfer(object):
                    "# Install FreeSurfer v{}\n"
                    "#--------------------------".format(self.version))
 
-        if self.use_binaries:
-            chunks = [comment, self.install_binaries(),
-                      self.add_env_instruction()]
+        chunks = [comment]
+
+        if self.min:
+            if self.version != "6.0.0":
+                raise ValueError("Minimized version is only avialable for"
+                                 " FreeSurfer version 6.0.0")
+            min_comment = ("# Install version minimized for recon-all"
+                           "\n# See https://github.com/freesurfer/freesurfer/issues/70")
+            chunks.append(min_comment)
+            chunks.append(self.add_min_recon_all())
+        elif self.use_binaries:
+            chunks.append(self.install_binaries())
         else:
             raise ValueError("Installation via binaries is the only available "
                              "installation method for now.")
@@ -116,7 +128,7 @@ class FreeSurfer(object):
             check_url(url)
 
         # https://github.com/nipy/workshops/blob/master/170327-nipype/docker/Dockerfile.complete#L8-L20
-
+        # TODO: allow users to choose which directories to exclude.
         excluded_dirs = ("--exclude='freesurfer/trctrain'"
                          "\n--exclude='freesurfer/subjects/fsaverage_sym'"
                          "\n--exclude='freesurfer/subjects/fsaverage3'"
@@ -136,33 +148,33 @@ class FreeSurfer(object):
                 "\n&& curl -sSL --retry 5 {url}"
                 "\n| tar xz -C /opt\n{excluded}"
                 "".format(url=url, excluded=excluded_dirs))
-        return indent("RUN", cmd)
 
-    @staticmethod
-    def add_env_instruction():
-        """Return Dockerfile instructions to add FreeSurfer environment
-        variables.
+        cmd += ("\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
+                " $ND_ENTRYPOINT")
+        cmd = indent("RUN", cmd)
+
+        env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
+
+        return "\n".join((cmd, env_cmd))
+
+    def add_min_recon_all(self):
+        """Return Dockerfile instructions to install minimized version of
+        recon-all.
+
+        See https://github.com/freesurfer/freesurfer/issues/70 for more
+        information.
         """
-        # https://github.com/freesurfer/freesurfer/issues/70#issuecomment-300488805
-        cmd1 = ("FS_OVERRIDE=0"
-                "\nOS=Linux"
-                "\nFSF_OUTPUT_FORMAT=nii.gz"
-                "\nFIX_VERTEX_AREA="
-                "\nFREESURFER_HOME=/opt/freesurfer"
-                "\nMNI_DIR=/opt/freesurfer/mni"
-                "\nSUBJECTS_DIR=/subjects")
-        cmd1 = indent("ENV", cmd1)
-
-        cmd2 = ("PERL5LIB=$MNI_DIR/share/perl5"
-                "\nMNI_PERL5LIB=$MNI_DIR/share/perl5"
-                "\nMINC_BIN_DIR=$MNI_DIR/bin"
-                "\nMINC_LIB_DIR=$MNI_DIR/lib"
-                "\nMNI_DATAPATH=$MNI_DIR/data"
-                "\nPATH=$FREESURFER_HOME/bin:$FREESURFER_HOME/tktools"
-                ":$MNI_DIR/bin:$PATH")
-        cmd2 = indent("ENV", cmd2)
-        return "\n".join((cmd1, cmd2))
-
+        cmd = self._install_binaries_deps()
+        url = ("https://dl.dropbox.com/s/nnzcfttc41qvt31/"
+               "recon-all-freesurfer6-3.min.tgz")
+        cmd += ('\n&& echo "Downloading minimized FreeSurfer ..."'
+                "\n&& curl -sSL {} | tar xz -C /opt"
+                "\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
+                " $ND_ENTRYPOINT"
+                "".format(url))
+        cmd = indent("RUN", cmd)
+        env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
+        return "\n".join((cmd, env_cmd))
 
     def _copy_license(self):
         """Return command to copy local license file into the container. Path

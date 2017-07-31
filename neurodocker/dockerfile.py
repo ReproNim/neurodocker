@@ -132,6 +132,11 @@ def _add_install(pkgs, pkg_manager):
     return indent("RUN", cmd)
 
 
+def _add_workdir(path, **kwargs):
+    """Return Dockerfile WORKDIR instruction to set working directory."""
+    return "WORKDIR {}".format(path)
+
+
 def _add_arbitrary_instruction(instruction, **kwargs):
     """Return `instruction`."""
     comment = "# User-defined instruction\n"
@@ -169,22 +174,35 @@ def _add_common_dependencies(pkg_manager):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     """
-    deps = "bzip2 ca-certificates curl unzip"
+    deps = "\n\tbzip2 ca-certificates curl unzip"
     if pkg_manager == "yum":
         deps += " epel-release"
 
-    comment = ("#----------------------------\n"
-               "# Install common dependencies\n"
-               "#----------------------------")
+    comment = ("#----------------------------------------------------------"
+               "\n# Install common dependencies and create default entrypoint"
+               "\n#----------------------------------------------------------")
+
+    entrypoint_file = "/neurodocker/startup.sh"
+
+    env = ('LANG="C.UTF-8"'
+           '\nLC_ALL="C"'
+           '\nND_ENTRYPOINT="{}"'.format(entrypoint_file))
+    env = indent("ENV", env)
+
     cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
     cmd = cmd.format(pkgs=deps)
-    # Create directory for Miniconda as route and modify permissions so
-    # non-root users can create their conda environments there.
-    cmd += ("\n&& mkdir {0} && chmod 777 {0}"
-            "".format(interfaces.Miniconda.INSTALL_PATH))
-    cmd = indent("RUN", cmd)
 
-    return "\n".join((comment, cmd))
+    cmd += ("\n&& chmod 777 /opt && chmod a+s /opt"
+            "\n&& mkdir /neurodocker"
+            "\n&& echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT"
+            "\n&& echo 'set +x' >> $ND_ENTRYPOINT"
+            "\n&& echo 'if [ -z \"$*\" ]; then /usr/bin/env bash; else $*; fi' >> $ND_ENTRYPOINT"
+            "\n&& chmod -R 777 /neurodocker && chmod a+s /neurodocker"
+            "".format(entrypoint_file))
+    cmd = indent("RUN", cmd)
+    entrypoint = 'ENTRYPOINT ["{}"]'.format(entrypoint_file)
+
+    return "\n".join((comment, env, cmd, entrypoint))
 
 
 def _add_neurodocker_header():
@@ -225,6 +243,7 @@ dockerfile_implementations = {
         'install': _add_install,
         'instruction': _add_arbitrary_instruction,
         'user': _DockerfileUsers.add,
+        'workdir': _add_workdir,
     },
 }
 

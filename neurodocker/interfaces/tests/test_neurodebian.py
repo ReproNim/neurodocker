@@ -16,11 +16,12 @@ class TestNeuroDebian(object):
         specs = {'pkg_manager': 'apt',
                  'check_urls': False,
                  'instructions': [
-                    ('base', 'ubuntu:xenial'),
-                    ('neurodebian', {'os_codename': 'xenial',
+                    ('base', 'debian:stretch'),
+                    ('neurodebian', {'os_codename': 'stretch',
                                     'download_server': 'usa-nh',
-                                    'full': False,
-                                    'pkgs': ['dcm2niix']})
+                                    'full': True,
+                                    'pkgs': ['dcm2niix']}),
+                    ('user', 'neuro'),
                 ]}
         container = utils.get_container_from_specs(specs)
         output = container.exec_run('dcm2niix -h')

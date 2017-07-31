@@ -66,6 +66,8 @@ View source: [`neurodocker.interfaces.FreeSurfer`](neurodocker/interfaces/freesu
 
 ## FSL
 
+FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
+
 FSL can be installed using pre-compiled binaries (default behavior), FSL's Python installer (not on Debian-based systems), or through NeuroDebian. To install FSL, include `'fsl'` (case-insensitive) in the specifications dictionary. Valid options are `'version'` (e.g., `'5.0.10'`), `'use_binaries'` (bool), and `'use_installer'` (bool; to use FSL's Python installer). To install FSL from NeuroDebian, see the [NeuroDebian interface](#neurodebian).
 
 [FSL license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence)  

@@ -52,6 +52,8 @@ class SPM(object):
 
         if self.version not in ['12']:
             raise ValueError("Only SPM12 is supported (for now).")
+        if self.matlab_version != "R2017a":
+            raise ValueError("Only MATLAB R2017a is supported (for now).")
 
         self.cmd = self._create_cmd()
 
@@ -60,23 +62,17 @@ class SPM(object):
         comment = ("#----------------------\n"
                    "# Install MCR and SPM{}\n"
                    "#----------------------".format(self.version))
-        mcr_url = self._get_mcr_url()
-        spm_url = self._get_spm_url()
-        chunks = [comment, self.install_libs(), '', self.install_mcr(mcr_url),
-                  '', self.install_spm(spm_url)]
+        chunks = [comment, self.install_mcr(), '', self.install_spm()]
         return "\n".join(chunks)
 
-    def install_libs(self):
+    def _install_libs(self):
         """Return Dockerfile instructions to install libxext6 and libxt6.
         Without these libraries, SPM encounters segmentation fault."""
         libs = {'apt': 'libxext6 libxt6',
                 'yum': 'libXext.x86_64 libXt.x86_64'}
-        comment = "# Install required libraries"
         cmd = ("{install}"
                "\n&& {clean}").format(**manage_pkgs[self.pkg_manager])
-        cmd = cmd.format(pkgs=libs[self.pkg_manager])
-        cmd = indent("RUN", cmd)
-        return "\n".join((comment, cmd))
+        return cmd.format(pkgs=libs[self.pkg_manager])
 
     def _get_mcr_url(self):
         base = 'https://www.mathworks.com/supportfiles/'
@@ -90,18 +86,19 @@ class SPM(object):
             check_url(url)
         return url
 
-    @staticmethod
-    def install_mcr(url):
+    def install_mcr(self):
         """Return Dockerfile instructions to install MATLAB Compiler Runtime."""
+        url = self._get_mcr_url()
         comment = "# Install MATLAB Compiler Runtime"
-        workdir_cmd = "WORKDIR /opt"
-        cmd = ('echo "Downloading MATLAB Compiler Runtime ..."'
-               "\n&& curl -sSL -o mcr.zip {}"
-               "\n&& unzip -q mcr.zip -d mcrtmp"
-               "\n&& mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
-               "\n&& rm -rf mcrtmp mcr.zip /tmp/*".format(url))
+        cmd = self._install_libs()
+        cmd += ("\n# Install MATLAB Compiler Runtime"
+               '\n&& echo "Downloading MATLAB Compiler Runtime ..."'
+               "\n&& curl -sSL -o /tmp/mcr.zip {}"
+               "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
+               "\n&& /tmp/mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
+               "\n&& rm -rf /tmp/*".format(url))
         cmd = indent("RUN", cmd)
-        return '\n'.join((comment, workdir_cmd, cmd))
+        return '\n'.join((comment, cmd))
 
     def _get_spm_url(self):
         url = ("http://www.fil.ion.ucl.ac.uk/spm/download/restricted/"
@@ -111,20 +108,21 @@ class SPM(object):
             check_url(url)
         return url
 
-    @staticmethod
-    def install_spm(url):
+    def install_spm(self):
         """Return Dockerfile instructions to install standalone SPM."""
+        url = self._get_spm_url()
         comment = "# Install standalone SPM"
-        workdir_cmd = "WORKDIR /opt"
         cmd = ('echo "Downloading standalone SPM ..."'
                "\n&& curl -sSL -o spm.zip {}"
-               "\n&& unzip -q spm.zip"
+               "\n&& unzip -q spm.zip -d /opt"
+               "\n&& chmod -R 777 /opt/spm*"
                "\n&& rm -rf spm.zip\n".format(url))
         cmd = indent("RUN", cmd)
 
-        env_cmd = ("MATLABCMD=/opt/mcr/v*/toolbox/matlab"
-                   '\nSPMMCRCMD="/opt/spm*/run_spm*.sh /opt/mcr/v*/ script"'
+        # TODO: look into the different MCR versions and find their path.
+        env_cmd = ("MATLABCMD=/opt/mcr/v92/toolbox/matlab"
+                   '\nSPMMCRCMD="/opt/spm12/run_spm12.sh /opt/mcr/v92/ script"'
                    "\nFORCE_SPMMCR=1"
-                   "\nLD_LIBRARY_PATH=/opt/mcr/v*/runtime/glnxa64:/opt/mcr/v*/bin/glnxa64:/opt/mcr/v*/sys/os/glnxa64:$LD_LIBRARY_PATH")
+                   "\nLD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH")
         env_cmd = indent("ENV", env_cmd)
-        return '\n'.join((comment, workdir_cmd, cmd, env_cmd))
+        return '\n'.join((comment, cmd, env_cmd))
