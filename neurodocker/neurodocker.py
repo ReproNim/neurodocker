@@ -190,7 +190,7 @@ def generate(namespace):
     if not namespace.no_print_df:
         print(df.cmd)
     if namespace.output:
-        df.save(namespace.output)
+        df.save(filepath=namespace.output)
 
 
 def reprozip(namespace):
