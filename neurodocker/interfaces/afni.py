@@ -102,7 +102,7 @@ class AFNI(object):
             cmd += ("\n# Install libxp (not in all ubuntu/debian repositories)"
                     "\n&& apt-get install -yq --no-install-recommends libxp6"
                     '\n|| /bin/bash -c "'
-                    '\n   curl -o /tmp/libxp6.deb -sSL {}'
+                    '\n   curl --retry 5 -o /tmp/libxp6.deb -sSL {}'
                     '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
                     ''.format(deb_url))
 
