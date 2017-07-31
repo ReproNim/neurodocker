@@ -64,12 +64,6 @@ class Miniconda(object):
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
-        # ENV instruction does not expand $HOME.
-        # https://github.com/moby/moby/issues/28971
-
-        # self._env_name = "default"
-        # self._env_path = posixpath.join(self._install_path, "envs",
-        #                                 self._env_name)
         self.cmd = self._create_cmd()
 
     def _create_cmd(self):
@@ -113,7 +107,8 @@ class Miniconda(object):
                "\n&& conda config --system --set show_channel_urls true"
                "\n&& conda update -y --all"
                "\n&& conda clean -tipsy"
-               "".format(url=install_url))
+               '\n&& find {} -name ".wh*" -exec rm {{}} +'
+               "".format(Miniconda.INSTALL_PATH, url=install_url))
         cmd = indent("RUN", cmd)
 
         Miniconda.installed = True
@@ -136,6 +131,8 @@ class Miniconda(object):
         if self.pip_install:
             cmd += self._install_pip_pkgs()
 
+        cmd += ('\n&& find {} -name ".wh*" -exec rm {{}} +'
+                ''.format(Miniconda.INSTALL_PATH))
         cmd = indent("RUN", cmd)
 
         if self.add_to_path:
