@@ -150,7 +150,7 @@ class FreeSurfer(object):
                 "".format(url=url, excluded=excluded_dirs))
 
         cmd += ("\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
-                " /neurodocker/startup.sh")
+                " $ND_ENTRYPOINT")
         cmd = indent("RUN", cmd)
 
         env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
@@ -170,7 +170,7 @@ class FreeSurfer(object):
         cmd += ('\n&& echo "Downloading minimized FreeSurfer ..."'
                 "\n&& curl -sSL {} | tar xz -C /opt"
                 "\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
-                " /neurodocker/startup.sh"
+                " $ND_ENTRYPOINT"
                 "".format(url))
         cmd = indent("RUN", cmd)
         env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
