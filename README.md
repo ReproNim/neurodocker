@@ -95,7 +95,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --base debian:stretch --pkg-manager apt \
 --install git vim \
 --afni version=latest \
---ants version=2.1.0 \
+--ants version=2.2.0 \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
 --user=neuro \

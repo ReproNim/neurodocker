@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-07-31 19:03:56
+# Timestamp: 2017-07-31 19:19:51
 
 FROM debian:stretch
 
@@ -69,10 +69,10 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends ed gsl-bin
     && rm -rf /tmp/*
 
 #-------------------
-# Install ANTs 2.1.0
+# Install ANTs 2.2.0
 #-------------------
 RUN echo "Downloading ANTs ..." \
-    && curl -sSL --retry 5 https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz \
+    && curl -sSL --retry 5 https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz \
     | tar zx -C /opt
 ENV ANTSPATH=/opt/ants \
     PATH=/opt/ants:$PATH
