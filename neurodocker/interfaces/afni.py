@@ -117,7 +117,7 @@ class AFNI(object):
 
             sh_url = ("https://gist.githubusercontent.com/kaczmarj/"
                       "8e3792ae1af70b03788163c44f453b43/raw/"
-                      "f6036cb55cd9252e46c34f109ba933a3215a0264/"
+                      "0577c62e4771236adf0191c826a25249eb69a130/"
                       "R_installer_debian_ubuntu.sh")
             cmd += ("\n# Install R"
                     "\n&& apt-get install -yq --no-install-recommends"
