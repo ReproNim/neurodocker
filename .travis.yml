@@ -30,7 +30,7 @@ script:
       if [ "$INTERFACE_TO_BUILD" == 'none' ]; then
         python -m pytest -v -k "not test_build_image" --cov=./ neurodocker;
       elif [ "$INTERFACE_TO_BUILD" == 'afni' ]; then
-        python -m pytest -v --cov=./ neurodocker/interfaces/tests/test_afni.py;
+        python -m pytest -v -s --cov=./ neurodocker/interfaces/tests/test_afni.py;
       else
         travis_wait 50 python -m pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       fi }
