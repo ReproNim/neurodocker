@@ -6,9 +6,11 @@ This script installs the standalone SPM, which requires MATLAB Compiler Runtime
 but does not require a MATLAB license.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
 from __future__ import absolute_import, division, print_function
 from distutils.version import LooseVersion
 import logging
+import posixpath
 
 try:
     from urllib.parse import urljoin  # Python 3
@@ -44,13 +46,17 @@ class SPM(object):
     Instructions to install MATLAB Compiler Runtime can be found at
     https://www.mathworks.com/help/compiler/install-the-matlab-runtime.html.
     """
+
+    MCR_DEST = "/opt/mcr"
+    MCR_VERSIONS = {'R2017a': 'v92',}
+
     def __init__(self, version, matlab_version, pkg_manager, check_urls=True):
         self.version = str(version)
         self.matlab_version = LooseVersion(matlab_version)
         self.pkg_manager = pkg_manager
         self.check_urls = check_urls
 
-        if self.version not in ['12']:
+        if self.version != '12':
             raise ValueError("Only SPM12 is supported (for now).")
         if self.matlab_version != "R2017a":
             raise ValueError("Only MATLAB R2017a is supported (for now).")
@@ -91,12 +97,12 @@ class SPM(object):
         url = self._get_mcr_url()
         comment = "# Install MATLAB Compiler Runtime"
         cmd = self._install_libs()
-        cmd += ("\n# Install MATLAB Compiler Runtime"
-               '\n&& echo "Downloading MATLAB Compiler Runtime ..."'
-               "\n&& curl -sSL -o /tmp/mcr.zip {}"
-               "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
-               "\n&& /tmp/mcrtmp/install -destinationFolder /opt/mcr -mode silent -agreeToLicense yes"
-               "\n&& rm -rf /tmp/*".format(url))
+        cmd += ('\n&& echo "Downloading MATLAB Compiler Runtime ..."'
+                "\n&& curl -sSL -o /tmp/mcr.zip {url}"
+                "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
+                "\n&& /tmp/mcrtmp/install -destinationFolder {dest}"
+                " -mode silent -agreeToLicense yes"
+                "\n&& rm -rf /tmp/*".format(url=url, dest=SPM.MCR_DEST))
         cmd = indent("RUN", cmd)
         return '\n'.join((comment, cmd))
 
@@ -108,21 +114,43 @@ class SPM(object):
             check_url(url)
         return url
 
+    @staticmethod
+    def _get_spm_env_cmd(mcr_path, spm_cmd):
+        matlabcmd = posixpath.join(mcr_path, 'toolbox', 'matlab')
+        spmmcrcmd = spm_cmd + ' script'
+
+        ld_lib_path = '/usr/lib/x86_64-linux-gnu'
+        for relpath in ['runtime/glnxa64', 'bin/glnxa64', 'sys/os/glnxa64']:
+            ld_lib_path += ":{}".format(posixpath.join(mcr_path, relpath))
+        ld_lib_path += ":$LD_LIBRARY_PATH"
+
+        env = ("MATLABCMD={}"
+               '\nSPMMCRCMD="{}"'
+               "\nFORCE_SPMMCR=1"
+               '\nLD_LIBRARY_PATH={}'
+               "".format(matlabcmd, spmmcrcmd, ld_lib_path))
+        return indent("ENV", env)
+
     def install_spm(self):
         """Return Dockerfile instructions to install standalone SPM."""
         url = self._get_spm_url()
+
+        mcr_path = posixpath.join(SPM.MCR_DEST,
+                                  SPM.MCR_VERSIONS[str(self.matlab_version)],
+                                  '')
+
+        spm_cmd = '/opt/spm{0}/run_spm{0}.sh {1}'.format(self.version, mcr_path)
+
         comment = "# Install standalone SPM"
         cmd = ('echo "Downloading standalone SPM ..."'
-               "\n&& curl -sSL -o spm.zip {}"
+               "\n&& curl -sSL -o spm.zip {url}"
                "\n&& unzip -q spm.zip -d /opt"
                "\n&& chmod -R 777 /opt/spm*"
-               "\n&& rm -rf spm.zip\n".format(url))
+               "\n&& rm -rf spm.zip"
+               "\n&& {spm_cmd} quit"
+               "".format(url=url, spm_cmd=spm_cmd))
         cmd = indent("RUN", cmd)
 
-        # TODO: look into the different MCR versions and find their path.
-        env_cmd = ("MATLABCMD=/opt/mcr/v92/toolbox/matlab"
-                   '\nSPMMCRCMD="/opt/spm12/run_spm12.sh /opt/mcr/v92/ script"'
-                   "\nFORCE_SPMMCR=1"
-                   "\nLD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH")
-        env_cmd = indent("ENV", env_cmd)
+        env_cmd = self._get_spm_env_cmd(mcr_path, spm_cmd)
+
         return '\n'.join((comment, cmd, env_cmd))
