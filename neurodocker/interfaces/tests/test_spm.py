@@ -21,7 +21,11 @@ class TestSPM(object):
 
         cmd = ["/bin/bash", "-c", """echo 'fprintf("desired output")' > /tmp/test.m """]
         container.exec_run(cmd)
-        cmd = ["/bin/bash", "-c", "$SPMMCRCMD /tmp/test.m"]
+        # QUESTION: how can we run the entrypoint on a container in the
+        # background? The cmd below is a workaround because the entrypoint is
+        # not being run, so SPMMCRCMD is not set.
+        cmd = ["/bin/bash", "-c",
+               'source /neurodocker/startup.sh true && $SPMMCRCMD /tmp/test.m']
         output = container.exec_run(cmd)
         assert "error" not in output.lower(), "error running SPM command"
         assert "desired output" in output, "expected output not found"
