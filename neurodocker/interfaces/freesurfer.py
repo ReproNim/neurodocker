@@ -119,6 +119,8 @@ class FreeSurfer(object):
 
     def install_binaries(self):
         """Return command to download and install FreeSurfer binaries."""
+        from neurodocker.dockerfile import _add_to_entrypoint
+
         url = self._get_binaries_url()
 
         if self.check_urls and self.version == 'dev':
@@ -144,13 +146,13 @@ class FreeSurfer(object):
                          "\n--exclude='freesurfer/lib/qt'")
 
         cmd = self._install_binaries_deps()
+        ent = _add_to_entrypoint("source $FREESURFER_HOME/SetUpFreeSurfer.sh",
+                                 with_run=False)
         cmd += ('\n&& echo "Downloading FreeSurfer ..."'
                 "\n&& curl -sSL --retry 5 {url}"
                 "\n| tar xz -C /opt\n{excluded}"
-                "".format(url=url, excluded=excluded_dirs))
-
-        cmd += ("\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
-                " $ND_ENTRYPOINT")
+                "\n&& {entrypoint_cmd}"
+                "".format(url=url, excluded=excluded_dirs, entrypoint_cmd=ent))
         cmd = indent("RUN", cmd)
 
         env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
@@ -164,15 +166,19 @@ class FreeSurfer(object):
         See https://github.com/freesurfer/freesurfer/issues/70 for more
         information.
         """
+        from neurodocker.dockerfile import _add_to_entrypoint
+
         cmd = self._install_binaries_deps()
         url = ("https://dl.dropbox.com/s/nnzcfttc41qvt31/"
                "recon-all-freesurfer6-3.min.tgz")
+        ent = _add_to_entrypoint("source $FREESURFER_HOME/SetUpFreeSurfer.sh",
+                                 with_run=False)
         cmd += ('\n&& echo "Downloading minimized FreeSurfer ..."'
                 "\n&& curl -sSL {} | tar xz -C /opt"
-                "\n&& sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh'"
-                " $ND_ENTRYPOINT"
-                "".format(url))
+                "\n&& {entrypoint_cmd}"
+                "".format(url, entrypoint_cmd=ent))
         cmd = indent("RUN", cmd)
+
         env_cmd = "ENV FREESURFER_HOME=/opt/freesurfer"
         return "\n".join((cmd, env_cmd))
 

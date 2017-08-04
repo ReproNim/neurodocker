@@ -11,6 +11,9 @@ from neurodocker import interfaces
 from neurodocker.utils import indent, manage_pkgs
 
 
+ENTRYPOINT_FILE = "/neurodocker/startup.sh"
+
+
 def _base_add_copy(list_srcs_dest, cmd):
     srcs = list_srcs_dest[:-1]
     dest = list_srcs_dest[-1]
@@ -165,6 +168,28 @@ class _DockerfileUsers(object):
         cls.initialized_users = ['root']
 
 
+def _add_to_entrypoint(bash_cmd, with_run=True):
+    """Return command that adds the string `bash_cmd` to second-to-last line of
+    entrypoint file.
+    """
+    import json
+    base_cmd = "sed -i '$i{}' $ND_ENTRYPOINT"
+
+    # Escape quotes and remove quotes on either end of string.
+    if isinstance(bash_cmd, (list, tuple)):
+        escaped_cmds = [json.dumps(c)[1:-1] for c in bash_cmd]
+        cmds = [base_cmd.format(c) for c in escaped_cmds]
+        cmd = "\n&& ".join(cmds)
+    else:
+        escaped_bash_cmd = json.dumps(bash_cmd)[1:-1]
+        cmd = base_cmd.format(escaped_bash_cmd)
+    if with_run:
+        comment = "# Add command(s) to entrypoint"
+        cmd = indent("RUN", cmd)
+        cmd = "\n".join((comment, cmd))
+    return cmd
+
+
 def _add_common_dependencies(pkg_manager):
     """Return Dockerfile instructions to download dependencies common to
     many software packages.
@@ -182,11 +207,11 @@ def _add_common_dependencies(pkg_manager):
                "\n# Install common dependencies and create default entrypoint"
                "\n#----------------------------------------------------------")
 
-    entrypoint_file = "/neurodocker/startup.sh"
+
 
     env = ('LANG="C.UTF-8"'
            '\nLC_ALL="C"'
-           '\nND_ENTRYPOINT="{}"'.format(entrypoint_file))
+           '\nND_ENTRYPOINT="{}"'.format(ENTRYPOINT_FILE))
     env = indent("ENV", env)
 
     cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
@@ -197,10 +222,9 @@ def _add_common_dependencies(pkg_manager):
             "\n&& echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT"
             "\n&& echo 'set +x' >> $ND_ENTRYPOINT"
             "\n&& echo 'if [ -z \"$*\" ]; then /usr/bin/env bash; else $*; fi' >> $ND_ENTRYPOINT"
-            "\n&& chmod -R 777 /neurodocker && chmod a+s /neurodocker"
-            "".format(entrypoint_file))
+            "\n&& chmod -R 777 /neurodocker && chmod a+s /neurodocker")
     cmd = indent("RUN", cmd)
-    entrypoint = 'ENTRYPOINT ["{}"]'.format(entrypoint_file)
+    entrypoint = 'ENTRYPOINT ["{}"]'.format(ENTRYPOINT_FILE)
 
     return "\n".join((comment, env, cmd, entrypoint))
 
@@ -235,6 +259,7 @@ dockerfile_implementations = {
     },
     'other': {
         'add': _add_add,
+        'add_to_entrypoint':_add_to_entrypoint,
         'base': _add_base,
         'copy': _add_copy,
         'entrypoint': _add_entrypoint,

@@ -60,6 +60,9 @@ def _add_generate_arguments(parser):
                            "multiple times. Added to end of Dockerfile."))
     p.add_argument('--entrypoint', action=OrderedArgs,
                    help="Entrypoint for the Docker image.")
+    p.add_argument('--add-to-entrypoint', action=OrderedArgs, nargs="+",
+                   help=("Add a command to the container's entrypoint"
+                         " (/neurodocker/startup.sh)"))
     p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
                    help="Environment variables to set in Docker image. Use the "
                         "format KEY=VALUE.", type=list_of_kv)
