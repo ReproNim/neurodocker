@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-07-31 19:19:51
+# Timestamp: 2017-08-04 13:15:02
 
 FROM debian:stretch
 
@@ -172,7 +172,7 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends dirmngr gn
     && apt-get update
 
 # Install NeuroDebian packages
-RUN apt-get update -qq && apt-get install -yq --no-install-recommends dcm2niix \
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends dcm2niix git-annex-standalone \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -183,7 +183,6 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends dcm2niix \
 RUN apt-get update -qq && apt-get install -yq --no-install-recommends libxext6 libxt6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    # Install MATLAB Compiler Runtime \
     && echo "Downloading MATLAB Compiler Runtime ..." \
     && curl -sSL -o /tmp/mcr.zip https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip \
     && unzip -q /tmp/mcr.zip -d /tmp/mcrtmp \
@@ -195,11 +194,12 @@ RUN echo "Downloading standalone SPM ..." \
     && curl -sSL -o spm.zip http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2017a.zip \
     && unzip -q spm.zip -d /opt \
     && chmod -R 777 /opt/spm* \
-    && rm -rf spm.zip
+    && rm -rf spm.zip \
+    && /opt/spm12/run_spm12.sh /opt/mcr/v92/ quit \
+    && sed -i '$iexport SPMMCRCMD=\"/opt/spm12/run_spm12.sh /opt/mcr/v92/ script\"' $ND_ENTRYPOINT
 ENV MATLABCMD=/opt/mcr/v92/toolbox/matlab \
-    SPMMCRCMD="/opt/spm12/run_spm12.sh /opt/mcr/v92/ script" \
     FORCE_SPMMCR=1 \
-    LD_LIBRARY_PATH=/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH
 
 USER neuro
 
@@ -209,6 +209,10 @@ ENV KEY_A="VAL_A" \
 ENV KEY_C="based on $KEY_A"
 
 # User-defined instruction
-RUN echo hello world
+RUN mkdir /opt/mydir
+
+# Add command(s) to entrypoint
+RUN sed -i '$iecho hello world' $ND_ENTRYPOINT \
+    && sed -i '$isource myfile.sh' $ND_ENTRYPOINT
 
 WORKDIR /home/neuro

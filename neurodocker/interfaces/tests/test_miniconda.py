@@ -11,9 +11,9 @@ class TestMiniconda(object):
     """Tests for Miniconda class."""
 
     #@pytest.mark.skip(reason="running container in background does not find correct Python")
-    def test_build_image_miniconda_latest_shellscript_xenial(self):
+    def test_build_image_miniconda_latest_shellscript_centos7(self):
         """Install latest version of Miniconda via ContinuumIO's installer
-        script on Ubuntu Xenial.
+        script on CentOS 7.
         """
         specs = {'pkg_manager': 'yum',
                  'check_urls': True,

@@ -8,12 +8,12 @@ from neurodocker.interfaces.tests import utils
 class TestSPM(object):
     """Tests for SPM class."""
 
-    def test_build_image_spm_12_standalone_centos7(self):
+    def test_build_image_spm_12_standalone_stretch(self):
         """Install standalone SPM12 and MATLAB MCR R2017a."""
-        specs = {'pkg_manager': 'yum',
+        specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
-                    ('base', 'centos:7'),
+                    ('base', 'debian:stretch'),
                     ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
                     ('user', 'neuro'),
                  ]}
@@ -21,7 +21,11 @@ class TestSPM(object):
 
         cmd = ["/bin/bash", "-c", """echo 'fprintf("desired output")' > /tmp/test.m """]
         container.exec_run(cmd)
-        cmd = ["/bin/bash", "-c", "$SPMMCRCMD /tmp/test.m"]
+        # QUESTION: how can we run the entrypoint on a container in the
+        # background? The cmd below is a workaround because the entrypoint is
+        # not being run, so SPMMCRCMD is not set.
+        cmd = ["/bin/bash", "-c",
+               'source /neurodocker/startup.sh true && $SPMMCRCMD /tmp/test.m']
         output = container.exec_run(cmd)
         assert "error" not in output.lower(), "error running SPM command"
         assert "desired output" in output, "expected output not found"

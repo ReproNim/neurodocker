@@ -125,14 +125,16 @@ class SPM(object):
         ld_lib_path += ":$LD_LIBRARY_PATH"
 
         env = ("MATLABCMD={}"
-               '\nSPMMCRCMD="{}"'
+            #    '\nSPMMCRCMD="{}"'
                "\nFORCE_SPMMCR=1"
                '\nLD_LIBRARY_PATH={}'
-               "".format(matlabcmd, spmmcrcmd, ld_lib_path))
+               "".format(matlabcmd, ld_lib_path))
         return indent("ENV", env)
 
     def install_spm(self):
         """Return Dockerfile instructions to install standalone SPM."""
+        from neurodocker.dockerfile import _add_to_entrypoint
+
         url = self._get_spm_url()
 
         mcr_path = posixpath.join(SPM.MCR_DEST,
@@ -140,6 +142,8 @@ class SPM(object):
                                   '')
 
         spm_cmd = '/opt/spm{0}/run_spm{0}.sh {1}'.format(self.version, mcr_path)
+        spmmcrcmd = 'export SPMMCRCMD="{} script"'.format(spm_cmd)
+        entrypoint_cmd = _add_to_entrypoint(spmmcrcmd, with_run=False)
 
         comment = "# Install standalone SPM"
         cmd = ('echo "Downloading standalone SPM ..."'
@@ -148,7 +152,9 @@ class SPM(object):
                "\n&& chmod -R 777 /opt/spm*"
                "\n&& rm -rf spm.zip"
                "\n&& {spm_cmd} quit"
-               "".format(url=url, spm_cmd=spm_cmd))
+               "\n&& {entrypoint_cmd}"
+               "".format(url=url, spm_cmd=spm_cmd,
+                         entrypoint_cmd=entrypoint_cmd))
         cmd = indent("RUN", cmd)
 
         env_cmd = self._get_spm_env_cmd(mcr_path, spm_cmd)

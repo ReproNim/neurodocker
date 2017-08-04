@@ -119,6 +119,8 @@ class FSL(object):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
+        from neurodocker.dockerfile import _add_to_entrypoint
+
         cmd = ('echo "Downloading FSL ..."'
                '\n&& curl -sSL {}'
                '\n| tar zx -C /opt'.format(url))
@@ -127,11 +129,12 @@ class FSL(object):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd +=  "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
 
-        cmd += ("\n&& sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT"
-                "\n&& sed -i '$iecho If you are considering commercial use of"
-                " this container, please consult the relevant license:' $ND_ENTRYPOINT"
-                "\n&& sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT"
-                "\n&& sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT")
+        ent_cmds = ["echo Some packages in this Docker container are non-free",
+                    ("echo If you are considering commercial use of this"
+                     " container, please consult the relevant license:"),
+                     "echo https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence",
+                     "source $FSLDIR/etc/fslconf/fsl.sh",]
+        cmd += "\n&& {}".format(_add_to_entrypoint(ent_cmds, with_run=False))
         cmd = indent("RUN", cmd)
 
         env_cmd = ("FSLDIR=/opt/fsl"
