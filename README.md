@@ -8,8 +8,8 @@ _Neurodocker_ is a Python project that generates custom Dockerfiles for neuroima
 
 Examples:
   - Command-line
-    - [Generate Dockerfile (with project's Docker image)](#generate-dockerfile-with-projects-docker-image)
-    - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-without-projects-docker-image)
+    - [Generate Dockerfile (with project's Docker image)](#generate-dockerfile)
+    - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-full)
   - In a Python script
     - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
     - [Generate full Dockerfile](#generate-full-dockerfile)
@@ -68,14 +68,14 @@ Valid options for each software package are the keyword arguments for the class 
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
 
 
-\* denotes required argument.
+\* required argument.
 
 ** FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
 
 
 # Examples
 
-## Generate Dockerfile (with project's Docker image)
+## Generate Dockerfile
 
 Generate Dockerfile, and print result to stdout. The result can be piped to `docker build` to build the Docker image.
 
@@ -85,7 +85,7 @@ docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants vers
 docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
 ```
 
-## Generate Dockerfile (without project's Docker image)
+## Generate Dockerfile (full)
 
 In this example, a Dockerfile is generated with all of the software that _Neurodocker_ supports, and the Dockerfile is saved to disk. The order in which the arguments are given is preserved in the Dockerfile. The saved Dockerfile can be passed to `docker build`.
 
@@ -99,18 +99,27 @@ docker run --rm kaczmarj/neurodocker generate \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
 --user=neuro \
---miniconda env_name=default python_version=3.5.1 conda_install="traits pandas" pip_install=nipype \
---miniconda env_name=py27 python_version=2.7 add_to_path=false \
+--miniconda env_name=default \
+            python_version=3.5.1 \
+            conda_install="traits pandas" \
+            pip_install="nipype" \
+--miniconda env_name=py27 \
+            python_version=2.7 \
+            add_to_path=false \
 --user=root \
 --mrtrix3 \
---neurodebian os_codename="jessie" download_server="usa-nh" pkgs="dcm2niix" \
+--neurodebian os_codename="jessie" \
+              download_server="usa-nh" \
+              pkgs="dcm2niix git-annex-standalone" \
 --spm version=12 matlab_version=R2017a \
 --user=neuro \
 --env KEY_A=VAL_A KEY_B=VAL_B \
 --env KEY_C="based on \$KEY_A" \
---instruction='RUN echo hello world' \
+--instruction='RUN mkdir /opt/mydir' \
+--add-to-entrypoint 'echo hello world' 'source myfile.sh' \
 --workdir /home/neuro \
---no-check-urls -o examples/generated-full.Dockerfile
+--no-check-urls \
+-o examples/generated-full.Dockerfile
 
 # Build Docker image using the saved Dockerfile.
 docker build -t myimage -f generated-full.Dockerfile examples
