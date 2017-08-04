@@ -8,12 +8,12 @@ from neurodocker.interfaces.tests import utils
 class TestSPM(object):
     """Tests for SPM class."""
 
-    def test_build_image_spm_12_standalone_centos7(self):
+    def test_build_image_spm_12_standalone_stretch(self):
         """Install standalone SPM12 and MATLAB MCR R2017a."""
-        specs = {'pkg_manager': 'yum',
+        specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
-                    ('base', 'centos:7'),
+                    ('base', 'debian:stretch'),
                     ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
                     ('user', 'neuro'),
                  ]}
