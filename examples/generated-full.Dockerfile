@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-08-04 13:15:02
+# Timestamp: 2017-08-10 11:22:38
 
 FROM debian:stretch
 
@@ -124,28 +124,26 @@ RUN echo "Downloading Miniconda installer ..." \
     && conda config --system --prepend channels conda-forge \
     && conda config --system --set auto_update_conda false \
     && conda config --system --set show_channel_urls true \
-    && conda update -y --all \
-    && conda clean -tipsy \
-    && find /opt/conda -name ".wh*" -exec rm {} +
+    && conda update -y -q --all && sync \
+    && conda clean -tipsy && sync
 
 #-------------------------
 # Create conda environment
 #-------------------------
-RUN conda create -y -q --name default python=3.5.1 \
-    	traits pandas \
-    && conda clean -tipsy \
+RUN conda create -y -q --name default --channel vida-nyu python=3.5.1 \
+    	numpy pandas reprozip traits \
+    && sync && conda clean -tipsy && sync \
     && /bin/bash -c "source activate default \
     	&& pip install -q --no-cache-dir \
     	nipype" \
-    && find /opt/conda -name ".wh*" -exec rm {} +
+    && sync
 ENV PATH=/opt/conda/envs/default/bin:$PATH
 
 #-------------------------
 # Create conda environment
 #-------------------------
 RUN conda create -y -q --name py27 python=2.7 \
-    && conda clean -tipsy \
-    && find /opt/conda -name ".wh*" -exec rm {} +
+    && sync && conda clean -tipsy && sync
 
 USER root
 
@@ -215,4 +213,7 @@ RUN mkdir /opt/mydir
 RUN sed -i '$iecho hello world' $ND_ENTRYPOINT \
     && sed -i '$isource myfile.sh' $ND_ENTRYPOINT
 
+EXPOSE 8888
+
 WORKDIR /home/neuro
+
