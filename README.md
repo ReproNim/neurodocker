@@ -8,8 +8,8 @@ _Neurodocker_ is a Python project that generates custom Dockerfiles for neuroima
 
 Examples:
   - Command-line
-    - [Generate Dockerfile (with project's Docker image)](#generate-dockerfile)
-    - [Generate Dockerfile (without project's Docker image)](#generate-dockerfile-full)
+    - [Generate Dockerfile](#generate-dockerfile)
+    - [Generate Dockerfile (full)](#generate-dockerfile-full)
   - In a Python script
     - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
     - [Generate full Dockerfile](#generate-full-dockerfile)
@@ -58,6 +58,8 @@ Valid options for each software package are the keyword arguments for the class 
 |               | python_version* | Version of Python. |
 |               | conda_install | Packages to install with conda. e.g., `conda_install="numpy traits"` |
 |               | pip_install | Packages to install with pip. |
+|               | conda_opts  | Command-line options to pass to [`conda create`](https://conda.io/docs/commands/conda-create.html). e.g., `conda_opts="-c vida-nyu"` |
+|               | pip_opts    | Command-line options to pass to [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#options). |
 |               | add_to_path | If true (default), add this environment to $PATH. |
 |               | miniconda_version | Version of Miniconda. Latest by default. |
 | **MRtrix3** | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
@@ -66,6 +68,8 @@ Valid options for each software package are the keyword arguments for the class 
 |                 | download_server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate --help` for the full list of servers. |
 |                 | pkgs | Packages to download from NeuroDebian. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
+| **SPM** | version        | 12 (earlier versions will be supported in the future). |
+|         | matlab_version | R2017a (other MCR versions will be supported once earlier SPM versions are supported). |
 
 
 \* required argument.
@@ -101,7 +105,8 @@ docker run --rm kaczmarj/neurodocker generate \
 --user=neuro \
 --miniconda env_name=default \
             python_version=3.5.1 \
-            conda_install="traits pandas" \
+            conda_opts="--channel vida-nyu" \
+            conda_install="numpy pandas reprozip traits" \
             pip_install="nipype" \
 --miniconda env_name=py27 \
             python_version=2.7 \
@@ -117,9 +122,9 @@ docker run --rm kaczmarj/neurodocker generate \
 --env KEY_C="based on \$KEY_A" \
 --instruction='RUN mkdir /opt/mydir' \
 --add-to-entrypoint 'echo hello world' 'source myfile.sh' \
+--expose 8888 \
 --workdir /home/neuro \
---no-check-urls \
--o examples/generated-full.Dockerfile
+--no-check-urls > examples/generated-full.Dockerfile
 
 # Build Docker image using the saved Dockerfile.
 docker build -t myimage -f generated-full.Dockerfile examples
