@@ -112,9 +112,10 @@ def _add_generate_arguments(parser):
         "miniconda": (
             "Install Miniconda. Valid keys are env_name (required),"
             " python_version (required), conda_install, pip_install,"
-            " add_to_path (default true) and miniconda_version (defaults to"
-            " latest). The options conda_install and pip_install accept"
-            ' strings of packages: conda_install="traits numpy".'),
+            " conda_opts, pip_opts, add_to_path (default true) and"
+            " miniconda_version (defaults to latest). The options conda_install"
+            " and pip_install accept strings of packages:"
+            ' conda_install="traits numpy".'),
         "mrtrix3": (
             "Install MRtrix3. Valid keys are use_binaries (default true) and"
             " git_hash. If git_hash is specified and use_binaries is false,"

@@ -34,6 +34,10 @@ class Miniconda(object):
         Packages to install using `pip`. Follow the syntax for `pip install`.
         For example, the input "https://github.com/nipy/nipype/" is interpreted
         as `pip install https://github.com/nipy/nipype/`.
+    conda_opts : str
+        Command-line options to pass to `conda create`. Eg. "-c vida-nyu"
+    pip_opts : str
+        Command-line options to pass to `pip install`.
     add_to_path : bool
         If true, prepend the new environment to $PATH.
     miniconda_verion : str
@@ -53,13 +57,16 @@ class Miniconda(object):
     INSTALL_PATH = "/opt/conda"
 
     def __init__(self, env_name, python_version, pkg_manager,
-                 conda_install=None, pip_install=None, add_to_path=True,
-                 miniconda_verion='latest', check_urls=True):
+                 conda_install=None, pip_install=None, conda_opts=None,
+                 pip_opts=None, add_to_path=True, miniconda_verion='latest',
+                 check_urls=True):
         self.env_name = env_name
         self.python_version = python_version
         self.pkg_manager = pkg_manager
         self.conda_install = conda_install
         self.pip_install = pip_install
+        self.conda_opts = conda_opts
+        self.pip_opts = pip_opts
         self.add_to_path = add_to_path
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
@@ -105,9 +112,8 @@ class Miniconda(object):
                "\n&& conda config --system --prepend channels conda-forge"
                "\n&& conda config --system --set auto_update_conda false"
                "\n&& conda config --system --set show_channel_urls true"
-               "\n&& conda update -y --all"
-               "\n&& conda clean -tipsy"
-               '\n&& find {} -name ".wh*" -exec rm {{}} +'
+               "\n&& conda update -y -q --all && sync"
+               "\n&& conda clean -tipsy && sync"
                "".format(Miniconda.INSTALL_PATH, url=install_url))
         cmd = indent("RUN", cmd)
 
@@ -119,20 +125,23 @@ class Miniconda(object):
         """Return Dockerfile instructions to create conda environment with
         desired version of Python and desired conda and pip packages.
         """
-        cmd = ("conda create -y -q --name {} python={}"
-               "".format(self.env_name, self.python_version))
+        cmd = "conda create -y -q --name {}".format(self.env_name)
+
+        if self.conda_opts:
+            cmd = "{} {}".format(cmd, self.conda_opts)
+
+        cmd = "{} python={}".format(cmd, self.python_version)
+
         if self.conda_install:
             if isinstance(self.conda_install, (list, tuple)):
                 self.conda_install = " ".join(self.conda_install)
             cmd += "\n\t{}".format(self.conda_install)
 
-        cmd += "\n&& conda clean -tipsy"
+        cmd += "\n&& sync && conda clean -tipsy && sync"
 
         if self.pip_install:
             cmd += self._install_pip_pkgs()
 
-        cmd += ('\n&& find {} -name ".wh*" -exec rm {{}} +'
-                ''.format(Miniconda.INSTALL_PATH))
         cmd = indent("RUN", cmd)
 
         if self.add_to_path:
@@ -146,10 +155,14 @@ class Miniconda(object):
         """Return Dockerfile instruction to install desired pip packages."""
         if isinstance(self.pip_install, (list, tuple)):
             self.pip_install = " ".join(self.pip_install)
+
         cmd = ('\n&& /bin/bash -c "source activate {}'
-               '\n\t&& pip install -q --no-cache-dir\n\t{}"'
-               "".format(self.env_name, self.pip_install))
-        return cmd
+               '\n\t&& pip install -q --no-cache-dir').format(self.env_name)
+
+        if self.pip_opts:
+            cmd = "{} {}".format(cmd, self.pip_opts)
+
+        return '{}\n\t{}"\n&& sync'.format(cmd, self.pip_install)
 
     @classmethod
     def clear_memory(cls):
