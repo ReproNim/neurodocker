@@ -1,23 +1,28 @@
-"""Merge multiple ReproZip pack files."""
+"""Merge multiple ReproZip version 2 pack files.
+
+This implementation makes several assumptions about the ReproZip traces. Please
+do not use this as a general pack file merger.
+
+Important note
+--------------
+The ouptut config.yml file is not created by merging the original config.yml
+files. This file (created with `reprozip combine`) will inherit traits of the
+machine on which it is running. Specifically, the architecture, distribution,
+hostname, system, group ID, and user ID will all come from the local machine
+and will not be taken from the original config.yml files. This script modifies
+the combined config.yml file to use the distribution from the first run of the
+first config.yml file.
+
+Assumptions
+-----------
+- Pack files are version 2.
+- All traces were run on the same distribution (e.g., debian stretch).
+- If the same files exist in different traces, the contents of those files are
+  identical.
+"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-# TODO: if this is done in the Neurodocker Docker image, the distribution in
-# the config.yml seems to be changed. Why? Consider checking that all
-# distributions are the same in all runs, and use that distribution.
-#
-# The only thing we need to do is include the distribution in run 0. It looks
-# like reprozip assumes that all distributions are the same (fair assumption).
-#
-# The config.yml file is not created from the trace database. It is created
-# on the machine running reprozip and does not consult the
-# platform-dependent keys:
-#   architecture
-#   distribution
-#   hostname
-#   system
-#
-# uid and guid are also different.
-
+from __future__ import absolute_import, division, print_function
 
 from glob import glob
 import logging
@@ -29,28 +34,37 @@ logger = logging.getLogger(__name__)
 
 
 def _check_deps():
+    """Raise RuntimeError if a dependency is not found. These dependencies are
+    not included in `requirements.txt`.
+    """
     import shutil
 
-    deps = ["reprozip", "rsync"]
-    for d in deps:
-        if shutil.which(d) is None:
-            raise RuntimeError("Dependency {} not found".format(d))
+    msg = "Dependency '{}' not found."
+
+    if shutil.which('rsync') is None:
+        raise RuntimeError(msg.format('rsync'))
+    try:
+        import reprozip
+    except Exception:
+        raise RuntimeError(msg.format('reprozip'))
 
 
 def _extract_rpz(rpz_path, out_dir):
+    """Unpack .rpz file (tar archive) and the DATA.tar.gz file inside it."""
     basename = os.path.basename(rpz_path)
     prefix = "{}-".format(basename)
     path = tempfile.mkdtemp(prefix=prefix, dir=out_dir)
-    # Unpack .rpz file (tar archive).
+
     with tarfile.open(rpz_path, 'r:*') as tar:
         tar.extractall(path)
-    # Uncompress and unpack DATA.tar.gz that was inside .rpz.
+
     data_path = os.path.join(path, 'DATA.tar.gz')
     with tarfile.open(data_path, 'r:*') as tar:
         tar.extractall(path)
 
 
 def _merge_data_dirs(data_dirs, merged_dest):
+    """Merge data directories using `rsync`, and tar.gz the output."""
     import subprocess
 
     tmp_dest = tempfile.mkdtemp(prefix="reprozip-data")
@@ -61,15 +75,11 @@ def _merge_data_dirs(data_dirs, merged_dest):
 
     data_tar = os.path.join(merged_dest, 'DATA.tar.gz')
     with tarfile.open(data_tar, 'w:gz') as tar:
-        tar.add(tmp_dest, arcname=".")
-
-
-# Replicating argparse namespace.
-# https://stackoverflow.com/a/28345836/5666087
+        tar.add(tmp_dest, arcname="")
 
 
 def _get_distribution(filepath):
-    """Get Linux distribution from an original config.yml file."""
+    """Return Linux distribution from the first run of a config.yml file."""
     import yaml
 
     with open(filepath, 'r') as fp:
@@ -79,6 +89,9 @@ def _get_distribution(filepath):
 
 
 def _fix_config_yml(filepath, distribution):
+    """Comment out 'additional_patterns', and replace the distribution of the
+    local machine with `distribution`.
+    """
     with open(filepath) as fp:
         config = fp.readlines()
 
@@ -95,11 +108,20 @@ def _fix_config_yml(filepath, distribution):
 
 
 class _Namespace:
+    # Replicates argparse namespace.
+    # https://stackoverflow.com/a/28345836/5666087
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
 
 def _combine_traces(traces, out_dir):
+    """Run `reprozip combine` to combine trace databases and create new
+    config.yml file.
+
+    Important note: the config.yml file lists the local machine's architecture,
+    distribution, hostname and system, and the current group id and user id.
+    For best results, this should be run on the same machine as the traces.
+    """
     from reprozip.main import combine
 
     args = _Namespace(traces=traces, dir=out_dir, identify_packages=False,
@@ -156,17 +178,19 @@ def merge_pack_files(outfile, pack_files):
     os.makedirs(merged_dest_metadata)
 
     for this_rpz in pack_files:
+        logger.info("Extracting {}".format(this_rpz))
         _extract_rpz(this_rpz, tmp_dest)
 
-    # Merge data directories.
+    logger.info("Merging DATA directories")
     data_dirs_pattern = os.path.abspath(os.path.join(tmp_dest, "**", "DATA"))
     data_dirs = glob(data_dirs_pattern)
     _merge_data_dirs(data_dirs, merged_dest)
 
-    # Merge traces, and create new config.yml.
+    logger.info("Merging traces and creating new config.yml")
     traces_pattern = os.path.join(tmp_dest, "**", "METADATA", "trace.sqlite3")
     traces = glob(traces_pattern)
     _combine_traces(traces=traces, out_dir=merged_dest_metadata)
 
     _write_version2_file(merged_dest)
+    logger.info("Creating merged pack file")
     _create_rpz(merged_dest, outfile)
