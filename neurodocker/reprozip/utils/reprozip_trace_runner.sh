@@ -107,7 +107,7 @@ fi
 
 # Run reprozip trace.
 echo "${NEURODOCKER_LOG_PREFIX}: running reprozip trace command(s)"
-run_reprozip_trace "$@";
+run_reprozip_trace "$@"
 
 # Run reprozip pack.
 REPROZIP_PATH_FILENAME=${REPROZIP_TRACE_DIR}/neurodocker-reprozip.rpz
