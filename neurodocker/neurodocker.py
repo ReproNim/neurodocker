@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Neurodocker command-line interface to generate Dockerfiles and minify
+"""
+Neurodocker command-line interface to generate Dockerfiles and minify
 existing containers.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
@@ -142,8 +143,8 @@ def _add_generate_arguments(parser):
                           metavar="", type=list_of_kv, help=pkgs_help[pkg])
 
 
-def _add_reprozip_arguments(parser):
-    """Add arguments to `parser` for sub-command `reprozip`."""
+def _add_reprozip_trace_arguments(parser):
+    """Add arguments to `parser` for sub-command `reprozip-trace`."""
     p = parser
     p.add_argument('container',
                         help="Running container in which to trace commands.")
@@ -152,6 +153,11 @@ def _add_reprozip_arguments(parser):
                         help=("Directory in which to save pack file. Default "
                               "is current directory."))
 
+def _add_reprozip_merge_arguments(parser):
+    """Add arguments to `parser` for sub-command `reprozip-merge`."""
+    p = parser
+    p.add_argument('outfile', help="Filepath to merged pack file.")
+    p.add_argument('pack_files', nargs='+', help="Pack files to merge.")
 
 def create_parser():
     """Return command-line argument parser."""
@@ -163,20 +169,23 @@ def create_parser():
     parser.add_argument("-V", "--version", action="version",
                         version=('neurodocker version {}'.format(__version__)))
 
-    subparsers = parser.add_subparsers(dest="subparser_name",
-                                       title="subcommands",
-                                       description="valid subcommands")
-    generate_parser = subparsers.add_parser('generate',
-                                            help="generate dockerfiles")
-    reprozip_parser = subparsers.add_parser('reprozip',
-                                            help="reprozip trace commands")
+    subparsers = parser.add_subparsers(
+        dest="subparser_name", title="subcommands",
+        description="valid subcommands")
+    generate_parser = subparsers.add_parser(
+        'generate', help="generate dockerfiles")
+    reprozip_trace_parser = subparsers.add_parser(
+        'reprozip-trace', help="reprozip trace commands")
+    reprozip_merge_parser = subparsers.add_parser(
+        'reprozip-merge', help="merge reprozip pack files")
 
     _add_generate_arguments(generate_parser)
-    _add_reprozip_arguments(reprozip_parser)
+    _add_reprozip_trace_arguments(reprozip_trace_parser)
+    _add_reprozip_merge_arguments(reprozip_merge_parser)
 
     # Add verbosity option to both parsers. How can this be done with parents?
-    generate_parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
-    reprozip_parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
+    for p in (generate_parser, reprozip_trace_parser, reprozip_merge_parser):
+        p.add_argument("-v", "--verbosity", choices=verbosity_choices)
 
     return parser
 
@@ -197,13 +206,20 @@ def generate(namespace):
         df.save(filepath=namespace.output)
 
 
-def reprozip(namespace):
+def reprozip_trace(namespace):
     """Run `neurodocker reprozip`."""
-    from neurodocker.interfaces.reprozip import ReproZip
+    from neurodocker.reprozip import ReproZipMinimizer
 
-    local_packfile_path = ReproZip(**vars(namespace)).run()
+    local_packfile_path = ReproZipMinimizer(**vars(namespace)).run()
     logger.info("Saved pack file on the local host:\n{}"
                 "".format(local_packfile_path))
+
+
+def reprozip_merge(namespace):
+    """Run `neurodocker reprozip merge`."""
+    from neurodocker.reprozip import merge_pack_files
+
+    merge_pack_files(namespace.outfile, namespace.pack_files)
 
 
 def main(args=None):
@@ -219,7 +235,8 @@ def main(args=None):
     logger.debug(vars(namespace))
 
     subparser_functions = {'generate': generate,
-                           'reprozip': reprozip,}
+                           'reprozip-trace': reprozip_trace,
+                           'reprozip-merge': reprozip_merge,}
 
     if namespace.subparser_name not in subparser_functions.keys():
         print(__doc__)
