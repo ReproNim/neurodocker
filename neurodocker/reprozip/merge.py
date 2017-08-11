@@ -1,0 +1,172 @@
+"""Merge multiple ReproZip pack files."""
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
+
+# TODO: if this is done in the Neurodocker Docker image, the distribution in
+# the config.yml seems to be changed. Why? Consider checking that all
+# distributions are the same in all runs, and use that distribution.
+#
+# The only thing we need to do is include the distribution in run 0. It looks
+# like reprozip assumes that all distributions are the same (fair assumption).
+#
+# The config.yml file is not created from the trace database. It is created
+# on the machine running reprozip and does not consult the
+# platform-dependent keys:
+#   architecture
+#   distribution
+#   hostname
+#   system
+#
+# uid and guid are also different.
+
+
+from glob import glob
+import logging
+import os
+import tarfile
+import tempfile
+
+logger = logging.getLogger(__name__)
+
+
+def _check_deps():
+    import shutil
+
+    deps = ["reprozip", "rsync"]
+    for d in deps:
+        if shutil.which(d) is None:
+            raise RuntimeError("Dependency {} not found".format(d))
+
+
+def _extract_rpz(rpz_path, out_dir):
+    basename = os.path.basename(rpz_path)
+    prefix = "{}-".format(basename)
+    path = tempfile.mkdtemp(prefix=prefix, dir=out_dir)
+    # Unpack .rpz file (tar archive).
+    with tarfile.open(rpz_path, 'r:*') as tar:
+        tar.extractall(path)
+    # Uncompress and unpack DATA.tar.gz that was inside .rpz.
+    data_path = os.path.join(path, 'DATA.tar.gz')
+    with tarfile.open(data_path, 'r:*') as tar:
+        tar.extractall(path)
+
+
+def _merge_data_dirs(data_dirs, merged_dest):
+    import subprocess
+
+    tmp_dest = tempfile.mkdtemp(prefix="reprozip-data")
+    data_dirs = ' '.join(data_dirs)
+    merge_cmd = ("rsync -rqabuP {srcs} {dest}"
+                 "".format(srcs=data_dirs, dest=tmp_dest))
+    subprocess.run(merge_cmd, shell=True, check=True)
+
+    data_tar = os.path.join(merged_dest, 'DATA.tar.gz')
+    with tarfile.open(data_tar, 'w:gz') as tar:
+        tar.add(tmp_dest, arcname=".")
+
+
+# Replicating argparse namespace.
+# https://stackoverflow.com/a/28345836/5666087
+
+
+def _get_distribution(filepath):
+    """Get Linux distribution from an original config.yml file."""
+    import yaml
+
+    with open(filepath, 'r') as fp:
+        config = yaml.load(fp)
+
+    return config['runs'][0]['distribution']
+
+
+def _fix_config_yml(filepath, distribution):
+    with open(filepath) as fp:
+        config = fp.readlines()
+
+    for ii, line in enumerate(config):
+        if line.startswith('additional_patterns'):
+            config[ii] = "# " + line
+        if 'distribution:' in line:
+            pre = line.split(':')[0]
+            config[ii] = "{}: {}\n".format(pre, distribution)
+
+    with open(filepath, 'w') as fp:
+        for line in config:
+            fp.write(line)
+
+
+class _Namespace:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+
+def _combine_traces(traces, out_dir):
+    from reprozip.main import combine
+
+    args = _Namespace(traces=traces, dir=out_dir, identify_packages=False,
+                      find_inputs_outputs=False)
+    combine(args)
+
+    original_config = os.path.join(os.path.dirname(traces[0]), 'config.yml')
+    distribution = _get_distribution(original_config)
+
+    config_filepath = os.path.join(out_dir, 'config.yml')
+    _fix_config_yml(config_filepath, distribution)
+
+
+def _write_version2_file(merged_dest):
+    path = os.path.join(merged_dest, "METADATA", 'version')
+    with open(path, 'w') as fp:
+        fp.write("REPROZIP VERSION 2\n")
+
+
+def _create_rpz(path, outfile):
+    """Create a .rpz file from a `path` that contains METADATA and DATA.tar.gz.
+    """
+    data = os.path.join(path, 'DATA.tar.gz')
+    metadata = os.path.join(path, 'METADATA')
+
+    with tarfile.open(outfile, 'w:') as tar:
+        tar.add(data, arcname='DATA.tar.gz')
+        tar.add(metadata, arcname='METADATA')
+
+
+def merge_pack_files(outfile, pack_files):
+    """Merge reprozip version 2 pack files.
+
+    This implementation has limitations. It uses rsync to merge the directories
+    in different reprozip pack files, and does not take into account that files
+    might have the same name but different contents.
+    """
+    _check_deps()
+
+    if not outfile.endswith('.rpz'):
+        logger.info("Adding '.rpz' extension to output file.")
+        outfile += '.rpz'
+
+    if isinstance(pack_files, str):
+        pack_files = [pack_files]
+
+    for pf in pack_files:
+        if not os.path.isfile(pf):
+            raise ValueError("File not found: {}".format(pf))
+
+    tmp_dest = tempfile.mkdtemp(prefix="neurodocker-reprozip-merge-")
+    merged_dest = os.path.join(tmp_dest, "merged")
+    merged_dest_metadata = os.path.join(merged_dest, "METADATA")
+    os.makedirs(merged_dest_metadata)
+
+    for this_rpz in pack_files:
+        _extract_rpz(this_rpz, tmp_dest)
+
+    # Merge data directories.
+    data_dirs_pattern = os.path.abspath(os.path.join(tmp_dest, "**", "DATA"))
+    data_dirs = glob(data_dirs_pattern)
+    _merge_data_dirs(data_dirs, merged_dest)
+
+    # Merge traces, and create new config.yml.
+    traces_pattern = os.path.join(tmp_dest, "**", "METADATA", "trace.sqlite3")
+    traces = glob(traces_pattern)
+    _combine_traces(traces=traces, out_dir=merged_dest_metadata)
+
+    _write_version2_file(merged_dest)
+    _create_rpz(merged_dest, outfile)

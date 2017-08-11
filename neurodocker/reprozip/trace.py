@@ -1,4 +1,4 @@
-"""Add Dockerfile instructions to minimize container with ReproZip.
+"""Minimize existing Docker container with ReproZip.
 
 Project repository: https://github.com/ViDA-NYU/reprozip/
 
@@ -53,7 +53,7 @@ BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = logging.getLogger(__name__)
 
 
-class ReproZip(object):
+class ReproZipMinimizer(object):
     """Minimize a container based on arbitrary number of commands. Can only be
     used at runtime (not while building a Docker image).
 
