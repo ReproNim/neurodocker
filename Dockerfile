@@ -1,12 +1,13 @@
-FROM alpine:3.5
+FROM alpine:3.6
 
 LABEL maintainer="Jakub Kaczmarzyk <jakubk@mit.edu>"
 
 COPY . /opt/neurodocker
 
-RUN apk update -q \
-    && apk add --no-cache python3 \
-    && pip3 install --upgrade --no-cache-dir pip \
-    && pip3 install --no-cache-dir /opt/neurodocker
+RUN tmp_pkgs="gcc musl-dev python3-dev sqlite-dev" \
+    && apk add --update --no-cache python3 rsync $tmp_pkgs \
+    && pip3 install --no-cache-dir reprozip \
+    && pip3 install --no-cache-dir -e /opt/neurodocker \
+    && apk del $tmp_pkgs
 
 ENTRYPOINT ["neurodocker"]
