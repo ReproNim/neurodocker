@@ -1,4 +1,11 @@
-**
-!neurodocker
-!requirements.txt
-!setup.py
+__pycache__
+.cache
+.DS_Store
+.ipynb_checkpoints
+dockerfile_tests
+*.egg-info
+
+*.ipynb
+*.pyc
+*.tar
+*.tar.gz

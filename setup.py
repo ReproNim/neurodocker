@@ -3,29 +3,31 @@
 import os
 from setuptools import find_packages, setup
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-def _get_version(filepath):
-    """Return version string."""
-    with open(filepath, 'r') as fp:
-        return fp.read().strip()
+def main():
+    here = os.path.dirname(os.path.realpath(__file__))
 
-version_file = os.path.join(BASE_PATH, "neurodocker", "VERSION")
-__version__ = _get_version(version_file)
+    # https://github.com/nipy/nipype/blob/master/setup.py#L114-L120
+    ldict = locals()
+    version_file = os.path.join(here, 'neurodocker', 'version.py')
+    with open(version_file) as fp:
+        exec(fp.read(), globals(), ldict)
 
+    reqs_file = os.path.join(here, 'requirements.txt')
+    with open(reqs_file) as fp:
+        requirements = [r.strip() for r in fp.readlines()]
 
-setup(name='neurodocker',
-      version=__version__,
-      url='https://github.com/kaczmarj/neurodocker',
-      author='Jakub Kaczmarzyk',
-      author_email='jakubk@mit.edu',
-      packages=find_packages(),
-      package_data={'': [version_file]},
-      include_package_data=True,
-      install_requires = [
-         'requests>=2.0',
-         'docker>=2.3'
-      ],
-      entry_points={'console_scripts':
-                    ['neurodocker=neurodocker.neurodocker:main']}
-      )
+    setup(name='neurodocker',
+          version=ldict['__version__'],
+          url='https://github.com/kaczmarj/neurodocker',
+          author='Jakub Kaczmarzyk',
+          author_email='jakubk@mit.edu',
+          license='Apache License, 2.0',
+          packages=find_packages(),
+          install_requires = requirements,
+          entry_points={'console_scripts':
+                        ['neurodocker=neurodocker.neurodocker:main']}
+          )
+
+if __name__ == '__main__':
+    main()
