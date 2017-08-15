@@ -84,7 +84,7 @@ class MINC(object):
         if self.check_urls:
             check_url(url)
 
-        self._install_binaries_deps()
+        deps_cmd = self._install_binaries_deps()
 
         cmd = ('echo "Downloading MINC ..."'
                "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {}"
@@ -94,4 +94,4 @@ class MINC(object):
         env_cmd = ('/bin/bash -c \"source /opt/minc/{}/minc-toolkit-config.sh\"'.format(self.version))
         env_cmd = indent("RUN", env_cmd)
 
-        return "\n".join((cmd, env_cmd))
+        return "\n".join((deps_cmd, cmd, env_cmd))
