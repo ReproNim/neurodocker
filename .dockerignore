@@ -1,6 +1,8 @@
 __pycache__
-.cache
+**/__pycache__
+**/.DS_Store
 .DS_Store
+.cache
 .ipynb_checkpoints
 dockerfile_tests
 *.egg-info
