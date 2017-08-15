@@ -111,8 +111,8 @@ class FreeSurfer(object):
         """Return command to install FreeSurfer dependencies. Use this for
         FreeSurfer binaries, not if attempting to build FreeSurfer from source.
         """
-        pkgs = {'apt': "bc libgomp1 libxmu6 libxt6 tcsh",
-                'yum': "bc libgomp libXmu libXt tcsh"}
+        pkgs = {'apt': "bc libgomp1 libxmu6 libxt6 tcsh perl",
+                'yum': "bc libgomp libXmu libXt tcsh perl"}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         return cmd.format(pkgs=pkgs[self.pkg_manager])
