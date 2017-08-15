@@ -85,6 +85,7 @@ class MINC(object):
             check_url(url)
 
         deps_cmd = self._install_binaries_deps()
+        deps_cmd = indent("RUN", deps_cmd)
 
         cmd = ('echo "Downloading MINC ..."'
                "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {}"
