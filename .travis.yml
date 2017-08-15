@@ -21,6 +21,7 @@ env:
   - INTERFACE_TO_BUILD=mrtrix3
   - INTERFACE_TO_BUILD=neurodebian
   - INTERFACE_TO_BUILD=spm
+  - INTERFACE_TO_BUILD=minc
 install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install pytest-cov

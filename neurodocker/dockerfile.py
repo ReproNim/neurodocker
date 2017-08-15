@@ -256,6 +256,7 @@ dockerfile_implementations = {
         'mrtrix3': interfaces.MRtrix3,
         'neurodebian': interfaces.NeuroDebian,
         'spm': interfaces.SPM,
+        'minc': interfaces.MINC
     },
     'other': {
         'add': _add_add,

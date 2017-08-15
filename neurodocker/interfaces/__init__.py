@@ -8,3 +8,4 @@ from neurodocker.interfaces.miniconda import Miniconda
 from neurodocker.interfaces.mrtrix import MRtrix3
 from neurodocker.interfaces.neurodebian import NeuroDebian
 from neurodocker.interfaces.spm import SPM
+from neurodocker.interfaces.minc import MINC
