@@ -33,5 +33,3 @@ script:
         travis_wait 50 python -m pytest -v -k "test_build_image_$INTERFACE_TO_BUILD" --cov=./ neurodocker;
       fi }
   - run_tests
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
