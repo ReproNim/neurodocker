@@ -22,18 +22,19 @@ def get_gitversion():
 
     try:
         cmd = 'git describe --tags'.split()
-        o, _ = subprocess.Popen(cmd, cwd=here,
-                                stdout=subprocess.PIPE).communicate()
-        ver = o.decode().strip()
+        stdout, stderr = subprocess.Popen(cmd, cwd=here,
+                                          stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE).communicate()
+        ver = stdout.decode().strip()
     except Exception:
         ver = None
 
     return ver
 
 
-
-gitversion = get_gitversion()
-if gitversion:
-    __version__ = gitversion
-    if gitversion.startswith('v'):
-        __version__ = __version__[1:]
+if __version__.endswith('-dev'):
+    gitversion = get_gitversion()
+    if gitversion:
+        __version__ = gitversion
+        if gitversion.startswith('v'):
+            __version__ = __version__[1:]
