@@ -230,7 +230,7 @@ def main(args=None):
         namespace = parse_args(args)
 
     if namespace.verbosity is not None:
-        utils.set_log_level(logger, namespace.verbosity)
+        utils.set_log_level(namespace.verbosity)
 
     logger.debug(vars(namespace))
 
