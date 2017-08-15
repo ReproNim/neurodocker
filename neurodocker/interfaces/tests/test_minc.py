@@ -12,8 +12,8 @@ from neurodocker.interfaces.tests import utils
 class TestMINC(object):
     """Tests for MINC class."""
 
-    def test_build_image_minc_1915_binaries_stretch(self):
-        """Install MINC binaries on Debian Stretch."""
+    def test_build_image_minc_1915_binaries_xenial(self):
+        """Install MINC binaries on Ubuntu Xenial."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
