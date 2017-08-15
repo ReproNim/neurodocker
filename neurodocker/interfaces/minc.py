@@ -89,7 +89,7 @@ class MINC(object):
 
         cmd = ('echo "Downloading MINC ..."'
                "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {}"
-               "\n| dpkg -i /tmp/minc.deb && rm -f /tmp/minc.deb".format(url))
+               "\n&& dpkg -i /tmp/minc.deb && rm -f /tmp/minc.deb".format(url))
         cmd = indent("RUN", cmd)
 
         env_cmd = ('/bin/bash -c \"source /opt/minc/{}/minc-toolkit-config.sh\"'.format(self.version))
