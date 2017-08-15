@@ -80,6 +80,7 @@ class MINC(object):
         """Return Dockerfile instructions to download and install MINC
         binaries.
         """
+        from neurodocker.dockerfile import _add_to_entrypoint
         url = self._get_binaries_urls(self.version)
         if self.check_urls:
             check_url(url)
@@ -87,12 +88,13 @@ class MINC(object):
         deps_cmd = self._install_binaries_deps()
         deps_cmd = indent("RUN", deps_cmd)
 
+        ent = _add_to_entrypoint("source /opt/minc/{}/minc-toolkit-config.sh".format(self.version),
+                                 with_run=False)
+
         cmd = ('echo "Downloading MINC ..."'
                "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {}"
-               "\n&& dpkg -i /tmp/minc.deb && rm -f /tmp/minc.deb".format(url))
+               "\n&& dpkg -i /tmp/minc.deb && rm -f /tmp/minc.deb"
+               "\n&& {entrypoint_cmd}".format(url, entrypoint_cmd=ent))
         cmd = indent("RUN", cmd)
 
-        env_cmd = ('/bin/bash -c \"source /opt/minc/{}/minc-toolkit-config.sh\"'.format(self.version))
-        env_cmd = indent("RUN", env_cmd)
-
-        return "\n".join((deps_cmd, cmd, env_cmd))
+        return "\n".join((deps_cmd, cmd))
