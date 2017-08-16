@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
+from neurodocker import DockerContainer, Dockerfile
 from neurodocker.interfaces import Miniconda
 from neurodocker.interfaces.tests import utils
 
@@ -28,9 +29,16 @@ class TestMiniconda(object):
                     }),
                     ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('python -V')
-        assert "3.5.1" in output, "incorrect Python version"
-        output = container.exec_run('python -c "import nipype"')
-        assert "ImportError" not in output, "nipype not installed"
-        utils.test_cleanup(container)
+
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['miniconda_centos7']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "python -V"
+        assert DockerContainer(image).run(cmd) == b'Python 3.5.1\n'
+
+        cmd = "bash /testscripts/test_miniconda.sh"
+        DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+        if push:
+            utils.push_image(image_name)

@@ -145,7 +145,21 @@ def save_json(obj, filepath, indent=4, **kwargs):
         fp.write('\n')
 
 
-def set_log_level(logger, level):
+def create_logger():
+    """Return Neurodocker logger."""
+    logger = logging.getLogger('neurodocker')
+    ch = logging.StreamHandler()
+    format_ = '[NEURODOCKER %(asctime)s %(levelname)s]: %(message)s'
+    formatter = logging.Formatter(format_)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    return logger
+
+
+logger = create_logger()
+
+
+def set_log_level(level):
     """Set logger verbosity.
 
     Parameters

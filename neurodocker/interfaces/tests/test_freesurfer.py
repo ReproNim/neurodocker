@@ -5,14 +5,16 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
+from neurodocker import DockerContainer, Dockerfile
 from neurodocker.interfaces import FreeSurfer
 from neurodocker.interfaces.tests import utils
+
 
 class TestFreeSurfer(object):
     """Tests for FreeSurfer class."""
 
-    def test_build_image_freesurfer_600_min_binaries_xenial(self):
-        """Install minimized FreeSurfer binaries on Ubuntu Xenial."""
+    def test_build_image_freesurfer_600_min_binaries_zesty(self):
+        """Install minimized FreeSurfer binaries on Ubuntu Zesty."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [
@@ -21,10 +23,15 @@ class TestFreeSurfer(object):
                                     'min': True}),
                     ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('bash -c "recon-all"')
-        assert "error" not in output, "error running recon-all"
-        utils.test_cleanup(container)
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['freesurfer-min_zesty']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "bash /testscripts/test_freesurfer.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+        if push:
+            utils.push_image(image_name)
 
     def test_copy_license(self):
         """Test that only relative paths are accepted."""
