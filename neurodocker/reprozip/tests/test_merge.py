@@ -1,5 +1,7 @@
 """Tests for merge.py."""
 
+from __future__ import absolute_import, division, print_function
+
 from glob import glob
 import os
 import tarfile
