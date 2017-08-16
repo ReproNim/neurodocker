@@ -73,7 +73,7 @@ class MINC(object):
 
     def _check_distro(self, distro):
         distro_list = ['ubuntu', 'debian', 'centos', 'fedora']
-        if self.distro not in distro_list:
+        if distro not in distro_list:
             raise ValueError(" Unidentified distro. Please provide from the following list {} ".format(distro_list))
         else:
             return distro
