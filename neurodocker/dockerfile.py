@@ -40,6 +40,8 @@ def _add_add(list_srcs_dest, **kwargs):
         local machine must be within the build context. The last item is the
         destination in the Docker image for these file or directories.
     """
+    if len(list_srcs_dest) < 2:
+        raise ValueError("At least two paths must be provided.")
     return _base_add_copy(list_srcs_dest, "ADD")
 
 
@@ -68,6 +70,8 @@ def _add_copy(list_srcs_dest, **kwargs):
         context. The last item is the destination in the Docker image for these
         file or directories.
     """
+    if len(list_srcs_dest) < 2:
+        raise ValueError("At least two paths must be provided.")
     return _base_add_copy(list_srcs_dest, "COPY")
 
 
