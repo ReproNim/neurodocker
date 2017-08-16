@@ -3,6 +3,5 @@
 set -e
 set -x
 
-bet --version
-fast --version
-flirt --version
+bet2 -h
+flirt -version

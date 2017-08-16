@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
+from neurodocker import DockerContainer, Dockerfile
 from neurodocker.interfaces import ANTs
 from neurodocker.interfaces.tests import utils
 
@@ -12,8 +13,8 @@ from neurodocker.interfaces.tests import utils
 class TestANTs(object):
     """Tests for ANTs class."""
 
-    def test_build_image_ants_210_binaries_centos7(self):
-        """Install ANTs 2.1.0 binaries on CentOS 7."""
+    def test_build_image_ants_220_binaries_centos7(self):
+        """Install ANTs 2.2.0 binaries on CentOS 7."""
         specs = {'pkg_manager': 'yum',
                  'check_urls': True,
                  'instructions': [
@@ -21,10 +22,17 @@ class TestANTs(object):
                     ('ants', {'version': '2.2.0', 'use_binaries': True}),
                     ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('Atropos')
-        assert "error" not in output, "error running Atropos"
-        utils.test_cleanup(container)
+
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['ants-2.0.0_stretch']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "bash /testscripts/test_ants.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+
+        if push:
+            utils.push_image(image_name)
 
     def test_invalid_binaries(self):
         with pytest.raises(ValueError):
