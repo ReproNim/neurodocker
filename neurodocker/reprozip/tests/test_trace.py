@@ -11,6 +11,7 @@ from neurodocker.docker import client
 from neurodocker.reprozip.trace import ReproZipMinimizer
 
 
+@pytest.mark.skip(reason="seccomp not available in ubuntu trusty (travis)")
 def test_ReproZipMinimizer_no_ptrace():
     container = client.containers.run('debian:stretch', detach=True, tty=True)
 
