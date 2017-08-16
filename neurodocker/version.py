@@ -3,8 +3,7 @@
 Copied from https://github.com/nipy/nipype/blob/master/nipype/info.py.
 """
 
-# Fallback version if `git describe` fails.
-__version__ = '0.2.0-dev'
+__version__ = '0.2.0'
 
 
 def get_gitversion():
