@@ -28,7 +28,7 @@ class TestMINC(object):
 
     def test_build_image_minc_1915_binaries_centos(self):
         """Install MINC binaries on Ubuntu Xenial."""
-        specs = {'pkg_manager': 'apt',
+        specs = {'pkg_manager': 'yum',
                  'check_urls': True,
                  'instructions': [
                      ('base', 'centos:latest'),
