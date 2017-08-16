@@ -34,6 +34,12 @@ class MINC(object):
     VERSION_Releases = {
         "1.9.15": "http://packages.bic.mni.mcgill.ca/minc-toolkit/Debian/minc-toolkit-1.9.15-20170529-Ubuntu_16.04-x86_64.deb",
     }
+    BEAST_URL = {
+        'latest': "http://packages.bic.mni.mcgill.ca/minc-toolkit/Debian/beast-library-1.1.0-20121212.deb"
+    }
+    MODELS_URL = {
+        'latest': "http://packages.bic.mni.mcgill.ca/minc-toolkit/Debian/bic-mni-models-0.1.1-20120421.deb"
+    }
 
     def __init__(self, version, pkg_manager, use_binaries=True, check_urls=True):
         self.version = version
@@ -81,9 +87,13 @@ class MINC(object):
         binaries.
         """
         from neurodocker.dockerfile import _add_to_entrypoint
-        url = self._get_binaries_urls(self.version)
+        minc_url = self._get_binaries_urls(self.version)
+        beast_url = self.BEAST_URL['latest']
+        models_url = self.MODELS_URL['latest']
         if self.check_urls:
-            check_url(url)
+            check_url(minc_url)
+            check_url(beast_url)
+            check_url(models_url)
 
         deps_cmd = self._install_binaries_deps()
         deps_cmd = indent("RUN", deps_cmd)
@@ -91,10 +101,15 @@ class MINC(object):
         ent = _add_to_entrypoint("source /opt/minc/{}/minc-toolkit-config.sh".format(self.version),
                                  with_run=False)
 
-        cmd = ('echo "Downloading MINC ..."'
-               "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {}"
+        cmd = ('echo "Downloading MINC, BEASTLIB, and MODELS..."'
+               "\n&& curl --retry 5 -o /tmp/minc.deb -sSL {minc_url}"
                "\n&& dpkg -i /tmp/minc.deb && rm -f /tmp/minc.deb"
-               "\n&& {entrypoint_cmd}".format(url, entrypoint_cmd=ent))
+               "\n&& curl --retry 5 -o /tmp/beast.deb -sSL {beast_url}"
+               "\n&& dpkg -i /tmp/beast.deb && rm -f /tmp/beast.deb"
+               "\n&& curl --retry 5 -o /tmp/models.deb -sSL {models_url}"
+               "\n&& dpkg -i /tmp/models.deb && rm -f /tmp/models.deb"
+               "\n&& {entrypoint_cmd}".format(minc_url=minc_url, beast_url=beast_url, models_url=models_url,
+                                              entrypoint_cmd=ent))
         cmd = indent("RUN", cmd)
 
         return "\n".join((deps_cmd, cmd))
