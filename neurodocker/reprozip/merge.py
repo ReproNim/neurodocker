@@ -152,23 +152,23 @@ def _create_rpz(path, outfile):
         tar.add(metadata, arcname='METADATA')
 
 
-def merge_pack_files(outfile, pack_files):
+def merge_pack_files(outfile, packfiles):
     """Merge reprozip version 2 pack files.
 
     This implementation has limitations. It uses rsync to merge the directories
     in different reprozip pack files, and does not take into account that files
     might have the same name but different contents.
     """
+    if len(packfiles) < 2:
+        raise ValueError("At least two packfiles are required.")
+
     _check_deps()
 
     if not outfile.endswith('.rpz'):
         logger.info("Adding '.rpz' extension to output file.")
         outfile += '.rpz'
 
-    if isinstance(pack_files, str):
-        pack_files = [pack_files]
-
-    for pf in pack_files:
+    for pf in packfiles:
         if not os.path.isfile(pf):
             raise ValueError("File not found: {}".format(pf))
 
@@ -177,7 +177,7 @@ def merge_pack_files(outfile, pack_files):
     merged_dest_metadata = os.path.join(merged_dest, "METADATA")
     os.makedirs(merged_dest_metadata)
 
-    for this_rpz in pack_files:
+    for this_rpz in packfiles:
         logger.info("Extracting {}".format(this_rpz))
         _extract_rpz(this_rpz, tmp_dest)
 

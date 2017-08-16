@@ -275,6 +275,13 @@ def copy_file_to_container(container, src, dest):
     from io import BytesIO
     import tarfile
 
+    try:
+        container.put_archive
+        container = container
+    except AttributeError:
+        container = client.containers.get(container)
+
+
     with BytesIO() as tar_stream:
         with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
             filename = os.path.split(src)[-1]
@@ -304,6 +311,12 @@ def copy_file_from_container(container, src, dest='.'):
     import tarfile
     import tempfile
     import traceback
+
+    try:
+        container.put_archive
+        container = container
+    except AttributeError:
+        container = client.containers.get(container)
 
     tar_stream, tar_info = container.get_archive(src)
     try:
