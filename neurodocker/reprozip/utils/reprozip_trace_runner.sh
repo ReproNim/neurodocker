@@ -10,10 +10,12 @@
 # this script.
 
 set -e
+set -x
 
 REPROZIP_CONDA=/opt/reprozip-miniconda
 REPROZIP_TRACE_DIR=/neurodocker-reprozip-trace
 CONDA_URL=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+# This log prefix is used in trace.py.
 NEURODOCKER_LOG_PREFIX="NEURODOCKER (in container)"
 
 
@@ -48,7 +50,6 @@ function install_conda_reprozip()
   bash $TMP_CONDA_INSTALLER -b -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
   ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.5 reprozip
-  return 0;
 }
 
 
@@ -71,38 +72,28 @@ function run_reprozip_trace()
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
     $reprozip_cmd
   done
-  return 0;
 }
 
 
 if [ ${#*} -eq 0 ]; then
-  echo "${NEURODOCKER_LOG_PREFIX}: Error: no arguments found."
+  echo "${NEURODOCKER_LOG_PREFIX}: error: no arguments found."
   exit 1
 fi
 
 if [ -d $REPROZIP_TRACE_DIR ]; then
-  echo "${NEURODOCKER_LOG_PREFIX}: Error: reprozip trace directory already exists: ${REPROZIP_TRACE_DIR}"
+  echo "${NEURODOCKER_LOG_PREFIX}: error: reprozip trace directory already exists: ${REPROZIP_TRACE_DIR}"
   exit 1
 fi
 
-MISSING_DEPENDENCIES=""
-if ! program_exists "bzip2"; then
-  MISSING_DEPENDENCIES="$MISSING_DEPENDENCIES bzip2"
-fi
-if ! program_exists "curl"; then
-  MISSING_DEPENDENCIES="$MISSING_DEPENDENCIES curl"
-fi
 
-echo $MISSING_DEPENDENCIES
-if [[ ! -z $MISSING_DEPENDENCIES ]]; then
-  install_missing_dependencies "$MISSING_DEPENDENCIES"
-fi
+install_missing_dependencies "bzip2 curl"
+
 
 if [ ! -f "${REPROZIP_CONDA}/bin/reprozip" ]; then
   echo "${NEURODOCKER_LOG_PREFIX}: installing dedicated Miniconda and ReproZip."
   install_conda_reprozip
 else
-  echo "${NEURODOCKER_LOG_PREFIX}: using reprozip found on system."
+  echo "${NEURODOCKER_LOG_PREFIX}: using installed reprozip."
 fi
 
 # Run reprozip trace.
