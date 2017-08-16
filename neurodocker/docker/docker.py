@@ -184,11 +184,19 @@ class DockerContainer(object):
         self.container = None
 
     @require_docker
-    def start(self, **kwargs):
-        """Start the container, and optionally mount volumes. `kwargs` are
-        arguments for `client.containers.run()`.
+    def run(self, command, **kwargs):
+        """Run command in the container. `kwargs` are arguments for
+        `client.containers.run()`.
+        """
+        return client.containers.run(self.image, command=command, remove=True,
+                                     **kwargs)
 
-        Equivalent to `docker run -it -d IMAGE`.
+    @require_docker
+    def start(self, **kwargs):
+        """Start the container in the background and optionally mount volumes.
+        `kwargs` are arguments for `client.containers.run()`.
+
+        Equivalent to `docker run -td IMAGE`.
         """
         self.container = client.containers.run(self.image, command=None,
                                                detach=True, tty=True,
