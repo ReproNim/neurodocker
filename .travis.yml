@@ -14,6 +14,7 @@ env:
   - INTERFACE_TO_BUILD=none
   - INTERFACE_TO_BUILD=afni
   - INTERFACE_TO_BUILD=ants
+  - INTERFACE_TO_BUILD=convert3d
   - INTERFACE_TO_BUILD=freesurfer
   - INTERFACE_TO_BUILD=fsl
   - INTERFACE_TO_BUILD=miniconda

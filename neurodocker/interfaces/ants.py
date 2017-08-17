@@ -87,9 +87,7 @@ class ANTs(object):
         return "\n".join(chunks)
 
     def install_binaries(self):
-        """Return command to download and install ANTs binaries. Supports
-        custom URL with tarball of binaries.
-        """
+        """Return command to download and install ANTs binaries."""
         try:
             url = ANTs.VERSION_TARBALLS[self.version]
         except KeyError:

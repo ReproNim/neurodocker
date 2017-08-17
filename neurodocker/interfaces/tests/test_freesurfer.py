@@ -13,8 +13,8 @@ from neurodocker.interfaces.tests import utils
 class TestFreeSurfer(object):
     """Tests for FreeSurfer class."""
 
-    def test_build_image_freesurfer_600_min_binaries_zesty(self):
-        """Install minimized FreeSurfer binaries on Ubuntu Zesty."""
+    def test_build_image_freesurfer_600_min_binaries_xenial(self):
+        """Install minimized FreeSurfer binaries on Ubuntu Xenial."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': True,
                  'instructions': [

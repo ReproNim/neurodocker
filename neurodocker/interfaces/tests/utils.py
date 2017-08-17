@@ -19,6 +19,9 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'ants-2.0.0_stretch': ('/Dockerfile.ANTs-2.2.0_stretch',
                            'kaczmarj/ants:2.2.0_stretch'),
 
+    'convert3d_zesty': ('/Dockerfile.Convert3D-1.0.0_zesty',
+                        'kaczmarj/c3d:1.0.0_zesty'),
+
     'freesurfer-min_zesty': ('/Dockerfile.FreeSurfer-min_zesty',
                              'kaczmarj/freesurfer:min_zesty'),
 
