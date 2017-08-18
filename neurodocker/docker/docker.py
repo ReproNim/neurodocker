@@ -184,11 +184,19 @@ class DockerContainer(object):
         self.container = None
 
     @require_docker
-    def start(self, **kwargs):
-        """Start the container, and optionally mount volumes. `kwargs` are
-        arguments for `client.containers.run()`.
+    def run(self, command, **kwargs):
+        """Run command in the container. `kwargs` are arguments for
+        `client.containers.run()`.
+        """
+        return client.containers.run(self.image, command=command, remove=True,
+                                     **kwargs)
 
-        Equivalent to `docker run -it -d IMAGE`.
+    @require_docker
+    def start(self, **kwargs):
+        """Start the container in the background and optionally mount volumes.
+        `kwargs` are arguments for `client.containers.run()`.
+
+        Equivalent to `docker run -td IMAGE`.
         """
         self.container = client.containers.run(self.image, command=None,
                                                detach=True, tty=True,
@@ -267,6 +275,13 @@ def copy_file_to_container(container, src, dest):
     from io import BytesIO
     import tarfile
 
+    try:
+        container.put_archive
+        container = container
+    except AttributeError:
+        container = client.containers.get(container)
+
+
     with BytesIO() as tar_stream:
         with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
             filename = os.path.split(src)[-1]
@@ -296,6 +311,12 @@ def copy_file_from_container(container, src, dest='.'):
     import tarfile
     import tempfile
     import traceback
+
+    try:
+        container.put_archive
+        container = container
+    except AttributeError:
+        container = client.containers.get(container)
 
     tar_stream, tar_info = container.get_archive(src)
     try:

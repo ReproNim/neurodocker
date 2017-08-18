@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
+from neurodocker import DockerContainer, Dockerfile
 from neurodocker.interfaces import MRtrix3
 from neurodocker.interfaces.tests import utils
 
@@ -21,10 +22,17 @@ class TestMRtrix3(object):
                     ('mrtrix3', {'use_binaries': True}),
                     ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('mrinfo')
-        assert "error" not in output, "error running mrinfo"
-        utils.test_cleanup(container)
+
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['mrtrix3_centos7']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "bash /testscripts/test_mrtrix.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+        if push:
+            utils.push_image(image_name)
+
 
     def test_build_from_source(self):
         # TODO: expand on tests for building MRtrix from source.

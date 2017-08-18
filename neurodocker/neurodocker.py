@@ -101,6 +101,8 @@ def _add_generate_arguments(parser):
             " pre-compiled binaries; if use_binaries=false, builds ANTs from"
             " source. If git_hash is specified, build from source from that"
             " commit."),
+        "c3d": (
+            "Install Convert3D. The only valid key is version (required)."),
         "freesurfer": (
             "Install FreeSurfer. Valid keys are version (required),"
             " license_path (relative path to license), min (if true, install"
@@ -233,7 +235,7 @@ def main(args=None):
         namespace = parse_args(args)
 
     if namespace.verbosity is not None:
-        utils.set_log_level(logger, namespace.verbosity)
+        utils.set_log_level(namespace.verbosity)
 
     logger.debug(vars(namespace))
 

@@ -3,8 +3,7 @@
 Copied from https://github.com/nipy/nipype/blob/master/nipype/info.py.
 """
 
-# Fallback version if `git describe` fails.
-__version__ = '0.2.0-dev'
+__version__ = '0.3.0-dev0'
 
 
 def get_gitversion():
@@ -21,15 +20,15 @@ def get_gitversion():
     here = os.path.dirname(os.path.realpath(__file__))
 
     try:
-        cmd = 'git describe --tags'.split()
-        o, _ = subprocess.Popen(cmd, cwd=here,
-                                stdout=subprocess.PIPE).communicate()
-        ver = o.decode().strip()
+        cmd = 'git describe'.split()
+        stdout, stderr = subprocess.Popen(cmd, cwd=here,
+                                          stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE).communicate()
+        ver = stdout.decode().strip()
     except Exception:
         ver = None
 
     return ver
-
 
 
 gitversion = get_gitversion()

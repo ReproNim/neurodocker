@@ -45,8 +45,6 @@ from __future__ import absolute_import, division, print_function
 import logging
 import os
 
-import docker
-
 from neurodocker.docker import copy_file_to_container, copy_file_from_container
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -98,6 +96,8 @@ class ReproZipMinimizer(object):
         ------
         RuntimeError : error occurs while running shell script within container.
         """
+        import docker
+
         copy_file_to_container(self.container, self.shell_filepath, '/tmp/')
 
         cmds = ' '.join('"{}"'.format(c) for c in self.commands)
@@ -108,9 +108,12 @@ class ReproZipMinimizer(object):
 
         for log in self.container.exec_run(trace_cmd, stream=True):
             log = log.decode().strip()
-            logging.info(log)
-            if "NEURODOCKER" in log and "Error" in log:
+            logger.debug(log)
+            # TODO: improve error handling. Look into exec_inspect in docker-py.
+            if (("REPROZIP" in log and "couldn't use ptrace" in log)
+                or "NEURODOCKER (in container): error" in log):
                 raise RuntimeError("Error: {}".format(log))
+
 
         self.pack_filepath = log.split()[-1].strip()
         try:

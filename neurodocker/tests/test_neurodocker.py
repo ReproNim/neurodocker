@@ -1,45 +1,66 @@
 """Tests for neurodocker.main"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
+from __future__ import absolute_import, unicode_literals
+
 import sys
 
 import pytest
 
 from neurodocker.neurodocker import create_parser, parse_args, main
 
-# TODO: write tests for parse_args
 
-def test_main():
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'version=2.1.0',
-            '--fsl', 'version=5.0.10',
-            '--miniconda', 'env_name=default', 'python_version=3.5.1',
-            '--mrtrix3',
-            '--neurodebian', 'os_codename=zesty', 'download_server=usa-nh',
-            '--spm', 'version=12', 'matlab_version=R2017a',
-            '--no-check-urls']
-    main(args)
-
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
-    main(args)
+def test_generate():
+    args = ("generate -b ubuntu:17.04 -p apt"
+            " --afni version=latest"
+            " --ants version=2.2.0"
+            " --freesurfer version=6.0.0"
+            " --fsl version=5.0.10"
+            " --user=neuro"
+            " --miniconda env_name=neuro python_version=3.6"
+            " --user=root"
+            " --mrtrix3"
+            " --neurodebian os_codename=zesty download_server=usa-nh"
+            " --spm version=12 matlab_version=R2017a"
+            " --no-check-urls"
+            " --expose 1234 9000"
+            " --copy relpath/to/file.txt /tmp/file.txt"
+            " --add relpath/to/file2.txt /tmp/file2.txt"
+            " --workdir /home"
+            " --install git"
+            " --user=neuro"
+            )
+    main(args.split())
 
     with pytest.raises(SystemExit):
-        args = ['-b', 'ubuntu:17.04']
-        main(args)
+        args = "-b ubuntu"
+        main(args.split())
+
+    with pytest.raises(SystemExit):
+        args = "-p apt"
+        main(args.split())
 
     with pytest.raises(SystemExit):
         main()
 
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt',
-            '--ants', 'option=value']
+    args = "generate -b ubuntu -p apt --ants option=value"
     with pytest.raises(ValueError):
-        main(args)
+        main(args.split())
 
-def test_dockerfile_opts(capsys):
+
+def test_generate_opts(capsys):
     args = "generate -b ubuntu:17.04 -p apt --no-check-urls {}"
     main(args.format('--user=neuro').split())
     out, _ = capsys.readouterr()
     assert "USER neuro" in out
+
+    main(args.format('--add path/to/file.txt /tmp/file.txt').split())
+    out, _ = capsys.readouterr()
+    assert 'ADD ["path/to/file.txt", "/tmp/file.txt"]' in out
+
+    main(args.format('--copy path/to/file.txt /tmp/file.txt').split())
+    out, _ = capsys.readouterr()
+    assert 'COPY ["path/to/file.txt", "/tmp/file.txt"]' in out
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
@@ -50,7 +71,20 @@ def test_dockerfile_opts(capsys):
     out, _ = capsys.readouterr()
     assert "EXPOSE 1230 1231" in out
 
-def test_no_print(capsys):
+    main(args.format('--workdir /home').split())
+    out, _ = capsys.readouterr()
+    assert "WORKDIR /home" in out
+
+    main(args.format('--install git').split())
+    out, _ = capsys.readouterr()
+    assert "git" in out
+
+    main(args.format('--instruction RUNecho').split())
+    out, _ = capsys.readouterr()
+    assert "RUNecho" in out
+
+
+def test_generate_no_print(capsys):
     args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
     main(args)
     out, _ = capsys.readouterr()
@@ -62,7 +96,7 @@ def test_no_print(capsys):
     assert not out
 
 
-def test_save(tmpdir):
+def test_generate_save(tmpdir):
     outfile = tmpdir.join("test.txt")
     args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--mrtrix3',
             'use_binaries=false', '--no-print-df', '-o', outfile.strpath,

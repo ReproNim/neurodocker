@@ -68,8 +68,8 @@ Valid options for each software package are the keyword arguments for the class 
 |                 | download_server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate --help` for the full list of servers. |
 |                 | pkgs | Packages to download from NeuroDebian. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
-| **SPM** | version        | 12 (earlier versions will be supported in the future). |
-|         | matlab_version | R2017a (other MCR versions will be supported once earlier SPM versions are supported). |
+| **SPM** | version*        | 12 (earlier versions will be supported in the future). |
+|         | matlab_version* | R2017a (other MCR versions will be supported once earlier SPM versions are supported). |
 
 
 \* required argument.
@@ -223,7 +223,7 @@ docker run --rm -it --name ants-reprozip-container --security-opt=seccomp:unconf
 # necessary to run antsMotionCorr.
 # See https://github.com/stnava/ANTs/blob/master/Scripts/antsMotionCorrExample
 cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
-neurodocker reprozip ants-reprozip-container "$cmd"
+neurodocker reprozip-trace ants-reprozip-container "$cmd"
 
-reprozip docker setup neurodocker-reprozip.rpz test
+reprounzip docker setup neurodocker-reprozip.rpz test
 ```

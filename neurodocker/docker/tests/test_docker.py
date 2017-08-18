@@ -1,21 +1,22 @@
 """"Tests for neurodocker.docker.docker"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
+
 from io import BytesIO
 import os
+import tempfile
 import threading
-import time
 
 import docker
 import pytest
 
 from neurodocker import Dockerfile
-from neurodocker.docker.docker import (BuildOutputLogger, docker_is_running,
-                                       DockerContainer, DockerImage)
-
-
-client = docker.from_env()
+from neurodocker.docker.docker import (BuildOutputLogger, client,
+                                       copy_file_from_container,
+                                       copy_file_to_container,
+                                       docker_is_running, DockerContainer,
+                                       DockerImage)
 
 
 def test_docker_is_running():
@@ -111,3 +112,56 @@ class TestDockerContainer(object):
         assert len(pre) + 1 == len(client.containers.list(all=True))
         container.cleanup(remove=True, force=True)
         assert len(pre) == len(client.containers.list(all=True))
+
+
+def test_copy_file_from_container():
+    import posixpath
+
+    tempdir = tempfile.mkdtemp()
+    container = client.containers.run('debian:stretch', detach=True, tty=True)
+    try:
+        filename = "newfile.txt"
+        filepath = posixpath.join("", "tmp", "newfile.txt")
+        container.exec_run("touch {}".format(filepath))
+        assert not os.path.isfile(os.path.join(tempdir, filename))
+        path = copy_file_from_container(container, filepath, tempdir)
+
+        local_path = os.path.join(tempdir, filename)
+        assert os.path.isfile(local_path)
+        os.remove(local_path)
+        assert not os.path.isfile(local_path)
+        copy_file_from_container(container.id, filepath, tempdir)
+        assert os.path.isfile(local_path)
+    except:
+        raise
+    finally:
+        container.stop()
+        container.remove()
+
+
+def test_copy_file_to_container():
+    import posixpath
+
+    tempdir = tempfile.mkdtemp()
+    container = client.containers.run('debian:stretch', detach=True, tty=True)
+    try:
+        contents = "hello from outside the container\n"
+        fname = 'tempfile.txt'
+        path = os.path.abspath(os.path.join(tempdir, fname))
+        with open(path, 'w') as f:
+            f.write(contents)
+
+        container_dir = "/tmp"
+        cmd = 'ls {}'.format(container_dir)
+
+        assert not fname.encode() in container.exec_run(cmd)
+        copy_file_to_container(container.id, path, dest=container_dir)
+        assert fname.encode() in container.exec_run(cmd)
+
+        copy_file_to_container(container, path, dest=container_dir)
+        assert fname.encode() in container.exec_run(cmd)
+    except:
+        raise
+    finally:
+        container.stop()
+        container.remove()
