@@ -211,10 +211,8 @@ def _add_common_dependencies(pkg_manager):
                "\n# Install common dependencies and create default entrypoint"
                "\n#----------------------------------------------------------")
 
-
-
     env = ('LANG="C.UTF-8"'
-           '\nLC_ALL="C"'
+           '\nLC_ALL="C.UTF-8"'
            '\nND_ENTRYPOINT="{}"'.format(ENTRYPOINT_FILE))
     env = indent("ENV", env)
 
@@ -222,10 +220,12 @@ def _add_common_dependencies(pkg_manager):
     cmd = cmd.format(pkgs=deps)
 
     cmd += ("\n&& chmod 777 /opt && chmod a+s /opt"
-            "\n&& mkdir /neurodocker"
-            "\n&& echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT"
-            "\n&& echo 'set +x' >> $ND_ENTRYPOINT"
-            "\n&& echo 'if [ -z \"$*\" ]; then /usr/bin/env bash; else $*; fi' >> $ND_ENTRYPOINT"
+            "\n&& mkdir -p /neurodocker"
+            '\n&& if [ ! -f "$ND_ENTRYPOINT" ]; then'
+            "\n     echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT"
+            "\n     && echo 'set +x' >> $ND_ENTRYPOINT"
+            "\n     && echo 'if [ -z \"$*\" ]; then /usr/bin/env bash; else $*; fi' >> $ND_ENTRYPOINT;"
+            "\n   fi"
             "\n&& chmod -R 777 /neurodocker && chmod a+s /neurodocker")
     cmd = indent("RUN", cmd)
     entrypoint = 'ENTRYPOINT ["{}"]'.format(ENTRYPOINT_FILE)
