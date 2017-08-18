@@ -134,7 +134,7 @@ def get_image_from_memory(df, remote_path, name, force_build=False):
         push = False
         return image, push
 
-    dbx_client = memory.Dropbox()
+    dbx_client = memory.Dropbox(token)
 
     if memory.should_build_image(df, remote_path, remote_object=dbx_client):
         logger.info("Building image... Result should be pushed.")
