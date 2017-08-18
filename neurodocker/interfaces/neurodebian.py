@@ -92,7 +92,8 @@ class NeuroDebian(object):
                "\n&& {clean}"
                "\n&& curl -sSL {url}"
                "\n> /etc/apt/sources.list.d/neurodebian.sources.list"
-               "\n&& apt-key adv --fetch-keys https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg"
+               "\n&& curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg"
+               "\n| apt-key add -"
                # Syntax from
                # https://github.com/poldracklab/fmriprep/blob/master/Dockerfile#L21
                "\n&& (apt-key adv --refresh-keys --keyserver"

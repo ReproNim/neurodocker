@@ -99,20 +99,20 @@ def push_image(name):
 def _get_dbx_token():
     """Get access token for Dopbox API."""
     import os
+    import warnings
 
     try:
-         return os.environ['DROPBOX_TOKEN']
+        return os.environ['DROPBOX_TOKEN']
     except KeyError:
-        raise Exception("Environment variable not found: DROPBOX_TOKEN."
-                        " Cannot interact with Dropbox API.")
+        warnings.warn("Environment variable not found: DROPBOX_TOKEN."
+                      " Cannot interact with Dropbox API. Cannot compare "
+                      " Dockerfiles. Will pull existing Docker images ...")
+        return None
 
 
 def _check_can_push():
     """Raise error if user cannot push to DockerHub."""
     pass
-
-
-dbx_client = memory.Dropbox(_get_dbx_token())
 
 
 def get_image_from_memory(df, remote_path, name, force_build=False):
@@ -123,7 +123,20 @@ def get_image_from_memory(df, remote_path, name, force_build=False):
         logger.info("Building image (forced) ... Result should be pushed.")
         image = build_image(df, name)
         push = True
-    elif memory.should_build_image(df, remote_path, remote_object=dbx_client):
+        return image, push
+
+    token = _get_dbx_token()
+
+    # Take into account other forks of the project. They cannot use the secret
+    # environment variables in travis ci (e.g., the dropbox token).
+    if token is None:
+        image = pull_image(name)
+        push = False
+        return image, push
+
+    dbx_client = memory.Dropbox(token)
+
+    if memory.should_build_image(df, remote_path, remote_object=dbx_client):
         logger.info("Building image... Result should be pushed.")
         image = build_image(df, name)
         push = True

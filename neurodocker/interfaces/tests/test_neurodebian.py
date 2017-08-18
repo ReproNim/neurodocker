@@ -11,14 +11,12 @@ from neurodocker.interfaces.tests import utils
 class TestNeuroDebian(object):
     """Tests for NeuroDebian class."""
 
-    def test_build_image_neurodebian_dcm2niix_stretch(self):
-        """Install latest version of Miniconda via ContinuumIO's installer
-        script on Debian Stretch.
-        """
+    def test_build_image_neurodebian_dcm2niix_xenial(self):
+        """Install NeuroDebian on Ubuntu 16.04."""
         specs = {'pkg_manager': 'apt',
                  'check_urls': False,
                  'instructions': [
-                    ('base', 'debian:stretch'),
+                    ('base', 'ubuntu:16.04'),
                     ('neurodebian', {'os_codename': 'stretch',
                                     'download_server': 'usa-nh',
                                     'full': True,
