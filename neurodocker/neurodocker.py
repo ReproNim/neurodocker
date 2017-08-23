@@ -135,6 +135,8 @@ def _add_generate_arguments(parser):
         "minc": (
             "Install MINC. Valid keys are version (required) and distro (ubuntu(def), debian, centos, fedora) . Only the 1.9.15"
             " version is supported at this time."),
+        "petpvc": (
+            "Install PETPVC. Valid keys are version (required)."),
     }
 
     pkgs = p.add_argument_group(title="software package arguments",

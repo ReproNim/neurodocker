@@ -46,6 +46,9 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'minc_centos7': ('/Dockerfile.MINC_centos7',
                      'kaczmarj/minc:1.9.15_centos7'),
 
+    'petpvc_xenial': ('/Dockerfile.PETPVC_xenial',
+                     'kaczmarj/petpvc:1.2.0b_xenial'),
+
 }
 
 
