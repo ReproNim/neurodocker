@@ -130,7 +130,11 @@ def get_image_from_memory(df, remote_path, name, force_build=False):
     # Take into account other forks of the project. They cannot use the secret
     # environment variables in travis ci (e.g., the dropbox token).
     if token is None:
+        logger.info("Attempting to pull image...")
         image = pull_image(name)
+        if image is None:
+            logger.info("Image not found. Building ...")
+            image = build_image(df, name)
         push = False
         return image, push
 
