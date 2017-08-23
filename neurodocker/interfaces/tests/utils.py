@@ -41,7 +41,7 @@ DROPBOX_DOCKERHUB_MAPPING = {
                      'kaczmarj/spm:12_zesty'),
 
     'minc_xenial': ('/Dockerfile.MINC_xenial',
-                     'kaczmarj/minc:1.9.15_zesty'),
+                     'kaczmarj/minc:1.9.15_xenial'),
 
     'minc_centos7': ('/Dockerfile.MINC_centos7',
                      'kaczmarj/minc:1.9.15_centos7'),
