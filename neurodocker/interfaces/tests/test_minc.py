@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
+from neurodocker import DockerContainer, Dockerfile
 from neurodocker.interfaces import minc
 from neurodocker.interfaces.tests import utils
 
@@ -21,13 +22,18 @@ class TestMINC(object):
                      ('minc', {'version': '1.9.15', 'use_binaries': True, 'distro':'ubuntu'}),
                      ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('bash -c "mincresample"')
-        assert "error" not in output, "error running mincresample"
-        utils.test_cleanup(container)
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['minc_xenial']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "bash /testscripts/test_minc.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+        if push:
+            utils.push_image(image_name)
 
     def test_build_image_minc_1915_binaries_centos(self):
-        """Install MINC binaries on Ubuntu Xenial."""
+        """Install MINC binaries on CentOS."""
         specs = {'pkg_manager': 'yum',
                  'check_urls': True,
                  'instructions': [
@@ -35,7 +41,12 @@ class TestMINC(object):
                      ('minc', {'version': '1.9.15', 'use_binaries': True, 'distro':'centos'}),
                      ('user', 'neuro'),
                  ]}
-        container = utils.get_container_from_specs(specs)
-        output = container.exec_run('bash -c "mincresample"')
-        assert "error" not in output, "error running mincresample"
-        utils.test_cleanup(container)
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['minc_centos7']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+
+        cmd = "bash /testscripts/test_minc.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+
+        if push:
+            utils.push_image(image_name)
