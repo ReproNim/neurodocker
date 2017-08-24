@@ -3,4 +3,4 @@
 set -e
 set -x
 
-petpvc
+ls /opt/petpvc/bin/petpvc
