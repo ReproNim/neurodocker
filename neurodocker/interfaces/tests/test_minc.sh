@@ -3,4 +3,4 @@
 set -e
 set -x
 
-mincresample -h
+mincresample -help
