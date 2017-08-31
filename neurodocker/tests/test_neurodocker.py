@@ -17,7 +17,7 @@ def test_generate():
             " --freesurfer version=6.0.0"
             " --fsl version=5.0.10"
             " --user=neuro"
-            " --miniconda env_name=neuro python_version=3.6"
+            " --miniconda env_name=neuro conda_install=python=3.6.2"
             " --user=root"
             " --mrtrix3"
             " --neurodebian os_codename=zesty download_server=usa-nh"

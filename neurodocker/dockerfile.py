@@ -214,15 +214,19 @@ def _add_common_dependencies(pkg_manager):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     """
-    deps = "\n\tbzip2 ca-certificates curl unzip"
+    deps = ['bzip2', 'ca-certificates', 'curl', 'unzip']
+    if pkg_manager == "apt":
+        deps.append('locales')
     if pkg_manager == "yum":
-        deps += " epel-release"
+        deps.append('epel-release')
+    deps = " ".join(sorted(deps))
+    deps = "\n\t" + deps
 
     comment = ("#----------------------------------------------------------"
                "\n# Install common dependencies and create default entrypoint"
                "\n#----------------------------------------------------------")
 
-    env = ('LANG="C.UTF-8"'
+    env = ('LANG="en_US.UTF-8"'
            '\nLC_ALL="C.UTF-8"'
            '\nND_ENTRYPOINT="{}"'.format(ENTRYPOINT_FILE))
     env = indent("ENV", env)
@@ -230,7 +234,8 @@ def _add_common_dependencies(pkg_manager):
     cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
     cmd = cmd.format(pkgs=deps)
 
-    cmd += ("\n&& chmod 777 /opt && chmod a+s /opt"
+    cmd += ("\n&& localedef --force --inputfile=en_US --charmap=UTF-8 C.UTF-8"
+            "\n&& chmod 777 /opt && chmod a+s /opt"
             "\n&& mkdir -p /neurodocker"
             '\n&& if [ ! -f "$ND_ENTRYPOINT" ]; then'
             "\n     echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT"
