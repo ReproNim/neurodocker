@@ -124,6 +124,5 @@ class MINC(object):
                                  with_run=False)
 
         cmd = self._get_install_cmd(minc_url, beast_url, models_09a_url, models_09c_url, ent)
-        cmd = indent("RUN", cmd)
 
         return "\n".join((deps_cmd, cmd))
