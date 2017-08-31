@@ -8,7 +8,7 @@ import os
 
 import neurodocker
 from neurodocker import interfaces
-from neurodocker.utils import indent, manage_pkgs
+from neurodocker.utils import apt_get_install, indent, manage_pkgs, yum_install
 
 
 ENTRYPOINT_FILE = "/neurodocker/startup.sh"
@@ -133,9 +133,20 @@ def _add_install(pkgs, pkg_manager):
     comment = ("#------------------------"
                "\n# Install system packages"
                "\n#------------------------")
-    pkgs = ' '.join(pkgs)
-    cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
-    cmd = cmd.format(pkgs=pkgs)
+    installers = {'apt': apt_get_install,
+                  'yum': yum_install,}
+    # pkgs = ' '.join(pkgs)
+    # cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
+    # cmd = cmd.format(pkgs=pkgs)
+    flags = [jj for jj in pkgs if jj.startswith('flags=')]
+    pkgs = [kk for kk in pkgs if kk not in flags]
+
+    if flags:
+        flags = flags[0].replace('flags=', '')
+    else:
+        flags = None
+    cmd = installers[pkg_manager](pkgs, flags)
+    cmd += "\n&& {clean}".format(**manage_pkgs[pkg_manager])
     return indent("RUN", cmd)
 
 
