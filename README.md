@@ -104,13 +104,12 @@ docker run --rm kaczmarj/neurodocker generate \
 --fsl version=5.0.10 \
 --user=neuro \
 --miniconda env_name=default \
-            python_version=3.5.1 \
             conda_opts="--channel vida-nyu" \
-            conda_install="numpy pandas reprozip traits" \
+            conda_install="python=3.5.1 numpy pandas reprozip traits" \
             pip_install="nipype" \
+            add_to_path=true \
 --miniconda env_name=py27 \
-            python_version=2.7 \
-            add_to_path=false \
+            conda_install="python=2.7" \
 --user=root \
 --mrtrix3 \
 --neurodebian os_codename="jessie" \
