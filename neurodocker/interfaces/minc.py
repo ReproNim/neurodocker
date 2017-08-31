@@ -74,8 +74,8 @@ class MINC(object):
 
     def _get_binaries_dependencies(self):
         base_deps = {
-            'apt': 'libc6 libstdc++6 imagemagick perl',
-            'yum': 'glibc libstdc++ ImageMagick perl',
+            'apt': 'libc6 libstdc++6 imagemagick perl unzip',
+            'yum': 'glibc libstdc++ ImageMagick perl unzip',
         }
         return base_deps[self.pkg_manager]
 
@@ -91,12 +91,13 @@ class MINC(object):
                "\n| tar zx -C /opt"
                "\n&& curl -sSL --retry 5 {beast_url}"
                "\n| tar zx -C /opt/minc/share"
-               "\n&& curl -sSL --retry 5 {models_09a_url}"
-               "\n| tar zx -C /opt/minc/share"
-               "\n&& curl -sSL --retry 5 {models_09c_url}"
-               "\n| tar zx -C /opt/minc/share"
+               "\n&& curl -sSL --retry 5 -o /tmp/mni_90a.zip {models_09a_url}"
+               "\n&& unzip /tmp/mni_90a.zip -d /opt/minc/share/icbm152_model_09a"
+               "\n&& curl -sSL --retry 5 -o /tmp/mni_90c.zip {models_09c_url}"
+               "\n&& unzip /tmp/mni_90c.zip -d /opt/minc/share/icbm152_model_09c"
+               "\n&& rm -r /tmp/mni_90* "
                "\n&& {entrypoint_cmd}".format(minc_url=minc_url, beast_url=beast_url, models_09a_url=models_90a_url,
-                       models_09c_url=models_90c_url, entrypoint_cmd=entrypoint_cmd))
+                                              models_09c_url=models_90c_url, entrypoint_cmd=entrypoint_cmd))
         cmd = indent("RUN", cmd)
         return cmd
 
