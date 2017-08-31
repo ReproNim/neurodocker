@@ -60,10 +60,12 @@ def test__add_env_vars():
 
 
 def test__add_install():
-    pkgs = ["git", "vim"]
+    pkgs = ["git", "vim", "flags=-q --fake-flag"]
     out = DF._add_install(pkgs, 'apt')
-    truth = 'apt-get install -yq --no-install-recommends {}'.format(' '.join(pkgs))
-    assert truth in out
+    assert 'apt-get install -y -q --fake-flag' in out
+    assert 'git' in out
+    assert 'vim' in out
+    assert '--no-install-recommends' not in out
 
 
 def test__add_workdir():
@@ -114,9 +116,8 @@ class TestDockerfile(object):
                         ('base', 'ubuntu:17.04'),
                         ('afni', {'version': 'latest'}),
                         ('mrtrix3', {}),
-                        ('miniconda', {'python_version': '3.5.1',
-                                       'env_name': 'default',
-                                       'conda_install': 'numpy',
+                        ('miniconda', {'env_name': 'default',
+                                       'conda_install': 'python=3.5.1 numpy',
                                        'pip_install': 'pandas'}),
                         ('ants', {'version': '2.1.0', 'use_binaries': True}),
                         ('freesurfer', {'version': '6.0.0', 'min': True}),
