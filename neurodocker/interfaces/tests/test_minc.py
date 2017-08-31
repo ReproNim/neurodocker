@@ -19,7 +19,7 @@ class TestMINC(object):
                  'check_urls': True,
                  'instructions': [
                      ('base', 'ubuntu:xenial'),
-                     ('minc', {'version': '1.9.15', 'use_binaries': True, 'distro':'ubuntu'}),
+                     ('minc', {'version': '1.9.15', 'use_binaries': True}),
                      ('user', 'neuro'),
                  ]}
         df = Dockerfile(specs).cmd
@@ -38,7 +38,7 @@ class TestMINC(object):
                  'check_urls': True,
                  'instructions': [
                      ('base', 'centos:latest'),
-                     ('minc', {'version': '1.9.15', 'use_binaries': True, 'distro':'centos'}),
+                     ('minc', {'version': '1.9.15', 'use_binaries': True}),
                      ('user', 'neuro'),
                  ]}
         df = Dockerfile(specs).cmd
