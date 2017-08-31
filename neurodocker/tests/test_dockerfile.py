@@ -60,10 +60,12 @@ def test__add_env_vars():
 
 
 def test__add_install():
-    pkgs = ["git", "vim"]
+    pkgs = ["git", "vim", "flags=-q --fake-flag"]
     out = DF._add_install(pkgs, 'apt')
-    truth = 'apt-get install -yq --no-install-recommends {}'.format(' '.join(pkgs))
-    assert truth in out
+    assert 'apt-get install -y -q --fake-flag' in out
+    assert 'git' in out
+    assert 'vim' in out
+    assert '--no-install-recommends' not in out
 
 
 def test__add_workdir():
