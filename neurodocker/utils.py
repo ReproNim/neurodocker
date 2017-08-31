@@ -7,6 +7,9 @@ import logging
 
 import requests
 
+APT_GET_INSTALL_FLAGS = "-q --no-install-recommends"
+YUM_INSTALL_FLAGS = "-q"
+
 
 # Templates for installing packages and cleaning up with apt and yum.
 manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
@@ -20,6 +23,32 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                        'clean': ('yum clean packages\n'
                                  '&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*'),},
                 }
+
+
+def _indent_pkgs(line_len, pkgs):
+    cmd = " {first_pkg}".format(first_pkg=pkgs[0])
+    separator = "\n" + " " * line_len
+    return separator.join((cmd, *pkgs[1:]))
+
+
+def yum_install(pkgs, flags=None):
+    """Return command to install `pkgs` with `yum`."""
+    if flags is None:
+        flags = YUM_INSTALL_FLAGS
+    cmd = "yum install -y {flags}".format(flags=flags)
+    line_len = len(cmd) + 1
+    return cmd + _indent_pkgs(line_len, pkgs)
+
+
+def apt_get_install(pkgs, flags=None):
+    """Return command to install `pkgs` with `apt-get`."""
+    if flags is None:
+        flags = APT_GET_INSTALL_FLAGS
+    cmd = ("apt-get update -qq"
+           "\n&& apt-get install -y {flags}").format(flags=flags)
+    line_len = len(cmd.split('\n')[-1]) + 1
+    return cmd + _indent_pkgs(line_len, pkgs)
+
 
 
 def _string_vals_to_bool(dictionary):
