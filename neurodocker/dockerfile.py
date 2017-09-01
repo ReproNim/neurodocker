@@ -164,6 +164,17 @@ def _add_arbitrary_instruction(instruction, **kwargs):
     return comment + instruction
 
 
+def _add_run_bash(bash_code, **kwargs):
+    """Return Dockerfile RUN instruction to execute bash code."""
+    import json
+
+    comment = "# User-defined BASH instruction"
+    escaped_bash_code = json.dumps(bash_code)
+    cmd = 'bash -c {}'.format(escaped_bash_code)
+    cmd = indent("RUN", cmd)
+    return "\n".join((comment, cmd))
+
+
 class _DockerfileUsers(object):
     """Class to add instructions to add Dockerfile users. Has memory of users
     already added to the Dockerfile.
@@ -306,6 +317,7 @@ dockerfile_implementations = {
         'env': _add_env_vars,
         'install': _add_install,
         'instruction': _add_arbitrary_instruction,
+        'run_bash': _add_run_bash,
         'user': _DockerfileUsers.add,
         'workdir': _add_workdir,
     },

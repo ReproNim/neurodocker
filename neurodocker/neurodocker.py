@@ -65,8 +65,9 @@ def _add_generate_arguments(parser):
                    help=("Add a command to the container's entrypoint"
                          " (/neurodocker/startup.sh)"))
     p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
-                   help="Environment variables to set in Docker image. Use the "
-                        "format KEY=VALUE.", type=list_of_kv)
+                   help=("Environment variables to set in Docker image. Use the "
+                         "format KEY=VALUE."), type=list_of_kv)
+    p.add_argument('--run-bash', action=OrderedArgs, help="Run BASH code.")
     p.add_argument('-u', '--user', action=OrderedArgs,
                    help="Set the user. If not set, user is root.")
     p.add_argument('--expose', nargs="+", action=OrderedArgs,

@@ -132,7 +132,7 @@ class FSL(object):
         from neurodocker.dockerfile import _add_to_entrypoint
 
         cmd = self._install_binaries_deps()
-        cmd += ('echo "Downloading FSL ..."'
+        cmd += ('\n&& echo "Downloading FSL ..."'
                 '\n&& curl -sSL {}'
                 '\n| tar zx -C /opt'.format(url))
 
