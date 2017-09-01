@@ -80,10 +80,14 @@ def _count_key_occurence_list_of_tuples(list_of_tuples, key):
 def _namespace_to_specs(namespace):
     """Return dictionary of specifications from namespace."""
     from neurodocker.dockerfile import dockerfile_implementations
-    instructions = [('base', namespace.base)]
 
+    instructions = [('base', namespace.base)]
     try:
         for arg in namespace.ordered_args:
+            # TODO: replace try-except with stricter logic.
+            if arg[0] == 'install':
+                instructions.append(arg)
+                continue
             try:
                 ii = (arg[0], {k: v for k, v in arg[1]})
             except ValueError:
