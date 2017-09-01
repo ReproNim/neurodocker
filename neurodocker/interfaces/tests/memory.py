@@ -67,8 +67,10 @@ class Dropbox(object):
 
 
 
-def _remove_comments_emptylines(string, comment_char="#"):
-    return '\n'.join(row for row in string.split('\n')
+def _prune_dockerfile(string, comment_char="#"):
+    """Remove comments, emptylines, and last layer (serialize to JSON)."""
+    json_removed = '\n\n'.join(string.split('\n\n')[:-1])
+    return '\n'.join(row for row in json_removed.split('\n')
                       if not row.startswith(comment_char) and row)
 
 
@@ -82,11 +84,14 @@ def _dockerfiles_equivalent(df_a, df_b):
     """Return True if unicode strings `df_a` and `df_b` are equivalent. Does
     not consider comments or empty lines.
     """
-    df_a_clean = _remove_comments_emptylines(df_a)
+    df_a_clean = _prune_dockerfile(df_a)
     hash_a = _get_hash(df_a_clean.encode())
 
-    df_b_clean = _remove_comments_emptylines(df_b)
+    df_b_clean = _prune_dockerfile(df_b)
     hash_b = _get_hash(df_b_clean.encode())
+
+    print(df_a_clean)
+    print(df_b_clean)
 
     return hash_a == hash_b
 
