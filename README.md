@@ -103,11 +103,13 @@ docker run --rm kaczmarj/neurodocker generate \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
 --user=neuro \
---miniconda env_name=default \
+--miniconda env_name=neuro \
             conda_opts="--channel vida-nyu" \
             conda_install="python=3.5.1 numpy pandas reprozip traits" \
             pip_install="nipype" \
             add_to_path=true \
+--miniconda env_name=neuro \
+            pip_install="pylsl" \
 --miniconda env_name=py27 \
             conda_install="python=2.7" \
 --user=root \
@@ -120,6 +122,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --env KEY_A=VAL_A KEY_B=VAL_B \
 --env KEY_C="based on \$KEY_A" \
 --instruction='RUN mkdir /opt/mydir' \
+--run-bash="echo 'myfile' > /tmp/myfile.txt" \
 --add-to-entrypoint 'echo hello world' 'source myfile.sh' \
 --expose 8888 \
 --workdir /home/neuro \

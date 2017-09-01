@@ -79,6 +79,13 @@ def test__add_arbitrary_instruction():
     assert instruction in DF._add_arbitrary_instruction(instruction)
 
 
+def test__add_run_bash():
+    bash = 'echo "hello world" > myfile.txt'
+    truth = ('# User-defined BASH instruction'
+             '\nRUN bash -c "echo \\"hello world\\" > myfile.txt"')
+    assert truth == DF._add_run_bash(bash)
+
+
 def test_DockerfileUsers():
     inst = DF._DockerfileUsers()
     assert inst.initialized_users == ['root']
