@@ -35,13 +35,11 @@ class MINC(object):
         "1.9.15": "https://www.dropbox.com/s/40hjzizaqi91373/minc-toolkit-1.9.15-20170529-CentOS_6.9-x86_64.tar.gz?dl=0",
     }
     BEAST_URL = {
-        "latest": "http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz",
+        "1.1": "http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz",
     }
-    MODELS_09a_URL = {
-        "latest": "http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip",
-    }
-    MODELS_09c_URL = {
-        "latest": "http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip",
+    MODELS_URL = {
+        "09a": "http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip",
+        "09c": "http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip",
     }
 
     def __init__(self, version, pkg_manager, use_binaries=True, check_urls=True):
@@ -73,11 +71,12 @@ class MINC(object):
             raise ValueError("MINC version not available: {}".format(version))
 
     def _get_binaries_dependencies(self):
-        base_deps = {
-            'apt': 'libc6 libstdc++6 imagemagick perl unzip',
-            'yum': 'glibc libstdc++ ImageMagick perl unzip',
+        pkgs = {
+            'apt': 'libc6 libstdc++6 imagemagick perl unzip libgl1-mesa-dev libice6 libsm6 libX11-6 libxext6 libxi6 libxmu6 libgomp1 libjpeg62 libjpeg62-dbg libjpeg62-dev',
+            'yum': 'glibc libstdc++ ImageMagick perl unzip mesa-libGL-devel libICE libSM libX11 libXext libXi libXmu libgomp1 libjpeg-turbo',
         }
-        return base_deps[self.pkg_manager]
+        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
+        return cmd.format(pkgs=pkgs[self.pkg_manager])
 
     def _install_binaries_deps(self):
         """Install the dependencies for binary installation
@@ -86,7 +85,7 @@ class MINC(object):
         return cmd.format(pkgs=self._get_binaries_dependencies())
 
     def _get_install_cmd(self, minc_url, beast_url, models_90a_url, models_90c_url, entrypoint_cmd):
-        cmd = ('echo " Downloading MINC, BEASTLIB, and MODELS..."'
+        cmd = ('\n&& echo " Downloading MINC, BEASTLIB, and MODELS..."'
                "\n&& curl -sSL --retry 5 {minc_url}"
                "\n| tar zx -C /opt"
                "\n&& curl -sSL --retry 5 {beast_url}"
@@ -98,7 +97,6 @@ class MINC(object):
                "\n&& rm -r /tmp/mni_90* "
                "\n&& {entrypoint_cmd}".format(minc_url=minc_url, beast_url=beast_url, models_09a_url=models_90a_url,
                                               models_09c_url=models_90c_url, entrypoint_cmd=entrypoint_cmd))
-        cmd = indent("RUN", cmd)
         return cmd
 
 
@@ -108,21 +106,18 @@ class MINC(object):
         """
         from neurodocker.dockerfile import _add_to_entrypoint
         minc_url = self._get_binaries_urls(self.version)
-        beast_url = self.BEAST_URL['latest']
-        models_09a_url = self.MODELS_09a_URL['latest']
-        models_09c_url = self.MODELS_09c_URL['latest']
+        beast_url = self.BEAST_URL['1.1']
+        models_09a_url = self.MODELS_URL['09a']
+        models_09c_url = self.MODELS_URL['09c']
         if self.check_urls:
             check_url(minc_url)
             check_url(beast_url)
             check_url(models_09a_url)
             check_url(models_09c_url)
 
-        deps_cmd = self._install_binaries_deps()
-        deps_cmd = indent("RUN", deps_cmd)
-
+        cmd = self._install_binaries_deps()
         ent = _add_to_entrypoint("source /opt/minc/minc-toolkit-config.sh",
                                  with_run=False)
-
-        cmd = self._get_install_cmd(minc_url, beast_url, models_09a_url, models_09c_url, ent)
-
-        return "\n".join((deps_cmd, cmd))
+        cmd += self._get_install_cmd(minc_url, beast_url, models_09a_url, models_09c_url, ent)
+        cmd = indent("RUN", cmd)
+        return cmd

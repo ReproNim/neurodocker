@@ -133,8 +133,7 @@ def _add_generate_arguments(parser):
             "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
             " keys are version and matlab_version."),
         "minc": (
-            "Install MINC. Valid keys is version (required). Only the 1.9.15"
-            " version is supported at this time."),
+            "Install MINC. Valid keys is version (required). Only version 1.9.15 is supported at this time."),
         "petpvc": (
             "Install PETPVC. Valid keys are version (required)."),
     }
