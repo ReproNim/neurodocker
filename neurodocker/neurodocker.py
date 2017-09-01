@@ -235,7 +235,7 @@ def reprozip_merge(namespace):
 def _validate_args(namespace):
     if (namespace.file is None and
         (namespace.base is None or namespace.pkg_manager is None)):
-        raise ValueError("--base and --pkg-manager are required if not"
+        raise ValueError("-b/--base and -p/--pkg-manager are required if not"
                          " generating from JSON file.")
 
 
