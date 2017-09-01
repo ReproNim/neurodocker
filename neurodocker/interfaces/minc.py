@@ -75,8 +75,7 @@ class MINC(object):
             'apt': 'libc6 libstdc++6 imagemagick perl unzip libgl1-mesa-dev libice6 libsm6 libX11-6 libxext6 libxi6 libxmu6 libgomp1 libjpeg62 libjpeg62-dbg libjpeg62-dev',
             'yum': 'glibc libstdc++ ImageMagick perl unzip mesa-libGL-devel libICE libSM libX11 libXext libXi libXmu libgomp1 libjpeg-turbo',
         }
-        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
-        return cmd.format(pkgs=pkgs[self.pkg_manager])
+        return pkgs[self.pkg_manager]
 
     def _install_binaries_deps(self):
         """Install the dependencies for binary installation
