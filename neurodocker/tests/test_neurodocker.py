@@ -75,13 +75,40 @@ def test_generate_opts(capsys):
     out, _ = capsys.readouterr()
     assert "WORKDIR /home" in out
 
-    main(args.format('--install git').split())
+    main(args.format('--install vi').split())
     out, _ = capsys.readouterr()
-    assert "git" in out
+    assert "vi" in out
 
     main(args.format('--instruction RUNecho').split())
     out, _ = capsys.readouterr()
     assert "RUNecho" in out
+
+
+def test_generate_from_json(capsys, tmpdir):
+    import json
+
+    cmd = "generate -b debian:stretch -p apt --c3d version=1.0.0"
+    main(cmd.split())
+    true, _ = capsys.readouterr()
+
+    specs = {'check_urls': True,
+             'generation_timestamp': '2017-08-31 21:49:04',
+             'instructions': [['base', 'debian:stretch'],
+                              ['c3d', {'version': '1.0.0'}]],
+             'neurodocker_version': '0.2.0-18-g9227b17',
+             'pkg_manager': 'apt'}
+    str_specs = json.dumps(specs)
+    filepath = tmpdir.join("specs.json")
+    filepath.write(str_specs)
+
+    gen_cmd = "generate --file {}".format(filepath)
+    main(gen_cmd.split())
+    test, _ = capsys.readouterr()
+
+    # These indices chop off the header (with timestamp) and the layer that
+    # saves to JSON (with timestamp).
+    sl = slice(8, -19)
+    assert true.split('\n')[sl] == test.split('\n')[sl]
 
 
 def test_generate_no_print(capsys):

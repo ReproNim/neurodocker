@@ -14,7 +14,7 @@ try:
 except ImportError:
     from urlparse import urljoin  # Python 2
 
-from neurodocker.utils import check_url, indent
+from neurodocker.utils import check_url, indent, manage_pkgs
 
 logger = logging.getLogger(__name__)
 
@@ -115,15 +115,26 @@ class FSL(object):
             check_url(url)
         return url
 
+    def _install_binaries_deps(self):
+        """Return command to install FreeSurfer dependencies. Use this for
+        FreeSurfer binaries, not if attempting to build FreeSurfer from source.
+        """
+        pkgs = {'apt': "dc",
+                'yum': "bc"}
+
+        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
+        return cmd.format(pkgs=pkgs[self.pkg_manager])
+
     def install_binaries(self, url):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
         from neurodocker.dockerfile import _add_to_entrypoint
 
-        cmd = ('echo "Downloading FSL ..."'
-               '\n&& curl -sSL {}'
-               '\n| tar zx -C /opt'.format(url))
+        cmd = self._install_binaries_deps()
+        cmd += ('\n&& echo "Downloading FSL ..."'
+                '\n&& curl -sSL {}'
+                '\n| tar zx -C /opt'.format(url))
 
         if self.version >= LooseVersion('5.0.10'):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
