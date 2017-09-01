@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import inspect
 
+import neurodocker
 from neurodocker import utils
 from neurodocker.dockerfile import dockerfile_implementations
 
@@ -46,12 +47,13 @@ class _SpecsParser(object):
     """
     from neurodocker.dockerfile import dockerfile_implementations
 
-    VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager']
+    VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
+                            'generation_timestamp', 'neurodocker_version',]
     VALID_INSTRUCTIONS_KEYS = list(dockerfile_implementations['other'].keys())
 
     SUPPORTED_SOFTWARE = dockerfile_implementations['software'].keys()
     VALID_INSTRUCTIONS_KEYS.extend(SUPPORTED_SOFTWARE)
-    sorted(VALID_INSTRUCTIONS_KEYS)
+    VALID_INSTRUCTIONS_KEYS.sort()
 
     def __init__(self, specs):
         self.specs = specs

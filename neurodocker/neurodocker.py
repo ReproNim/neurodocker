@@ -38,9 +38,9 @@ def _add_generate_arguments(parser):
         l[1:] = ["=".join(l[1:])]
         return l
 
-    p.add_argument("-b", "--base", required=True,
+    p.add_argument("-b", "--base", #required=True,
                             help="Base Docker image. Eg, ubuntu:17.04")
-    p.add_argument("-p", "--pkg-manager", required=True,
+    p.add_argument("-p", "--pkg-manager", #required=True,
                             choices=utils.manage_pkgs.keys(),
                             help="Linux package manager.")
 
@@ -73,6 +73,11 @@ def _add_generate_arguments(parser):
                    help="Port(s) to expose.")
     p.add_argument('--workdir', action=OrderedArgs,
                    help="Working directory in container")
+
+    # To generate from file.
+    p.add_argument('-f', '--file', dest='file',
+                   help=("Generate Dockerfile from JSON. Overrides other"
+                         " `generate` arguments"))
 
     # Other arguments (no order).
     p.add_argument('-o', '--output', dest="output",
@@ -200,7 +205,10 @@ def parse_args(args):
 
 def generate(namespace):
     """Run `neurodocker generate`."""
-    specs = utils._namespace_to_specs(namespace)
+    if namespace.file is not None:
+        specs = utils.load_json(namespace.file)
+    else:
+        specs = utils._namespace_to_specs(namespace)
     df = Dockerfile(specs)
     if not namespace.no_print_df:
         print(df.cmd)
@@ -224,12 +232,21 @@ def reprozip_merge(namespace):
     merge_pack_files(namespace.outfile, namespace.pack_files)
 
 
+def _validate_args(namespace):
+    if (namespace.file is None and
+        (namespace.base is None or namespace.pkg_manager is None)):
+        raise ValueError("-b/--base and -p/--pkg-manager are required if not"
+                         " generating from JSON file.")
+
+
 def main(args=None):
     """Main program function."""
     if args is None:
         namespace = parse_args(sys.argv[1:])
     else:
         namespace = parse_args(args)
+
+    _validate_args(namespace)
 
     if namespace.verbosity is not None:
         utils.set_log_level(namespace.verbosity)
