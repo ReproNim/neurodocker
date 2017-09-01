@@ -72,8 +72,8 @@ class MINC(object):
 
     def _get_binaries_dependencies(self):
         pkgs = {
-            'apt': 'libc6 libstdc++6 imagemagick perl unzip libgl1-mesa-dev libice6 libsm6 libx11-6 libxext6 libxi6 libxmu6 libgomp1 libjpeg62 libjpeg62-dbg libjpeg62-dev',
-            'yum': 'glibc libstdc++ ImageMagick perl unzip mesa-libGL-devel libICE libSM libX11 libXext libXi libXmu libgomp1 libjpeg-turbo',
+            'apt': 'libgl1-mesa-dev libice6 libsm6 libx11-6 libxext6 libxi6 libxmu6 libgomp1 libjpeg62',
+            'yum': 'mesa-libGL-devel libICE libSM libX11 libXext libXi libXmu libgomp libjpeg-turbo',
         }
         return pkgs[self.pkg_manager]
 
