@@ -68,8 +68,11 @@ class PETPVC(object):
 
     def _get_install_cmd(self, petpvc_url):
         cmd = ('echo "Downloading PETPVC..."'
-               "\n&& curl --retry 5 -sSL {petpvc_url}"
-                "\n| tar xz --strip-components=1 -C /opt/petpvc"
+               "\n&& curl --retry 5 -o /tmp/PETPV.tar.gz -sSL {petpvc_url}"
+               "\n&& tar zxf /tmp/PETPV.tar.gz -C /tmp"
+               "\n&& mkdir /opt/petpvc"
+               "\n&& mv /tmp/PETPVC*/* /opt/petpvc"
+               "\n&& rm -r /tmp/PETPV* "
                .format(petpvc_url=petpvc_url))
         return cmd
 
