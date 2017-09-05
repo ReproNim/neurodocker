@@ -105,9 +105,6 @@ def test__add_to_entrypoint():
     assert truth in out and "RUN" in out
 
 
-
-
-
 def _get_val_in_list_of_tuple(list_of_tuple, key):
     return [v for k, v in list_of_tuple if k == key][0]
 
@@ -134,13 +131,12 @@ class TestDockerfile(object):
                       ]
                       }
 
-
         inst = self.specs['instructions']
-
 
         self.base = "FROM {}".format(_get_val_in_list_of_tuple(inst, 'base'))
         self.noninteractive = "ARG DEBIAN_FRONTEND=noninteractive"
         self.miniconda = Miniconda(pkg_manager='apt', check_urls=False, **_get_val_in_list_of_tuple(inst, 'miniconda')).cmd
+        Miniconda.clear_memory()
         self.ants = ANTs(pkg_manager='apt', check_urls=False, **_get_val_in_list_of_tuple(inst, 'ants')).cmd
         self.fsl = FSL(pkg_manager='apt', check_urls=False, **_get_val_in_list_of_tuple(inst, 'fsl')).cmd
         self.spm = SPM(pkg_manager='apt', check_urls=False, **_get_val_in_list_of_tuple(inst, 'spm')).cmd
@@ -156,6 +152,8 @@ class TestDockerfile(object):
         cmd = DF.Dockerfile(self.specs).cmd
         assert self.base in cmd
         assert self.noninteractive in cmd
+        print(cmd)
+        print(self.miniconda)
         assert self.miniconda in cmd
         assert self.ants in cmd
         assert self.fsl in cmd
