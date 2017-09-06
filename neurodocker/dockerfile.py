@@ -231,6 +231,9 @@ def _add_spec_json_file(specs):
 
     json_specs = json.dumps(specs, indent=2)
     json_specs = "\n\\n".join(json_specs.split("\n"))
+    # Workaround to escape single quotes in a single-quoted string.
+    # https://stackoverflow.com/a/1250279/5666087
+    json_specs = json_specs.replace("'", """'"'"'""")
     cmd = "echo '{string}' > {path}".format(string=json_specs, path=SPEC_FILE)
     cmd = indent("RUN", cmd)
     return "\n".join((comment, cmd))
