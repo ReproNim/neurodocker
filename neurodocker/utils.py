@@ -50,7 +50,6 @@ def apt_get_install(pkgs, flags=None):
     return cmd + _indent_pkgs(line_len, pkgs)
 
 
-
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     import re
@@ -70,6 +69,15 @@ def _string_vals_to_bool(dictionary):
             else:
                 dictionary[key] = bool(int(dictionary[key]))
 
+
+def _string_vals_to_list(dictionary):
+    """Convert string values to lists."""
+    list_keys = ['conda_install', 'pip_install']
+
+    for kk in list_keys:
+        if kk in dictionary.keys():
+            dictionary[kk] = " ".join((jj.strip() for jj
+                                       in dictionary[kk].split()))
 
 
 def _count_key_occurence_list_of_tuples(list_of_tuples, key):
@@ -100,6 +108,7 @@ def _namespace_to_specs(namespace):
     for instruction, options in instructions:
         if instruction in dockerfile_implementations['software'].keys():
             _string_vals_to_bool(options)
+            _string_vals_to_list(options)
 
     specs = {'pkg_manager': namespace.pkg_manager,
              'check_urls': namespace.check_urls,

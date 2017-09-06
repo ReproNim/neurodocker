@@ -363,6 +363,8 @@ def _get_dockerfile_chunks(specs):
         dockerfile_chunks.append(chunk)
 
     _DockerfileUsers.clear_memory()
+    interfaces.Miniconda.clear_memory()
+
     return dockerfile_chunks
 
 
