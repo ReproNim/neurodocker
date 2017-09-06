@@ -30,7 +30,6 @@ class MINC(object):
             If true, raise error if a URL used by this class responds with an error
             code.
     """
-
     VERSION_Releases = {
         "1.9.15": "https://dl.dropbox.com/s/40hjzizaqi91373/minc-toolkit-1.9.15-20170529-CentOS_6.9-x86_64.tar.gz",
     }
