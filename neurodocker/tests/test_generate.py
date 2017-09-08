@@ -42,7 +42,7 @@ def test__add_base():
 
 
 def test__add_cmd():
-    cmd = "--arg1 --arg2"
+    cmd = ["--arg1", "--arg2"]
     truth = 'CMD ["--arg1", "--arg2"]'
     assert truth == DF._add_cmd(cmd)
 
@@ -113,7 +113,7 @@ def test_add_run():
 def test__add_run_bash():
     bash = 'echo "hello world" > myfile.txt'
     truth = ('# User-defined BASH instruction'
-             '\nRUN bash -c "echo \"hello world\" > myfile.txt"')
+             '\nRUN bash -c "echo \\"hello world\\" > myfile.txt"')
     assert truth == DF._add_run_bash(bash)
 
 
