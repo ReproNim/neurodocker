@@ -53,7 +53,7 @@ def test_merge_pack_files():
         with tarfile.open(datafile) as tardata:
             tardata.extractall(path=tmpdir)
             usr_bin_path = os.path.join(tmpdir, 'DATA', 'usr', 'bin')
-            bin_path = os.path.join(tmpdir, 'DATA', 'usr', 'bin')
+            bin_path = os.path.join(tmpdir, 'DATA', 'bin')
             assert os.path.isfile(os.path.join(usr_bin_path, 'du'))
             assert os.path.isfile(os.path.join(bin_path, 'grep'))
             assert os.path.isfile(os.path.join(usr_bin_path, 'ls'))
