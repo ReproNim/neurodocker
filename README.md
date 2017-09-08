@@ -26,13 +26,16 @@ This software is still in the early stages of development. If you come across an
 
 # Installation
 
-You can install _Neurodocker_ with `pip`, or you can use the project's Docker image.
+You can use _Neurodocker's_ Docker image, or you can install the project with `pip`:
 
-`pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz`
+`docker run --rm kaczmarj/neurodocker --help`
 
 or
 
-`docker run --rm kaczmarj/neurodocker --help`
+```shell
+pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz
+neurodocker --help
+```
 
 Note that building and minifying Docker images is not possible within the _Neurodocker_ Docker image.
 
@@ -104,6 +107,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --ants version=2.2.0 \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
+--minc version=1.9.15 \
 --user=neuro \
 --miniconda env_name=neuro \
             conda_opts="--channel vida-nyu" \
@@ -119,6 +123,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --neurodebian os_codename="jessie" \
               download_server="usa-nh" \
               pkgs="dcm2niix git-annex-standalone" \
+--petpvc version=1.2.0-b \
 --spm version=12 matlab_version=R2017a \
 --user=neuro \
 --env KEY_A=VAL_A KEY_B=VAL_B \
@@ -126,7 +131,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --instruction='RUN mkdir /opt/mydir' \
 --run-bash="echo 'myfile' > /tmp/myfile.txt" \
 --add-to-entrypoint 'echo hello world' 'source myfile.sh' \
---cmd "-arg1" "-arg2" \
+--cmd arg1 arg2 \
 --volume /var /tmp \
 --expose 8888 80 \
 --label FOO=BAR BAZ=CAT \
