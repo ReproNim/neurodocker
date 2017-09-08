@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import posixpath
 
-from neurodocker.utils import check_url, indent
+from neurodocker.utils import _indent_pkgs, check_url, indent
 
 logger = logging.getLogger(__name__)
 
@@ -131,9 +131,11 @@ class Miniconda(object):
             cmd = "{} {}".format(cmd, self.conda_opts)
 
         if self.conda_install:
-            if isinstance(self.conda_install, (list, tuple)):
-                self.conda_install = " ".join(self.conda_install)
-            cmd += "\n\t{}".format(self.conda_install)
+            if isinstance(self.conda_install, str):
+                self.conda_install = self.conda_install.split()
+            pkgs = _indent_pkgs(len(cmd.split('\n')[-1]), self.conda_install)
+            cmd += pkgs
+            # cmd += "\n\t{}".format(self.conda_install)
 
         cmd += "\n&& sync && conda clean -tipsy && sync"
 
@@ -157,16 +159,18 @@ class Miniconda(object):
 
     def _pip_install(self):
         """Return Dockerfile instruction to install desired pip packages."""
-        if isinstance(self.pip_install, (list, tuple)):
-            self.pip_install = " ".join(self.pip_install)
+        if isinstance(self.pip_install, str):
+            self.pip_install = self.pip_install.split()
 
         cmd = ('/bin/bash -c "source activate {}'
-               '\n\t&& pip install -q --no-cache-dir').format(self.env_name)
+               '\n  && pip install -q --no-cache-dir').format(self.env_name)
 
         if self.pip_opts:
             cmd = "{} {}".format(cmd, self.pip_opts)
 
-        return '{}\n\t{}"\n&& sync'.format(cmd, self.pip_install)
+        pkgs = _indent_pkgs(len(cmd.split('\n')[-1]), self.pip_install)
+
+        return '{}{}"\n&& sync'.format(cmd, pkgs)
 
     @classmethod
     def clear_memory(cls):
