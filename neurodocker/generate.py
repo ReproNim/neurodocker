@@ -107,7 +107,7 @@ def _add_cmd(cmd, **kwargs):
     import json
 
     escaped = json.dumps(cmd)
-    return "CMD [{}]".format('", "'.join(escaped.split()))
+    return "CMD {}".format(escaped)
 
 
 def _add_copy(list_srcs_dest, **kwargs):
