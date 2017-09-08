@@ -12,6 +12,7 @@ from neurodocker.neurodocker import create_parser, parse_args, main
 
 def test_generate():
     args = ("generate -b ubuntu:17.04 -p apt"
+            " --arg FOO=BAR BAZ"
             " --afni version=latest"
             " --ants version=2.2.0"
             " --freesurfer version=6.0.0"
@@ -24,8 +25,11 @@ def test_generate():
             " --spm version=12 matlab_version=R2017a"
             " --no-check-urls"
             " --expose 1234 9000"
+            " --volume /var /usr/bin"
+            " --label FOO=BAR BAZ=CAT"
             " --copy relpath/to/file.txt /tmp/file.txt"
             " --add relpath/to/file2.txt /tmp/file2.txt"
+            " --cmd '--arg1' '--arg2'"
             " --workdir /home"
             " --install git"
             " --user=neuro"

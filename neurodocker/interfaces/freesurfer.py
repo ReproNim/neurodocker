@@ -119,7 +119,7 @@ class FreeSurfer(object):
 
     def install_binaries(self):
         """Return command to download and install FreeSurfer binaries."""
-        from neurodocker.dockerfile import _add_to_entrypoint
+        from neurodocker.generate import _add_to_entrypoint
 
         url = self._get_binaries_url()
 
@@ -166,7 +166,7 @@ class FreeSurfer(object):
         See https://github.com/freesurfer/freesurfer/issues/70 for more
         information.
         """
-        from neurodocker.dockerfile import _add_to_entrypoint
+        from neurodocker.generate import _add_to_entrypoint
 
         cmd = self._install_binaries_deps()
         url = ("https://dl.dropbox.com/s/nnzcfttc41qvt31/"

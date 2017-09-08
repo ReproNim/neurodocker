@@ -133,7 +133,7 @@ class SPM(object):
 
     def install_spm(self):
         """Return Dockerfile instructions to install standalone SPM."""
-        from neurodocker.dockerfile import _add_to_entrypoint
+        from neurodocker.generate import _add_to_entrypoint
 
         url = self._get_spm_url()
 

@@ -48,6 +48,49 @@ def _add_add(list_srcs_dest, **kwargs):
     return _base_add_copy(list_srcs_dest, "ADD")
 
 
+def _add_to_entrypoint(bash_cmd, with_run=True):
+    """Return command that adds the string `bash_cmd` to second-to-last line of
+    entrypoint file.
+    """
+    import json
+    base_cmd = "sed -i '$i{}' $ND_ENTRYPOINT"
+
+    # Escape quotes and remove quotes on either end of string.
+    if isinstance(bash_cmd, (list, tuple)):
+        escaped_cmds = [json.dumps(c)[1:-1] for c in bash_cmd]
+        cmds = [base_cmd.format(c) for c in escaped_cmds]
+        cmd = "\n&& ".join(cmds)
+    else:
+        escaped_bash_cmd = json.dumps(bash_cmd)[1:-1]
+        cmd = base_cmd.format(escaped_bash_cmd)
+    if with_run:
+        comment = "# Add command(s) to entrypoint"
+        cmd = indent("RUN", cmd)
+        cmd = "\n".join((comment, cmd))
+    return cmd
+
+
+def _add_arg(arg_dict, **kwargs):
+    """Return Dockerfile ARG instruction.
+
+    Parameters
+    ----------
+    arg_dict : dict
+        ARG variables where keys are the variable names, and values are the
+        values assigned to those variables.
+    """
+    import json
+    out = ""
+    for k, v in arg_dict.items():
+        newline = "\n" if out else ""
+        if not v:  # no default value
+            out += '{}{}'.format(newline, k)
+        else:
+            v = json.dumps(v)  # Escape double quotes and other things.
+            out += '{}{}={}'.format(newline, k, v)
+    return indent("ARG", out)
+
+
 def _add_base(base, **kwargs):
     """Return Dockerfile FROM instruction to specify base image.
 
@@ -57,6 +100,14 @@ def _add_base(base, **kwargs):
         Base image.
     """
     return "FROM {}".format(base)
+
+
+def _add_cmd(cmd, **kwargs):
+    """Return Dockerfile CMD instruction."""
+    import json
+
+    escaped = json.dumps(cmd)
+    return "CMD {}".format(escaped)
 
 
 def _add_copy(list_srcs_dest, **kwargs):
@@ -76,19 +127,6 @@ def _add_copy(list_srcs_dest, **kwargs):
     if len(list_srcs_dest) < 2:
         raise ValueError("At least two paths must be provided.")
     return _base_add_copy(list_srcs_dest, "COPY")
-
-
-def _add_exposed_ports(exposed_ports, **kwargs):
-    """Return Dockerfile EXPOSE instruction to expose ports.
-
-    Parameters
-    ----------
-    exposed_ports : str, list, tuple
-        Port(s) in the container to expose.
-    """
-    if not isinstance(exposed_ports, (list, tuple)):
-        exposed_ports = [exposed_ports]
-    return "EXPOSE " + " ".join((str(p) for p in exposed_ports))
 
 
 def _add_entrypoint(entrypoint, **kwargs):
@@ -123,6 +161,19 @@ def _add_env_vars(env_vars, **kwargs):
     return indent("ENV", out)
 
 
+def _add_exposed_ports(exposed_ports, **kwargs):
+    """Return Dockerfile EXPOSE instruction to expose ports.
+
+    Parameters
+    ----------
+    exposed_ports : str, list, tuple
+        Port(s) in the container to expose.
+    """
+    if not isinstance(exposed_ports, (list, tuple)):
+        exposed_ports = [exposed_ports]
+    return "EXPOSE " + " ".join((str(p) for p in exposed_ports))
+
+
 def _add_install(pkgs, pkg_manager):
     """Return Dockerfile RUN instruction that installs system packages.
 
@@ -153,26 +204,59 @@ def _add_install(pkgs, pkg_manager):
     return indent("RUN", cmd)
 
 
-def _add_workdir(path, **kwargs):
-    """Return Dockerfile WORKDIR instruction to set working directory."""
-    return "WORKDIR {}".format(path)
-
-
 def _add_arbitrary_instruction(instruction, **kwargs):
-    """Return `instruction`."""
+    """Return `instruction` with a comment."""
     comment = "# User-defined instruction\n"
     return comment + instruction
 
 
+def _add_label(labels, **kwargs):
+    """Return Dockerfile LABEL instruction to set image labels.
+
+    Parameters
+    ----------
+    labels : dict
+        Dictionary of label names and values.
+    """
+    import json
+    out = ""
+    for k, v in labels.items():
+        newline = "\n" if out else ""
+        v = json.dumps(v)  # Escape double quotes and other things.
+        out += '{}{}={}'.format(newline, k, v)
+    return indent("LABEL", out)
+
+
+def _add_run(cmd, **kwargs):
+    """Return Dockerfile RUN instruction."""
+    comment = "# User-defined instruction\n"
+    return comment + indent("RUN", cmd)
+
+
 def _add_run_bash(bash_code, **kwargs):
     """Return Dockerfile RUN instruction to execute bash code."""
+    comment = "# User-defined BASH instruction\n"
+    cmd = 'bash -c "{}"'.format(bash_code.replace('"', '\\"'))
+    return comment + indent("RUN", cmd)
+
+
+def _add_volume(paths, **kwargs):
+    """Return Dockerfile VOLUME instruction.
+
+    Parameters
+    ----------
+    paths : list
+        List of paths in the container.
+    """
     import json
 
-    comment = "# User-defined BASH instruction"
-    escaped_bash_code = json.dumps(bash_code)
-    cmd = 'bash -c {}'.format(escaped_bash_code)
-    cmd = indent("RUN", cmd)
-    return "\n".join((comment, cmd))
+    escaped = json.dumps(" ".join(paths))
+    return "VOLUME [{}]".format('", "'.join(escaped.split()))
+
+
+def _add_workdir(path, **kwargs):
+    """Return Dockerfile WORKDIR instruction to set working directory."""
+    return "WORKDIR {}".format(path)
 
 
 class _DockerfileUsers(object):
@@ -197,28 +281,6 @@ class _DockerfileUsers(object):
         cls.initialized_users = ['root']
 
 
-def _add_to_entrypoint(bash_cmd, with_run=True):
-    """Return command that adds the string `bash_cmd` to second-to-last line of
-    entrypoint file.
-    """
-    import json
-    base_cmd = "sed -i '$i{}' $ND_ENTRYPOINT"
-
-    # Escape quotes and remove quotes on either end of string.
-    if isinstance(bash_cmd, (list, tuple)):
-        escaped_cmds = [json.dumps(c)[1:-1] for c in bash_cmd]
-        cmds = [base_cmd.format(c) for c in escaped_cmds]
-        cmd = "\n&& ".join(cmds)
-    else:
-        escaped_bash_cmd = json.dumps(bash_cmd)[1:-1]
-        cmd = base_cmd.format(escaped_bash_cmd)
-    if with_run:
-        comment = "# Add command(s) to entrypoint"
-        cmd = indent("RUN", cmd)
-        cmd = "\n".join((comment, cmd))
-    return cmd
-
-
 def _add_spec_json_file(specs):
     """Return Dockerfile instruction to write out specs dictionary to JSON
     file.
@@ -230,7 +292,10 @@ def _add_spec_json_file(specs):
                "\n#--------------------------------------")
 
     json_specs = json.dumps(specs, indent=2)
+    json_specs = json_specs.replace('\\n', '__TO_REPLACE_NEWLINE__')
     json_specs = "\n\\n".join(json_specs.split("\n"))
+    # Escape newline characters that the user provided.
+    json_specs = json_specs.replace('__TO_REPLACE_NEWLINE__', '\\\\n')
     # Workaround to escape single quotes in a single-quoted string.
     # https://stackoverflow.com/a/1250279/5666087
     json_specs = json_specs.replace("'", """'"'"'""")
@@ -315,15 +380,20 @@ dockerfile_implementations = {
     'other': {
         'add': _add_add,
         'add_to_entrypoint':_add_to_entrypoint,
+        'arg': _add_arg,
         'base': _add_base,
+        'cmd': _add_cmd,
         'copy': _add_copy,
         'entrypoint': _add_entrypoint,
         'expose': _add_exposed_ports,
         'env': _add_env_vars,
         'install': _add_install,
         'instruction': _add_arbitrary_instruction,
+        'label': _add_label,
+        'run': _add_run,
         'run_bash': _add_run_bash,
         'user': _DockerfileUsers.add,
+        'volume': _add_volume,
         'workdir': _add_workdir,
     },
 }
@@ -365,9 +435,6 @@ def _get_dockerfile_chunks(specs):
         chunk = _get_dockerfile_chunk(instruction, options, specs)
         dockerfile_chunks.append(chunk)
 
-    _DockerfileUsers.clear_memory()
-    interfaces.Miniconda.clear_memory()
-
     return dockerfile_chunks
 
 
@@ -387,6 +454,9 @@ class Dockerfile(object):
         self._add_metadata()
         _SpecsParser(specs)  # Raise exception on error in specs dict.
         self.cmd = self._create_cmd()
+
+        _DockerfileUsers.clear_memory()
+        interfaces.Miniconda.clear_memory()
 
     def __repr__(self):
         return "{self.__class__.__name__}({self.cmd})".format(self=self)
@@ -418,7 +488,7 @@ class Dockerfile(object):
 
         chunks.append(_add_spec_json_file(self.specs))
 
-        return "\n\n".join(chunks) + "\n"
+        return "\n\n".join(chunks)
 
     def save(self, filepath="Dockerfile", **kwargs):
         """Save Dockerfile to `filepath`. `kwargs` are for `open()`."""

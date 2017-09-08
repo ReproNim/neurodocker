@@ -27,7 +27,7 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
 
 def _indent_pkgs(line_len, pkgs):
     cmd = " {first_pkg}".format(first_pkg=pkgs[0])
-    separator = "\n" + " " * line_len
+    separator = "\n" + " " * (line_len + 1)
     return separator.join((cmd, *pkgs[1:]))
 
 
@@ -36,7 +36,7 @@ def yum_install(pkgs, flags=None):
     if flags is None:
         flags = YUM_INSTALL_FLAGS
     cmd = "yum install -y {flags}".format(flags=flags)
-    line_len = len(cmd) + 1
+    line_len = len(cmd)
     return cmd + _indent_pkgs(line_len, pkgs)
 
 
@@ -46,7 +46,7 @@ def apt_get_install(pkgs, flags=None):
         flags = APT_GET_INSTALL_FLAGS
     cmd = ("apt-get update -qq"
            "\n&& apt-get install -y {flags}").format(flags=flags)
-    line_len = len(cmd.split('\n')[-1]) + 1
+    line_len = len(cmd.split('\n')[-1])
     return cmd + _indent_pkgs(line_len, pkgs)
 
 
@@ -87,7 +87,7 @@ def _count_key_occurence_list_of_tuples(list_of_tuples, key):
 
 def _namespace_to_specs(namespace):
     """Return dictionary of specifications from namespace."""
-    from neurodocker.dockerfile import dockerfile_implementations
+    from neurodocker.generate import dockerfile_implementations
 
     instructions = [('base', namespace.base)]
     try:

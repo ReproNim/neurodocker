@@ -11,7 +11,7 @@ import logging
 import sys
 
 from neurodocker import __version__, Dockerfile, utils
-from neurodocker.dockerfile import dockerfile_implementations
+from neurodocker.generate import dockerfile_implementations
 
 logger = logging.getLogger(__name__)
 
@@ -46,34 +46,41 @@ def _add_generate_arguments(parser):
 
     # Arguments that should be ordered.
     p.add_argument('--add', action=OrderedArgs, nargs="+",
-                   help=("Add file or directory within build context or a URL"
-                         " to Docker container filesystem. Use form"
-                         " <src> ... <dest>"))
+                   help="Dockerfile ADD instruction. Use format <src> ... <dest>")
+    p.add_argument('--add-to-entrypoint', action=OrderedArgs, nargs="+",
+                   help=("Add a command to the file /neurodocker/startup.sh,"
+                         " which is the container's default entrypoint."))
+    p.add_argument('--arg', action=OrderedArgs, nargs="+",
+                   help="Dockerfile ARG instruction. Use format KEY[=DEFAULT_VALUE] ...",
+                   type=list_of_kv)
+    p.add_argument('--cmd', action=OrderedArgs, nargs="+",
+                   help="Dockerfile CMD instruction.")
     p.add_argument('--copy', action=OrderedArgs, nargs="+",
-                   help=("Copy file or directory within build context to"
-                         " Docker container filesystem. Use form"
-                         " <src> ... <dest>"))
+                   help="Dockerfile COPY instruction. Use format <src> ... <dest>")
+    p.add_argument('--entrypoint', action=OrderedArgs,
+                   help="Dockerfile ENTRYPOINT instruction.")
+    p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
+                   help="Dockerfile ENV instruction. Use the format KEY=VALUE ...",
+                   type=list_of_kv)
+    p.add_argument('--expose', nargs="+", action=OrderedArgs,
+                   help="Dockerfile EXPOSE instruction.")
     p.add_argument('--install', action=OrderedArgs, nargs="+",
                    help=("Install system packages with apt-get or yum,"
-                         " depending on the base image."))
-    p.add_argument('-i', '--instruction', action=OrderedArgs,
-                     help=("Arbitrary Dockerfile instruction. Can be used "
-                           "multiple times. Added to end of Dockerfile."))
-    p.add_argument('--entrypoint', action=OrderedArgs,
-                   help="Entrypoint for the Docker image.")
-    p.add_argument('--add-to-entrypoint', action=OrderedArgs, nargs="+",
-                   help=("Add a command to the container's entrypoint"
-                         " (/neurodocker/startup.sh)"))
-    p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
-                   help=("Environment variables to set in Docker image. Use the "
-                         "format KEY=VALUE."), type=list_of_kv)
-    p.add_argument('--run-bash', action=OrderedArgs, help="Run BASH code.")
+                         " depending on the package manager specified."))
+    p.add_argument('--instruction', action=OrderedArgs,
+                   help="Arbitrary text to write to Dockerfile.")
+    p.add_argument('--label', action=OrderedArgs, nargs="+",
+                   help="Dockerfile LABEL instruction.", type=list_of_kv)
+    p.add_argument('-r', '--run', action=OrderedArgs,
+                   help="Dockerfile RUN instruction")
+    p.add_argument('--run-bash', action=OrderedArgs,
+                   help="Run BASH code in RUN instruction.")
     p.add_argument('-u', '--user', action=OrderedArgs,
-                   help="Set the user. If not set, user is root.")
-    p.add_argument('--expose', nargs="+", action=OrderedArgs,
-                   help="Port(s) to expose.")
+                   help="Dockerfile USER instruction.")
+    p.add_argument('--volume', action=OrderedArgs, nargs="+",
+                   help="Dockerfile VOLUME instruction.")
     p.add_argument('--workdir', action=OrderedArgs,
-                   help="Working directory in container")
+                   help="Dockerfile WORKDIR instruction.")
 
     # To generate from file.
     p.add_argument('-f', '--file', dest='file',
@@ -120,11 +127,10 @@ def _add_generate_arguments(parser):
             " (default true) and use_installer."),
         "miniconda": (
             "Install Miniconda. Valid keys are env_name (required),"
-            " python_version (required), conda_install, pip_install,"
-            " conda_opts, pip_opts, add_to_path (default true) and"
-            " miniconda_version (defaults to latest). The options conda_install"
-            " and pip_install accept strings of packages:"
-            ' conda_install="traits numpy".'),
+            " conda_install, pip_install, conda_opts, pip_opts, add_to_path"
+            " (default false) and miniconda_version (defaults to latest). The"
+            " options conda_install and pip_install accept strings of packages:"
+            ' conda_install="python=3.6 numpy traits".'),
         "mrtrix3": (
             "Install MRtrix3. Valid keys are use_binaries (default true) and"
             " git_hash. If git_hash is specified and use_binaries is false,"
@@ -251,7 +257,8 @@ def main(args=None):
     else:
         namespace = parse_args(args)
 
-    _validate_args(namespace)
+    if namespace.subparser_name == 'generate':
+        _validate_args(namespace)
 
     if namespace.verbosity is not None:
         utils.set_log_level(namespace.verbosity)

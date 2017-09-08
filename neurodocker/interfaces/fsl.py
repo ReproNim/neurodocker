@@ -129,7 +129,7 @@ class FSL(object):
         """Return Dockerfile instructions to install FSL using binaries hosted
         on FSL's website.
         """
-        from neurodocker.dockerfile import _add_to_entrypoint
+        from neurodocker.generate import _add_to_entrypoint
 
         cmd = self._install_binaries_deps()
         cmd += ('\n&& echo "Downloading FSL ..."'

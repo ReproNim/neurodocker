@@ -26,13 +26,16 @@ This software is still in the early stages of development. If you come across an
 
 # Installation
 
-You can install _Neurodocker_ with `pip`, or you can use the project's Docker image.
+You can use _Neurodocker's_ Docker image, or you can install the project with `pip`:
 
-`pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz`
+`docker run --rm kaczmarj/neurodocker --help`
 
 or
 
-`docker run --rm kaczmarj/neurodocker --help`
+```shell
+pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz
+neurodocker --help
+```
 
 Note that building and minifying Docker images is not possible within the _Neurodocker_ Docker image.
 
@@ -54,9 +57,9 @@ Valid options for each software package are the keyword arguments for the class 
 | **FSL**** | version* | Any version for which binaries are provided. |
 |           | use_binaries | If true (default), use pre-compiled binaries. Building from source is not available now but might be added in the future. |
 |           | use_installer | If true, use FSL's Python installer. Only valid on CentOS images. |
+| **MINC** | version* | 1.9.15 |
 | **Miniconda** | env_name* | Name of this conda environment. |
-|               | python_version* | Version of Python. |
-|               | conda_install | Packages to install with conda. e.g., `conda_install="numpy traits"` |
+|               | conda_install | Packages to install with conda. e.g., `conda_install="python=3.6 numpy traits"` |
 |               | pip_install | Packages to install with pip. |
 |               | conda_opts  | Command-line options to pass to [`conda create`](https://conda.io/docs/commands/conda-create.html). e.g., `conda_opts="-c vida-nyu"` |
 |               | pip_opts    | Command-line options to pass to [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#options). |
@@ -68,6 +71,7 @@ Valid options for each software package are the keyword arguments for the class 
 |                 | download_server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate --help` for the full list of servers. |
 |                 | pkgs | Packages to download from NeuroDebian. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
+| **PETPVC** | version* | 1.2.0-b, 1.2.0-a, 1.1.0, 1.0.0 |
 | **SPM** | version*        | 12 (earlier versions will be supported in the future). |
 |         | matlab_version* | R2017a (other MCR versions will be supported once earlier SPM versions are supported). |
 
@@ -97,11 +101,13 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 # Generate Dockerfile.
 docker run --rm kaczmarj/neurodocker generate \
 --base debian:stretch --pkg-manager apt \
+--arg FOO=BAR BAZ \
 --install git vim \
 --afni version=latest \
 --ants version=2.2.0 \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
+--minc version=1.9.15 \
 --user=neuro \
 --miniconda env_name=neuro \
             conda_opts="--channel vida-nyu" \
@@ -117,6 +123,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --neurodebian os_codename="jessie" \
               download_server="usa-nh" \
               pkgs="dcm2niix git-annex-standalone" \
+--petpvc version=1.2.0-b \
 --spm version=12 matlab_version=R2017a \
 --user=neuro \
 --env KEY_A=VAL_A KEY_B=VAL_B \
@@ -124,7 +131,10 @@ docker run --rm kaczmarj/neurodocker generate \
 --instruction='RUN mkdir /opt/mydir' \
 --run-bash="echo 'myfile' > /tmp/myfile.txt" \
 --add-to-entrypoint 'echo hello world' 'source myfile.sh' \
---expose 8888 \
+--cmd arg1 arg2 \
+--volume /var /tmp \
+--expose 8888 80 \
+--label FOO=BAR BAZ=CAT \
 --workdir /home/neuro \
 --no-check-urls > examples/generated-full.Dockerfile
 
@@ -182,8 +192,7 @@ specs = {
         ('user', 'neuro'),
         ('miniconda', {
             'env_name': 'my_env',
-            'python_version': '3.5.1',
-            'conda_install': 'traits',
+            'conda_install': 'python=3.5.1 traits',
             'pip_install': 'https://github.com/nipy/nipype/archive/master.tar.gz'}),
         ('user', 'root'),
         ('afni', {'version': 'latest'}),
