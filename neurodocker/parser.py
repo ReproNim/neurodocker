@@ -7,7 +7,7 @@ import inspect
 
 import neurodocker
 from neurodocker import utils
-from neurodocker.dockerfile import dockerfile_implementations
+from neurodocker.generate import dockerfile_implementations
 
 
 def _check_for_invalid_keys(keys, valid_keys, where):
@@ -45,8 +45,6 @@ class _SpecsParser(object):
     ... }
     >>> SpecsParser(specs)
     """
-    from neurodocker.dockerfile import dockerfile_implementations
-
     VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
                             'generation_timestamp', 'neurodocker_version',]
     VALID_INSTRUCTIONS_KEYS = list(dockerfile_implementations['other'].keys())
