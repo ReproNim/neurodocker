@@ -30,7 +30,7 @@ class MINC(object):
             If true, raise error if a URL used by this class responds with an error
             code.
     """
-    VERSION_Releases = {
+    VERSION_TARBALLS = {
         "1.9.15": "https://dl.dropbox.com/s/40hjzizaqi91373/minc-toolkit-1.9.15-20170529-CentOS_6.9-x86_64.tar.gz",
     }
     BEAST_URL = {
@@ -65,7 +65,7 @@ class MINC(object):
 
     def _get_binaries_urls(self, version):
         try:
-            return MINC.VERSION_Releases[version]
+            return MINC.VERSION_TARBALLS[version]
         except KeyError:
             raise ValueError("MINC version not available: {}".format(version))
 
@@ -102,7 +102,7 @@ class MINC(object):
         """Return Dockerfile instructions to download and install MINC
         binaries.
         """
-        from neurodocker.dockerfile import _add_to_entrypoint
+        from neurodocker.generate import _add_to_entrypoint
         minc_url = self._get_binaries_urls(self.version)
         beast_url = self.BEAST_URL['1.1']
         models_09a_url = self.MODELS_URL['09a']

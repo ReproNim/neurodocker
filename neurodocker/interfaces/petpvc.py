@@ -31,7 +31,7 @@ class PETPVC(object):
             code.
     """
 
-    VERSION_Releases = {
+    VERSION_TARBALLS = {
         "1.2.0-b": "https://github.com/UCL/PETPVC/releases/download/v1.2.0-b/PETPVC-1.2.0-b-Linux.tar.gz",
         "1.2.0-a": "https://github.com/UCL/PETPVC/releases/download/v1.2.0-a/PETPVC-1.2.0-a-Linux.tar.gz",
         "1.1.0": "https://github.com/UCL/PETPVC/releases/download/v1.1.0/PETPVC-1.1.0-Linux.tar.gz",
@@ -62,7 +62,7 @@ class PETPVC(object):
 
     def _get_binaries_urls(self, version):
         try:
-            return PETPVC.VERSION_Releases[version]
+            return PETPVC.VERSION_TARBALLS[version]
         except KeyError:
             raise ValueError("PETPVC version not available: {}".format(version))
 
