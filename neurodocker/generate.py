@@ -80,15 +80,15 @@ def _add_arg(arg_dict, **kwargs):
         values assigned to those variables.
     """
     import json
-    out = ""
-    for k, v in arg_dict.items():
-        newline = "\n" if out else ""
-        if not v:  # no default value
-            out += '{}{}'.format(newline, k)
-        else:
-            v = json.dumps(v)  # Escape double quotes and other things.
-            out += '{}{}={}'.format(newline, k, v)
-    return indent("ARG", out)
+    cmds = []
+    base = "ARG {}"
+    for arg, value in arg_dict.items():
+        out = base.format(arg)
+        if value:  # default value provided.
+            value = json.dumps(value)  # Escape double quotes and other things.
+            out += "={}".format(value)
+        cmds.append(out)
+    return "\n".join(cmds)
 
 
 def _add_base(base, **kwargs):
@@ -328,7 +328,7 @@ def _add_common_dependencies(pkg_manager):
     """
     deps = ['bzip2', 'ca-certificates', 'curl', 'unzip']
     if pkg_manager == "apt":
-        deps.append('locales')
+        deps += ['apt-utils', 'locales']
     if pkg_manager == "yum":
         deps.append('epel-release')
     deps = " ".join(sorted(deps))

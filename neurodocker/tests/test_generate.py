@@ -30,8 +30,8 @@ def test__add_to_entrypoint():
 
 def test__add_arg():
     args = {'FOO': 'BAR', 'BAZ': ''}
-    truth = ('ARG FOO="BAR" \\'
-             '\n    BAZ')
+    truth = ('ARG FOO="BAR"'
+             '\nARG BAZ')
     assert truth == DF._add_arg(args)
 
 
