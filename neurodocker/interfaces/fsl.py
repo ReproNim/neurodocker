@@ -119,7 +119,7 @@ class FSL(object):
         """Return command to install FreeSurfer dependencies. Use this for
         FreeSurfer binaries, not if attempting to build FreeSurfer from source.
         """
-        pkgs = {'apt': "dc",
+        pkgs = {'apt': "bc dc",
                 'yum': "bc"}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
