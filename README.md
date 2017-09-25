@@ -55,6 +55,8 @@ Valid options for each software package are the keyword arguments for the class 
 |                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
 |                | min | If true, install a version of FreeSurfer minimized for recon-all. See [freesurfer/freesurfer#70](https://github.com/freesurfer/freesurfer/issues/70). False by default. |
 | **FSL**** | version* | Any version for which binaries are provided. |
+|           | eddy | 5.0.11 to use pre-release version of FSL eddy |
+|           | cuda_version | 6.5, 7.0, 7.5, 8.0; only valid if using eddy pre-release |
 |           | use_binaries | If true (default), use pre-compiled binaries. Building from source is not available now but might be added in the future. |
 |           | use_installer | If true, use FSL's Python installer. Only valid on CentOS images. |
 | **MINC** | version* | 1.9.15 |
