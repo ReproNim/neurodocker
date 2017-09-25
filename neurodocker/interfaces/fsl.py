@@ -190,7 +190,7 @@ class FSL(object):
             filename = cuda_versions.get(self.cuda_version, None)
             if filename is None:
                 raise ValueError("Valid CUDA versions are {}"
-                                 .format(cuda_versions.keys()))
+                                 .format(', '.join(cuda_versions.keys())))
         return urljoin(base_url, filename)
 
     def install_eddy_5011(self, url):
