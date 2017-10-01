@@ -121,7 +121,7 @@ class AFNI(object):
                       "R_installer_debian_ubuntu.sh")
             cmd += ("\n# Install R"
                     "\n&& apt-get install -yq --no-install-recommends"
-                    "\n\tr-base-dev r-cran-rmpi"
+                    "\n\tr-base-dev r-cran-rmpi libnlopt-dev"
                     '\n || /bin/bash -c "'
                     '\n    curl -o /tmp/install_R.sh -sSL {}'
                     '\n    && /bin/bash /tmp/install_R.sh"'
