@@ -33,6 +33,11 @@ class FSL(object):
     use_installer : bool
         If true, install FSL using FSL's Python installer. Only works on
         CentOS/RHEL (default false).
+    eddy_5011 : bool
+        If true, install pre-release of FSL eddy v5.0.11.
+    eddy_5011_cuda : {'6.5', '7.0', '7.5', '8.0'}
+        Version of CUDA for FSL eddy pre-release. Only applies if eddy_5011 is
+        true.
     check_urls : bool
         If true, raise error if a URL used by this class responds with an error
         code.
@@ -42,19 +47,16 @@ class FSL(object):
     Look into ReproNim/simple_workflow to learn how to install specific
     versions of FSL on Debian (https://github.com/ReproNim/simple_workflow).
     """
-    def __init__(self, version=None, eddy=None, cuda_version=None,
-                 pkg_manager=None, use_binaries=True, use_installer=False,
+    def __init__(self, version, pkg_manager, use_binaries=True,
+                 use_installer=False, eddy_5011=False, eddy_5011_cuda=None,
                  check_urls=True):
-        self.version = version
-        self.eddy = eddy
-        self.cuda_version = cuda_version
+        self.version = LooseVersion(version)
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
         self.use_installer = use_installer
+        self.eddy_5011 = eddy_5011
+        self.eddy_5011_cuda = eddy_5011_cuda
         self.check_urls = check_urls
-
-        if self.version is not None:
-            self.version = LooseVersion(self.version)
 
         self._check_args()
         self.cmd = self._create_cmd()
@@ -66,16 +68,11 @@ class FSL(object):
         if self.use_binaries and self.use_installer:
             raise ValueError("More than one installation method specified.")
         if self.use_installer and self.pkg_manager != 'yum':
-            raise ValueError("FSL's Python installer works only on "
-                             "CentOS/RHEL-based systems.")
-        if self.version and (self.eddy or self.cuda_version):
-            raise ValueError("version cannot be specified with eddy and/or "
-                             "cuda_version.")
-        if not self.version and not self.eddy:
-            raise ValueError("version or eddy must be specfied.")
-        if not self.eddy and self.cuda_version:
-            raise ValueError("cuda_version can only be specified when eddy is "
-                             "specified.")
+            raise ValueError("FSL's Python installer works only on"
+                             " CentOS/RHEL-based systems.")
+        if self.version < LooseVersion('5.0.10') and self.eddy_5011:
+            raise ValueError("Pre-release of FSL eddy can only be installed"
+                             " with FSL v5.0.10.")
         return True
 
     def _create_cmd(self):
@@ -86,15 +83,9 @@ class FSL(object):
                    "\n# of this Docker image, please consult the relevant license:"
                    "\n# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence"
                    "\n#-----------------------------------------------------------")
-        if self.version:
-            comment = comment.format(self.version)
-        elif self.eddy:
-            comment = comment.format(self.eddy)
+        comment = comment.format(self.version)
 
-        if self.eddy:
-            url = self._get_eddy_5011_url()
-            cmd = self.install_eddy_5011(url)
-        elif self.use_binaries:
+        if self.use_binaries:
             url = self._get_binaries_url()
             cmd = self.install_binaries(url)
         elif self.use_installer:
@@ -139,7 +130,7 @@ class FSL(object):
     def _install_binaries_deps(self):
         """Return command to install FSL dependencies."""
         pkgs = {'apt': "bc dc",
-                'yum': "bc"}
+                'yum': "bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt"}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         return cmd.format(pkgs=pkgs[self.pkg_manager])
@@ -158,6 +149,9 @@ class FSL(object):
         if self.version >= LooseVersion('5.0.10'):
             fsl_python = "/opt/fsl/etc/fslconf/fslpython_install.sh"
             cmd += "\n&& /bin/bash {} -q -f /opt/fsl".format(fsl_python)
+
+        if self.eddy_5011:
+            cmd += self._install_eddy_5011()
 
         ent_cmds = ["echo Some packages in this Docker container are non-free",
                     ("echo If you are considering commercial use of this"
@@ -184,46 +178,32 @@ class FSL(object):
             '7.5': 'eddy_cuda7.5',
             '8.0': 'eddy_cuda8.0',
         }
-        if self.cuda_version is None:
+        if self.eddy_5011_cuda is None:
             filename = "eddy_openmp"
         else:
-            filename = cuda_versions.get(self.cuda_version, None)
+            filename = cuda_versions.get(self.eddy_5011_cuda, None)
             if filename is None:
                 raise ValueError("Valid CUDA versions are {}"
                                  .format(', '.join(cuda_versions.keys())))
         return urljoin(base_url, filename)
 
-    def install_eddy_5011(self, url):
-        """Return Dockerfile instructions to install FSL eddy 5.0.11
+    def _install_eddy_5011(self):
+        """Return Dockerfile instructions to install FSL eddy v5.0.11
         pre-release.
         """
-        from neurodocker.generate import _add_to_entrypoint
+        url = self._get_eddy_5011_url()
 
         if self.check_urls:
             check_url(url)
 
-        comment = "# Eddy v5.0.11 pre-release"
+        cmd = ('\n&& cd /opt/fsl/bin'
+               '\n&& rm -f eddy_*'
+               '\n&& echo "Downloading FSL eddy v5.0.11 pre-release ..."'
+               '\n&& curl -sSLO {}').format(url)
 
-        pkgs = {'apt': "libgomp1",
-                'yum': "libgomp"}
+        filename = url.split('/')[-1]
+        if 'cuda' in filename:
+            cmd += ('\n&& ln -sv {} eddy_cuda'
+                    '\n&& chmod +x eddy_cuda').format(filename)
 
-        cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
-        cmd = cmd.format(pkgs=pkgs[self.pkg_manager])
-
-        cmd += ('\n&& mkdir -p /opt/fsl/bin'
-                '\n&& cd /opt/fsl/bin'
-                '\n&& echo "Downloading FSL eddy..."'
-                '\n&& curl -sSLO {}'
-                '\n&& ln -sfv eddy_* eddy'
-                '\n&& chmod +x eddy').format(url)
-
-        ent_cmds = ["echo Some packages in this Docker container are non-free",
-                    ("echo If you are considering commercial use of this"
-                     " container, please consult the relevant license:"),
-                    "echo https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence"]
-        cmd += "\n&& {}".format(_add_to_entrypoint(ent_cmds, with_run=False))
-
-        cmd = indent("RUN", cmd)
-
-        env_cmd = "ENV PATH=/opt/fsl/bin:$PATH"
-        return "\n".join((comment, cmd, env_cmd))
+        return cmd
