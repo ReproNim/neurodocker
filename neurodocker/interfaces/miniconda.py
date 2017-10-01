@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import posixpath
 
-from neurodocker.utils import _indent_pkgs, check_url, indent
+from neurodocker.utils import _indent_pkgs, check_url, indent, is_url
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,8 @@ class Miniconda(object):
         Name to give this environment.
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
+    yaml_file : path-like or url-like
+        Conda environment specification file.
     conda_install : str or list or tuple
         Packages to install using `conda`, including Python. Follow the syntax
         for `conda install`. For example, the input ['numpy=1.12', 'scipy'] is
@@ -55,10 +57,12 @@ class Miniconda(object):
     INSTALLED = False
     INSTALL_PATH = "/opt/conda"
 
-    def __init__(self, env_name, pkg_manager, conda_install=None,
-                 pip_install=None, conda_opts=None, pip_opts=None,
-                 add_to_path=False, miniconda_verion='latest', check_urls=True):
+    def __init__(self, env_name, pkg_manager, yaml_file=None,
+                 conda_install=None, pip_install=None, conda_opts=None,
+                 pip_opts=None, add_to_path=False, miniconda_verion='latest',
+                 check_urls=True):
         self.env_name = env_name
+        self.yaml_file = yaml_file
         self.pkg_manager = pkg_manager
         self.conda_install = conda_install
         self.pip_install = pip_install
@@ -68,7 +72,14 @@ class Miniconda(object):
         self.miniconda_verion = miniconda_verion
         self.check_urls = check_urls
 
+        self._check_args()
         self.cmd = self._create_cmd()
+
+    def _check_args(self):
+        if self.yaml_file and (self.conda_install is not None
+                               or self.pip_install is not None):
+            raise ValueError("Packages cannot be installed while creating an"
+                             " environment from a yaml file.")
 
     def _create_cmd(self):
         cmds = []
@@ -80,13 +91,16 @@ class Miniconda(object):
             cmds.append(self.install_miniconda())
             cmds.append('')
 
-        create = not (self.env_name in Miniconda.created_envs)
+        create = self.env_name not in Miniconda.created_envs
         _comment_base = "Create" if create else "Update"
         comment = ("#-------------------------"
                    "\n# {} conda environment"
                    "\n#-------------------------").format(_comment_base)
         cmds.append(comment)
-        cmds.append(self.conda_and_pip_install(create=create))
+        if self.yaml_file is not None:
+            cmds.append(self.create_from_yaml())
+        else:
+            cmds.append(self.conda_and_pip_install(create=create))
 
         return "\n".join(cmds)
 
@@ -119,6 +133,34 @@ class Miniconda(object):
         Miniconda.INSTALLED = True
 
         return "\n".join((env_cmd, cmd))
+
+    def create_from_yaml(self):
+        """Return Dockerfile instructions to create conda environment from
+        a YAML file.
+        """
+        tmp_yml = "/tmp/environment.yml"
+        cmd = ("conda env create -q --name {n} --file {tmp}"
+               "\n&& rm -f {tmp}")
+
+        if is_url(self.yaml_file):
+            get_file = "curl -sSL {f} > {tmp}"
+            cmd = get_file + "\n&& " + cmd
+            if self.check_urls:
+                check_url(self.yaml_file)
+            cmd = indent("RUN", cmd)
+        else:
+            get_file = 'COPY ["{f}", "{tmp}"]'
+            cmd = indent("RUN", cmd)
+            cmd = "\n".join((get_file, cmd))
+
+        cmd = cmd.format(n=self.env_name, f=self.yaml_file, tmp=tmp_yml)
+
+        if self.add_to_path:
+            bin_path = posixpath.join(Miniconda.INSTALL_PATH, 'envs',
+                                      self.env_name, 'bin')
+            env_cmd = "ENV PATH={}:$PATH".format(bin_path)
+            return "\n".join((cmd, env_cmd))
+        return cmd
 
     def conda_and_pip_install(self, create=True):
         """Return Dockerfile instructions to create conda environment with
