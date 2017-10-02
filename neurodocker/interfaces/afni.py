@@ -29,6 +29,9 @@ class AFNI(object):
         Linux package manager.
     use_binaries : bool
         If true, uses pre-compiled AFNI binaries. True by default.
+    install_r : bool
+        If true, install R and R packages for AFNI. This can significantly
+        increase container build time.
     check_urls : bool
         If true, raise error if a URL used by this class responds with an error
         code.
@@ -37,13 +40,14 @@ class AFNI(object):
     VERSION_TARBALLS = {
         "latest": "https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz",
         "17.2.02": "https://dl.dropbox.com/s/yd4umklaijydn13/afni-Linux-openmp64-v17.2.02.tgz",
-        }
+    }
 
     def __init__(self, version, pkg_manager, use_binaries=True,
-                 check_urls=True):
+                 install_r=False, check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
+        self.install_r = install_r
         self.check_urls = check_urls
 
         self.cmd = self._create_cmd()
@@ -99,7 +103,7 @@ class AFNI(object):
             # libxp was removed after ubuntu trusty.
             deb_url = ('http://mirrors.kernel.org/debian/pool/main/libx/'
                        'libxp/libxp6_1.0.2-2_amd64.deb')
-            cmd += ("\n# Install libxp (not in all ubuntu/debian repositories)"
+            cmd += ('\n&& echo "Install libxp (not in all ubuntu/debian repositories)"'
                     "\n&& apt-get install -yq --no-install-recommends libxp6"
                     '\n|| /bin/bash -c "'
                     '\n   curl --retry 5 -o /tmp/libxp6.deb -sSL {}'
@@ -108,33 +112,35 @@ class AFNI(object):
 
             deb_url = ('http://mirrors.kernel.org/debian/pool/main/libp/'
                        'libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb')
-            cmd += ("\n# Install libpng12 (not in all ubuntu/debian repositories)"
+            cmd += ('\n&& echo "Install libpng12 (not in all ubuntu/debian repositories"'
                     "\n&& apt-get install -yq --no-install-recommends libpng12-0"
                     '\n|| /bin/bash -c "'
                     '\n   curl -o /tmp/libpng12.deb -sSL {}'
                     '\n   && dpkg -i /tmp/libpng12.deb && rm -f /tmp/libpng12.deb"'
                     ''.format(deb_url))
 
-            sh_url = ("https://gist.githubusercontent.com/kaczmarj/"
-                      "8e3792ae1af70b03788163c44f453b43/raw/"
-                      "0577c62e4771236adf0191c826a25249eb69a130/"
-                      "R_installer_debian_ubuntu.sh")
-            cmd += ("\n# Install R"
-                    "\n&& apt-get install -yq --no-install-recommends"
-                    "\n\tr-base-dev r-cran-rmpi libnlopt-dev"
-                    '\n || /bin/bash -c "'
-                    '\n    curl -o /tmp/install_R.sh -sSL {}'
-                    '\n    && /bin/bash /tmp/install_R.sh"'
-                    ''.format(sh_url))
+            if self.install_r:
+                sh_url = ("https://gist.githubusercontent.com/kaczmarj/"
+                          "8e3792ae1af70b03788163c44f453b43/raw/"
+                          "0577c62e4771236adf0191c826a25249eb69a130/"
+                          "R_installer_debian_ubuntu.sh")
+                cmd += ('\n&& echo "Install R"'
+                        "\n&& apt-get install -yq --no-install-recommends"
+                        "\n\tr-base-dev r-cran-rmpi libnlopt-dev"
+                        '\n || /bin/bash -c "'
+                        '\n    curl -o /tmp/install_R.sh -sSL {}'
+                        '\n    && /bin/bash /tmp/install_R.sh"').format(sh_url)
 
         cmd += ("\n&& {clean}"
                 '\n&& echo "Downloading AFNI ..."'
                 "\n&& mkdir -p /opt/afni"
                 "\n&& curl -sSL --retry 5 {}"
                 "\n| tar zx -C /opt/afni --strip-components=1"
-                "\n&& /opt/afni/rPkgsInstall -pkgs ALL"
-                "\n&& rm -rf /tmp/*"
                 "".format(url, **manage_pkgs[self.pkg_manager]))
+        if self.install_r:
+            cmd += ("\n&& /opt/afni/rPkgsInstall -pkgs ALL"
+                    "\n&& rm -rf /tmp/*")
+
         cmd = indent("RUN", cmd)
 
         env_cmd = "PATH=/opt/afni:$PATH"

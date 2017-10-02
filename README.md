@@ -48,6 +48,7 @@ Valid options for each software package are the keyword arguments for the class 
 | software | argument | description |
 | -------- | -------- | ----------- |
 | **AFNI** | version* | Either 17.2.02 or latest. |
+|          | install_r | If true, install R and AFNI R packages. False by default. |
 | **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0 |
 |          | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
 |          | git_hash  | Git hash to checkout to before building from source (only used if use_binaries is false). |
