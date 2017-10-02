@@ -21,7 +21,7 @@ SUPPORTED_SOFTWARE = dockerfile_implementations['software']
 # https://stackoverflow.com/a/9028031/5666087
 class OrderedArgs(Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        if not 'ordered_args' in namespace:
+        if 'ordered_args' not in namespace:
             setattr(namespace, 'ordered_args', [])
         previous = namespace.ordered_args
         previous.append((self.dest, values))
@@ -38,11 +38,11 @@ def _add_generate_arguments(parser):
         l[1:] = ["=".join(l[1:])]
         return l
 
-    p.add_argument("-b", "--base", #required=True,
-                            help="Base Docker image. Eg, ubuntu:17.04")
-    p.add_argument("-p", "--pkg-manager", #required=True,
-                            choices=utils.manage_pkgs.keys(),
-                            help="Linux package manager.")
+    p.add_argument("-b", "--base",  # required=True,
+                   help="Base Docker image. Eg, ubuntu:17.04")
+    p.add_argument("-p", "--pkg-manager",  # required=True,
+                   choices=utils.manage_pkgs.keys(),
+                   help="Linux package manager.")
 
     # Arguments that should be ordered.
     p.add_argument('--add', action=OrderedArgs, nargs="+",
@@ -93,8 +93,7 @@ def _add_generate_arguments(parser):
     p.add_argument('--no-print-df', dest='no_print_df', action="store_true",
                      help="Do not print the Dockerfile")
     p.add_argument("--no-check-urls", action="store_false", dest="check_urls",
-                        help=("Do not verify communication with URLs used in "
-                              "the build."))
+                   help="Do not verify communication with URLs used in the build.")
 
     _ndeb_servers = ", ".join(SUPPORTED_SOFTWARE['neurodebian'].SERVERS.keys())
 
@@ -145,7 +144,8 @@ def _add_generate_arguments(parser):
             "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
             " keys are version and matlab_version."),
         "minc": (
-            "Install MINC. Valid keys is version (required). Only version 1.9.15 is supported at this time."),
+            "Install MINC. Valid keys is version (required). Only version"
+            " 1.9.15 is supported at this time."),
         "petpvc": (
             "Install PETPVC. Valid keys are version (required)."),
     }
@@ -165,11 +165,12 @@ def _add_reprozip_trace_arguments(parser):
     """Add arguments to `parser` for sub-command `reprozip-trace`."""
     p = parser
     p.add_argument('container',
-                        help="Running container in which to trace commands.")
+                   help="Running container in which to trace commands.")
     p.add_argument('commands', nargs='+', help="Command(s) to trace.")
     p.add_argument('--dir', '-d', dest="packfile_save_dir", default=".",
-                        help=("Directory in which to save pack file. Default "
-                              "is current directory."))
+                   help=("Directory in which to save pack file. Default "
+                         "is current directory."))
+
 
 def _add_reprozip_merge_arguments(parser):
     """Add arguments to `parser` for sub-command `reprozip-merge`."""
@@ -177,9 +178,10 @@ def _add_reprozip_merge_arguments(parser):
     p.add_argument('outfile', help="Filepath to merged pack file.")
     p.add_argument('pack_files', nargs='+', help="Pack files to merge.")
 
+
 def create_parser():
     """Return command-line argument parser."""
-    parser = ArgumentParser(description=__doc__, #add_help=False,
+    parser = ArgumentParser(description=__doc__,  # add_help=False,
                             formatter_class=RawDescriptionHelpFormatter)
 
     verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
@@ -245,7 +247,7 @@ def reprozip_merge(namespace):
 
 def _validate_args(namespace):
     if (namespace.file is None and
-        (namespace.base is None or namespace.pkg_manager is None)):
+       (namespace.base is None or namespace.pkg_manager is None)):
         raise ValueError("-b/--base and -p/--pkg-manager are required if not"
                          " generating from JSON file.")
 
@@ -267,7 +269,7 @@ def main(args=None):
 
     subparser_functions = {'generate': generate,
                            'reprozip-trace': reprozip_trace,
-                           'reprozip-merge': reprozip_merge,}
+                           'reprozip-merge': reprozip_merge}
 
     if namespace.subparser_name not in subparser_functions.keys():
         print(__doc__)
