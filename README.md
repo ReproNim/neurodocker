@@ -61,6 +61,7 @@ Valid options for each software package are the keyword arguments for the class 
 |           | use_installer | If true, use FSL's Python installer. Only valid on CentOS images. |
 | **MINC** | version* | 1.9.15 |
 | **Miniconda** | env_name* | Name of this conda environment. |
+|               | yaml_file | Environment specification file. Can be path on host or URL. |
 |               | conda_install | Packages to install with conda. e.g., `conda_install="python=3.6 numpy traits"` |
 |               | pip_install | Packages to install with pip. |
 |               | conda_opts  | Command-line options to pass to [`conda create`](https://conda.io/docs/commands/conda-create.html). e.g., `conda_opts="-c vida-nyu"` |
