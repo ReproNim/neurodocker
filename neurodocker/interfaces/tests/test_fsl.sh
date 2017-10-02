@@ -5,4 +5,3 @@ set -x
 
 bet2 -h
 flirt -version
-eddy_openmp -h
