@@ -28,6 +28,9 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'fsl-5.0.9_centos7': ('/Dockerfile.FSL-5.0.9_centos7',
                           'kaczmarj/fsl:5.0.9_centos7'),
 
+    'fsl-5.0.10_centos7': ('/Dockerfile.FSL-5.0.10_centos7',
+                           'kaczmarj/fsl:5.0.10_centos7'),
+
     'miniconda_centos7': ('/Dockerfile.Miniconda-latest_centos7',
                           'kaczmarj/miniconda:latest_centos7'),
 

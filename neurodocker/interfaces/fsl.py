@@ -129,8 +129,13 @@ class FSL(object):
 
     def _install_binaries_deps(self):
         """Return command to install FSL dependencies."""
-        pkgs = {'apt': "bc dc",
-                'yum': "bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt"}
+        pkgs = {'apt': ("bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev"
+                        " libglu1-mesa-dev libgomp1 libice6 libmng1"
+                        " libxcursor1 libxft2 libxinerama1 libxrandr2"
+                        " libxrender1 libxt6"),
+                'yum': ("bc libGL libGLU libgomp libICE libjpeg libmng"
+                        " libpng12 libSM libX11 libXcursor libXext libXft"
+                        " libXinerama libXrandr libXt")}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         return cmd.format(pkgs=pkgs[self.pkg_manager])
@@ -197,13 +202,13 @@ class FSL(object):
             check_url(url)
 
         cmd = ('\n&& cd /opt/fsl/bin'
-               '\n&& rm -f eddy_*'
+               '\n&& rm -f eddy_openmp eddy_cuda*'
                '\n&& echo "Downloading FSL eddy v5.0.11 pre-release ..."'
-               '\n&& curl -sSLO {}').format(url)
+               '\n&& curl -sSLO {}'
+               '\n&& chmod +x eddy_*').format(url)
 
         filename = url.split('/')[-1]
         if 'cuda' in filename:
-            cmd += ('\n&& ln -sv {} eddy_cuda'
-                    '\n&& chmod +x eddy_cuda').format(filename)
+            cmd += '\n&& ln -sv {} eddy_cuda'.format(filename)
 
         return cmd

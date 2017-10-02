@@ -33,17 +33,19 @@ class TestFSL(object):
         if push:
             utils.push_image(image_name)
 
-    def test_build_image_fsl_509_binaries_centos7(self):
+    def test_build_image_fsl_5010_binaries_centos7(self):
         """Install FSL binaries on CentOS 7."""
         specs = {'pkg_manager': 'yum',
                  'check_urls': True,
                  'instructions': [
-                    ('base', 'centos:7'),
-                    ('fsl', {'version': '5.0.9', 'use_binaries': True})
+                     ('base', 'centos:7'),
+                     ('fsl', {'version': '5.0.10',
+                              'use_binaries': True,
+                              'eddy_5011': True})
                  ]}
 
         df = Dockerfile(specs).cmd
-        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['fsl-5.0.9_centos7']
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['fsl-5.0.10_centos7']
         image, push = utils.get_image_from_memory(df, dbx_path, image_name)
 
         cmd = "bash /testscripts/test_fsl.sh"
