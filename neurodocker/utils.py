@@ -112,9 +112,19 @@ def _namespace_to_specs(namespace):
 
     specs = {'pkg_manager': namespace.pkg_manager,
              'check_urls': namespace.check_urls,
-             'instructions': instructions,}
+             'instructions': instructions, }
 
     return specs
+
+
+def is_url(string):
+    try:
+        from urllib.parse import urlparse  # Python 3
+    except ImportError:
+        from urlparse import urlparse  # Python 2
+
+    result = urlparse(string)
+    return (result.scheme and result.netloc)
 
 
 def check_url(url, timeout=5, **kwargs):
