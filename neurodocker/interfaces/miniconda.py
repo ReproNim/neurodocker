@@ -40,7 +40,7 @@ class Miniconda(object):
         Command-line options to pass to `pip install`.
     add_to_path : bool
         If true, prepend the new environment to $PATH. False by default.
-    miniconda_verion : str
+    miniconda_version : str
         Version of Miniconda to install. Defaults to 'latest'. This does not
         correspond to Python version.
     check_urls : bool
@@ -59,7 +59,7 @@ class Miniconda(object):
 
     def __init__(self, env_name, pkg_manager, yaml_file=None,
                  conda_install=None, pip_install=None, conda_opts=None,
-                 pip_opts=None, add_to_path=False, miniconda_verion='latest',
+                 pip_opts=None, add_to_path=False, miniconda_version='latest',
                  check_urls=True):
         self.env_name = env_name
         self.yaml_file = yaml_file
@@ -69,7 +69,7 @@ class Miniconda(object):
         self.conda_opts = conda_opts
         self.pip_opts = pip_opts
         self.add_to_path = add_to_path
-        self.miniconda_verion = miniconda_verion
+        self.miniconda_version = miniconda_version
         self.check_urls = check_urls
 
         self._check_args()
@@ -109,7 +109,7 @@ class Miniconda(object):
 
         install_url = ("https://repo.continuum.io/miniconda/"
                        "Miniconda3-{}-Linux-x86_64.sh"
-                       "".format(self.miniconda_verion))
+                       "".format(self.miniconda_version))
         if self.check_urls:
             check_url(install_url)
 
