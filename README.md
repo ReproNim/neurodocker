@@ -52,6 +52,7 @@ Valid options for each software package are the keyword arguments for the class 
 | **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0 |
 |          | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
 |          | git_hash  | Git hash to checkout to before building from source (only used if use_binaries is false). |
+| **c3d | version* | "1.0.0" or "nightly". |
 | **dcm2niix** | version* | "latest", "master", git commit hash, or git tag. |
 | **FreeSurfer** | version* | Any version for which binaries are provided. |
 |                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
