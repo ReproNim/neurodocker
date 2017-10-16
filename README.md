@@ -10,7 +10,6 @@ Examples:
   - [Generate Dockerfile](#generate-dockerfile)
   - [Generate Dockerfile (full)](#generate-dockerfile-full)
   - [Minimize existing Docker image](#minimize-existing-docker-image)
-  - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 
 
 # Note to users
