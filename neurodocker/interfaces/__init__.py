@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from neurodocker.interfaces.afni import AFNI
 from neurodocker.interfaces.ants import ANTs
 from neurodocker.interfaces.convert3d import Convert3D
+from neurodocker.interfaces.dcm2niix import Dcm2niix
 from neurodocker.interfaces.freesurfer import FreeSurfer
 from neurodocker.interfaces.fsl import FSL
 from neurodocker.interfaces.miniconda import Miniconda
