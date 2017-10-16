@@ -7,16 +7,10 @@
 _Neurodocker_ is a Python project that generates custom Dockerfiles for neuroimaging and minifies existing Docker images (using [ReproZip](https://www.reprozip.org/)). The package can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles and minifies Docker images, but interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)), and minify Docker images. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
 
 Examples:
-  - Command-line
-    - [Generate Dockerfile](#generate-dockerfile)
-    - [Generate Dockerfile (full)](#generate-dockerfile-full)
-  - In a Python script
-    - [Generate Dockerfile, build Docker image, run commands in image (minimal)](#generate-dockerfile-build-docker-image-run-commands-in-image-minimal)
-    - [Generate full Dockerfile](#generate-full-dockerfile)
-      - [Generated Dockerfile](examples/generated-full.Dockerfile)
-  - Minimize Docker image
-    - [Minimize existing Docker image](#minimize-existing-docker-image)
-    - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
+  - [Generate Dockerfile](#generate-dockerfile)
+  - [Generate Dockerfile (full)](#generate-dockerfile-full)
+  - [Minimize existing Docker image](#minimize-existing-docker-image)
+  - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 
 
 # Note to users
@@ -26,18 +20,18 @@ This software is still in the early stages of development. If you come across an
 
 # Installation
 
-You can use _Neurodocker's_ Docker image, or you can install the project with `pip`:
+You can use _Neurodocker's_ Docker image (recommended), or you can install the project with `pip`:
 
 `docker run --rm kaczmarj/neurodocker:v0.3.1 --help`
 
 or
 
 ```shell
-pip install https://github.com/kaczmarj/neurodocker/archive/master.tar.gz
+pip install --no-cache-dir https://github.com/kaczmarj/neurodocker/tarball/master
 neurodocker --help
 ```
 
-Note that building and minifying Docker images is not possible within the _Neurodocker_ Docker image.
+Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
 
 
 # Supported Software
@@ -52,7 +46,7 @@ Valid options for each software package are the keyword arguments for the class 
 | **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0 |
 |          | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
 |          | git_hash  | Git hash to checkout to before building from source (only used if use_binaries is false). |
-| **c3d | version* | "1.0.0" or "nightly". |
+| **c3d** | version* | "1.0.0" or "nightly". |
 | **dcm2niix** | version* | "latest", "master", git commit hash, or git tag. |
 | **FreeSurfer** | version* | Any version for which binaries are provided. |
 |                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
@@ -111,6 +105,7 @@ docker run --rm kaczmarj/neurodocker generate \
 --install git vim \
 --afni version=latest \
 --ants version=2.2.0 \
+--c3d version=1.0.0 \
 --dcm2niix version=latest \
 --freesurfer version=6.0.0 min=true \
 --fsl version=5.0.10 \
