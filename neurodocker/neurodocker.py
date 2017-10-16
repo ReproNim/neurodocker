@@ -115,6 +115,8 @@ def _add_generate_arguments(parser):
             " commit."),
         "c3d": (
             "Install Convert3D. The only valid key is version (required)."),
+        "dcm2niix": (
+            "Install dcm2niix. The only valid key is version (required)."),
         "freesurfer": (
             "Install FreeSurfer. Valid keys are version (required),"
             " license_path (relative path to license), min (if true, install"

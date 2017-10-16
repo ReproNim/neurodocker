@@ -22,6 +22,9 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'convert3d_zesty': ('/Dockerfile.Convert3D-1.0.0_zesty',
                         'kaczmarj/c3d:1.0.0_zesty'),
 
+    'dcm2niix-master_centos7': ('/Dockerfile.dcm2niix-master_centos7',
+                                'kaczmarj/dcm2niix:master_centos7'),
+
     'freesurfer-min_zesty': ('/Dockerfile.FreeSurfer-min_zesty',
                              'kaczmarj/freesurfer:min_zesty'),
 
