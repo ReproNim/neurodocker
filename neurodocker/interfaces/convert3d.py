@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 
 import posixpath
 
-from neurodocker.utils import check_url, indent, manage_pkgs
+from neurodocker.utils import check_url, indent
 
 
 class Convert3D(object):
