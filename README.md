@@ -22,7 +22,9 @@ This software is still in the early stages of development. If you come across an
 
 You can use _Neurodocker's_ Docker image (recommended), or you can install the project with `pip`:
 
-`docker run --rm kaczmarj/neurodocker:v0.3.1 --help`
+```
+docker run --rm kaczmarj/neurodocker:v0.3.1 --help
+```
 
 or
 
