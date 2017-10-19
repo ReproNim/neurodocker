@@ -90,9 +90,9 @@ Valid options for each software package are the keyword arguments for the class 
 Generate Dockerfile, and print result to stdout. The result can be piped to `docker build` to build the Docker image.
 
 ```shell
-docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.2.0
+docker run --rm kaczmarj/neurodocker:v0.3.1 generate -b ubuntu:17.04 -p apt --ants version=2.2.0
 
-docker run --rm kaczmarj/neurodocker generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
+docker run --rm kaczmarj/neurodocker:v0.3.1 generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
 ```
 
 ## Generate Dockerfile (full)
@@ -101,7 +101,7 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 
 ```shell
 # Generate Dockerfile.
-docker run --rm kaczmarj/neurodocker generate \
+docker run --rm kaczmarj/neurodocker:v0.3.1 generate \
 --base debian:stretch --pkg-manager apt \
 --arg FOO=BAR BAZ \
 --install git vim \
