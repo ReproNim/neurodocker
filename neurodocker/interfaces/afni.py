@@ -43,11 +43,13 @@ class AFNI(object):
     }
 
     def __init__(self, version, pkg_manager, use_binaries=True,
-                 install_r=False, check_urls=True):
+                 install_r=False, check_urls=True, install_python2=False, install_python3=False):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
         self.install_r = install_r
+        self.install_python2 = install_python2
+        self.install_python3 = install_python3
         self.check_urls = check_urls
 
         self.cmd = self._create_cmd()
@@ -80,6 +82,13 @@ class AFNI(object):
                    '\nopenmotif R-devel tcsh xorg-x11-fonts-misc'
                    ' xorg-x11-server-Xvfb',
         }
+        if self.install_python2:
+            base_deps['apt'] += ' python'
+            base_deps['yum'] += ' python'
+        if self.install_python3:
+            base_deps['apt'] += ' python3'
+            base_deps['yum'] += ' python3'
+
         return base_deps[self.pkg_manager]
 
     def install_binaries(self):
