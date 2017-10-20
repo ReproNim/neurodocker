@@ -32,6 +32,10 @@ class AFNI(object):
     install_r : bool
         If true, install R and R packages for AFNI. This can significantly
         increase container build time.
+    install_python2: bool
+        If true, install Python 2
+    install_python3: bool
+        If true, install Python 3
     check_urls : bool
         If true, raise error if a URL used by this class responds with an error
         code.
