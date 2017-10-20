@@ -47,7 +47,8 @@ class AFNI(object):
     }
 
     def __init__(self, version, pkg_manager, use_binaries=True,
-                 install_r=False, check_urls=True, install_python2=False, install_python3=False):
+                 install_r=False, install_python2=False, install_python3=False,
+                 check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries

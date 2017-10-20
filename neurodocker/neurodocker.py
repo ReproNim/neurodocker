@@ -105,8 +105,9 @@ def _add_generate_arguments(parser):
             " behavior is to install by downloading and uncompressing"
             " binaries."),
         "afni": (
-            "Install AFNI. Valid keys are version (required). Only the latest"
-            " version is supported at this time."),
+            "Install AFNI. Valid keys are version (required), install_r,"
+            " install_python2, and install_python3. Only the latest"
+            " version and version 17.2.02 are supported at this time."),
         "ants": (
             "Install ANTs. Valid keys are version (required), use_binaries"
             " (default true), and git_hash. If use_binaries=true, installs"
