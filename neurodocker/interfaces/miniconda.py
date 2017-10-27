@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import posixpath
 
-from neurodocker.utils import _indent_pkgs, check_url, indent, is_url
+from neurodocker.utils import _indent_pkgs,  check_url, indent, is_url
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +35,12 @@ class Miniconda(object):
         For example, the input "https://github.com/nipy/nipype/" is interpreted
         as `pip install https://github.com/nipy/nipype/`.
     conda_opts : str
-        Command-line options to pass to `conda create`. Eg. "-c vida-nyu"
+        Command-line options to pass to `conda create`. E.g., "-c vida-nyu"
     pip_opts : str
         Command-line options to pass to `pip install`.
-    add_to_path : bool
-        If true, prepend the new environment to $PATH. False by default.
+    activate : bool
+        If true, activate the environment in the container's entrpoint. False
+        by default.
     miniconda_version : str
         Version of Miniconda to install. Defaults to 'latest'. This does not
         correspond to Python version.
@@ -59,7 +60,7 @@ class Miniconda(object):
 
     def __init__(self, env_name, pkg_manager, yaml_file=None,
                  conda_install=None, pip_install=None, conda_opts=None,
-                 pip_opts=None, add_to_path=False, miniconda_version='latest',
+                 pip_opts=None, activate=False, miniconda_version='latest',
                  check_urls=True):
         self.env_name = env_name
         self.yaml_file = yaml_file
@@ -68,7 +69,7 @@ class Miniconda(object):
         self.pip_install = pip_install
         self.conda_opts = conda_opts
         self.pip_opts = pip_opts
-        self.add_to_path = add_to_path
+        self.activate = activate
         self.miniconda_version = miniconda_version
         self.check_urls = check_urls
 
@@ -104,6 +105,12 @@ class Miniconda(object):
 
         return "\n".join(cmds)
 
+    def _get_source_activate_cmd(self):
+        from neurodocker.generate import _add_to_entrypoint
+
+        cmd = "source activate {}".format(self.env_name)
+        return "\n&& " + _add_to_entrypoint(cmd, with_run=False)
+
     def install_miniconda(self):
         """Return Dockerfile instructions to install Miniconda."""
 
@@ -125,7 +132,6 @@ class Miniconda(object):
                "\n&& conda config --system --prepend channels conda-forge"
                "\n&& conda config --system --set auto_update_conda false"
                "\n&& conda config --system --set show_channel_urls true"
-               "\n&& conda update -y -q --all && sync"
                "\n&& conda clean -tipsy && sync"
                "".format(Miniconda.INSTALL_PATH, url=install_url))
         cmd = indent("RUN", cmd)
@@ -142,6 +148,9 @@ class Miniconda(object):
         cmd = ("conda env create -q --name {n} --file {tmp}"
                "\n&& rm -f {tmp}")
 
+        if self.activate:
+            cmd += self._get_source_activate_cmd()
+
         if is_url(self.yaml_file):
             get_file = "curl -sSL {f} > {tmp}"
             cmd = get_file + "\n&& " + cmd
@@ -154,12 +163,6 @@ class Miniconda(object):
             cmd = "\n".join((get_file, cmd))
 
         cmd = cmd.format(n=self.env_name, f=self.yaml_file, tmp=tmp_yml)
-
-        if self.add_to_path:
-            bin_path = posixpath.join(Miniconda.INSTALL_PATH, 'envs',
-                                      self.env_name, 'bin')
-            env_cmd = "ENV PATH={}:$PATH".format(bin_path)
-            return "\n".join((cmd, env_cmd))
         return cmd
 
     def conda_and_pip_install(self, create=True):
@@ -188,15 +191,11 @@ class Miniconda(object):
                 cmd += "\n&& "
             cmd += self._pip_install()
 
+        if self.activate:
+            cmd += self._get_source_activate_cmd()
+
         cmd = indent("RUN", cmd)
-
         self.created_envs.append(self.env_name)
-
-        if self.add_to_path:
-            bin_path = posixpath.join(Miniconda.INSTALL_PATH, 'envs',
-                                      self.env_name, 'bin')
-            env_cmd = "ENV PATH={}:$PATH".format(bin_path)
-            return "\n".join((cmd, env_cmd))
         return cmd
 
     def _pip_install(self):

@@ -67,7 +67,7 @@ Valid options for each software package are the keyword arguments for the class 
 |               | pip_install | Packages to install with pip. |
 |               | conda_opts  | Command-line options to pass to [`conda create`](https://conda.io/docs/commands/conda-create.html). e.g., `conda_opts="-c vida-nyu"` |
 |               | pip_opts    | Command-line options to pass to [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#options). |
-|               | add_to_path | If true (default), add this environment to $PATH. |
+|               | activate | If true (default), activate this environment in container entrypoint. |
 |               | miniconda_version | Version of Miniconda. Latest by default. |
 | **MRtrix3** | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
 |             | git_hash | Git hash to checkout to before building from source (only used if use_binaries is false). |
