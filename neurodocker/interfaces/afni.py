@@ -46,12 +46,13 @@ class AFNI(object):
         "17.2.02": "https://dl.dropbox.com/s/yd4umklaijydn13/afni-Linux-openmp64-v17.2.02.tgz",
     }
 
-    def __init__(self, version, pkg_manager, use_binaries=True,
+    def __init__(self, version, pkg_manager, use_binaries=True, build_source=False,
                  install_r=False, install_python2=False, install_python3=False,
                  check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
+        self.build_source = build_source
         self.install_r = install_r
         self.install_python2 = install_python2
         self.install_python3 = install_python3
@@ -67,6 +68,8 @@ class AFNI(object):
 
         if self.use_binaries:
             chunks = [comment, self.install_binaries()]
+        elif self.build_source:
+            chunks = [comment, self.install_from_source()]
         else:
             raise ValueError("`use_binaries=True` is the only available "
                              "option at this time.")
@@ -93,6 +96,24 @@ class AFNI(object):
         if self.install_python3:
             base_deps['apt'] += ' python3'
             base_deps['yum'] += ' python3'
+
+        return base_deps[self.pkg_manager]
+
+    def _get_source_dependencies(self):
+        if self.pkg_manager == "apt":
+            raise ValueError("Building from source not yet supported on APT based distributions.")
+
+        base_deps = {
+            'yum': 'git gcc make m4 zlib-devel libXt-devel libXext-devel'
+                   '\nlibXmu-devel openmotif-devel expat-devel compat-gcc-34 tcsh'
+                   '\nlibXpm-devel gsl-devel mesa-libGL-devel mesa-libGLU-devel'
+                   '\nlibXi-devel glib2-devel gcc-c++ netpbm-devel gcc-gfortran'
+        }
+
+        if self.install_python2:
+            base_deps['yum'] += ' python'
+        if self.install_python3:
+            raise ValueError("Python3 not yet supported when build from source.")
 
         return base_deps[self.pkg_manager]
 
@@ -161,3 +182,39 @@ class AFNI(object):
         env_cmd = indent("ENV", env_cmd)
 
         return "\n".join((env_cmd, cmd))
+
+    def install_from_source(self):
+        """Return Dockerfile instructions to download and build AFNI from
+        source."""
+        pkgs = self._get_source_dependencies()
+
+        cmd = ("{install}"
+               "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
+
+        cmd += ("\n&& ln -sf /usr/bin/x86_64-redhat-linux-gcc34 /usr/bin/x86_64-redhat-linux-gcc-34")
+
+        cmd += ("\n&& {clean}"
+                '\n&& echo "Downloading AFNI ..."'
+                "\n&& cd /opt"
+                "\n&& git clone https://github.com/afni/afni.git"
+                "\n&& cd afni"
+                "\n&& git checkout {}"
+                "\n&& cd src"
+                "\n&& cp Makefile.linux_openmp_64 Makefile"
+                "\n&& perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile"
+                "\n&& make INSTALLDIR=/opt/afni vastness"
+                "".format(self.version, **manage_pkgs[self.pkg_manager]))
+
+        if self.install_r:
+            cmd += ("\n&& /opt/afni/rPkgsInstall -pkgs ALL"
+                    "\n&& rm -rf /tmp/*")
+
+        cmd = indent("RUN", cmd)
+
+        env_plugin_path = "AFNI_PLUGINPATH=/opt/afni"
+        env_plugin_path = indent("ENV", env_plugin_path)
+
+        env_cmd = "PATH=/opt/afni:$PATH"
+        env_cmd = indent("ENV", env_cmd)
+
+        return "\n".join((env_cmd, env_plugin_path, cmd))
