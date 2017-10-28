@@ -1,0 +1,209 @@
+# Generic Dockerfile instructions to install various software.
+#
+# Each program's entry requires instructions for at least one installation
+# method. Valid installation methods are 'binaries' and 'source'. The former
+# installs pre-compiled binaries, and the latter builds the software from
+# source.
+#
+# Tree structure of a program's entry.
+#
+# program
+# |-- binaries
+# |   |-- instructions
+# |   +-- dependencies
+# |       |-- apt
+# |       +-- yum
+# +-- source
+#     |-- instructions
+#     +-- dependencies
+#         |-- apt
+#         +-- yum
+
+header:
+  dependencies:
+    apt: apt-utils bzip2 ca-certificates curl locales unzip
+    yum: bzip2 ca-certificates curl locales unzip
+  instructions: |
+    ENV LANG="en_US.UTF-8"
+        LC_ALL="C.UTF-8"
+        ND_ENTRYPOINT="/neurodocker/startup.sh"
+    RUN {install_deps}
+        && localedef --force --inputfile=en_US --charmap=UTF-8 C.UTF-8
+        && chmod 777 /opt && chmod a+s /opt
+        && mkdir -p "$(dirname $ND_ENTRYPOINT)"
+        && if [ ! -f "$ND_ENTRYPOINT" ]; then
+             echo '#!/usr/bin/env bash' >> $ND_ENTRYPOINT
+             && echo 'set -ex' >> $ND_ENTRYPOINT
+             && echo 'if [ -z "$*" ]; then /usr/bin/env bash; else $*; fi' >> $ND_ENTRYPOINT;
+           fi
+        && chmod -R 777 /neurodocker && chmod a+s /neurodocker
+    ENTRYPOINT ["/neurodocker/startup.sh"]
+
+afni:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "todo"
+
+ants:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading ANTs ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar -zx -C {install_path} --strip-components=1
+      ENV ANTSPATH={install_path}
+          PATH={install_path}:$PATH
+  source:
+    dependencies:
+      apt: cmake g++ gcc git make zlib1g-dev
+      yum: cmake gcc-c++ git make zlib-devel
+    instructions: |
+      RUN {install_deps}
+          && cd /tmp
+          && git clone https://github.com/stnava/ANTs.git"
+          && {checkout}
+          && mkdir ants_build && cd ants_build
+          && cmake -DBUILD_SHARED_LIBS=ON ../ANTs
+          && make -j 1
+          && mkdir -p {install_path}
+          && mv bin/* {install_path} && mv ../ANTs/Scripts/* {install_path}
+          && rm -rf /tmp/ANTs /tmp/build /tmp/ants_build
+      ENV ANTSPATH={install_path}
+          PATH={install_path}:$PATH
+
+convert3d:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading Convert3D ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar -xz -C {install_path} --strip-components=1
+      ENV C3DPATH={install_path}
+          PATH={install_path}/bin:$PATH
+
+dcm2niix:
+  source:
+    dependencies:
+      apt: cmake g++ gcc git make pigz zlib1g-dev
+      yum: cmake gcc-c++ git libstdc++-static make pigz zlib-devel
+    instructions: |
+      RUN {install_deps}
+          && mkdir -p /tmp/dcm2niix
+          && curl -sSL {source_url}
+          | tar -xz -C /tmp/dcm2niix --strip-components=1
+          && mkdir /tmp/dcm2niix/build
+          && cd /tmp/dcm2niix/build
+          && cmake .. && make
+          && make install
+          && rm -rf /tmp/dcm2niix
+
+freesurfer:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "todo"
+
+freesurfer-recon-all:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "todo"
+
+fsl:
+  binaries:
+    dependencies:
+      apt: bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng1 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6
+      yum: bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt
+    instructions: |
+      RUN {install_deps}
+          && echo "Downloading FSL ..."
+          && curl -sSL {binaries_url}
+          | tar -zx -C {install_path} --strip-components=1
+          && if [ -f {install_path}/etc/fslconf/fslpython_install.sh ]; then
+               bash {install_path}/etc/fslconf/fslpython_install.sh -q -f {install_path}
+             fi
+          && sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
+          && sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
+          && sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
+          && sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
+      ENV FSLDIR={install_path}
+          PATH={install_path}/bin:$PATH
+
+minc:
+  binaries:
+    dependencies:
+      apt: libgl1-mesa-dev libice6 libsm6 libx11-6 libxext6 libxi6 libxmu6 libgomp1 libjpeg62
+      yum: libICE libSM libX11 libXext libXi libXmu libgomp libjpeg-turbo mesa-libGL-devel
+    # TODO: Replace mni urls with string formatting keys.
+    instructions: |
+      RUN {install_deps}
+          && echo "Downloading MINC, BEASTLIB, and MODELS..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar -zx -C {install_path} --strip-components=1
+          && curl -sSL --retry=5 http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
+          | tar -zx -C {install_path}/share \
+          && curl -sSL --retry=5 -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip \
+          && unzip /tmp/mni_90a.zip -d {install_path}/share/icbm152_model_09a \
+          && curl -sSL --retry=5 -o /tmp/mni_90c.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip \
+          && unzip /tmp/mni_90c.zip -d {install_path}/share/icbm152_model_09c \
+          && rm -f /tmp/mni_90*.zip  \
+          && sed -i '$isource {install_path}/minc-toolkit-config.sh' $ND_ENTRYPOINT
+
+matlab-mcr:
+  binaries:
+    dependencies:
+      apt: libxext6 libxt6
+      yum: libXext.x86_64 libXt.x86_64
+    instructions: |
+      RUN echo "Downloading MATLAB Compiler Runtime ..."
+          && curl -sSL -o /tmp/mcr.zip {binaries_url}
+          && unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
+          && /tmp/mcrtmp/install -destinationFolder {install_path} -mode silent -agreeToLicense yes
+          && rm -rf /tmp/*
+      ENV MATLABCMD={matlabcmd}
+          LD_LIBRARY_PATH={ld_library_path}:$LD_LIBRARY_PATH
+
+miniconda:
+  binaries:
+    dependencies: null
+    instructions: |
+      ENV CONDA_DIR={install_path} \
+          PATH={install_path}/bin:$PATH
+      RUN echo "Downloading Miniconda installer ..."
+          && CONDA_INSTALLER="/tmp/miniconda.sh"
+          && curl -sSL -o "$CONDA_INSTALLER" {miniconda_url}
+          && bash "$CONDA_INSTALLER" -b -p "$CONDA_DIR"
+          && rm -f "$CONDA_INSTALLER"
+          && conda config --system --prepend channels conda-forge
+          && conda config --system --set auto_update_conda false
+          && conda config --system --set show_channel_urls true
+          && sync && conda clean -tipsy && sync
+
+mrtrix3:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading MRtrix3 ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar zx -C {install_path} --strip-components=1
+      ENV PATH={install_path}/bin:$PATH
+
+spm:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading standalone SPM ..."
+          && curl -sSL -o /tmp/spm.zip {binaries_url}
+          && unzip -q spm.zip -d /tmp
+          && mkdir -p {install_path}
+          && mv /tmp/spm*/* {install_path}/
+          && chmod -R 777 {install_path}
+          && rm -rf /tmp/spm*
+          && {install_path}/run_spm12.sh {mcr_path} quit
+          && sed -i '$iexport SPMMCRCMD=\"{install_path}/run_spm12.sh {mcr_path} script\"' $ND_ENTRYPOINT
+      ENV FORCE_SPMMCR=1
