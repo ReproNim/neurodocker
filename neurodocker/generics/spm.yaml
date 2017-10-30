@@ -9,7 +9,7 @@ generic:
     dependencies: null
     instructions: |
       RUN echo "Downloading standalone SPM ..."
-          && curl -sSL -o /tmp/spm.zip {binaries_url}
+          && curl -sSL --retry 5 -o /tmp/spm.zip {binaries_url}
           && unzip -q spm.zip -d /tmp
           && mkdir -p {install_path}
           && mv /tmp/spm*/* {install_path}/

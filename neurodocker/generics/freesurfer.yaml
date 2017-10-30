@@ -19,7 +19,7 @@ generic:
       RUN {install_deps}
           && echo "Downloading minimized FreeSurfer ..."
           && mkdir -p {install_path}
-          && curl -sSL https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
-          | tar xz -C {install_path} --strip-components=1
+          && curl -sSL --retry 5 https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
+          | tar xz -C {install_path} --strip-components 1
           && sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh' $ND_ENTRYPOINT
       ENV FREESURFER_HOME={install_path}

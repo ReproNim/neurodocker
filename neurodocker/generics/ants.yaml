@@ -12,7 +12,7 @@ generic:
     instructions: |
       RUN echo "Downloading ANTs ..."
           && mkdir -p {install_path}
-          && curl -sSL --retry=5 {binaries_url}
+          && curl -sSL --retry 5 {binaries_url}
           | tar -zx -C {install_path} --strip-components=1
       ENV ANTSPATH={install_path}
           PATH={install_path}:$PATH

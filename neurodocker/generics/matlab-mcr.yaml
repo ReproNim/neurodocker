@@ -9,7 +9,7 @@ generic:
       yum: libXext.x86_64 libXt.x86_64
     instructions: |
       RUN echo "Downloading MATLAB Compiler Runtime ..."
-          && curl -sSL -o /tmp/mcr.zip {binaries_url}
+          && curl -sSL --retry 5 -o /tmp/mcr.zip {binaries_url}
           && unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
           && /tmp/mcrtmp/install -destinationFolder {install_path} -mode silent -agreeToLicense yes
           && rm -rf /tmp/*

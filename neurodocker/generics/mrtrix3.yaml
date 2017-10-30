@@ -10,6 +10,6 @@ generic:
     instructions: |
       RUN echo "Downloading MRtrix3 ..."
           && mkdir -p {install_path}
-          && curl -sSL --retry=5 {binaries_url}
-          | tar zx -C {install_path} --strip-components=1
+          && curl -sSL --retry 5 {binaries_url}
+          | tar zx -C {install_path} --strip-components 1
       ENV PATH={install_path}/bin:$PATH

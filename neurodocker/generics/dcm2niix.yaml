@@ -11,8 +11,8 @@ generic:
     instructions: |
       RUN {install_deps}
           && mkdir -p /tmp/dcm2niix
-          && curl -sSL {source_url}
-          | tar -xz -C /tmp/dcm2niix --strip-components=1
+          && curl -sSL --retry 5 {source_url}
+          | tar -xz -C /tmp/dcm2niix --strip-components 1
           && mkdir /tmp/dcm2niix/build
           && cd /tmp/dcm2niix/build
           && cmake .. && make

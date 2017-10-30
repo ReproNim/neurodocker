@@ -9,7 +9,7 @@ generic:
           PATH={install_path}/bin:$PATH
       RUN echo "Downloading Miniconda installer ..."
           && CONDA_INSTALLER="/tmp/miniconda.sh"
-          && curl -sSL -o "$CONDA_INSTALLER" {miniconda_url}
+          && curl -sSL --retry 5 -o "$CONDA_INSTALLER" {miniconda_url}
           && bash "$CONDA_INSTALLER" -b -p "$CONDA_DIR"
           && rm -f "$CONDA_INSTALLER"
           && conda config --system --prepend channels conda-forge

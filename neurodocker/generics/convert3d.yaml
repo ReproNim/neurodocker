@@ -10,7 +10,7 @@ generic:
     instructions: |
       RUN echo "Downloading Convert3D ..."
           && mkdir -p {install_path}
-          && curl -sSL --retry=5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components=1
+          && curl -sSL --retry 5 {binaries_url}
+          | tar -xz -C {install_path} --strip-components 1
       ENV C3DPATH={install_path}
           PATH={install_path}/bin:$PATH

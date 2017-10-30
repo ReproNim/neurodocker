@@ -16,8 +16,8 @@ generic:
     instructions: |
       RUN {install_deps}
           && echo "Downloading FSL ..."
-          && curl -sSL {binaries_url}
-          | tar -zx -C {install_path} --strip-components=1
+          && curl -sSL --retry 5 {binaries_url}
+          | tar -zx -C {install_path} --strip-components 1
           && if [ -f {install_path}/etc/fslconf/fslpython_install.sh ]; then
                bash {install_path}/etc/fslconf/fslpython_install.sh -q -f {install_path}
              fi

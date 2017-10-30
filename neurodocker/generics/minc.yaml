@@ -18,13 +18,13 @@ generic:
       RUN {install_deps}
           && echo "Downloading MINC, BEASTLIB, and MODELS..."
           && mkdir -p {install_path}
-          && curl -sSL --retry=5 {binaries_url}
-          | tar -zx -C {install_path} --strip-components=1
-          && curl -sSL --retry=5 http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
+          && curl -sSL --retry 5 {binaries_url}
+          | tar -zx -C {install_path} --strip-components 1
+          && curl -sSL --retry 5 http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
           | tar -zx -C {install_path}/share \
-          && curl -sSL --retry=5 -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip \
+          && curl -sSL --retry 5 -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip \
           && unzip /tmp/mni_90a.zip -d {install_path}/share/icbm152_model_09a \
-          && curl -sSL --retry=5 -o /tmp/mni_90c.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip \
+          && curl -sSL --retry 5 -o /tmp/mni_90c.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip \
           && unzip /tmp/mni_90c.zip -d {install_path}/share/icbm152_model_09c \
           && rm -f /tmp/mni_90*.zip  \
           && sed -i '$isource {install_path}/minc-toolkit-config.sh' $ND_ENTRYPOINT
