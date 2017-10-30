@@ -1,0 +1,29 @@
+# Instructions to install FSL.
+#
+# *****************************************************************************
+# FSL is non-free. If you are considering commercial use of FSL, please consult
+# the relevant license.
+# *****************************************************************************
+#
+# Website: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
+# License: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+
+generic:
+  binaries:
+    dependencies:
+      apt: bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng1 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6
+      yum: bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt
+    instructions: |
+      RUN {install_deps}
+          && echo "Downloading FSL ..."
+          && curl -sSL {binaries_url}
+          | tar -zx -C {install_path} --strip-components=1
+          && if [ -f {install_path}/etc/fslconf/fslpython_install.sh ]; then
+               bash {install_path}/etc/fslconf/fslpython_install.sh -q -f {install_path}
+             fi
+          && sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
+          && sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
+          && sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
+          && sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
+      ENV FSLDIR={install_path}
+          PATH={install_path}/bin:$PATH

@@ -1,0 +1,20 @@
+# Instructions to install SPM.
+#
+# Website: http://www.fil.ion.ucl.ac.uk/spm/
+# Documentation: http://www.fil.ion.ucl.ac.uk/spm/doc/
+
+# TODO: make this generic. It is specific to SPM12 at the moment.
+generic:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading standalone SPM ..."
+          && curl -sSL -o /tmp/spm.zip {binaries_url}
+          && unzip -q spm.zip -d /tmp
+          && mkdir -p {install_path}
+          && mv /tmp/spm*/* {install_path}/
+          && chmod -R 777 {install_path}
+          && rm -rf /tmp/spm*
+          && {install_path}/run_spm12.sh {mcr_path} quit
+          && sed -i '$iexport SPMMCRCMD=\"{install_path}/run_spm12.sh {mcr_path} script\"' $ND_ENTRYPOINT
+      ENV FORCE_SPMMCR=1

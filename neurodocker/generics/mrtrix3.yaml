@@ -1,0 +1,15 @@
+# Instructions to install MRtrix3.
+#
+# Repository: https://github.com/MRtrix3/mrtrix3
+# Website: http://www.mrtrix.org/
+# Documentation: http://mrtrix.readthedocs.io/en/latest/
+
+generic:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading MRtrix3 ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar zx -C {install_path} --strip-components=1
+      ENV PATH={install_path}/bin:$PATH

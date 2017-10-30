@@ -1,0 +1,17 @@
+# Instructions to install MATLAB Compiler Runtime.
+#
+# Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
+
+generic:
+  binaries:
+    dependencies:
+      apt: libxext6 libxt6
+      yum: libXext.x86_64 libXt.x86_64
+    instructions: |
+      RUN echo "Downloading MATLAB Compiler Runtime ..."
+          && curl -sSL -o /tmp/mcr.zip {binaries_url}
+          && unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
+          && /tmp/mcrtmp/install -destinationFolder {install_path} -mode silent -agreeToLicense yes
+          && rm -rf /tmp/*
+      ENV MATLABCMD={matlabcmd}
+          LD_LIBRARY_PATH={ld_library_path}:$LD_LIBRARY_PATH

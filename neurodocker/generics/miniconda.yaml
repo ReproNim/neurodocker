@@ -1,0 +1,18 @@
+# Instructions to install Miniconda.
+#
+# Website: https://conda.io/miniconda.html
+
+generic:
+  binaries:
+    instructions: |
+      ENV CONDA_DIR={install_path} \
+          PATH={install_path}/bin:$PATH
+      RUN echo "Downloading Miniconda installer ..."
+          && CONDA_INSTALLER="/tmp/miniconda.sh"
+          && curl -sSL -o "$CONDA_INSTALLER" {miniconda_url}
+          && bash "$CONDA_INSTALLER" -b -p "$CONDA_DIR"
+          && rm -f "$CONDA_INSTALLER"
+          && conda config --system --prepend channels conda-forge
+          && conda config --system --set auto_update_conda false
+          && conda config --system --set show_channel_urls true
+          && sync && conda clean -tipsy && sync

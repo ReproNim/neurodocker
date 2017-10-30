@@ -1,0 +1,38 @@
+# Instructions to install ANTs.
+#
+# Repository: https://github.com/ANTsX/ANTs
+# Website: http://stnava.github.io/ANTs/
+# Documentation:
+#   - https://github.com/ANTsX/ANTs/wiki
+#   - https://github.com/stnava/ANTsTutorial
+
+generic:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading ANTs ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar -zx -C {install_path} --strip-components=1
+      ENV ANTSPATH={install_path}
+          PATH={install_path}:$PATH
+  source:
+    dependencies:
+      apt: cmake g++ gcc git make zlib1g-dev
+      yum: cmake gcc-c++ git make zlib-devel
+    instructions: |
+      RUN {install_deps}
+          && cd /tmp
+          && git clone https://github.com/stnava/ANTs.git
+          && {checkout}
+          && mkdir ants_build
+          && cd ants_build
+          && cmake -DBUILD_SHARED_LIBS=ON ../ANTs
+          && make -j 1
+          && mkdir -p {install_path}
+          && mv bin lib {install_path}
+          && mv ../ANTs/Scripts/* {install_path}/bin
+          && rm -rf /tmp/ANTs /tmp/ants_build
+      ENV ANTSPATH={install_path}/bin
+          PATH={install_path}/bin:$PATH
+          LD_LIBRARY_PATH={install_path}/lib:$LD_LIBRARY_PATH

@@ -1,0 +1,16 @@
+# Instructions to install Convert3D.
+#
+# Repository: https://sourceforge.net/projects/c3d/
+# Website: http://www.itksnap.org/c3d/
+# Documentation: https://sourceforge.net/p/c3d/git/ci/master/tree/doc/c3d.md
+
+generic:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "Downloading Convert3D ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry=5 {binaries_url}
+          | tar -xz -C {install_path} --strip-components=1
+      ENV C3DPATH={install_path}
+          PATH={install_path}/bin:$PATH

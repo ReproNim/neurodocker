@@ -1,0 +1,11 @@
+# Instructions to install AFNI.
+#
+# Repository: https://github.com/afni/afni
+# Website: https://afni.nimh.nih.gov/
+# Documentation: https://afni.nimh.nih.gov/Documentation
+
+generic:
+  binaries:
+    dependencies: null
+    instructions: |
+      RUN echo "todo"
