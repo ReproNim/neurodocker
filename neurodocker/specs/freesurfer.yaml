@@ -4,14 +4,14 @@
 # Website: https://surfer.nmr.mgh.harvard.edu/
 # Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki
 
-generic:
+">=2.2":
   binaries:
     dependencies: null
     instructions: |
       RUN echo "todo"
 
 # See https://github.com/freesurfer/freesurfer/issues/70
-6.0.0-min-recon-all:
+"==6.0.0-min-recon-all":
   binaries:
     dependencies:
       apt: bc libgomp1 libxmu6 libxt6 tcsh perl

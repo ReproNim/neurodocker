@@ -124,6 +124,8 @@ def add_slashes(string):
     for ii, line in enumerate(lines):
         if ii + 1 == len(lines):
             continue
+        elif not lines[ii + 1]:
+            continue
         elif lines[ii + 1].split()[0] in dockerfile_instructions:
             continue
         elif lines[ii + 1].startswith("#"):

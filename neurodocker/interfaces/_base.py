@@ -48,13 +48,12 @@ class BaseInterface:
 
         bool_matches = [requested_ver in rr for rr in avail_vers]
         matches = list(itertools.compress(avail_vers, bool_matches))
-        print(matches)
 
         if len(matches) > 1:
             err = "multiple matching versions: " + ", ".join(matches)
             raise ValueError(err)
         elif len(matches) == 1:
-            return str(matches[0])
+            return str(matches[0].specifier)
         else:
             err = "no matching versions"
             raise ValueError(err)
