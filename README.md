@@ -103,7 +103,7 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 
 ```shell
 # Generate Dockerfile.
-docker run --rm kaczmarj/neurodocker:v0.3.1 generate \
+docker run --rm kaczmarj/neurodocker:master generate \
 --base debian:stretch --pkg-manager apt \
 --arg FOO=BAR BAZ \
 --install git vim \
