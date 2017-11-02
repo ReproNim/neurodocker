@@ -367,7 +367,7 @@ dockerfile_implementations = {
     'software': {
         'afni': interfaces.AFNI,
         'ants': interfaces.ANTs,
-        'c3d': interfaces.Convert3D,
+        'convert3d': interfaces.Convert3D,
         'dcm2niix': interfaces.Dcm2niix,
         'freesurfer': interfaces.FreeSurfer,
         'fsl': interfaces.FSL,

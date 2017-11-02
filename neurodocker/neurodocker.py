@@ -103,54 +103,67 @@ def _add_generate_arguments(parser):
             "Install software packages. Each argument takes a list of"
             " key=value pairs. Where applicable, the default installation"
             " behavior is to install by downloading and uncompressing"
-            " binaries."),
+            " binaries."
+        ),
         "afni": (
             "Install AFNI. Valid keys are version (required), install_r,"
             " install_python2, and install_python3. Only the latest"
-            " version and version 17.2.02 are supported at this time."),
+            " version and version 17.2.02 are supported at this time."
+        ),
         "ants": (
             "Install ANTs. Valid keys are version (required), use_binaries"
             " (default true), and git_hash. If use_binaries=true, installs"
             " pre-compiled binaries; if use_binaries=false, builds ANTs from"
             " source. If git_hash is specified, build from source from that"
-            " commit."),
-        "c3d": (
-            "Install Convert3D. The only valid key is version (required)."),
+            " commit."
+        ),
+        "convert3d": (
+            "Install Convert3D. The only valid key is version (required)."
+        ),
         "dcm2niix": (
-            "Install dcm2niix. The only valid key is version (required)."),
+            "Install dcm2niix. The only valid key is version (required)."
+        ),
         "freesurfer": (
             "Install FreeSurfer. Valid keys are version (required),"
             " license_path (relative path to license), min (if true, install"
             " binaries minimized for recon-all) and use_binaries (default true"
-            "). A FreeSurfer license is required to run the software and is not"
-            " provided by Neurodocker."),
+            "). A FreeSurfer license is required to run the software and is"
+            " not provided by Neurodocker."
+        ),
         "fsl": (
             "Install FSL. Valid keys are version (required), use_binaries"
-            " (default true) and use_installer."),
+            " (default true) and use_installer."
+        ),
         "miniconda": (
             "Install Miniconda. Valid keys are env_name (required),"
             " conda_install, pip_install, conda_opts, pip_opts, activate"
             " (default false) and miniconda_version (defaults to latest). The"
             " options conda_install and pip_install accept strings of"
-            ' packages: conda_install="python=3.6 numpy traits".'),
+            ' packages: conda_install="python=3.6 numpy traits".'
+        ),
         "mrtrix3": (
             "Install MRtrix3. Valid keys are use_binaries (default true) and"
             " git_hash. If git_hash is specified and use_binaries is false,"
-            " will checkout to that commit before building."),
+            " will checkout to that commit before building."
+        ),
         "neurodebian": (
             "Add NeuroDebian repository and optionally install NeuroDebian"
             " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
             " download_server (required), full (if true, default, use non-free"
             " packages), and pkgs (list of packages to install). Valid"
-            " download servers are {}.".format(_ndeb_servers)),
+            " download servers are {}.".format(_ndeb_servers)
+        ),
         "spm": (
             "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
-            " keys are version and matlab_version."),
+            " keys are version and matlab_version."
+        ),
         "minc": (
             "Install MINC. Valid keys is version (required). Only version"
-            " 1.9.15 is supported at this time."),
+            " 1.9.15 is supported at this time."
+        ),
         "petpvc": (
-            "Install PETPVC. Valid keys are version (required)."),
+            "Install PETPVC. Valid keys are version (required)."
+        ),
     }
 
     pkgs = p.add_argument_group(title="software package arguments",
