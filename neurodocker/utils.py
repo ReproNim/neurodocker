@@ -8,6 +8,13 @@ import string
 
 import requests
 
+
+dockerfile_instructions = ['ADD', 'ARG', 'CMD', 'COPY', 'ENTRYPOINT', 'ENV',
+                           'EXPOSE', 'FROM', 'HEALTHCHECK', 'LABEL',
+                           'MAINTAINER', 'ONBUILD', 'RUN', 'SHELL',
+                           'STOPSIGNAL', 'USER', 'VOLUME', 'WORKDIR']
+
+
 APT_GET_INSTALL_FLAGS = "-q --no-install-recommends"
 YUM_INSTALL_FLAGS = "-q"
 
@@ -115,8 +122,11 @@ def install(pkg_manager, pkgs, flags=None, indent=4, sort=False):
 def add_slashes(string):
     lines = string.split('\n')
     for ii, line in enumerate(lines):
-        if (lines[ii + 1].split()[0] in dockerfile_instructions
-           or ii + 1 == len(lines)):
+        if ii + 1 == len(lines):
+            continue
+        elif lines[ii + 1].split()[0] in dockerfile_instructions:
+            continue
+        elif lines[ii + 1].startswith("#"):
             continue
         lines[ii] = line + "  \\"
     return '\n'.join(lines)

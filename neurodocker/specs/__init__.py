@@ -12,8 +12,6 @@ def load_global_specs(glob_pattern):
     import glob
 
     def _load_interface_spec(filepath):
-        import os
-
         _, filename = os.path.split(filepath)
         key, _ = os.path.splitext(filename)
         return key, load_yaml(filepath)

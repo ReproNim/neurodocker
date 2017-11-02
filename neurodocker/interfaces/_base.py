@@ -3,11 +3,11 @@
 from __future__ import absolute_import
 
 from neurodocker.specs import global_specs
-from neurodocker.utils import comment, indent_str, install
+from neurodocker.utils import add_slashes, comment, indent_str, install
 
 
 class BaseInterface:
-    """"""
+    """Base class for interfaces."""
 
     def __init__(self, yaml_key, method, version, pkg_manager=None, **kwargs):
         self.yaml_key = yaml_key
@@ -29,7 +29,8 @@ class BaseInterface:
 
     @property
     def cmd(self):
-        return self._create_header() + "\n" + self._create_cmd()
+        cmd = add_slashes(self._create_cmd().strip())
+        return self._create_header() + "\n" + cmd
 
     def _get_version_in_yaml(self):
         import itertools
@@ -58,17 +59,23 @@ class BaseInterface:
             err = "no matching versions"
             raise ValueError(err)
 
-    def _get_install_deps_cmd(self):
+    def _get_install_deps_cmd(self, additional_deps=None):
         """Return command to install dependencies."""
         deps = self._specs.get('dependencies', None)
 
-        if deps is None:
+        if deps is None and additional_deps is None:
             return None
 
         deps = deps.get(self.pkg_manager, None)
         if deps is None:
             err = "no dependencies for package manager '{}'."
             raise ValueError(err.format(self.pkg_manager))
+
+        if additional_deps is not None:
+            try:
+                deps += " " + additional_deps
+            except TypeError:
+                deps += " " + " ".join(additional_deps)
 
         deps = deps.split()
         deps_cmd = install(pkg_manager=self.pkg_manager, pkgs=deps)
@@ -96,8 +103,8 @@ class BaseInterface:
         raise NotImplementedError("this method must be implemented")
 
     def _create_header(self):
-        message = "Installing {} version {}.".format(self.pretty_name,
-                                                     self.version)
+        message = "Install {} version {}".format(self.pretty_name,
+                                                 self.version)
         border = "-" * len(message)
         uncommented_header = "\n".join((border, message, border))
         return comment(uncommented_header)

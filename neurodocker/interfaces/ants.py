@@ -58,4 +58,4 @@ class ANTs(BaseInterface):
                                         binaries_url=binaries_url,
                                         install_deps=deps_cmd,
                                         **self.__dict__)
-        return cmd.strip()
+        return cmd
