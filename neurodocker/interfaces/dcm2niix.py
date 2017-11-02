@@ -6,67 +6,39 @@ Project repository: https://github.com/rordenlab/dcm2niix
 
 from __future__ import absolute_import, division, print_function
 
-from neurodocker.utils import check_url, indent, manage_pkgs
+from urllib.parse import urljoin
+
+from neurodocker.interfaces._base import BaseInterface
+from neurodocker.utils import optional_formatter
 
 
-class Dcm2niix(object):
-    """Add Dockerfile instructions to install dcm2niix.
+class Dcm2niix(BaseInterface):
 
-    Parameters
-    ----------
-    version : str
-        Dcm2niix version. Use "latest" or "master" for version of current
-        master branch. Can also be git commit hash or git tag.
-    pkg_manager : {'apt', 'yum'}
-        Linux package manager.
-    check_urls : bool
-        If true, raise error if a URL used by this class responds with an error
-        code.
-    """
+    _yaml_key = 'dcm2niix'
+    pretty_name = 'dcm2niix'
 
-    def __init__(self, version, pkg_manager, check_urls=True):
+    def __init__(self, version, method='source', **kwargs):
         self.version = version
-        self.pkg_manager = pkg_manager
-        self.check_urls = check_urls
+        self.method = method
+        self.__dict__.update(kwargs)
 
-        if self.version in ["latest", "master"]:
-            self.version = "master"
-
-        self.cmd = self._create_cmd()
+        super().__init__(yaml_key=self._yaml_key,
+                         version=version,
+                         method=method,
+                         **kwargs)
 
     def _create_cmd(self):
-        """Return full command to install ANTs."""
-        comment = ("#------------------------\n"
-                   "# Install dcm2niix {}\n"
-                   "#------------------------".format(self.version))
-        chunks = [comment, self.build_from_source()]
-        return "\n".join(chunks)
+        base_cmd = self._specs['instructions']
+        deps_cmd = self._get_install_deps_cmd()
 
-    def build_from_source(self):
-        """Return Dockerfile instructions to build dcm2niix from source.
-        """
-        pkgs = {'apt': 'cmake g++ gcc git make pigz zlib1g-dev',
-                'yum': 'cmake gcc-c++ git libstdc++-static make pigz zlib-devel'}
+        source_url = "https://github.com/rordenlab/dcm2niix/tarball"
+        if self.version == 'latest':
+            source_url = urljoin(source_url, 'master')
+        else:
+            source_url = urljoin(source_url, self.version)
 
-        url = ("https://github.com/rordenlab/dcm2niix/tarball/{}"
-               .format(self.version))
-        if self.check_urls:
-            check_url(url)
-
-        workdir_cmd = "WORKDIR /tmp"
-        cmd = ("deps='{pkgs}'"
-               "\n&& {install}"
-               "\n&& {clean}"
-               "\n&& mkdir dcm2niix"
-               "\n&& curl -sSL {url} | tar xz -C dcm2niix --strip-components 1"
-               "\n&& mkdir dcm2niix/build && cd dcm2niix/build"
-               "\n&& cmake .. && make"
-               "\n&& make install"
-               "\n&& rm -rf /tmp/*"
-               "\n&& {remove}"
-               "".format(pkgs=pkgs[self.pkg_manager], url=url,
-                         **manage_pkgs[self.pkg_manager]))
-        cmd = cmd.format(pkgs='$deps')
-        cmd = indent("RUN", cmd)
-
-        return "\n".join((workdir_cmd, cmd))
+        cmd = optional_formatter.format(base_cmd,
+                                        install_deps=deps_cmd,
+                                        source_url=source_url,
+                                        **self.__dict__)
+        return cmd
