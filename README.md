@@ -119,7 +119,7 @@ docker run --rm kaczmarj/neurodocker:master generate \
             conda_opts="--channel vida-nyu" \
             conda_install="python=3.5.1 numpy pandas reprozip traits" \
             pip_install="nipype" \
-            add_to_path=true \
+            activate=true \
 --miniconda env_name=neuro \
             pip_install="pylsl" \
 --miniconda env_name=py27 \
