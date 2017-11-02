@@ -8,12 +8,13 @@
 
 generic:
   binaries:
-    dependencies: null
+    dependencies:
+      apt: git cmake
     instructions: |
       RUN echo "Downloading ANTs ..."
           && mkdir -p {install_path}
           && curl -sSL --retry 5 {binaries_url}
-          | tar -zx -C {install_path} --strip-components=1
+          | tar -xz -C {install_path} --strip-components 1
       ENV ANTSPATH={install_path}
           PATH={install_path}:$PATH
   source:
@@ -24,7 +25,7 @@ generic:
       RUN {install_deps}
           && cd /tmp
           && git clone https://github.com/stnava/ANTs.git
-          && {checkout}
+          && git checkout {version}
           && mkdir ants_build
           && cd ants_build
           && cmake -DBUILD_SHARED_LIBS=ON ../ANTs

@@ -4,6 +4,7 @@
 from __future__ import absolute_import, division, print_function
 import json
 import logging
+import string
 
 import requests
 
@@ -25,10 +26,115 @@ manage_pkgs = {'apt': {'install': ('apt-get update -qq && apt-get install -yq '
                 }
 
 
-def _indent_pkgs(line_len, pkgs):
-    cmd = " {first_pkg}".format(first_pkg=pkgs[0])
-    separator = "\n" + " " * (line_len + 1)
-    return separator.join((cmd, *pkgs[1:]))
+class OptionalStrFormatter(string.Formatter):
+    # https://stackoverflow.com/a/20250018/5666087
+    """"""
+    def __init__(self, missing_optional="", optional_prefix="optional_"):
+        self.missing_optional = missing_optional
+        self.optional_prefix = optional_prefix
+
+    def get_field(self, field_name, args, kwargs):
+        # Handle missing fields
+        try:
+            return super().get_field(field_name, args, kwargs)
+        except (KeyError, AttributeError):
+            if field_name.startswith(self.optional_prefix):
+                return None, field_name
+            else:
+                err = "keyword argument '{}' is required".format(field_name)
+                raise KeyError(err)
+
+    def format_field(self, value, spec):
+        if value is None:
+            return self.missing_optional
+        else:
+            return super().format_field(value, spec)
+
+
+optional_formatter = OptionalStrFormatter()
+
+# NEW
+
+
+def get_string_format_keys(string):
+    from string import Formatter
+    return set(ii[1] for ii in Formatter().parse(string)
+               if ii[1] is not None)
+
+
+def indent_str(string, indent=4, indent_first_line=False):
+    separator = "\n" + " " * indent
+    if indent_first_line:
+        return separator + separator.join(string.split('\n'))
+    else:
+        return separator.join(string.split('\n'))
+
+
+def _indent_pkgs(pkgs, indent, sort):
+    separator = "\n" + " " * indent
+    if sort:
+        return separator + separator.join(sorted(pkgs))
+    else:
+        return separator + separator.join(pkgs)
+
+
+def _yum_install(pkgs, flags=None, indent=4, sort=False):
+    """Return command to install `pkgs` with `yum`."""
+    if flags is None:
+        flags = "-q"
+    install = "yum install -y {flags}".format(flags=flags)
+    clean = ("\n&& yum clean packages"
+             "\n&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*")
+    return install + _indent_pkgs(pkgs, indent=indent, sort=sort) + clean
+
+
+def _apt_get_install(pkgs, flags=None, indent=4, sort=False):
+    """Return command to install `pkgs` with `apt-get`."""
+    if flags is None:
+        flags = "-q --no-install-recommends"
+    install = ("apt-get update -qq"
+               "\n&& apt-get install -y {flags}").format(flags=flags)
+    clean = ("\n&& apt-get clean"
+             "\n&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+    return install + _indent_pkgs(pkgs, indent=indent, sort=sort) + clean
+
+
+def install(pkg_manager, pkgs, flags=None, indent=4, sort=False):
+    installers = {
+        'apt': _apt_get_install,
+        'yum': _yum_install,
+    }
+    installer = installers.get(pkg_manager, None)
+    if installer is None:
+        err = "installation instructions not known for package manager '{}'."
+        err = err.format(pkg_manager)
+        raise ValueError(err)
+    return installer(pkgs=pkgs, flags=flags, indent=indent, sort=sort)
+
+
+def add_slashes(string):
+    lines = string.split('\n')
+    for ii, line in enumerate(lines):
+        if (lines[ii + 1].split()[0] in dockerfile_instructions
+           or ii + 1 == len(lines)):
+            continue
+        lines[ii] = line + "  \\"
+    return '\n'.join(lines)
+
+
+def comment(string):
+    split_point = "\n"
+    comment = "# "
+    return split_point.join((comment + ll for ll in string.split(split_point)))
+
+
+# END NEW
+
+
+# def _indent_pkgs(line_len, pkgs):
+#     cmd = " {first_pkg}".format(first_pkg=pkgs[0])
+#     separator = "\n" + " " * (line_len + 1)
+#     return separator.join((cmd, *pkgs[1:]))
 
 
 def yum_install(pkgs, flags=None):
@@ -186,6 +292,12 @@ def load_json(filepath, **kwargs):
     """
     with open(filepath, 'r') as fp:
         return json.load(fp, **kwargs)
+
+
+def load_yaml(filepath):
+    import yaml
+    with open(filepath) as fp:
+        return yaml.load(fp)
 
 
 def save_json(obj, filepath, indent=4, **kwargs):
