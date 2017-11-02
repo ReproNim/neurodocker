@@ -12,12 +12,13 @@ generic:
     instructions: |
       ENV PATH={install_path}:$PATH
       RUN {install_deps}
-          && libs_path=/usr/lib/x86_64-linux-gnu \
-          && if [ -f $libs_path/libgsl.so.19 ]; then \
-                 ln $libs_path/libgsl.so.19 $libs_path/libgsl.so.0; \
-             fi \
-          && echo "Downloading AFNI ..." \
-          && mkdir -p {install_path} \
-          && curl -sSL --retry 5 {binaries_url} \
+          && libs_path=/usr/lib/x86_64-linux-gnu
+          && if [ -f $libs_path/libgsl.so.19 ]; then
+                 ln $libs_path/libgsl.so.19 $libs_path/libgsl.so.0;
+             fi
+          && echo "Downloading AFNI ..."
+          && mkdir -p {install_path}
+          && curl -sSL --retry 5 {binaries_url}
           | tar -xz -C {install_path} --strip-components 1
-      {optional_debian_extras}
+          {optional_install_python}
+          {optional_install_R}

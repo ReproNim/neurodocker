@@ -31,7 +31,7 @@ generic:
           && cmake -DBUILD_SHARED_LIBS=ON ../ANTs
           && make -j 1
           && mkdir -p {install_path}
-          && mv bin lib {install_path}
+          && mv bin lib {install_path}/
           && mv ../ANTs/Scripts/* {install_path}/bin
           && rm -rf /tmp/ANTs /tmp/ants_build
       ENV ANTSPATH={install_path}/bin
