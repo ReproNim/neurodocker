@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-11-02 16:59:05
+# Timestamp: 2017-11-03 11:03:06
 
 FROM debian:stretch
 
@@ -31,15 +31,6 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends  \
        fi \
     && chmod -R 777 /neurodocker && chmod a+s /neurodocker
 ENTRYPOINT ["/neurodocker/startup.sh"]
-
-ARG FOO="BAR"
-ARG BAZ
-
-RUN apt-get update -qq \
-    && apt-get install -y -q --no-install-recommends git \
-                                                     vim \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #--------------------
 # Install AFNI latest
@@ -263,31 +254,13 @@ ENV MATLABCMD=/opt/mcr/v92/toolbox/matlab \
     FORCE_SPMMCR=1 \
     LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/opt/mcr/v92/runtime/glnxa64:/opt/mcr/v92/bin/glnxa64:/opt/mcr/v92/sys/os/glnxa64:$LD_LIBRARY_PATH
 
+RUN apt-get update -qq \
+    && apt-get install -y -q --no-install-recommends git \
+                                                     vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 USER neuro
-
-ENV KEY_A="VAL_A" \
-    KEY_B="VAL_B"
-
-ENV KEY_C="based on $KEY_A"
-
-# User-defined instruction
-RUN mkdir /opt/mydir
-
-# User-defined BASH instruction
-RUN bash -c "echo 'myfile' > /tmp/myfile.txt"
-
-# Add command(s) to entrypoint
-RUN sed -i '$iecho hello world' $ND_ENTRYPOINT \
-    && sed -i '$isource myfile.sh' $ND_ENTRYPOINT
-
-CMD ["arg1", "arg2"]
-
-VOLUME ["/var", "/tmp"]
-
-EXPOSE 8888 80
-
-LABEL FOO="BAR" \
-      BAZ="CAT"
 
 WORKDIR /home/neuro
 
@@ -301,20 +274,6 @@ RUN echo '{ \
     \n    [ \
     \n      "base", \
     \n      "debian:stretch" \
-    \n    ], \
-    \n    [ \
-    \n      "arg", \
-    \n      { \
-    \n        "FOO": "BAR", \
-    \n        "BAZ": "" \
-    \n      } \
-    \n    ], \
-    \n    [ \
-    \n      "install", \
-    \n      [ \
-    \n        "git", \
-    \n        "vim" \
-    \n      ] \
     \n    ], \
     \n    [ \
     \n      "afni", \
@@ -417,70 +376,21 @@ RUN echo '{ \
     \n      } \
     \n    ], \
     \n    [ \
+    \n      "install", \
+    \n      [ \
+    \n        "git", \
+    \n        "vim" \
+    \n      ] \
+    \n    ], \
+    \n    [ \
     \n      "user", \
     \n      "neuro" \
-    \n    ], \
-    \n    [ \
-    \n      "env", \
-    \n      { \
-    \n        "KEY_A": "VAL_A", \
-    \n        "KEY_B": "VAL_B" \
-    \n      } \
-    \n    ], \
-    \n    [ \
-    \n      "env", \
-    \n      { \
-    \n        "KEY_C": "based on $KEY_A" \
-    \n      } \
-    \n    ], \
-    \n    [ \
-    \n      "instruction", \
-    \n      "RUN mkdir /opt/mydir" \
-    \n    ], \
-    \n    [ \
-    \n      "run_bash", \
-    \n      "echo '"'"'myfile'"'"' > /tmp/myfile.txt" \
-    \n    ], \
-    \n    [ \
-    \n      "add_to_entrypoint", \
-    \n      [ \
-    \n        "echo hello world", \
-    \n        "source myfile.sh" \
-    \n      ] \
-    \n    ], \
-    \n    [ \
-    \n      "cmd", \
-    \n      [ \
-    \n        "arg1", \
-    \n        "arg2" \
-    \n      ] \
-    \n    ], \
-    \n    [ \
-    \n      "volume", \
-    \n      [ \
-    \n        "/var", \
-    \n        "/tmp" \
-    \n      ] \
-    \n    ], \
-    \n    [ \
-    \n      "expose", \
-    \n      [ \
-    \n        "8888", \
-    \n        "80" \
-    \n      ] \
-    \n    ], \
-    \n    [ \
-    \n      "label", \
-    \n      { \
-    \n        "FOO": "BAR", \
-    \n        "BAZ": "CAT" \
-    \n      } \
     \n    ], \
     \n    [ \
     \n      "workdir", \
     \n      "/home/neuro" \
     \n    ] \
     \n  ], \
-    \n  "generation_timestamp": "2017-11-02 16:59:05", \
+    \n  "generation_timestamp": "2017-11-03 11:03:06", \
     \n  "neurodocker_version": "0.3.1-16-g980aed3" \
     \n}' > /neurodocker/neurodocker_specs.json
