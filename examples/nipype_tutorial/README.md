@@ -11,3 +11,11 @@ The `Dockerfile` contains:
  - using datalad to download data
  - copying a current directory to the container
  - using `jupyter-notebook` as a default command
+
+
+You can test the script and `Dockerfile`
+
+ - creating a `Dockerfile`: `bash create_dockerfile.sh`
+ - building a Docker image (this will take a while): `docker build -t test/nipype_tutorial .`
+ - running a Docker container: `docker run -it --rm -p8888:8888 test/nipype_tutorial`
+ - container should start `jupyter-notebook`, you can copy the link and paste to your browser
