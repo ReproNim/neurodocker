@@ -97,7 +97,7 @@ In this example, a Dockerfile is generated with all of the software that _Neurod
 ```shell
 # Generate Dockerfile.
 docker run --rm kaczmarj/neurodocker:master generate \
---base debian:stretch --pkg-manager apt \
+--base debian:jessie --pkg-manager apt \
 --afni version=latest \
 --ants version=2.2.0 \
 --c3d version=1.0.0 \
@@ -119,7 +119,7 @@ docker run --rm kaczmarj/neurodocker:master generate \
 --mrtrix3 \
 --neurodebian os_codename="jessie" \
               download_server="usa-nh" \
-              pkgs="dcm2niix git-annex-standalone" \
+              pkgs="dcm2niix git-annex-standalone mrtrix" \
 --petpvc version=1.2.0-b \
 --spm version=12 matlab_version=R2017a \
 --install git vim \
