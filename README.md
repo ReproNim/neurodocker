@@ -117,7 +117,7 @@ docker run --rm kaczmarj/neurodocker:master generate \
             conda_install="python=2.7" \
 --user root \
 --mrtrix3 \
---neurodebian os_codename="jessie" \
+--neurodebian os_codename="stretch" \
               download_server="usa-nh" \
               pkgs="dcm2niix git-annex-standalone" \
 --petpvc version=1.2.0-b \
