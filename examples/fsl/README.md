@@ -6,7 +6,7 @@ The `Dockerfile` contains:
 
  - using `neurodebian:stretch-non-free` as a base image
  - installing fsl and text editors
- - creating a user `neuro` and a home directory `/home/neuro` (as `root` and changing owner to `neuro`)
+ - creating a user `neuro` and a home directory `/home/neuro`
  - setting `/home/neuro` as a working directory
 
 

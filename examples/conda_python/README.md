@@ -6,10 +6,8 @@ The `Dockerfile` contains:
 
  - using `neurodebian:stretch-non-free` as a base image
  - installing text editors
- - creating a conda environment and installing various python library including jupyter-notebook; most of the libraries are installed using `conda`, and `nilearn` is installed using a `pip` command, the environment will be automatically activated
- - changing a jupyter configuartion, so you'll be able to open a notebook locally
- - creating directory and changing permission
- - copying a current directory to the container
+ - creating a conda environment and installing various python library including jupyter-notebook; most of the libraries are installed using `conda`, and `nilearn` is installed using a `pip` command; the environment will be automatically activated
+ - changing a jupyter configuartion, so you'll be able to open notebooks locally
  - using `jupyter-notebook` as a default command
 
 

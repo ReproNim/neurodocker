@@ -5,7 +5,7 @@
 # pull request on our GitHub repository:
 #     https://github.com/kaczmarj/neurodocker
 #
-# Timestamp: 2017-11-06 19:34:37
+# Timestamp: 2017-11-07 03:01:03
 
 FROM neurodebian:stretch-non-free
 
@@ -46,13 +46,6 @@ RUN sed -i '$isource /etc/fsl/fsl.sh' $ND_ENTRYPOINT
 RUN useradd --no-user-group --create-home --shell /bin/bash neuro
 USER neuro
 
-USER root
-
-# User-defined instruction
-RUN chown -R neuro /home/neuro
-
-USER neuro
-
 WORKDIR /home/neuro
 
 #--------------------------------------
@@ -85,22 +78,10 @@ RUN echo '{ \
     \n      "neuro" \
     \n    ], \
     \n    [ \
-    \n      "user", \
-    \n      "root" \
-    \n    ], \
-    \n    [ \
-    \n      "run", \
-    \n      "chown -R neuro /home/neuro" \
-    \n    ], \
-    \n    [ \
-    \n      "user", \
-    \n      "neuro" \
-    \n    ], \
-    \n    [ \
     \n      "workdir", \
     \n      "/home/neuro" \
     \n    ] \
     \n  ], \
-    \n  "generation_timestamp": "2017-11-06 19:34:37", \
+    \n  "generation_timestamp": "2017-11-07 03:01:03", \
     \n  "neurodocker_version": "0.3.1-19-g8d02eb4" \
     \n}' > /neurodocker/neurodocker_specs.json
