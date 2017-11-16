@@ -9,7 +9,7 @@ The `Dockerfile` contains:
  - creating a conda environment and installing various python library, including `nipype` from source
  - creating directory and changing permission
  - using datalad to download data
- - copying a current directory to the container
+ - copying a current directory to the container (so don't expect the [Nipype Tutorial notebooks](https://github.com/miykael/nipype_tutorial/tree/master/notebooks) if you're not in the specific directory)
  - using `jupyter-notebook` as a default command
 
 
