@@ -98,7 +98,7 @@ class SPM(object):
         comment = "# Install MATLAB Compiler Runtime"
         cmd = self._install_libs()
         cmd += ('\n&& echo "Downloading MATLAB Compiler Runtime ..."'
-                "\n&& curl -sSL -o /tmp/mcr.zip {url}"
+                "\n&& curl -sSL --retry 5 -o /tmp/mcr.zip {url}"
                 "\n&& unzip -q /tmp/mcr.zip -d /tmp/mcrtmp"
                 "\n&& /tmp/mcrtmp/install -destinationFolder {dest}"
                 " -mode silent -agreeToLicense yes"
@@ -147,7 +147,7 @@ class SPM(object):
 
         comment = "# Install standalone SPM"
         cmd = ('echo "Downloading standalone SPM ..."'
-               "\n&& curl -sSL -o spm.zip {url}"
+               "\n&& curl -sSL --retry 5 -o spm.zip {url}"
                "\n&& unzip -q spm.zip -d /opt"
                "\n&& chmod -R 777 /opt/spm*"
                "\n&& rm -rf spm.zip"

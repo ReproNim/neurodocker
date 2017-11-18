@@ -102,7 +102,7 @@ class FSL(object):
         url = "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py"
         if check_urls:
             check_url(url)
-        cmd = ("curl -sSL -o fslinstaller.py {url}"
+        cmd = ("curl -sSL --retry 5 -o fslinstaller.py {url}"
                "\n&& python fslinstaller.py --dest=/opt --quiet"
                "\n&& . /opt/fsl/etc/fslconf/fsl.sh"
                "\n&& rm -f fslinstaller.py"
@@ -148,7 +148,7 @@ class FSL(object):
 
         cmd = self._install_binaries_deps()
         cmd += ('\n&& echo "Downloading FSL ..."'
-                '\n&& curl -sSL {}'
+                '\n&& curl -sSL --retry 5 {}'
                 '\n| tar zx -C /opt'.format(url))
 
         if self.version >= LooseVersion('5.0.10'):
@@ -204,7 +204,7 @@ class FSL(object):
         cmd = ('\n&& cd /opt/fsl/bin'
                '\n&& rm -f eddy_openmp eddy_cuda*'
                '\n&& echo "Downloading FSL eddy v5.0.11 pre-release ..."'
-               '\n&& curl -sSLO {}'
+               '\n&& curl -sSLO --retry 5 {}'
                '\n&& chmod +x eddy_*').format(url)
 
         filename = url.split('/')[-1]

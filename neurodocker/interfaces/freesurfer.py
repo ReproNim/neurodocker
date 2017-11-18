@@ -174,7 +174,7 @@ class FreeSurfer(object):
         ent = _add_to_entrypoint("source $FREESURFER_HOME/SetUpFreeSurfer.sh",
                                  with_run=False)
         cmd += ('\n&& echo "Downloading minimized FreeSurfer ..."'
-                "\n&& curl -sSL {} | tar xz -C /opt"
+                "\n&& curl -sSL --retry 5 {} | tar xz -C /opt"
                 "\n&& {entrypoint_cmd}"
                 "".format(url, entrypoint_cmd=ent))
         cmd = indent("RUN", cmd)

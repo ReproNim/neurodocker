@@ -129,7 +129,7 @@ class AFNI(object):
             cmd += ('\n&& echo "Install libpng12 (not in all ubuntu/debian repositories"'
                     "\n&& apt-get install -yq --no-install-recommends libpng12-0"
                     '\n|| /bin/bash -c "'
-                    '\n   curl -o /tmp/libpng12.deb -sSL {}'
+                    '\n   curl --retry 5 -o /tmp/libpng12.deb -sSL {}'
                     '\n   && dpkg -i /tmp/libpng12.deb && rm -f /tmp/libpng12.deb"'
                     ''.format(deb_url))
 
@@ -142,7 +142,7 @@ class AFNI(object):
                         "\n&& apt-get install -yq --no-install-recommends"
                         "\n\tr-base-dev r-cran-rmpi libnlopt-dev"
                         '\n || /bin/bash -c "'
-                        '\n    curl -o /tmp/install_R.sh -sSL {}'
+                        '\n    curl --retry 5 -o /tmp/install_R.sh -sSL {}'
                         '\n    && /bin/bash /tmp/install_R.sh"').format(sh_url)
 
         cmd += ("\n&& {clean}"

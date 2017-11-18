@@ -5,7 +5,6 @@ from __future__ import absolute_import
 
 import inspect
 
-import neurodocker
 from neurodocker import utils
 from neurodocker.generate import dockerfile_implementations
 
@@ -110,7 +109,6 @@ class _SpecsParser(object):
                 bad_opts = [opt for opt in opts if opt not in params]
                 if bad_opts:
                     bad_opts = ', '.join(bad_opts)
-                    good_opts = ', '.join(params)
                     raise ValueError("Invalid option(s) found in instructions "
                                      " key '{}': {}. Valid options are {}"
                                      "".format(pkg, bad_opts, params))

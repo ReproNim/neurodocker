@@ -55,7 +55,7 @@ def _string_vals_to_bool(dictionary):
     import re
 
     bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian',
-                 'add_to_path', 'min']
+                 'add_to_path', 'min', 'activate']
 
     if dictionary is None:
         return

@@ -126,7 +126,7 @@ class Miniconda(object):
 
         cmd = ('echo "Downloading Miniconda installer ..."'
                "\n&& miniconda_installer=/tmp/miniconda.sh"
-               "\n&& curl -sSL -o $miniconda_installer {url}"
+               "\n&& curl -sSL --retry 5 -o $miniconda_installer {url}"
                "\n&& /bin/bash $miniconda_installer -b -p $CONDA_DIR"
                "\n&& rm -f $miniconda_installer"
                "\n&& conda config --system --prepend channels conda-forge"
