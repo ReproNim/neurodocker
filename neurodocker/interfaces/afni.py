@@ -100,20 +100,24 @@ class AFNI(object):
         return base_deps[self.pkg_manager]
 
     def _get_source_dependencies(self):
-        if self.pkg_manager == "apt":
-            raise ValueError("Building from source not yet supported on APT based distributions.")
-
         base_deps = {
+            'apt': 'ed git curl gcc g++ make m4 zlib1g-dev libxt-dev libxext-dev'
+                   '\nlibxmu-headers libmotif-dev libxpm-dev tcsh libgsl-dev'
+                   '\nmesa-common-dev libglu1-mesa-dev libxi-dev libnetpbm10-dev'
+                   ' libglib2.0-dev r-base r-base-dev',
             'yum': 'git gcc make m4 zlib-devel libXt-devel libXext-devel'
                    '\nlibXmu-devel openmotif-devel expat-devel compat-gcc-34 tcsh'
                    '\nlibXpm-devel gsl-devel mesa-libGL-devel mesa-libGLU-devel'
                    '\nlibXi-devel glib2-devel gcc-c++ netpbm-devel gcc-gfortran'
+                   ' epel-release'
         }
 
         if self.install_python2:
+            base_deps['apt'] += ' python'
             base_deps['yum'] += ' python'
         if self.install_python3:
-            raise ValueError("Python3 not yet supported when build from source.")
+            base_deps['apt'] += ' python3'
+            base_deps['yum'] += ' python3'
 
         return base_deps[self.pkg_manager]
 
@@ -191,7 +195,22 @@ class AFNI(object):
         cmd = ("{install}"
                "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
 
-        cmd += ("\n&& ln -sf /usr/bin/x86_64-redhat-linux-gcc34 /usr/bin/x86_64-redhat-linux-gcc-34")
+        if self.pkg_manager == "yum":
+            cmd += ("\n&& yum install -y -q R R-devel")
+
+        if self.pkg_manager == "apt":
+            # libxp was removed after ubuntu trusty.
+            deb_url = ('http://mirrors.kernel.org/debian/pool/main/libx/'
+                       'libxp/libxp6_1.0.2-2_amd64.deb')
+            cmd += ('\n&& echo "Install libxp (not in all ubuntu/debian repositories)"'
+                    "\n&& apt-get install -yq --no-install-recommends libxp6"
+                    '\n|| /bin/bash -c "'
+                    '\n   curl --retry 5 -o /tmp/libxp6.deb -sSL {}'
+                    '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
+                    ''.format(deb_url))
+
+            cmd += ('\n&& ln -s /usr/lib/x86_64-linux-gnu/libXp.so.6.2.0 /usr/lib/x86_64-linux-gnu/libXp.so'
+                    '\n&& ln -s /usr/lib/x86_64-linux-gnu/libXmu.so.6.2.0 /usr/lib/x86_64-linux-gnu/libXmu.so')
 
         cmd += ("\n&& {clean}"
                 '\n&& echo "Downloading AFNI ..."'
@@ -201,7 +220,15 @@ class AFNI(object):
                 "\n&& git checkout {}"
                 "\n&& cd src"
                 "\n&& cp Makefile.linux_openmp_64 Makefile"
+                "\n&& perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile"
                 "\n&& perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile"
+                "\n&& perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile"
+                "\n&& perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile"
+                "\n&& perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile"
+                "\n&& perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile"
+                "\n&& perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile"
+                "\n&& perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile"
+                "\n&& perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile"
                 "\n&& make INSTALLDIR=/opt/afni vastness"
                 "".format(self.version, **manage_pkgs[self.pkg_manager]))
 
