@@ -6,34 +6,51 @@
 #   - https://github.com/ANTsX/ANTs/wiki
 #   - https://github.com/stnava/ANTsTutorial
 
+# {% macro apt_install(pkgs) -%}
+#   apt-get update && apt-get install
+# {%- endmacro %}
+#
+# {% macro yum_install(name, value='', type='text', size=20) -%}
+#
+# {%- endmacro %}
+
+
+binary_urls:
+  "2.2.0": "https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz"
+  "2.1.0": "https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz"
+  "2.0.3": "https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz"
+  "2.0.0": "https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz"
+
 generic:
+
   binaries:
-    dependencies:
-      apt: git cmake
+    env:
+      ANTSPATH: "{{ ants.install_path }}"
+      PATH: "{{ ants.install_path }}:$PATH"
     instructions: |
-      RUN echo "Downloading ANTs ..."
-          && mkdir -p {install_path}
-          && curl -sSL --retry 5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components 1
-      ENV ANTSPATH={install_path}
-          PATH={install_path}:$PATH
+      echo "Downloading ANTs ..."
+      mkdir -p {{ ants.install_path }}
+      curl -sSL --retry 5 {{ ants.binaries_url }} | tar -xz -C {{ ants.install_path }} --strip-components 1
+
   source:
     dependencies:
       apt: cmake g++ gcc git make zlib1g-dev
       yum: cmake gcc-c++ git make zlib-devel
+    env:
+      ANTSPATH: "{{ ants.install_path }}/bin"
+      PATH: "{{ ants.install_path }}/bin:$PATH"
+      LD_LIBRARY_PATH: "{{ ants.install_path }}/lib:$LD_LIBRARY_PATH"
     instructions: |
-      RUN {install_deps}
-          && cd /tmp
-          && git clone https://github.com/stnava/ANTs.git
-          && git checkout {version}
-          && mkdir ants_build
-          && cd ants_build
-          && cmake -DBUILD_SHARED_LIBS=ON ../ANTs
-          && make -j 1
-          && mkdir -p {install_path}
-          && mv bin lib {install_path}/
-          && mv ../ANTs/Scripts/* {install_path}/bin
-          && rm -rf /tmp/ANTs /tmp/ants_build
-      ENV ANTSPATH={install_path}/bin
-          PATH={install_path}/bin:$PATH
-          LD_LIBRARY_PATH={install_path}/lib:$LD_LIBRARY_PATH
+      git clone https://github.com/ANTsX/ANTs.git /tmps/ants_source
+      {% if ants.version != "master" and ants.version != "latest" %}
+      cd /tmp/ants_source
+      git checkout {{ ants.version }}
+      {% endif %}
+      mkdir /tmp/ants_build
+      cd /tmp/ants_build
+      cmake -DBUILD_SHARED_LIBS=ON /tmp/ants_source
+      make -j 1
+      mkdir -p {{ ants.install_path }}
+      mv bin lib {{ ants.install_path }}/
+      mv /tmp/ants_source/Scripts/* {{ ants.install_path }}/bin
+      rm -rf /tmp/ants_source /tmp/ants_build
