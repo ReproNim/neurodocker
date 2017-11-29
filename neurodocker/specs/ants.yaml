@@ -6,14 +6,6 @@
 #   - https://github.com/ANTsX/ANTs/wiki
 #   - https://github.com/stnava/ANTsTutorial
 
-# {% macro apt_install(pkgs) -%}
-#   apt-get update && apt-get install
-# {%- endmacro %}
-#
-# {% macro yum_install(name, value='', type='text', size=20) -%}
-#
-# {%- endmacro %}
-
 
 binary_urls:
   "2.2.0": "https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz"
@@ -28,6 +20,13 @@ generic:
       ANTSPATH: "{{ ants.install_path }}"
       PATH: "{{ ants.install_path }}:$PATH"
     instructions: |
+      {% macro apt_install(pkgs) -%}
+        apt-get update && apt-get install
+          {% for pkg in pkgs -%}
+            {{ pkg }}
+          {% endfor %}
+      {%- endmacro %}
+      {{ apt_install(pkgs=['git', 'vim']) }}
       echo "Downloading ANTs ..."
       mkdir -p {{ ants.install_path }}
       curl -sSL --retry 5 {{ ants.binaries_url }} | tar -xz -C {{ ants.install_path }} --strip-components 1
