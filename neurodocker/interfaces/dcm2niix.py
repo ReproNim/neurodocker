@@ -63,7 +63,6 @@ class Dcm2niix(object):
                "\n&& cmake .. && make"
                "\n&& make install"
                "\n&& rm -rf /tmp/*"
-               "\n&& {remove}"
                "".format(pkgs=pkgs[self.pkg_manager], url=url,
                          **manage_pkgs[self.pkg_manager]))
         cmd = cmd.format(pkgs='$deps')
