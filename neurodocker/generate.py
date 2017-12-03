@@ -184,14 +184,8 @@ def _add_install(pkgs, pkg_manager):
     pkg_manager : {'apt', 'yum'}
         Linux package manager.
     """
-    comment = ("#------------------------"
-               "\n# Install system packages"
-               "\n#------------------------")
     installers = {'apt': apt_get_install,
-                  'yum': yum_install,}
-    # pkgs = ' '.join(pkgs)
-    # cmd = "{install}\n&& {clean}".format(**manage_pkgs[pkg_manager])
-    # cmd = cmd.format(pkgs=pkgs)
+                  'yum': yum_install}
     flags = [jj for jj in pkgs if jj.startswith('flags=')]
     pkgs = [kk for kk in pkgs if kk not in flags]
 
@@ -380,7 +374,7 @@ dockerfile_implementations = {
     },
     'other': {
         'add': _add_add,
-        'add_to_entrypoint':_add_to_entrypoint,
+        'add_to_entrypoint': _add_to_entrypoint,
         'arg': _add_arg,
         'base': _add_base,
         'cmd': _add_cmd,
