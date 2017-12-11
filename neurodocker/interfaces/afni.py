@@ -192,6 +192,9 @@ class AFNI(object):
         source."""
         pkgs = self._get_source_dependencies()
 
+        if self.version == "latest":
+            self.version = "master"
+
         cmd = ("{install}"
                "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
 
@@ -238,10 +241,7 @@ class AFNI(object):
 
         cmd = indent("RUN", cmd)
 
-        env_plugin_path = "AFNI_PLUGINPATH=/opt/afni"
-        env_plugin_path = indent("ENV", env_plugin_path)
-
-        env_cmd = "PATH=/opt/afni:$PATH"
+        env_cmd = "PATH=/opt/afni:$PATH AFNI_PLUGINPATH=/opt/afni"
         env_cmd = indent("ENV", env_cmd)
 
-        return "\n".join((env_cmd, env_plugin_path, cmd))
+        return "\n".join((env_cmd, cmd))
