@@ -11,6 +11,13 @@ from __future__ import absolute_import, division, print_function
 from neurodocker.utils import check_url, indent, manage_pkgs
 
 
+def _get_dirs_to_exclude(dirs):
+    import posixpath
+
+    dirs = (posixpath.join('freesurfer', dd) for dd in dirs)
+    return "\n".join("--exclude='{}'".format(dd) for dd in dirs)
+
+
 class FreeSurfer(object):
     """Add Dockerfile instructions to install FreeSurfer. A FreeSurfer license
     is required to run the software.
@@ -33,19 +40,48 @@ class FreeSurfer(object):
     use_binaries : bool, str
         If true, uses pre-compiled FreeSurfer binaries. Building from source
         is not yet supported.
+    exclude : list
+        Directories to exclude when extracting the FreeSurfer tarball. If None,
+        excludes average/mult-comp-cor', 'lib/cuda', 'lib/qt',
+        'subjects/V1_average', 'subjects/bert', 'subjects/cvs_avg35',
+        'subjects/cvs_avg35_inMNI152', 'subjects/fsaverage3',
+        'subjects/fsaverage4', 'subjects/fsaverage5', 'subjects/fsaverage6',
+        'subjects/fsaverage_sym', and 'trctrain.
     check_urls : bool
         If true, raise error if a URL used by this class responds with an error
         code.
     """
 
     def __init__(self, version, pkg_manager, min=False, license_path=None,
-                 use_binaries=True, check_urls=True):
+                 use_binaries=True, exclude=None, check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.min = min
         self.license_path = license_path
         self.use_binaries = use_binaries
+        self.exclude = exclude
         self.check_urls = check_urls
+
+        if self.exclude is None:
+            self.exclude = [
+                'average/mult-comp-cor',
+                'lib/cuda',
+                'lib/qt',
+                'subjects/V1_average',
+                'subjects/bert',
+                'subjects/cvs_avg35',
+                'subjects/cvs_avg35_inMNI152',
+                'subjects/fsaverage3',
+                'subjects/fsaverage4',
+                'subjects/fsaverage5',
+                'subjects/fsaverage6',
+                'subjects/fsaverage_sym',
+                'trctrain',
+            ]
+        elif not self.exclude:
+            pass
+        elif isinstance(self.exclude, str):
+            self.exclude = self.exclude.split(' ')
 
         self.cmd = self._create_cmd()
 
@@ -129,21 +165,10 @@ class FreeSurfer(object):
         elif self.check_urls:
             check_url(url)
 
-        # https://github.com/nipy/workshops/blob/master/170327-nipype/docker/Dockerfile.complete#L8-L20
-        # TODO: allow users to choose which directories to exclude.
-        excluded_dirs = ("--exclude='freesurfer/trctrain'"
-                         "\n--exclude='freesurfer/subjects/fsaverage_sym'"
-                         "\n--exclude='freesurfer/subjects/fsaverage3'"
-                         "\n--exclude='freesurfer/subjects/fsaverage4'"
-                         "\n--exclude='freesurfer/subjects/fsaverage5'"
-                         "\n--exclude='freesurfer/subjects/fsaverage6'"
-                         "\n--exclude='freesurfer/subjects/cvs_avg35'"
-                         "\n--exclude='freesurfer/subjects/cvs_avg35_inMNI152'"
-                         "\n--exclude='freesurfer/subjects/bert'"
-                         "\n--exclude='freesurfer/subjects/V1_average'"
-                         "\n--exclude='freesurfer/average/mult-comp-cor'"
-                         "\n--exclude='freesurfer/lib/cuda'"
-                         "\n--exclude='freesurfer/lib/qt'")
+        if self.exclude:
+            excluded_dirs = _get_dirs_to_exclude(self.exclude)
+        else:
+            excluded_dirs = ''
 
         cmd = self._install_binaries_deps()
         ent = _add_to_entrypoint("source $FREESURFER_HOME/SetUpFreeSurfer.sh",
