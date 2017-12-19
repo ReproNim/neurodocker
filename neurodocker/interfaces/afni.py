@@ -241,7 +241,8 @@ class AFNI(object):
 
         cmd = indent("RUN", cmd)
 
-        env_cmd = "PATH=/opt/afni:$PATH AFNI_PLUGINPATH=/opt/afni"
+        env_cmd = ("PATH=/opt/afni:$PATH"
+                   "\nAFNI_PLUGINPATH=/opt/afni")
         env_cmd = indent("ENV", env_cmd)
 
         return "\n".join((env_cmd, cmd))
