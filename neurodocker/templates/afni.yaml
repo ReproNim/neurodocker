@@ -1,9 +1,10 @@
+---
+
 # Instructions to install AFNI.
 #
 # Repository: https://github.com/afni/afni
 # Website: https://afni.nimh.nih.gov/
 # Documentation: https://afni.nimh.nih.gov/Documentation
-
 
 binary_urls:
   "2.2.0": https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz
@@ -68,20 +69,18 @@ generic:
       apt: null
       yum: "compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel gsl-devel libXext-devel libXi-devel libXmu-devel libXpm-devel libXt-devel m4 make mesa-libGL-devel mesa-libGLU-devel netpbm-devel openmotif-devel R R-devel tcsh zlib-devel"
     instructions: |
-      echo "Downloading AFNI ..." \
-      cd /opt \
-      git clone https://github.com/afni/afni.git \
-      cd afni \
-      git checkout {{ afni.version }} \
-      cd src \
-      cp Makefile.linux_openmp_64 Makefile \
-      perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile \
-      perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile \
-      perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile \
-      perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile \
-      perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile \
-      perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile \
-      perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile \
-      perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile \
-      perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile \
-      make INSTALLDIR={{ afni.install_path }} vastness
+      git clone https://github.com/afni/afni.git {{ afni.install_path }}
+      cd {{ afni.install_path }}
+      git checkout {{ afni.version }}
+      cd src
+      cp Makefile.linux_openmp_64 Makefile
+      perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile
+      perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile
+      perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile
+      perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile
+      perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile
+      perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+      perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+      perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile
+      perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile
+      make INSTALLDIR="{{ afni.install_path }}" vastness
