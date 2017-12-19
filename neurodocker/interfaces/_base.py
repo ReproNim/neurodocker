@@ -1,109 +1,182 @@
 """"""
 
-from __future__ import absolute_import
+from copy import deepcopy
+import posixpath
 
-from neurodocker.templates import global_specs
-from neurodocker.utils import add_slashes, comment, indent_str, install
+import jinja2
+
+from neurodocker.templates import _global_specs
+
+GENERIC_VERSION = 'generic'
 
 
-class BaseInterface:
-    """Base class for interfaces."""
+def _interface_exists_in_yaml(name):
+    return name in _global_specs.keys()
 
-    def __init__(self, yaml_key, method, version, pkg_manager=None, **kwargs):
-        self.yaml_key = yaml_key
-        self.method = method
-        self.version = version
-        self.pkg_manager = pkg_manager
-        self.__dict__.update(kwargs)
 
-        self._all_interface_specs = global_specs.get(self.yaml_key, None)
-        if self._all_interface_specs is None:
-            err = "no yaml entry for program '{}'".format(self.yaml_key)
-            raise ValueError(err)
-
-        self._version_in_yaml = self._get_version_in_yaml()
-        self._specs = self._all_interface_specs[self._version_in_yaml][self.method]
-        self._validate_method()
-        self._set_install_path()
-        self._base_cmd = self._specs['instructions']
+class _Resolver:
+    """
+    Parameters
+    ----------
+    d : dict
+    """
+    def __init__(self, d):
+        self._d = d
+        self._generic_only = self._d.keys() == {GENERIC_VERSION}
 
     @property
-    def cmd(self):
-        cmd = add_slashes(self._create_cmd().strip())
-        return self._create_header() + "\n" + cmd
+    def versions(self):
+        return set(self._d.keys())
 
-    def _get_version_in_yaml(self):
-        import itertools
-        from pkg_resources import Distribution, Requirement
-
-        avail_vers = self._all_interface_specs.keys()
-        if list(avail_vers) == ['generic']:
-            return "generic"
+    def version_exists(self, version):
+        if self._generic_only:
+            return True
         else:
-            avail_vers = [Requirement(self.yaml_key + rr)
-                          for rr in avail_vers]
+            return version in self.versions
 
-        requested_ver = Distribution(project_name=self.yaml_key,
-                                     version=self.version)
+    def check_version_exists(self, version):
+        if not self.version_exists(version):
+            raise ValueError("version '{}' not found.".format(version))
 
-        bool_matches = [requested_ver in rr for rr in avail_vers]
-        matches = list(itertools.compress(avail_vers, bool_matches))
+    def get_version_key(self, version):
+        """Return version key to use given a specific version. For example,
+        if a dictionary only has instructions for version 'generic', will
+        return 'generic' given any version string.
 
-        if len(matches) > 1:
-            err = "multiple matching versions: " + ", ".join(matches)
-            raise ValueError(err)
-        elif len(matches) == 1:
-            return str(matches[0].specifier)
+        Raises
+        ------
+        `ValueError` if no key could be found for requested version.
+        """
+        if self._generic_only:
+            return GENERIC_VERSION
         else:
-            err = "no matching versions"
-            raise ValueError(err)
+            self.check_version_exists(version)
+            return version
 
-    def _get_install_deps_cmd(self, additional_deps=None):
-        """Return command to install dependencies."""
-        deps = self._specs.get('dependencies', None)
+    def version_has_method(self, version, method):
+        version_key = self.get_version_key(version)
+        return method in self._d[version_key].keys()
 
-        if deps is None and additional_deps is None:
+    def check_version_has_method(self, version, method):
+        if not self.version_has_method(version, method):
+            raise ValueError(
+                "version '{}' does not have method '{}'"
+                .format(version, method)
+            )
+
+    def version_method_has_instructions(self, version, method):
+        version_key = self.get_version_key(version)
+        self.check_version_has_method(version_key, method)
+        return 'instructions' in self._d[version_key][method].keys()
+
+    def check_version_method_has_instructions(self, version, method):
+        if not self.version_method_has_instructions(version, method):
+            raise ValueError(
+                "installation method '{}' for version '{}' does not have an"
+                " 'instructions' key.".format(method, version)
+            )
+
+    def binaries_has_url(self, version):
+        version_key = self.get_version_key(version)
+        if self.version_has_method(version_key, 'binaries'):
+            try:
+                urls = self._d[version_key]['binaries']['urls'].keys()
+                return version in urls
+            except KeyError:
+                raise ValueError(
+                    "no binary URLs defined for version '{}".format(version)
+                )
+        else:
+            raise ValueError(
+                "no binary installation method defined for version '{}"
+                .format(version)
+            )
+
+    def check_binaries_has_url(self, version):
+        if not self.binaries_has_url(version):
+            raise ValueError(
+                "URL not found for version '{}'".format(version)
+            )
+
+
+class _BaseInterface:
+    """Base class for interface objects."""
+
+    def __init__(self, name, version, pkg_manager, method='binaries',
+                 install_path=None, **kwargs):
+        self._name = name
+        self._version = version
+        self._pkg_manager = pkg_manager
+        self._method = method
+        self._install_path = install_path
+        self.__dict__.update(**kwargs)
+
+        if not _interface_exists_in_yaml(self._name):
+            raise ValueError(
+                "No YAML entry for package '{}'".format(self._name)
+             )
+        self._resolver = _Resolver(_global_specs[self._name])
+
+        self._version_key = self._resolver.get_version_key(self._version)
+        self._resolver.check_version_exists(self._version)
+        self._resolver.check_version_has_method(self._version, self._method)
+        self._resolver.check_version_method_has_instructions(
+            self._version, self._method
+        )
+
+        self._instance_specs = deepcopy(
+            _global_specs[self._name][self._version_key][self._method]
+        )
+
+        self._template = jinja2.Template(self._instance_specs['instructions'])
+        self._dependencies = self._get_dependencies()
+
+    def _get_dependencies(self):
+        if 'dependencies' not in self._instance_specs.keys():
+            return None
+        try:
+            deps = self._instance_specs['dependencies'][self._pkg_manager]
+            return deps.split()
+        except KeyError:
             return None
 
-        deps = deps.get(self.pkg_manager, None)
-        if deps is None:
-            err = "no dependencies for package manager '{}'."
-            raise ValueError(err.format(self.pkg_manager))
+    @property
+    def _pretty_name(self):
+        return self.__class__.__name__
 
-        if additional_deps is not None:
-            try:
-                deps += " " + additional_deps
-            except TypeError:
-                deps += " " + " ".join(additional_deps)
+    @property
+    def name(self):
+        return self._name
 
-        deps = deps.split()
-        deps_cmd = install(pkg_manager=self.pkg_manager, pkgs=deps)
+    @property
+    def version(self):
+        return self._version
 
-        return indent_str(deps_cmd)
+    @property
+    def pkg_manager(self):
+        return self._pkg_manager
 
-    def _set_install_path(self):
-        """Set install path if it is not provided."""
-        try:
-            self.install_path
-        except AttributeError:
-            self.install_path = "/opt/{}-{}".format(self.yaml_key,
-                                                    self.version)
+    @property
+    def method(self):
+        return self._method
 
-    def _validate_method(self):
-        methods = self._all_interface_specs[self._version_in_yaml].keys()
-        if self.method not in methods:
-            valid_methods = ", ".join(methods)
-            err = "invalid installation method: '{}'. Valid methods are {}."
-            err = err.format(self.method, valid_methods)
-            raise ValueError(err)
-        return True
+    @property
+    def template(self):
+        return self._template
 
-    def _create_cmd(self):
-        raise NotImplementedError("this method must be implemented")
+    @property
+    def install_path(self):
+        if self._install_path is None:
+            path = posixpath.join(posixpath.sep, 'opt', '{}-v{}')
+            return path.format(self._name, self._version)
+        return self._install_path
 
-    def _create_header(self):
-        message = "Install {} version {}".format(self.pretty_name,
-                                                 self.version)
-        border = "-" * len(message)
-        uncommented_header = "\n".join((border, message, border))
-        return comment(uncommented_header)
+    @property
+    def dependencies(self):
+        return self._dependencies
+
+    def install_dependencies(self):
+        return "INSTALL HERE"
+
+    def render(self):
+        return self.template.render({self.name: self})
