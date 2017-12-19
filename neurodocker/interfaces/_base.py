@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import
 
-from neurodocker.specs import global_specs
+from neurodocker.templates import global_specs
 from neurodocker.utils import add_slashes, comment, indent_str, install
 
 

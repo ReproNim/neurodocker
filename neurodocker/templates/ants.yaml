@@ -33,6 +33,7 @@ generic:
       PATH: "{{ ants.install_path }}/bin:$PATH"
       LD_LIBRARY_PATH: "{{ ants.install_path }}/lib:$LD_LIBRARY_PATH"
     instructions: |
+      {%  %}
       mkdir -p /tmp/ants/build
       git clone https://github.com/ANTsX/ANTs.git /tmps/ants/source
       {% if ants.version != "master" and ants.version != "latest" %}
