@@ -307,9 +307,15 @@ def load_json(filepath, **kwargs):
 
 
 def load_yaml(filepath):
+    """Return dictionary from YAML file."""
     import yaml
+    try:
+        from yaml import CLoader as Loader
+    except ImportError:
+        from yaml import Loader
+
     with open(filepath) as fp:
-        return yaml.load(fp)
+        return yaml.load(fp, Loader=Loader)
 
 
 def save_json(obj, filepath, indent=4, **kwargs):
