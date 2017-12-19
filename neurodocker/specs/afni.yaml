@@ -4,21 +4,68 @@
 # Website: https://afni.nimh.nih.gov/
 # Documentation: https://afni.nimh.nih.gov/Documentation
 
+
+binary_urls:
+  "2.2.0": https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz
+  "2.1.0": https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz
+  "2.0.3": https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz
+  "2.0.0": https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz
+
+generic:
+  binaries:
+    env:
+      ANTSPATH: "{{ ants.install_path }}"
+      PATH: "{{ ants.install_path }}:$PATH"
+    instructions: |
+      echo "Downloading ANTs ..."
+      mkdir -p {{ ants.install_path }}
+      curl {{ ants.curl_opts }} {{ ants.binaries_url }} \
+      | tar -xz -C {{ ants.install_path }} --strip-components 1
+
+  source:
+    dependencies:
+      apt: cmake g++ gcc git make zlib1g-dev
+      yum: cmake gcc-c++ git make zlib-devel
+    env:
+      ANTSPATH: "{{ ants.install_path }}/bin"
+      PATH: "{{ ants.install_path }}/bin:$PATH"
+      LD_LIBRARY_PATH: "{{ ants.install_path }}/lib:$LD_LIBRARY_PATH"
+    instructions: |
+      mkdir -p /tmp/ants/build
+      git clone https://github.com/ANTsX/ANTs.git /tmps/ants/source
+      {% if ants.version != "master" and ants.version != "latest" %}
+      cd /tmp/ants/source
+      git checkout {{ ants.version }}
+      {% endif %}
+      cd /tmp/ants_build
+      cmake {{ ants.cmake_opts|default("-DBUILD_SHARED_LIBS=ON") }} /tmp/ants_source
+      make {{ ants.make_opts|default("-j1") }}
+      mkdir -p {{ ants.install_path }}
+      mv bin lib {{ ants.install_path }}/
+      mv /tmp/ants_source/Scripts/* {{ ants.install_path }}/bin
+      rm -rf /tmp/ants_source /tmp/ants_build
+
+
+binary_urls:
+  latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
+
 generic:
   binaries:
     dependencies:
       apt: ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1 libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb
       yum: ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif R-devel tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
     instructions: |
-      ENV PATH={install_path}:$PATH
-      RUN {install_deps}
-          && libs_path=/usr/lib/x86_64-linux-gnu
-          && if [ -f $libs_path/libgsl.so.19 ]; then
-                 ln $libs_path/libgsl.so.19 $libs_path/libgsl.so.0;
-             fi
-          && echo "Downloading AFNI ..."
-          && mkdir -p {install_path}
-          && curl -sSL --retry 5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components 1
-          {optional_install_python}
-          {optional_install_R}
+      {install_deps}
+      && libs_path=/usr/lib/x86_64-linux-gnu
+      && echo "Downloading AFNI ..."
+      && mkdir -p {install_path}
+      && curl -sSL --retry 5 {binaries_url}
+      | tar -xz -C {install_path} --strip-components 1
+      {optional_install_python}
+      {optional_install_R_pkgs}
+
+  source:
+    dependencies:
+      apt: null
+      yum: null
+    instructions: |
