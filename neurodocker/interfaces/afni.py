@@ -46,12 +46,13 @@ class AFNI(object):
         "17.2.02": "https://dl.dropbox.com/s/yd4umklaijydn13/afni-Linux-openmp64-v17.2.02.tgz",
     }
 
-    def __init__(self, version, pkg_manager, use_binaries=True,
+    def __init__(self, version, pkg_manager, use_binaries=True, build_source=False,
                  install_r=False, install_python2=False, install_python3=False,
                  check_urls=True):
         self.version = version
         self.pkg_manager = pkg_manager
         self.use_binaries = use_binaries
+        self.build_source = build_source
         self.install_r = install_r
         self.install_python2 = install_python2
         self.install_python3 = install_python3
@@ -67,6 +68,8 @@ class AFNI(object):
 
         if self.use_binaries:
             chunks = [comment, self.install_binaries()]
+        elif self.build_source:
+            chunks = [comment, self.install_from_source()]
         else:
             raise ValueError("`use_binaries=True` is the only available "
                              "option at this time.")
@@ -87,6 +90,28 @@ class AFNI(object):
                    '\nopenmotif R-devel tcsh xorg-x11-fonts-misc'
                    ' xorg-x11-server-Xvfb',
         }
+        if self.install_python2:
+            base_deps['apt'] += ' python'
+            base_deps['yum'] += ' python'
+        if self.install_python3:
+            base_deps['apt'] += ' python3'
+            base_deps['yum'] += ' python3'
+
+        return base_deps[self.pkg_manager]
+
+    def _get_source_dependencies(self):
+        base_deps = {
+            'apt': 'ed git curl gcc g++ make m4 zlib1g-dev libxt-dev libxext-dev'
+                   '\nlibxmu-headers libmotif-dev libxpm-dev tcsh libgsl-dev'
+                   '\nmesa-common-dev libglu1-mesa-dev libxi-dev libnetpbm10-dev'
+                   ' libglib2.0-dev r-base r-base-dev',
+            'yum': 'git gcc make m4 zlib-devel libXt-devel libXext-devel'
+                   '\nlibXmu-devel openmotif-devel expat-devel compat-gcc-34 tcsh'
+                   '\nlibXpm-devel gsl-devel mesa-libGL-devel mesa-libGLU-devel'
+                   '\nlibXi-devel glib2-devel gcc-c++ netpbm-devel gcc-gfortran'
+                   ' epel-release'
+        }
+
         if self.install_python2:
             base_deps['apt'] += ' python'
             base_deps['yum'] += ' python'
@@ -158,6 +183,65 @@ class AFNI(object):
         cmd = indent("RUN", cmd)
 
         env_cmd = "PATH=/opt/afni:$PATH"
+        env_cmd = indent("ENV", env_cmd)
+
+        return "\n".join((env_cmd, cmd))
+
+    def install_from_source(self):
+        """Return Dockerfile instructions to download and build AFNI from
+        source."""
+        pkgs = self._get_source_dependencies()
+
+        if self.version == "latest":
+            self.version = "master"
+
+        cmd = ("{install}"
+               "".format(**manage_pkgs[self.pkg_manager]).format(pkgs=pkgs))
+
+        if self.pkg_manager == "yum":
+            cmd += ("\n&& yum install -y -q R R-devel")
+
+        if self.pkg_manager == "apt":
+            # libxp was removed after ubuntu trusty.
+            deb_url = ('http://mirrors.kernel.org/debian/pool/main/libx/'
+                       'libxp/libxp6_1.0.2-2_amd64.deb')
+            cmd += ('\n&& echo "Install libxp (not in all ubuntu/debian repositories)"'
+                    "\n&& apt-get install -yq --no-install-recommends libxp6"
+                    '\n|| /bin/bash -c "'
+                    '\n   curl --retry 5 -o /tmp/libxp6.deb -sSL {}'
+                    '\n   && dpkg -i /tmp/libxp6.deb && rm -f /tmp/libxp6.deb"'
+                    ''.format(deb_url))
+
+            cmd += ('\n&& ln -s /usr/lib/x86_64-linux-gnu/libXp.so.6.2.0 /usr/lib/x86_64-linux-gnu/libXp.so'
+                    '\n&& ln -s /usr/lib/x86_64-linux-gnu/libXmu.so.6.2.0 /usr/lib/x86_64-linux-gnu/libXmu.so')
+
+        cmd += ("\n&& {clean}"
+                '\n&& echo "Downloading AFNI ..."'
+                "\n&& cd /opt"
+                "\n&& git clone https://github.com/afni/afni.git"
+                "\n&& cd afni"
+                "\n&& git checkout {}"
+                "\n&& cd src"
+                "\n&& cp Makefile.linux_openmp_64 Makefile"
+                "\n&& perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile"
+                "\n&& perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile"
+                "\n&& perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile"
+                "\n&& perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile"
+                "\n&& perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile"
+                "\n&& perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile"
+                "\n&& perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile"
+                "\n&& perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile"
+                "\n&& perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile"
+                "\n&& make INSTALLDIR=/opt/afni vastness"
+                "".format(self.version, **manage_pkgs[self.pkg_manager]))
+
+        if self.install_r:
+            cmd += ("\n&& /opt/afni/rPkgsInstall -pkgs ALL"
+                    "\n&& rm -rf /tmp/*")
+
+        cmd = indent("RUN", cmd)
+
+        env_cmd = "PATH=/opt/afni:$PATH AFNI_PLUGINPATH=/opt/afni"
         env_cmd = indent("ENV", env_cmd)
 
         return "\n".join((env_cmd, cmd))
