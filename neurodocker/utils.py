@@ -77,7 +77,7 @@ def indent_str(string, indent=4, indent_first_line=False):
         return separator.join(string.split('\n'))
 
 
-def _indent_pkgs(pkgs, indent, sort):
+def _indent_pkgs(pkgs, indent, sort=True):
     separator = "\n" + " " * indent
     if sort:
         return separator + separator.join(sorted(pkgs))
@@ -85,28 +85,28 @@ def _indent_pkgs(pkgs, indent, sort):
         return separator + separator.join(pkgs)
 
 
-def _yum_install(pkgs, flags=None, indent=4, sort=False):
+def _yum_install(pkgs, opts=None, indent=4, sort=False):
     """Return command to install `pkgs` with `yum`."""
-    if flags is None:
-        flags = "-q"
-    install = "yum install -y {flags}".format(flags=flags)
+    if opts is None:
+        opts = "-q"
+    install = "yum install -y {opts}".format(opts=opts)
     clean = ("\n&& yum clean packages"
              "\n&& rm -rf /var/cache/yum/* /tmp/* /var/tmp/*")
     return install + _indent_pkgs(pkgs, indent=indent, sort=sort) + clean
 
 
-def _apt_get_install(pkgs, flags=None, indent=4, sort=False):
+def _apt_get_install(pkgs, opts=None, indent=4, sort=False):
     """Return command to install `pkgs` with `apt-get`."""
-    if flags is None:
-        flags = "-q --no-install-recommends"
+    if opts is None:
+        opts = "-q --no-install-recommends"
     install = ("apt-get update -qq"
-               "\n&& apt-get install -y {flags}").format(flags=flags)
-    clean = ("\n&& apt-get clean"
+               "\napt-get install -y {opts}").format(opts=opts)
+    clean = ("\napt-get clean"
              "\n&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
     return install + _indent_pkgs(pkgs, indent=indent, sort=sort) + clean
 
 
-def install(pkg_manager, pkgs, flags=None, indent=4, sort=False):
+def install(pkg_manager, pkgs, opts=None, indent=4, sort=False):
     installers = {
         'apt': _apt_get_install,
         'yum': _yum_install,
@@ -116,7 +116,7 @@ def install(pkg_manager, pkgs, flags=None, indent=4, sort=False):
         err = "installation instructions not known for package manager '{}'."
         err = err.format(pkg_manager)
         raise ValueError(err)
-    return installer(pkgs=pkgs, flags=flags, indent=indent, sort=sort)
+    return installer(pkgs=pkgs, opts=opts, indent=indent, sort=sort)
 
 
 def add_slashes(string):

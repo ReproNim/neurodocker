@@ -6,11 +6,14 @@
 
 generic:
   binaries:
-    dependencies: null
+    urls:
+      nightly: https://sourceforge.net/projects/c3d/files/c3d/Nightly/c3d-nightly-Linux-x86_64.tar.gz/download
+      "1.0.0": https://sourceforge.net/projects/c3d/files/c3d/1.0.0/c3d-1.0.0-Linux-x86_64.tar.gz/download
+    env:
+      C3DPATH: "{{ convert3d.install_path }}"
+      PATH: "{{ convert3d.install_path }}/bin:$PATH"
     instructions: |
-      RUN echo "Downloading Convert3D ..."
-          && mkdir -p {install_path}
-          && curl -sSL --retry 5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components 1
-      ENV C3DPATH={install_path}
-          PATH={install_path}/bin:$PATH
+      echo "Downloading Convert3D ..."
+      mkdir -p {{ convert3d.install_path }}
+      curl {{ convert3d.curl_opts }} {{ convert3d.binaries_url }} \
+      | tar -xz -C {{ convert3d.install_path }} --strip-components 1

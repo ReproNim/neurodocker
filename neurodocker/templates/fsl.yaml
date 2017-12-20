@@ -8,37 +8,28 @@
 # Website: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
 # License: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
 
-">=4.0.10":
+generic:
   binaries:
+    urls:
+      "4.0.10": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz
+      "4.0.9": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
+      "4.0.8": https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
     dependencies:
       apt: bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng1 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6
       yum: bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt
+    env:
+      FSLDIR: "{{ fsl.install_path }}"
+      PATH: "{{ fsl.install_path }}/bin:$PATH"
     instructions: |
-      RUN {install_deps}
-          && echo "Downloading FSL ..."
-          && curl -sSL --retry 5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components 1
-          && bash {install_path}/etc/fslconf/fslpython_install.sh -q -f {install_path}
-          && sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
-          && sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
-          && sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
-          && sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
-      ENV FSLDIR={install_path}
-          PATH={install_path}/bin:$PATH
-
-"<=4.0.9":
-  binaries:
-    dependencies:
-      apt: bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng1 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6
-      yum: bc libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt
-    instructions: |
-      RUN {install_deps}
-          && echo "Downloading FSL ..."
-          && curl -sSL --retry 5 {binaries_url}
-          | tar -xz -C {install_path} --strip-components 1
-          && sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
-          && sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
-          && sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
-          && sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
-      ENV FSLDIR={install_path}
-          PATH={install_path}/bin:$PATH
+      {{ fsl.install_dependencies() }}
+      echo "Downloading FSL ..."
+      curl {{ fsl.curl_opts }} {{ fsl.binaries_url }} \
+      | tar -xz -C {install_path} --strip-components 1
+      sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
+      sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
+      sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
+      sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
+      {% if fsl.version in ("4.0.10", ) -%}
+      echo "Installing FSL conda environment ..."
+      bash {{ fsl.install_path }}/etc/fslconf/fslpython_install.sh -q -f {{ fsl.install_path }}
+      {% endif -%}

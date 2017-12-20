@@ -33,9 +33,10 @@ generic:
 
   source:
     dependencies:
-      apt: null
+      apt: "foo bar"
       yum: "compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel gsl-devel libXext-devel libXi-devel libXmu-devel libXpm-devel libXt-devel m4 make mesa-libGL-devel mesa-libGLU-devel netpbm-devel openmotif-devel R R-devel tcsh zlib-devel"
     instructions: |
+      {{ afni.install_dependencies() }}
       git clone https://github.com/afni/afni.git {{ afni.install_path }}
       cd {{ afni.install_path }}
       git checkout {{ afni.version }}

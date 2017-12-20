@@ -364,20 +364,20 @@ def _add_common_dependencies(pkg_manager):
 # Dictionary of each instruction or software package can be added to the
 # Dockerfile and the function that returns the Dockerfile instruction(s).
 dockerfile_implementations = {
-    'software': {
-        'afni': interfaces.AFNI,
-        'ants': interfaces.ANTs,
-        'convert3d': interfaces.Convert3D,
-        'dcm2niix': interfaces.Dcm2niix,
-        'freesurfer': interfaces.FreeSurfer,
-        'fsl': interfaces.FSL,
-        'miniconda': interfaces.Miniconda,
-        'mrtrix3': interfaces.MRtrix3,
-        'neurodebian': interfaces.NeuroDebian,
-        'spm': interfaces.SPM,
-        'minc': interfaces.MINC,
-        'petpvc': interfaces.PETPVC
-    },
+    # 'software': {
+    #     'afni': interfaces.AFNI,
+    #     'ants': interfaces.ANTs,
+    #     'convert3d': interfaces.Convert3D,
+    #     'dcm2niix': interfaces.Dcm2niix,
+    #     'freesurfer': interfaces.FreeSurfer,
+    #     'fsl': interfaces.FSL,
+    #     'miniconda': interfaces.Miniconda,
+    #     'mrtrix3': interfaces.MRtrix3,
+    #     'neurodebian': interfaces.NeuroDebian,
+    #     'spm': interfaces.SPM,
+    #     'minc': interfaces.MINC,
+    #     'petpvc': interfaces.PETPVC
+    # },
     'other': {
         'add': _add_add,
         'add_to_entrypoint':_add_to_entrypoint,

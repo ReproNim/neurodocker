@@ -10,13 +10,41 @@ from neurodocker.utils import load_yaml
 
 GENERIC_VERSION = 'generic'
 
+apt_install = """apt-get update -qq
+apt-get install -y {{ apt_opts|default('-q --no-install-recommends', true) }} \\\
+{% for pkg in pkgs %}
+    {% if not loop.last -%}
+    {{ pkg }} \\\
+    {%- else -%}
+    {{ pkg }}
+    {%- endif -%}
+{% endfor %}
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+"""
+apt_install = jinja2.Template(apt_install)
 
-def load_global_specs():
+yum_install = """yum install -y {{ yum_opts|default('-q', true) }} \\\
+{% for pkg in pkgs %}
+    {% if not loop.last -%}
+    {{ pkg }} \\\
+    {%- else -%}
+    {{ pkg }}
+    {%- endif -%}
+{% endfor %}
+yum clean packages
+rm -rf /var/cache/yum/* /tmp/* /var/tmp/*
+"""
+yum_install = jinja2.Template(yum_install)
 
-    def _load_global_specs(glob_pattern):
+
+
+def _load_global_specs():
+
+    def load_global_specs(glob_pattern):
         import glob
 
-        def _load_interface_spec(filepath):
+        def load_interface_spec(filepath):
             _, filename = os.path.split(filepath)
             key, _ = os.path.splitext(filename)
             return key, load_yaml(filepath)
@@ -24,16 +52,17 @@ def load_global_specs():
         interface_yamls = glob.glob(glob_pattern)
         instructions = {}
         for ff in interface_yamls:
-            key, data = _load_interface_spec(ff)
+            key, data = load_interface_spec(ff)
             instructions[key] = data
         return instructions
 
     base_path = os.path.dirname(os.path.realpath(__file__))
     glob_pattern = os.path.join(base_path, '..', 'templates', '*.yaml')
-    return _load_global_specs(glob_pattern)
+    return load_global_specs(glob_pattern)
 
 
-_global_specs = load_global_specs()
+_global_specs = _load_global_specs()
+
 
 def _interface_exists_in_yaml(name):
     return name in _global_specs.keys()
@@ -123,6 +152,11 @@ class _Resolver:
                 "URL not found for version '{}'".format(version)
             )
 
+    def binaries_url(self, version):
+        self.check_binaries_has_url(version)
+        version_key = self.get_version_key(version)
+        return self._d[version_key]['binaries']['urls'][version]
+
 
 class _BaseInterface:
     """Base class for interface objects."""
@@ -139,7 +173,7 @@ class _BaseInterface:
         if not _interface_exists_in_yaml(self._name):
             raise ValueError(
                 "No YAML entry for package '{}'".format(self._name)
-             )
+            )
         self._resolver = _Resolver(_global_specs[self._name])
 
         self._version_key = self._resolver.get_version_key(self._version)
@@ -148,6 +182,9 @@ class _BaseInterface:
         self._resolver.check_version_method_has_instructions(
             self._version, self._method
         )
+
+        if method == 'binaries':
+            self.binaries_url = self._resolver.binaries_url(self._version)
 
         self._instance_specs = deepcopy(
             _global_specs[self._name][self._version_key][self._method]
@@ -159,9 +196,14 @@ class _BaseInterface:
     def _get_dependencies(self):
         if 'dependencies' not in self._instance_specs.keys():
             return None
+        if self._instance_specs['dependencies'] is None:
+            return None
         try:
             deps = self._instance_specs['dependencies'][self._pkg_manager]
-            return deps.split()
+            if deps:
+                return deps.split()
+            else:
+                return None
         except KeyError:
             return None
 
@@ -201,7 +243,22 @@ class _BaseInterface:
         return self._dependencies
 
     def install_dependencies(self):
-        return "INSTALL HERE"
+        if not self.dependencies:
+            raise ValueError(
+                "No dependencies to install. Add dependencies or remove the"
+                " `install_dependencies()` call in the package template."
+            )
+
+        if self.pkg_manager == 'apt':
+            return apt_install.render(
+                pkgs=self.dependencies,
+                apt_opts=self.__dict__.get('apt_opts')
+            )
+        elif self.pkg_manager == 'yum':
+            return yum_install.render(
+                pkgs=self.dependencies,
+                yum_opts=self.__dict__.get('yum_opts')
+            )
 
     def render(self):
         return self.template.render({self.name: self})
