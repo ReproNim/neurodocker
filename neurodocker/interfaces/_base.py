@@ -1,14 +1,39 @@
 """"""
 
 from copy import deepcopy
+import os
 import posixpath
 
 import jinja2
 
-from neurodocker.templates import _global_specs
+from neurodocker.utils import load_yaml
 
 GENERIC_VERSION = 'generic'
 
+
+def load_global_specs():
+
+    def _load_global_specs(glob_pattern):
+        import glob
+
+        def _load_interface_spec(filepath):
+            _, filename = os.path.split(filepath)
+            key, _ = os.path.splitext(filename)
+            return key, load_yaml(filepath)
+
+        interface_yamls = glob.glob(glob_pattern)
+        instructions = {}
+        for ff in interface_yamls:
+            key, data = _load_interface_spec(ff)
+            instructions[key] = data
+        return instructions
+
+    base_path = os.path.dirname(os.path.realpath(__file__))
+    glob_pattern = os.path.join(base_path, '..', 'templates', '*.yaml')
+    return _load_global_specs(glob_pattern)
+
+
+_global_specs = load_global_specs()
 
 def _interface_exists_in_yaml(name):
     return name in _global_specs.keys()
