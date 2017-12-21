@@ -7,9 +7,10 @@
 generic:
   binaries:
     dependencies: null
+    env:
+      PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
     instructions: |
-      RUN echo "Downloading MRtrix3 ..."
-          && mkdir -p {install_path}
-          && curl -sSL --retry 5 {binaries_url}
-          | tar zx -C {install_path} --strip-components 1
-      ENV PATH={install_path}/bin:$PATH
+      echo "Downloading MRtrix3 ..."
+      mkdir -p {{ mrtrix3.install_path }}
+      curl {{ mrtrix3.curl_opts }} {binaries_url} \
+      | tar zx -C {{ mrtrix3.install_path }} --strip-components 1

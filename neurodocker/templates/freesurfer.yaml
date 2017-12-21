@@ -4,15 +4,17 @@
 # Website: https://surfer.nmr.mgh.harvard.edu/
 # Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki
 
-">=2.2":
+full:
   binaries:
     dependencies: null
     instructions: |
       RUN echo "todo"
 
 # See https://github.com/freesurfer/freesurfer/issues/70
-"==6.0.0-min-recon-all":
+min-recon-all:
   binaries:
+    urls:
+      "6.0.0": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
     dependencies:
       apt: bc libgomp1 libxmu6 libxt6 tcsh perl
     env:
@@ -21,6 +23,6 @@
       {{ freesurfer.install_dependencies() }}
       echo "Downloading minimized FreeSurfer ..."
       mkdir -p {{ freesurfer.install_path }}
-      curl {{ freesurfer.curl_opts }} https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz \
+      curl {{ freesurfer.curl_opts }}  \
       | tar xz -C {install_path} --strip-components 1
       && sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh' $ND_ENTRYPOINT

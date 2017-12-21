@@ -3,18 +3,18 @@
 # Website: http://www.fil.ion.ucl.ac.uk/spm/
 # Documentation: http://www.fil.ion.ucl.ac.uk/spm/doc/
 
-# TODO: make this generic. It is specific to SPM12 at the moment.
 generic:
   binaries:
     dependencies: null
+    env:
+      FORCE_SPMMCR: 1
     instructions: |
-      RUN echo "Downloading standalone SPM ..."
-          && curl -sSL --retry 5 -o /tmp/spm.zip {binaries_url}
-          && unzip -q spm.zip -d /tmp
-          && mkdir -p {install_path}
-          && mv /tmp/spm*/* {install_path}/
-          && chmod -R 777 {install_path}
-          && rm -rf /tmp/spm*
-          && {install_path}/run_spm12.sh {mcr_path} quit
-          && sed -i '$iexport SPMMCRCMD=\"{install_path}/run_spm12.sh {mcr_path} script\"' $ND_ENTRYPOINT
-      ENV FORCE_SPMMCR=1
+      echo "Downloading standalone SPM ..."
+      curl {{ spm12.curl_opts }} -o /tmp/spm12.zip {{ spm12.binaries_url }}
+      unzip -q spm12.zip -d /tmp
+      mkdir -p {{ spm12.install_path }}
+      mv /tmp/spm*/* {{ spm12.install_path }}/
+      chmod -R 777 {{ spm12.install_path }}
+      rm -rf /tmp/spm*
+      {{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} quit
+      sed -i '$iexport SPMMCRCMD=\"{{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} script\"' $ND_ENTRYPOINT

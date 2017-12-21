@@ -1,17 +1,21 @@
 # Instructions to install MATLAB Compiler Runtime.
 #
 # Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
+#
+# TODO: add version 2010 from SPM.
 
 generic:
   binaries:
     dependencies:
       apt: libxext6 libxt6
       yum: libXext.x86_64 libXt.x86_64
+    env:
+      MATLABCMD: {{ matlab.matlabcmd }}
+      LD_LIBRARY_PATH: {{ matlab.ld_library_path }}:$LD_LIBRARY_PATH
     instructions: |
-      RUN echo "Downloading MATLAB Compiler Runtime ..."
-          && curl -sSL --retry 5 -o /tmp/mcr.zip {binaries_url}
-          && unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
-          && /tmp/mcrtmp/install -destinationFolder {install_path} -mode silent -agreeToLicense yes
-          && rm -rf /tmp/*
-      ENV MATLABCMD={matlabcmd}
-          LD_LIBRARY_PATH={ld_library_path}:$LD_LIBRARY_PATH
+      {{ matlab.install_dependencies() }}
+      echo "Downloading MATLAB Compiler Runtime ..."
+      curl -sSL --retry 5 -o /tmp/mcr.zip {{ matlab.binaries_url }}
+      unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
+      /tmp/mcrtmp/install -destinationFolder {{ matlab.install_path }} -mode silent -agreeToLicense yes
+      rm -rf /tmp/*

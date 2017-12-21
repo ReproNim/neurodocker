@@ -37,6 +37,15 @@ rm -rf /var/cache/yum/* /tmp/* /var/tmp/*
 """
 yum_install = jinja2.Template(yum_install)
 
+deb_install = """{% for deb_url in debs -%}
+curl -sSL --retry 5 -o /tmp/toinstall.deb {{ deb_url }}
+dpkg -i /tmp/toinstall.deb
+{% endfor -%}
+apt-get install -f
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+"""
+deb_install = jinja2.Template(deb_install)
 
 
 def _load_global_specs():
@@ -200,10 +209,18 @@ class _BaseInterface:
             return None
         try:
             deps = self._instance_specs['dependencies'][self._pkg_manager]
-            if deps:
-                return deps.split()
-            else:
-                return None
+            return deps.split() if deps else None
+        except KeyError:
+            return None
+
+    def _get_debs(self):
+        if 'dependencies' not in self._instance_specs.keys():
+            return None
+        if self._instance_specs['dependencies'] is None:
+            return None
+        try:
+            debs = self._instance_specs['dependencies']['debs']
+            return debs if debs else None
         except KeyError:
             return None
 
@@ -242,23 +259,35 @@ class _BaseInterface:
     def dependencies(self):
         return self._dependencies
 
-    def install_dependencies(self):
+    def install_dependencies(self, sort=True):
         if not self.dependencies:
             raise ValueError(
                 "No dependencies to install. Add dependencies or remove the"
                 " `install_dependencies()` call in the package template."
             )
+        pkgs = sorted(self.dependencies) if sort else self.dependencies
 
         if self.pkg_manager == 'apt':
             return apt_install.render(
-                pkgs=self.dependencies,
-                apt_opts=self.__dict__.get('apt_opts')
+                pkgs=pkgs,
+                apt_opts=self.__dict__.get('apt_opts'),
+                sort=True,
             )
         elif self.pkg_manager == 'yum':
             return yum_install.render(
-                pkgs=self.dependencies,
-                yum_opts=self.__dict__.get('yum_opts')
+                pkgs=pkgs,
+                yum_opts=self.__dict__.get('yum_opts'),
+                sort=True,
             )
+
+    def install_debs(self):
+        debs = self._get_debs()
+        if not debs:
+            raise ValueError(
+                "No .deb files to install. Add .deb files or remove the"
+                " `install_debs()` call in the package template."
+            )
+        return deb_install.render(debs=debs)
 
     def render(self):
         return self.template.render({self.name: self})

@@ -9,8 +9,34 @@ class AFNI(_BaseInterface):
     _name = 'afni'
     _pretty_name = 'AFNI'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, install_python2=False, install_python3=False,
+                 install_r=False, install_r_pkgs=False, **kwargs):
+        self.install_python2 = install_python2
+        self.install_python3 = install_python3
+        self.install_r = install_r
+        self.install_r_pkgs = install_r_pkgs
         super().__init__(self._name, *args, **kwargs)
+
+        if self.install_python2:
+            self._dependencies.append('python')
+        if self.install_python3:
+            self._dependencies.append('python3')
+        if self.install_r:
+            r = {
+                'apt': ['r-base', 'r-base-dev'],
+                'yum': ['R-devel'],
+            }
+            self._dependencies.extend(r[self._pkg_manager])
+
+        if self.install_r_pkgs and not self.install_r:
+            raise ValueError(
+                "option `install_r=True` must be specified if"
+                " `install_r_pkgs=True`."
+            )
+
+    def _install_r_pkgs(self):
+        """Return string of instructions to install AFNI's R packages."""
+        return "{{ afni.install_path }}/rPkgsInstall -pkgs ALL"
 
 
 class ANTs(_BaseInterface):

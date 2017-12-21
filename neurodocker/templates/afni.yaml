@@ -11,32 +11,44 @@ generic:
     urls:
       latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
     dependencies:
-      apt: ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1 libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb
-      yum: ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif R-devel tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
+      apt: >
+        ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1
+        libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb
+      yum: >
+        ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif
+        tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
+      debs:
+        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        - http://mirrors.kernel.org/debian/pool/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
     instructions: |
       {{ afni.install_dependencies() }}
+      {{ afni.install_debs() }}
       echo "Downloading AFNI ..."
       mkdir -p {{ afni.install_path }}
       curl {{ afni.curl_opts }} {{ afni.binaries_url }}
-      | tar -xz -C {install_path} --strip-components 1
-
-      {% if afni.install_python %}
-      {{ afni.install_python() }}
-      {% endif %}
-
+      | tar -xz -C {{ self.install_path }} --strip-components 1
       {% if afni.install_r_pkgs %}
-      # Install apt: r-base r-base-dev
-      #         yum: R-devel
-
-      {{ afni.install_r_pkgs() }}
+      {{ afni._install_r_pkgs() }}
       {% endif %}
 
   source:
     dependencies:
-      apt: "foo bar"
-      yum: "compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel gsl-devel libXext-devel libXi-devel libXmu-devel libXpm-devel libXt-devel m4 make mesa-libGL-devel mesa-libGLU-devel netpbm-devel openmotif-devel R R-devel tcsh zlib-devel"
+      apt: >
+        curl ed g++ gcc git libglib2.0-dev libglu1-mesa-dev libgsl-dev
+        libmotif-dev libnetpbm10-dev libxext-dev libxi-dev libxpm-dev libxt-dev
+        m4 make nlibxmu-headers nmesa-common-dev r-base r-base-dev tcsh
+        zlib1g-dev
+      yum: >
+        compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel
+        gsl-devel libXext-devel libXi-devel libXmu-devel libXpm-devel
+        libXt-devel m4 make mesa-libGL-devel mesa-libGLU-devel netpbm-devel
+        openmotif-devel R R-devel tcsh zlib-devel
+      debs:
+        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        - http://mirrors.kernel.org/debian/pool/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
     instructions: |
       {{ afni.install_dependencies() }}
+      {{ afni.install_debs() }}
       git clone https://github.com/afni/afni.git {{ afni.install_path }}
       cd {{ afni.install_path }}
       git checkout {{ afni.version }}
