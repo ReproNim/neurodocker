@@ -22,12 +22,12 @@ generic:
       echo "Downloading MINC, BEASTLIB, and MODELS..."
       mkdir -p {{ minc.install_path }}
       curl {{ minc.curl_opts }} {{ minc.binaries_url }} \
-      | tar -zx -C {{ minc.install_path }} --strip-components 1
+      | tar -xz -C {{ minc.install_path }} --strip-components 1
       curl {{ minc.curl_opts }} http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
-      | tar -zx -C {install_path}/share \
-      curl {{ minc.curl_opts }} -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip \
-      unzip /tmp/mni_90a.zip -d {{ minc.install_path }}/share/icbm152_model_09a \
-      curl {{ minc.curl_opts }} -o /tmp/mni_90c.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip \
-      unzip /tmp/mni_90c.zip -d {{ minc._install_path }}/share/icbm152_model_09c \
-      rm -f /tmp/mni_90*.zip  \
+      | tar -xz -C {install_path}/share
+      curl {{ minc.curl_opts }} -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip
+      unzip /tmp/mni_90a.zip -d {{ minc.install_path }}/share/icbm152_model_09a
+      curl {{ minc.curl_opts }} -o /tmp/mni_90c.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09c_minc2.zip
+      unzip /tmp/mni_90c.zip -d {{ minc._install_path }}/share/icbm152_model_09c
       sed -i '$isource {{ minc.install_path }}/minc-toolkit-config.sh' $ND_ENTRYPOINT
+      rm -f /tmp/*

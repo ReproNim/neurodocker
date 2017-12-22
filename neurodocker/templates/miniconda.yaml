@@ -9,10 +9,10 @@ generic:
       PATH: "{{ miniconda.install_path }}/bin:$PATH"
     instructions: |
       echo "Downloading Miniconda installer ..."
-      CONDA_INSTALLER="/tmp/miniconda.sh"
-      curl -sSL --retry 5 -o "$CONDA_INSTALLER" {{ miniconda.binaries_url }}
-      bash "$CONDA_INSTALLER" -b -p "$CONDA_DIR"
-      rm -f "$CONDA_INSTALLER"
+      conda_installer="/tmp/miniconda.sh"
+      curl -sSL --retry 5 -o "$conda_installer" {{ miniconda.binaries_url }}
+      bash "$conda_installer" -b -p {{ miniconda.install_path }}
+      rm -f "$conda_installer"
       conda config --system --prepend channels conda-forge
       conda config --system --set auto_update_conda false
       conda config --system --set show_channel_urls true

@@ -35,7 +35,7 @@ generic:
     instructions: |
       {{ matlabmcr.install_dependencies() }}
       echo "Downloading MATLAB Compiler Runtime ..."
-      curl -sSL --retry 5 -o /tmp/mcr.zip {{ matlabmcr.binaries_url }}
+      curl {{ matlabmcr.curl_opts }} -o /tmp/mcr.zip {{ matlabmcr.binaries_url }}
       unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
       /tmp/mcrtmp/install -destinationFolder {{ matlabmcr.install_path }} -mode silent -agreeToLicense yes
       rm -rf /tmp/*
