@@ -199,8 +199,11 @@ class _BaseInterface:
             _global_specs[self._name][self._version_key][self._method]
         )
 
-        self._template = jinja2.Template(self._instance_specs['instructions'])
+        # self._template = jinja2.Template(self._instance_specs['instructions'])
+        self._template = self._instance_specs['instructions']
         self._dependencies = self._get_dependencies()
+
+        self._env = self._instance_specs.get('env', None)
 
     def _get_dependencies(self):
         if 'dependencies' not in self._instance_specs.keys():
@@ -243,6 +246,10 @@ class _BaseInterface:
     @property
     def method(self):
         return self._method
+
+    @property
+    def env(self):
+        return self._env
 
     @property
     def template(self):
@@ -290,4 +297,12 @@ class _BaseInterface:
         return deb_install.render(debs=debs)
 
     def render(self):
-        return self.template.render({self.name: self})
+        return jinja2.Template(self.template).render({self.name: self})
+
+    def _render_dockerfile(self):
+        # TODO + QUESTION: when should we create the Template object?
+        if self._env:
+            env = "\n".join(
+                '{}="{}"'.format(k, v) for k, v in self._env.items()
+            )
+        return jinja2.Template(env + "\n" + self.template).render({self.name: self})
