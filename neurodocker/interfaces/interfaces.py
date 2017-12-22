@@ -89,6 +89,41 @@ class FSL(_BaseInterface):
         super().__init__(self._name, *args, **kwargs)
 
 
+class MatlabMCR(_BaseInterface):
+    """Create instance of MatlabMCR object."""
+
+    _name = 'matlabmcr'
+    _pretty_name = "MATLAB MCR"
+
+    _mcr_versions = {
+        '2017b': '93',
+        '2017a': '92',
+        '2016b': '91',
+        '2016a': '901',
+        '2015b': '90',
+        '2015a': '85',
+        '2014b': '84',
+        '2014a': '83',
+        '2013b': '82',
+        '2013a': '81',
+        '2012b': '80',
+        '2012a': '717',
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
+
+    @property
+    def mcr_version(self):
+        try:
+            return "v{}".format(self._mcr_versions[self.version])
+        except KeyError:
+            raise ValueError(
+                "Matlab MCR version not known for Matlab version '{}'."
+                .format(self.version)
+            )
+
+
 class MINC(_BaseInterface):
     """Create instance of MINC object."""
 
