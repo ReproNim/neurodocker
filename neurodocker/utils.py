@@ -72,9 +72,9 @@ def get_string_format_keys(string):
 def indent_str(string, indent=4, indent_first_line=False):
     separator = "\n" + " " * indent
     if indent_first_line:
-        return separator + separator.join(string.split('\n'))
+        return separator + separator.join(string.splitlines())
     else:
-        return separator.join(string.split('\n'))
+        return separator.join(string.splitlines())
 
 
 def _indent_pkgs(pkgs, indent, sort=True):
