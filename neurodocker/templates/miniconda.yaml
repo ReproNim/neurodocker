@@ -4,6 +4,8 @@
 
 generic:
   binaries:
+    urls:
+      latest: "FOOBAR"
     env:
       CONDA_DIR: "{{ miniconda.install_path }}"
       PATH: "{{ miniconda.install_path }}/bin:$PATH"
