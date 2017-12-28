@@ -1,6 +1,11 @@
 """Package utility functions."""
 
 
+def _count_key_occurence_list_of_tuples(list_of_tuples, key):
+    """Return the number of times `key` occurs as a key in `list_of_tuples`."""
+    return sum(1 for i, _ in list_of_tuples if i == key)
+
+
 # TODO: move this function to neurodocker.generate.py
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
@@ -36,7 +41,7 @@ def _string_vals_to_list(dictionary):
 # TODO: move this function to neurodocker.generate.py
 def _namespace_to_specs(namespace):
     """Return dictionary of specifications from namespace."""
-    from neurodocker.generate import dockerfile_implementations
+    from neurodocker.generators.common import _installation_implementations
 
     instructions = [('base', namespace.base)]
     try:
@@ -55,7 +60,7 @@ def _namespace_to_specs(namespace):
 
     # Convert string options that should be booleans to booleans.
     for instruction, options in instructions:
-        if instruction in dockerfile_implementations['software'].keys():
+        if instruction in _installation_implementations.keys():
             _string_vals_to_bool(options)
             _string_vals_to_list(options)
 

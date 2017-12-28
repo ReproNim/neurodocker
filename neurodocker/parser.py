@@ -5,9 +5,9 @@ from __future__ import absolute_import
 
 import inspect
 
-import neurodocker
 from neurodocker import utils
-from neurodocker.generate import dockerfile_implementations
+from neurodocker.generators.common import _installation_implementations
+from neurodocker.generators.docker import Dockerfile
 
 
 def _check_for_invalid_keys(keys, valid_keys, where):
@@ -47,11 +47,8 @@ class _SpecsParser(object):
     """
     VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
                             'generation_timestamp', 'neurodocker_version',]
-    VALID_INSTRUCTIONS_KEYS = list(dockerfile_implementations['other'].keys())
 
-    SUPPORTED_SOFTWARE = dockerfile_implementations['software'].keys()
-    VALID_INSTRUCTIONS_KEYS.extend(SUPPORTED_SOFTWARE)
-    VALID_INSTRUCTIONS_KEYS.sort()
+    VALID_INSTRUCTIONS_KEYS = Dockerfile._implementations.keys()
 
     def __init__(self, specs):
         self.specs = specs
@@ -96,21 +93,13 @@ class _SpecsParser(object):
         """Raise ValueError if a key is present that does not belong in a
         function's signature.
         """
-        supported_software = dockerfile_implementations['software']
         for pkg, opts in self.specs['instructions']:
-            if pkg in supported_software.keys():
-                func = supported_software[pkg]
-                try:
-                    params = list(inspect.signature(func).parameters)
-                # Python 2.7 does not have inspect.signature
-                except AttributeError:
-                    params = inspect.getargspec(func.__init__)[0]
-                    params.remove('self')
-
+            if pkg in _installation_implementations.keys():
+                func = _installation_implementations[pkg]
+                params = list(inspect.signature(func).parameters)
                 bad_opts = [opt for opt in opts if opt not in params]
                 if bad_opts:
                     bad_opts = ', '.join(bad_opts)
-                    good_opts = ', '.join(params)
                     raise ValueError("Invalid option(s) found in instructions "
                                      " key '{}': {}. Valid options are {}"
                                      "".format(pkg, bad_opts, params))

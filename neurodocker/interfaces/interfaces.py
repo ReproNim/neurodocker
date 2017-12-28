@@ -160,6 +160,20 @@ class NeuroDebian(_BaseInterface):
     _name = 'neurodebian'
     _pretty_name = 'NeuroDebian'
 
+    _servers = {
+        'australia': 'au',
+        'china-tsinghua': 'cn-bj1',
+        'china-scitech': 'cn-bj2',
+        'china-zhejiang': 'cn-zj',
+        'germany-munich': 'de-m',
+        'germany-magdeburg': 'de-md',
+        'greece': 'gr',
+        'japan': 'jp',
+        'usa-ca': 'us-ca',
+        'usa-nh': 'us-nh',
+        'usa-tn': 'us-tn',
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
 

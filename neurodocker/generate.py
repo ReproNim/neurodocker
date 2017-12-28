@@ -6,8 +6,6 @@ import posixpath
 
 import neurodocker
 from neurodocker import interfaces
-from neurodocker.utils import apt_get_install, indent, manage_pkgs, yum_install
-
 
 ND_DIRECTORY = posixpath.join(posixpath.sep, 'neurodocker')
 ENTRYPOINT_FILE = posixpath.join(ND_DIRECTORY, 'startup.sh')

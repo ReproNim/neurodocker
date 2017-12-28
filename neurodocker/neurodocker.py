@@ -10,12 +10,11 @@ from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import sys
 
-from neurodocker import __version__, Dockerfile, utils
-from neurodocker.generate import dockerfile_implementations
+from neurodocker import __version__, utils
+from neurodocker.generators import Dockerfile, SingularityRecipe
+from neurodocker.generators.common import _installation_implementations
 
 logger = logging.getLogger(__name__)
-
-SUPPORTED_SOFTWARE = dockerfile_implementations['software']
 
 
 # https://stackoverflow.com/a/9028031/5666087
@@ -34,15 +33,19 @@ def _add_generate_arguments(parser):
 
     def list_of_kv(kv):
         """Split string `kv` at first equals sign."""
-        l = kv.split("=")
-        l[1:] = ["=".join(l[1:])]
-        return l
+        ll = kv.split("=")
+        ll[1:] = ["=".join(ll[1:])]
+        return ll
 
     p.add_argument("-b", "--base",  # required=True,
                    help="Base Docker image. Eg, ubuntu:17.04")
     p.add_argument("-p", "--pkg-manager",  # required=True,
-                   choices=utils.manage_pkgs.keys(),
+                   choices={'apt', 'yum'},
                    help="Linux package manager.")
+
+    # TODO: create separate subparsers for docker and singularity. This will
+    # help catch errors in invalid requests. For example, the "EXPOSE"
+    # Dockerfile instruction does not have a Singularity counterpart.
 
     # Arguments that should be ordered.
     p.add_argument('--add', action=OrderedArgs, nargs="+",
@@ -95,7 +98,9 @@ def _add_generate_arguments(parser):
     p.add_argument("--no-check-urls", action="store_false", dest="check_urls",
                    help="Do not verify communication with URLs used in the build.")
 
-    _ndeb_servers = ", ".join(SUPPORTED_SOFTWARE['neurodebian'].SERVERS.keys())
+    _ndeb_servers = ", ".join(
+        _installation_implementations['neurodebian']._servers.keys()
+    )
 
     # Software package options.
     pkgs_help = {
@@ -134,6 +139,9 @@ def _add_generate_arguments(parser):
             "Install FSL. Valid keys are version (required), use_binaries"
             " (default true) and use_installer."
         ),
+        "matlabmcr": (
+            "Install Matlab Compiler Runtime."
+        ),
         "miniconda": (
             "Install Miniconda. Valid keys are env_name (required),"
             " conda_install, pip_install, conda_opts, pip_opts, activate"
@@ -153,7 +161,7 @@ def _add_generate_arguments(parser):
             " packages), and pkgs (list of packages to install). Valid"
             " download servers are {}.".format(_ndeb_servers)
         ),
-        "spm": (
+        "spm12": (
             "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
             " keys are version and matlab_version."
         ),
@@ -169,7 +177,7 @@ def _add_generate_arguments(parser):
     pkgs = p.add_argument_group(title="software package arguments",
                                 description=pkgs_help['all'])
 
-    for pkg in SUPPORTED_SOFTWARE.keys():
+    for pkg in _installation_implementations.keys():
         flag = "--{}".format(pkg)
         # MRtrix3 does not need any arguments by default.
         nargs = "*" if pkg == "mrtrix3" else "+"
@@ -234,15 +242,16 @@ def parse_args(args):
 
 def generate(namespace):
     """Run `neurodocker generate`."""
-    if namespace.file is not None:
-        specs = utils.load_json(namespace.file)
-    else:
+    if namespace.file is None:
         specs = utils._namespace_to_specs(namespace)
-    df = Dockerfile(specs)
+    else:
+        specs = utils.load_json(namespace.file)
+
+    recipe_obj = Dockerfile(specs)
     if not namespace.no_print_df:
-        print(df.cmd)
+        print(recipe_obj.render())
     if namespace.output:
-        df.save(filepath=namespace.output)
+        recipe_obj.save(filepath=namespace.output)
 
 
 def reprozip_trace(namespace):
