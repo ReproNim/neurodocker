@@ -1,9 +1,6 @@
 """Functions and classes to generate Dockerfiles."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import os
 import posixpath
 
