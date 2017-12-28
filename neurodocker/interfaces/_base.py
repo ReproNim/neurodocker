@@ -40,6 +40,7 @@ yum_install = jinja2.Template(yum_install)
 deb_install = """{% for deb_url in debs -%}
 curl -sSL --retry 5 -o /tmp/toinstall.deb {{ deb_url }}
 dpkg -i /tmp/toinstall.deb
+rm /tmp/toinstall.deb
 {% endfor -%}
 apt-get install -f
 apt-get clean
@@ -147,7 +148,7 @@ class _Resolver:
                 return version in urls
             except KeyError:
                 raise ValueError(
-                    "no binary URLs defined for version '{}".format(version)
+                    "no binary URLs defined for version '{}'".format(version)
                 )
         else:
             raise ValueError(
@@ -199,8 +200,7 @@ class _BaseInterface:
             _global_specs[self._name][self._version_key][self._method]
         )
 
-        # self._template = jinja2.Template(self._instance_specs['instructions'])
-        self._template = self._instance_specs['instructions']
+        self._run = self._instance_specs['instructions']
         self._dependencies = self._get_dependencies()
 
         self._env = self._instance_specs.get('env', None)
@@ -240,6 +240,10 @@ class _BaseInterface:
         return self._version
 
     @property
+    def versions(self):
+        return self._resolver.versions
+
+    @property
     def pkg_manager(self):
         return self._pkg_manager
 
@@ -252,8 +256,8 @@ class _BaseInterface:
         return self._env
 
     @property
-    def template(self):
-        return self._template
+    def run(self):
+        return self._run
 
     @property
     def install_path(self):
@@ -296,13 +300,13 @@ class _BaseInterface:
             )
         return deb_install.render(debs=debs)
 
-    def render(self):
-        return jinja2.Template(self.template).render({self.name: self})
+    def render_run(self):
+        return jinja2.Template(self.run).render({self.name: self})
 
-    def _render_dockerfile(self):
-        # TODO + QUESTION: when should we create the Template object?
-        if self._env:
-            env = "\n".join(
-                '{}="{}"'.format(k, v) for k, v in self._env.items()
-            )
-        return jinja2.Template(env + "\n" + self.template).render({self.name: self})
+    def render_env(self):
+        """Return dictionary with rendered keys and values."""
+        return {
+            jinja2.Template(k).render({self.name: self}):
+            jinja2.Template(v).render({self.name: self})
+            for k, v in self.env.items()
+        } if self.env else self.env
