@@ -140,6 +140,8 @@ def _add_generate_common_arguments(parser):
     )
 
     for pkg in _installation_implementations.keys():
+        if pkg == '_header':
+            continue
         flag = "--{}".format(pkg)
         # MRtrix3 does not need any arguments by default.
         nargs = "*" if pkg == "mrtrix3" else "+"
