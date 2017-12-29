@@ -10,10 +10,13 @@ from neurodocker.generators.common import _installation_implementations
 def _indent(string, indent=4, add_list_op=False):
     out = []
     lines = string.splitlines()
+
     for ii, line in enumerate(lines):
-        line = line.strip()
-        already_cont = line.startswith(('&&', '&', '||', '|'))
-        previous_cont = lines[ii-1].endswith('\\')
+        line = line.rstrip()
+        already_cont = line.startswith(('&&', '&', '||', '|', 'fi'))
+        previous_cont = (
+            lines[ii - 1].endswith('\\') or lines[ii - 1].startswith('if')
+        )
         if ii:
             if add_list_op and not already_cont and not previous_cont:
                 line = "&& " + line
@@ -232,8 +235,17 @@ class Dockerfile:
     def __init__(self, specs):
         self._specs = specs
 
+        self._add_neurodocker_install_header_to_specs()
+
     def render(self):
         return "\n\n".join(self._ispecs_to_dockerfile_str())
+
+    def _add_neurodocker_install_header_to_specs(self):
+        # self._specs['instructions'] _Header(
+        #     'generic', pkg_manager=self._specs['pkg_manager'], method='custom'
+        # )
+        self._specs['instructions'].insert(1, ('_header', {'version': 'generic', 'method': 'custom'}))
+        # return _DockerfileInterfaceFormatter(interface).render()
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']

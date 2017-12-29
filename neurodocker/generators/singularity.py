@@ -69,6 +69,7 @@ class SingularityRecipe:
             ('labels', self._labels)
         )
         self._parts_filled = False
+        self._add_neurodocker_header()
 
     def render(self):
         def _render_one(section):
@@ -112,6 +113,14 @@ class SingularityRecipe:
 
     def _render_labels(self):
         return "%labels\n" + "\n".join(self._labels)
+
+    def _add_neurodocker_header(self):
+        self._specs['instructions'].insert(1, ('_header', {'version': 'generic', 'method': 'custom'}))
+        # interface = _Header(
+        #     'generic', pkg_manager=self._specs['pkg_manager'], method='custom'
+        # )
+        # self._post.append(interface.render_run())
+        # self._environment.update(**interface.render_env())
 
     def _fill_parts(self):
         pkg_man = self._specs['pkg_manager']
