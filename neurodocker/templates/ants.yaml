@@ -33,9 +33,10 @@ generic:
     instructions: |
       {{ ants.install_dependencies() }}
       mkdir -p /tmp/ants/build
-      git clone https://github.com/ANTsX/ANTs.git /tmps/ants/source
+      git clone https://github.com/ANTsX/ANTs.git /tmp/ants/source
       {% if ants.version != "master" and ants.version != "latest" -%}
       cd /tmp/ants/source
+      git fetch --tags
       git checkout {{ ants.version }}
       {% endif -%}
       cd /tmp/ants/build
