@@ -3,6 +3,15 @@
 from neurodocker.interfaces._base import _BaseInterface
 
 
+class _Header(_BaseInterface):
+    """Create instance of _Header oject."""
+
+    _name = "_header"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
+
+
 class AFNI(_BaseInterface):
     """Create instance of AFNI object."""
 
