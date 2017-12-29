@@ -10,7 +10,7 @@ generic:
     LC_ALL: "C.UTF-8"
     ND_ENTRYPOINT: "/neurodocker/startup.sh"
   instructions: |
-    {install_deps}
+    {{ header.install_dependencies() }}
     && localedef --force --inputfile=en_US --charmap=UTF-8 C.UTF-8
     && chmod 777 /opt && chmod a+s /opt
     && mkdir -p "$(dirname $ND_ENTRYPOINT)"
