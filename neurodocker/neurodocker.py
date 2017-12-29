@@ -17,8 +17,14 @@ from neurodocker.generators.common import _installation_implementations
 logger = logging.getLogger(__name__)
 
 
-# https://stackoverflow.com/a/9028031/5666087
 class OrderedArgs(Action):
+    """
+    Object to preserve order in which command-line arguments are given.
+
+    Notes
+    -----
+    From https://stackoverflow.com/a/9028031/5666087
+    """
     def __call__(self, parser, namespace, values, option_string=None):
         if 'ordered_args' not in namespace:
             setattr(namespace, 'ordered_args', [])
@@ -27,79 +33,110 @@ class OrderedArgs(Action):
         setattr(namespace, 'ordered_args', previous)
 
 
-def _add_generate_arguments(parser):
-    """Add arguments to `parser` for sub-command `generate`."""
+def _list_of_kv(kv):
+    """Split string `kv` at first equals sign."""
+    ll = kv.split("=")
+    ll[1:] = ["=".join(ll[1:])]
+    return ll
+
+
+def _add_generate_docker_arguments(parser):
+    """Add arguments to `parser` for sub-command `generate docker`."""
     p = parser
 
-    def list_of_kv(kv):
-        """Split string `kv` at first equals sign."""
-        ll = kv.split("=")
-        ll[1:] = ["=".join(ll[1:])]
-        return ll
-
-    p.add_argument("-b", "--base",  # required=True,
-                   help="Base Docker image. Eg, ubuntu:17.04")
-    p.add_argument("-p", "--pkg-manager",  # required=True,
-                   choices={'apt', 'yum'},
-                   help="Linux package manager.")
-
-    # TODO: create separate subparsers for docker and singularity. This will
-    # help catch errors in invalid requests. For example, the "EXPOSE"
-    # Dockerfile instruction does not have a Singularity counterpart.
+    p.add_argument("-b", "--base", help="Base Docker image. Eg, ubuntu:17.04")
+    p.add_argument(
+        "-p", "--pkg-manager", choices={'apt', 'yum'},
+        help="Linux package manager."
+    )
 
     # Arguments that should be ordered.
-    p.add_argument('--add', action=OrderedArgs, nargs="+",
-                   help="Dockerfile ADD instruction. Use format <src> ... <dest>")
-    p.add_argument('--add-to-entrypoint', action=OrderedArgs, nargs="+",
-                   help=("Add a command to the file /neurodocker/startup.sh,"
-                         " which is the container's default entrypoint."))
-    p.add_argument('--arg', action=OrderedArgs, nargs="+",
-                   help="Dockerfile ARG instruction. Use format KEY[=DEFAULT_VALUE] ...",
-                   type=list_of_kv)
-    p.add_argument('--cmd', action=OrderedArgs, nargs="+",
-                   help="Dockerfile CMD instruction.")
-    p.add_argument('--copy', action=OrderedArgs, nargs="+",
-                   help="Dockerfile COPY instruction. Use format <src> ... <dest>")
-    p.add_argument('--entrypoint', action=OrderedArgs,
-                   help="Dockerfile ENTRYPOINT instruction.")
-    p.add_argument('-e', '--env', action=OrderedArgs, nargs="+",
-                   help="Dockerfile ENV instruction. Use the format KEY=VALUE ...",
-                   type=list_of_kv)
-    p.add_argument('--expose', nargs="+", action=OrderedArgs,
-                   help="Dockerfile EXPOSE instruction.")
-    p.add_argument('--install', action=OrderedArgs, nargs="+",
-                   help=("Install system packages with apt-get or yum,"
-                         " depending on the package manager specified."))
-    p.add_argument('--instruction', action=OrderedArgs,
-                   help="Arbitrary text to write to Dockerfile.")
-    p.add_argument('--label', action=OrderedArgs, nargs="+",
-                   help="Dockerfile LABEL instruction.", type=list_of_kv)
-    p.add_argument('-r', '--run', action=OrderedArgs,
-                   help="Dockerfile RUN instruction")
-    p.add_argument('--run-bash', action=OrderedArgs,
-                   help="Run BASH code in RUN instruction.")
-    p.add_argument('-u', '--user', action=OrderedArgs,
-                   help="Dockerfile USER instruction.")
-    p.add_argument('--volume', action=OrderedArgs, nargs="+",
-                   help="Dockerfile VOLUME instruction.")
-    p.add_argument('--workdir', action=OrderedArgs,
-                   help="Dockerfile WORKDIR instruction.")
+    p.add_argument(
+        '--add', action=OrderedArgs, nargs="+",
+        help="Dockerfile ADD instruction. Use format <src>... <dest>"
+    )
+    p.add_argument(
+        '--add-to-entrypoint', action=OrderedArgs, nargs="+",
+        help=("Add a command to the file /neurodocker/startup.sh, which is the"
+              " container's default entrypoint.")
+    )
+    p.add_argument(
+        '--arg', action=OrderedArgs, nargs="+", type=_list_of_kv,
+        help="Dockerfile ARG instruction. Use format KEY[=DEFAULT_VALUE] ...",
+    )
+    p.add_argument(
+        '--cmd', action=OrderedArgs, nargs="+",
+        help="Dockerfile CMD instruction."
+    )
+    p.add_argument(
+        '--copy', action=OrderedArgs, nargs="+",
+        help="Dockerfile COPY instruction. Use format <src>... <dest>"
+    )
+    p.add_argument(
+        '--entrypoint', action=OrderedArgs,
+        help="Dockerfile ENTRYPOINT instruction."
+    )
+    p.add_argument(
+        '-e', '--env', action=OrderedArgs, nargs="+", type=_list_of_kv,
+        help="Dockerfile ENV instruction. Use the format KEY=VALUE ...",
+    )
+    p.add_argument(
+        '--expose', nargs="+", action=OrderedArgs,
+        help="Dockerfile EXPOSE instruction."
+    )
+    p.add_argument(
+        '--install', action=OrderedArgs, nargs="+",
+        help=("Install system packages with apt-get or yum, depending on the"
+              " package manager specified.")
+    )
+    p.add_argument(
+        '--instruction', action=OrderedArgs,
+        help="Arbitrary text to write to Dockerfile."
+    )
+    p.add_argument(
+        '--label', action=OrderedArgs, nargs="+", type=_list_of_kv,
+        help="Dockerfile LABEL instruction."
+    )
+    p.add_argument(
+        '-r', '--run', action=OrderedArgs, help="Dockerfile RUN instruction"
+    )
+    p.add_argument(
+        '--run-bash', action=OrderedArgs,
+        help="Run BASH code in RUN instruction."
+    )
+    p.add_argument(
+        '-u', '--user', action=OrderedArgs, help="Dockerfile USER instruction."
+    )
+    p.add_argument(
+        '--volume', action=OrderedArgs, nargs="+",
+        help="Dockerfile VOLUME instruction."
+    )
+    p.add_argument(
+        '--workdir', action=OrderedArgs, help="Dockerfile WORKDIR instruction."
+    )
+
+
+def _add_generate_common_arguments(parser):
+    p = parser
 
     # To generate from file.
-    p.add_argument('-f', '--file', dest='file',
-                   help=("Generate Dockerfile from JSON. Overrides other"
-                         " `generate` arguments"))
+    p.add_argument(
+        '-f', '--file', dest='file',
+        help="Generate file from JSON. Overrides other `generate` arguments"
+    )
 
     # Other arguments (no order).
-    p.add_argument('-o', '--output', dest="output",
-                     help="If specified, save Dockerfile to file with this name.")
-    p.add_argument('--no-print-df', dest='no_print_df', action="store_true",
-                     help="Do not print the Dockerfile")
-    p.add_argument("--no-check-urls", action="store_false", dest="check_urls",
-                   help="Do not verify communication with URLs used in the build.")
+    p.add_argument(
+        '-o', '--output', dest="output",
+        help="If specified, save Dockerfile to file with this name."
+    )
+    p.add_argument(
+        '--no-print', dest='no_print', action="store_true",
+        help="Do not print the generated file"
+    )
 
     _ndeb_servers = ", ".join(
-        _installation_implementations['neurodebian']._servers.keys()
+            _installation_implementations['neurodebian']._servers.keys()
     )
 
     # Software package options.
@@ -182,7 +219,7 @@ def _add_generate_arguments(parser):
         # MRtrix3 does not need any arguments by default.
         nargs = "*" if pkg == "mrtrix3" else "+"
         pkgs.add_argument(flag, dest=pkg, nargs=nargs, action=OrderedArgs,
-                          metavar="", type=list_of_kv, help=pkgs_help[pkg])
+                          metavar="", type=_list_of_kv, help=pkgs_help[pkg])
 
 
 def _add_reprozip_trace_arguments(parser):
@@ -215,15 +252,30 @@ def create_parser():
 
     subparsers = parser.add_subparsers(
         dest="subparser_name", title="subcommands",
-        description="valid subcommands")
+        description="valid subcommands"
+    )
     generate_parser = subparsers.add_parser(
-        'generate', help="generate dockerfiles")
-    reprozip_trace_parser = subparsers.add_parser(
-        'reprozip-trace', help="reprozip trace commands")
-    reprozip_merge_parser = subparsers.add_parser(
-        'reprozip-merge', help="merge reprozip pack files")
+        'generate', help="generate recipes"
+    )
 
-    _add_generate_arguments(generate_parser)
+    generate_subparsers = generate_parser.add_subparsers(
+        dest="subparser_name", title="subcommands",
+        description="valid subcommands"
+    )
+
+    generate_docker_parser = generate_subparsers.add_parser(
+        'docker', help="generate Dockerfile"
+    )
+
+    reprozip_trace_parser = subparsers.add_parser(
+        'reprozip-trace', help="reprozip trace commands"
+    )
+    reprozip_merge_parser = subparsers.add_parser(
+        'reprozip-merge', help="merge reprozip pack files"
+    )
+
+    _add_generate_common_arguments(generate_docker_parser)
+    _add_generate_docker_arguments(generate_docker_parser)
     _add_reprozip_trace_arguments(reprozip_trace_parser)
     _add_reprozip_merge_arguments(reprozip_merge_parser)
 
@@ -248,7 +300,7 @@ def generate(namespace):
         specs = utils.load_json(namespace.file)
 
     recipe_obj = Dockerfile(specs)
-    if not namespace.no_print_df:
+    if not namespace.no_print:
         print(recipe_obj.render())
     if namespace.output:
         recipe_obj.save(filepath=namespace.output)
@@ -284,7 +336,7 @@ def main(args=None):
     else:
         namespace = parse_args(args)
 
-    if namespace.subparser_name == 'generate':
+    if namespace.subparser_name == 'docker':
         _validate_args(namespace)
 
     if namespace.verbosity is not None:
@@ -292,7 +344,7 @@ def main(args=None):
 
     logger.debug(vars(namespace))
 
-    subparser_functions = {'generate': generate,
+    subparser_functions = {'docker': generate,
                            'reprozip-trace': reprozip_trace,
                            'reprozip-merge': reprozip_merge}
 
