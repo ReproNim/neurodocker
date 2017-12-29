@@ -7,26 +7,26 @@ import os
 from neurodocker.generators.common import _installation_implementations
 
 
-def _add_slashes(string):
-    """Return string with slashes added to each line."""
-    lines = string.strip().splitlines()
-    return "\n".join(line if line.endswith('\\') or ii == len(lines) - 1
-                     else line + " \\"
-                     for ii, line in enumerate(lines))
+# def _add_slashes(string):
+#     """Return string with slashes added to each line."""
+#     lines = string.strip().splitlines()
+#     return "\n".join(line if line.endswith('\\') or ii == len(lines) - 1
+#                      else line + " \\"
+#                      for ii, line in enumerate(lines))
 
+# TODO: add methods to insert '&&' where necessary and to not add extra
+# slashes.
 
 def _indent(string, indent=4, indent_first_line=False):
-    indent = 4
-    indent_first_line = False
     separator = " \\\n" + " " * indent
     if not indent_first_line:
         return separator.join(string.splitlines())
     else:
-        return " " * indent + separator.join(string.splitlines())
+        return (" " * indent + separator.join(string.splitlines())).replace('\\  \\', '\\')
 
 
 def _dockerfile_base_add_copy(list_srcs_dest, cmd):
-    """Base method """
+    """Base method for `ADD` and `COPY` instructions."""
     if len(list_srcs_dest) < 2:
         raise ValueError("At least two paths must be provided.")
 

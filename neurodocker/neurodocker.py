@@ -5,11 +5,11 @@ existing containers.
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import, unicode_literals
 from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import sys
 
+import neurodocker
 from neurodocker import __version__, utils
 from neurodocker.generators import Dockerfile, SingularityRecipe
 from neurodocker.generators.common import _installation_implementations
@@ -38,6 +38,115 @@ def _list_of_kv(kv):
     ll = kv.split("=")
     ll[1:] = ["=".join(ll[1:])]
     return ll
+
+
+def _add_generate_common_arguments(parser):
+    p = parser
+
+    # To generate from file.
+    p.add_argument(
+        '-f', '--file', dest='file',
+        help="Generate file from JSON. Overrides other `generate` arguments"
+    )
+
+    # Other arguments (no order).
+    p.add_argument(
+        '-o', '--output', dest="output",
+        help="If specified, save Dockerfile to file with this name."
+    )
+    p.add_argument(
+        '--no-print', dest='no_print', action="store_true",
+        help="Do not print the generated file"
+    )
+
+    _ndeb_servers = ", ".join(
+        _installation_implementations['neurodebian']._servers.keys()
+    )
+
+    # Software package options.
+    pkgs_help = {
+        "all": (
+            "Install software packages. Each argument takes a list of"
+            " key=value pairs. Where applicable, the default installation"
+            " behavior is to install by downloading and uncompressing"
+            " binaries."
+        ),
+        "afni": (
+            "Install AFNI. Valid keys are version (required), install_r,"
+            " install_python2, and install_python3. Only the latest"
+            " version and version 17.2.02 are supported at this time."
+        ),
+        "ants": (
+            "Install ANTs. Valid keys are version (required), use_binaries"
+            " (default true), and git_hash. If use_binaries=true, installs"
+            " pre-compiled binaries; if use_binaries=false, builds ANTs from"
+            " source. If git_hash is specified, build from source from that"
+            " commit."
+        ),
+        "convert3d": (
+            "Install Convert3D. The only valid key is version (required)."
+        ),
+        "dcm2niix": (
+            "Install dcm2niix. The only valid key is version (required)."
+        ),
+        "freesurfer": (
+            "Install FreeSurfer. Valid keys are version (required),"
+            " license_path (relative path to license), min (if true, install"
+            " binaries minimized for recon-all) and use_binaries (default true"
+            "). A FreeSurfer license is required to run the software and is"
+            " not provided by Neurodocker."
+        ),
+        "fsl": (
+            "Install FSL. Valid keys are version (required), use_binaries"
+            " (default true) and use_installer."
+        ),
+        "matlabmcr": (
+            "Install Matlab Compiler Runtime."
+        ),
+        "miniconda": (
+            "Install Miniconda. Valid keys are env_name (required),"
+            " conda_install, pip_install, conda_opts, pip_opts, activate"
+            " (default false) and miniconda_version (defaults to latest). The"
+            " options conda_install and pip_install accept strings of"
+            ' packages: conda_install="python=3.6 numpy traits".'
+        ),
+        "mrtrix3": (
+            "Install MRtrix3. Valid keys are use_binaries (default true) and"
+            " git_hash. If git_hash is specified and use_binaries is false,"
+            " will checkout to that commit before building."
+        ),
+        "neurodebian": (
+            "Add NeuroDebian repository and optionally install NeuroDebian"
+            " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
+            " download_server (required), full (if true, default, use non-free"
+            " packages), and pkgs (list of packages to install). Valid"
+            " download servers are {}.".format(_ndeb_servers)
+        ),
+        "spm12": (
+            "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
+            " keys are version and matlab_version."
+        ),
+        "minc": (
+            "Install MINC. Valid keys is version (required). Only version"
+            " 1.9.15 is supported at this time."
+        ),
+        "petpvc": (
+            "Install PETPVC. Valid keys are version (required)."
+        ),
+    }
+
+    pkgs = p.add_argument_group(
+        title="software package arguments", description=pkgs_help['all']
+    )
+
+    for pkg in _installation_implementations.keys():
+        flag = "--{}".format(pkg)
+        # MRtrix3 does not need any arguments by default.
+        nargs = "*" if pkg == "mrtrix3" else "+"
+        pkgs.add_argument(
+            flag, dest=pkg, nargs=nargs, action=OrderedArgs, metavar="",
+            type=_list_of_kv, help=pkgs_help[pkg]
+        )
 
 
 def _add_generate_docker_arguments(parser):
@@ -116,110 +225,17 @@ def _add_generate_docker_arguments(parser):
     )
 
 
-def _add_generate_common_arguments(parser):
+def _add_generate_singularity_arguments(parser):
+    """Add arguments to `parser` for sub-command `generate singularity`."""
     p = parser
 
-    # To generate from file.
     p.add_argument(
-        '-f', '--file', dest='file',
-        help="Generate file from JSON. Overrides other `generate` arguments"
-    )
-
-    # Other arguments (no order).
-    p.add_argument(
-        '-o', '--output', dest="output",
-        help="If specified, save Dockerfile to file with this name."
+        "-b", "--base", help="Base image. Eg, `docker://ubuntu:17.04`"
     )
     p.add_argument(
-        '--no-print', dest='no_print', action="store_true",
-        help="Do not print the generated file"
+        "-p", "--pkg-manager", choices={'apt', 'yum'},
+        help="Linux package manager."
     )
-
-    _ndeb_servers = ", ".join(
-            _installation_implementations['neurodebian']._servers.keys()
-    )
-
-    # Software package options.
-    pkgs_help = {
-        "all": (
-            "Install software packages. Each argument takes a list of"
-            " key=value pairs. Where applicable, the default installation"
-            " behavior is to install by downloading and uncompressing"
-            " binaries."
-        ),
-        "afni": (
-            "Install AFNI. Valid keys are version (required), install_r,"
-            " install_python2, and install_python3. Only the latest"
-            " version and version 17.2.02 are supported at this time."
-        ),
-        "ants": (
-            "Install ANTs. Valid keys are version (required), use_binaries"
-            " (default true), and git_hash. If use_binaries=true, installs"
-            " pre-compiled binaries; if use_binaries=false, builds ANTs from"
-            " source. If git_hash is specified, build from source from that"
-            " commit."
-        ),
-        "convert3d": (
-            "Install Convert3D. The only valid key is version (required)."
-        ),
-        "dcm2niix": (
-            "Install dcm2niix. The only valid key is version (required)."
-        ),
-        "freesurfer": (
-            "Install FreeSurfer. Valid keys are version (required),"
-            " license_path (relative path to license), min (if true, install"
-            " binaries minimized for recon-all) and use_binaries (default true"
-            "). A FreeSurfer license is required to run the software and is"
-            " not provided by Neurodocker."
-        ),
-        "fsl": (
-            "Install FSL. Valid keys are version (required), use_binaries"
-            " (default true) and use_installer."
-        ),
-        "matlabmcr": (
-            "Install Matlab Compiler Runtime."
-        ),
-        "miniconda": (
-            "Install Miniconda. Valid keys are env_name (required),"
-            " conda_install, pip_install, conda_opts, pip_opts, activate"
-            " (default false) and miniconda_version (defaults to latest). The"
-            " options conda_install and pip_install accept strings of"
-            ' packages: conda_install="python=3.6 numpy traits".'
-        ),
-        "mrtrix3": (
-            "Install MRtrix3. Valid keys are use_binaries (default true) and"
-            " git_hash. If git_hash is specified and use_binaries is false,"
-            " will checkout to that commit before building."
-        ),
-        "neurodebian": (
-            "Add NeuroDebian repository and optionally install NeuroDebian"
-            " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
-            " download_server (required), full (if true, default, use non-free"
-            " packages), and pkgs (list of packages to install). Valid"
-            " download servers are {}.".format(_ndeb_servers)
-        ),
-        "spm12": (
-            "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
-            " keys are version and matlab_version."
-        ),
-        "minc": (
-            "Install MINC. Valid keys is version (required). Only version"
-            " 1.9.15 is supported at this time."
-        ),
-        "petpvc": (
-            "Install PETPVC. Valid keys are version (required)."
-        ),
-    }
-
-    pkgs = p.add_argument_group(title="software package arguments",
-                                description=pkgs_help['all'])
-
-    for pkg in _installation_implementations.keys():
-        flag = "--{}".format(pkg)
-        # MRtrix3 does not need any arguments by default.
-        nargs = "*" if pkg == "mrtrix3" else "+"
-        pkgs.add_argument(flag, dest=pkg, nargs=nargs, action=OrderedArgs,
-                          metavar="", type=_list_of_kv, help=pkgs_help[pkg])
 
 
 def _add_reprozip_trace_arguments(parser):
@@ -254,28 +270,38 @@ def create_parser():
         dest="subparser_name", title="subcommands",
         description="valid subcommands"
     )
+
+    # `neurodocker gnerate` parsers.
     generate_parser = subparsers.add_parser(
         'generate', help="generate recipes"
     )
-
     generate_subparsers = generate_parser.add_subparsers(
-        dest="subparser_name", title="subcommands",
+        dest="subsubparser_name", title="subcommands",
         description="valid subcommands"
     )
-
     generate_docker_parser = generate_subparsers.add_parser(
         'docker', help="generate Dockerfile"
     )
-
-    reprozip_trace_parser = subparsers.add_parser(
-        'reprozip-trace', help="reprozip trace commands"
+    generate_singularity_parser = generate_subparsers.add_parser(
+        'singularity', help="generate Singularity recipe"
     )
-    reprozip_merge_parser = subparsers.add_parser(
-        'reprozip-merge', help="merge reprozip pack files"
-    )
-
     _add_generate_common_arguments(generate_docker_parser)
     _add_generate_docker_arguments(generate_docker_parser)
+    _add_generate_common_arguments(generate_singularity_parser)
+    _add_generate_singularity_arguments(generate_singularity_parser)
+
+    # `neurodocker reprozip` parsers.
+    reprozip_parser = subparsers.add_parser('reprozip', help="")
+    reprozip_subparsers = reprozip_parser.add_subparsers(
+        dest="subsubparser_name", title="subcommands",
+        description="valid subcommands"
+    )
+    reprozip_trace_parser = reprozip_subparsers.add_parser(
+        'trace', help="minify container for traced command(s)"
+    )
+    reprozip_merge_parser = reprozip_subparsers.add_parser(
+        'merge', help="merge reprozip pack files"
+    )
     _add_reprozip_trace_arguments(reprozip_trace_parser)
     _add_reprozip_merge_arguments(reprozip_merge_parser)
 
@@ -295,11 +321,16 @@ def parse_args(args):
 def generate(namespace):
     """Run `neurodocker generate`."""
     if namespace.file is None:
-        specs = utils._namespace_to_specs(namespace)
+        specs = neurodocker.generate._namespace_to_specs(namespace)
     else:
         specs = utils.load_json(namespace.file)
 
-    recipe_obj = Dockerfile(specs)
+    recipe_objs = {
+        'docker': Dockerfile,
+        'singularity': SingularityRecipe,
+    }
+
+    recipe_obj = recipe_objs[namespace.subsubparser_name](specs)
     if not namespace.no_print:
         print(recipe_obj.render())
     if namespace.output:
@@ -336,7 +367,7 @@ def main(args=None):
     else:
         namespace = parse_args(args)
 
-    if namespace.subparser_name == 'docker':
+    if namespace.subparser_name == 'generate':
         _validate_args(namespace)
 
     if namespace.verbosity is not None:
@@ -345,14 +376,15 @@ def main(args=None):
     logger.debug(vars(namespace))
 
     subparser_functions = {'docker': generate,
+                           'singularity': generate,
                            'reprozip-trace': reprozip_trace,
                            'reprozip-merge': reprozip_merge}
 
-    if namespace.subparser_name not in subparser_functions.keys():
+    if namespace.subsubparser_name not in subparser_functions.keys():
         print(__doc__)
         return
 
-    subparser_functions[namespace.subparser_name](namespace)
+    subparser_functions[namespace.subsubparser_name](namespace)
 
 
 if __name__ == "__main__":  # pragma: no cover

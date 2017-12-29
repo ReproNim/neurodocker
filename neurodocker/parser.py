@@ -1,13 +1,12 @@
 """Class to parse specifications for Dockerfile."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import
-
 import inspect
 
 from neurodocker import utils
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.docker import Dockerfile
+from neurodocker.generators.singularity import SingularityRecipe
 
 
 def _check_for_invalid_keys(keys, valid_keys, where):
@@ -46,7 +45,7 @@ class _SpecsParser(object):
     >>> SpecsParser(specs)
     """
     VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
-                            'generation_timestamp', 'neurodocker_version',]
+                            'generation_timestamp', 'neurodocker_version']
 
     VALID_INSTRUCTIONS_KEYS = Dockerfile._implementations.keys()
 

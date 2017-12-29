@@ -12,7 +12,19 @@ class _SingularityRecipeImplementations:
         self._singobj = singularity_recipe_object
 
     def base(self, base):
-        self._singobj._header.append(base)
+        if base.startswith('docker://'):
+            bootstrap = 'docker'
+            from_ = base.split('docker://', 1)[1]
+        elif base.startswith('shub://'):
+            bootstrap = 'shub'
+            from_ = base.split('shub://', 1)[1]
+        else:
+            raise ValueError(
+                "singularity base must be in the form `docker://...` or"
+                " `shub://...`"
+            )
+        self._singobj._header['Bootstrap'] = bootstrap
+        self._singobj._header['From'] = from_
 
     def copy(self, list_srcs_dest):
         self._singobj._files.append(list_srcs_dest)
@@ -29,7 +41,7 @@ class SingularityRecipe:
     def __init__(self, specs):
         self._specs = specs
 
-        self._header = []
+        self._header = OrderedDict()
         self._help = []
         self._setup = []
         self._post = []
@@ -70,7 +82,9 @@ class SingularityRecipe:
         )
 
     def _render_header(self):
-        return "\n".join(self._header)
+        return "\n".join(
+            "{}: {}".format(k, v) for k, v in self._header.items()
+        )
 
     def _render_help(self):
         return "%help\n" + "\n".join(self._help)

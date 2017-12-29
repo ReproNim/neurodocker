@@ -205,27 +205,8 @@ class _BaseInterface:
 
         self._env = self._instance_specs.get('env', None)
 
-    def _get_dependencies(self):
-        if 'dependencies' not in self._instance_specs.keys():
-            return None
-        if self._instance_specs['dependencies'] is None:
-            return None
-        try:
-            deps = self._instance_specs['dependencies'][self._pkg_manager]
-            return deps.split() if deps else None
-        except KeyError:
-            return None
-
-    def _get_debs(self):
-        if 'dependencies' not in self._instance_specs.keys():
-            return None
-        if self._instance_specs['dependencies'] is None:
-            return None
-        try:
-            debs = self._instance_specs['dependencies']['debs']
-            return debs if debs else None
-        except KeyError:
-            return None
+        # Set default curl options for all interfaces.
+        self.__dict__.setdefault("curl_opts", "-sSL --retry 5")
 
     @property
     def _pretty_name(self):
@@ -269,6 +250,28 @@ class _BaseInterface:
     @property
     def dependencies(self):
         return self._dependencies
+
+    def _get_dependencies(self):
+        if 'dependencies' not in self._instance_specs.keys():
+            return None
+        if self._instance_specs['dependencies'] is None:
+            return None
+        try:
+            deps = self._instance_specs['dependencies'][self._pkg_manager]
+            return deps.split() if deps else None
+        except KeyError:
+            return None
+
+    def _get_debs(self):
+        if 'dependencies' not in self._instance_specs.keys():
+            return None
+        if self._instance_specs['dependencies'] is None:
+            return None
+        try:
+            debs = self._instance_specs['dependencies']['debs']
+            return debs if debs else None
+        except KeyError:
+            return None
 
     def install_dependencies(self, sort=True):
         if not self.dependencies:

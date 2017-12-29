@@ -12,6 +12,67 @@ ENTRYPOINT_FILE = posixpath.join(ND_DIRECTORY, 'startup.sh')
 SPEC_FILE = posixpath.join(ND_DIRECTORY, 'neurodocker_specs.json')
 
 
+def _string_vals_to_bool(dictionary):
+    """Convert string values to bool."""
+    import re
+
+    bool_vars = ['use_binaries', 'use_installer', 'use_neurodebian',
+                 'add_to_path', 'min']
+
+    if dictionary is None:
+        return
+
+    for key in dictionary.keys():
+        if key in bool_vars:
+            if re.search('false', dictionary[key], re.IGNORECASE):
+                dictionary[key] = False
+            elif re.search('true', dictionary[key], re.IGNORECASE):
+                dictionary[key] = True
+            else:
+                dictionary[key] = bool(int(dictionary[key]))
+
+
+def _string_vals_to_list(dictionary):
+    """Convert string values to lists."""
+    list_keys = ['conda_install', 'pip_install']
+
+    for kk in list_keys:
+        if kk in dictionary.keys():
+            dictionary[kk] = " ".join((jj.strip() for jj
+                                       in dictionary[kk].split()))
+
+
+def _namespace_to_specs(namespace):
+    """Return dictionary of specifications from namespace."""
+    from neurodocker.generators.common import _installation_implementations
+
+    instructions = [('base', namespace.base)]
+    try:
+        for arg in namespace.ordered_args:
+            # TODO: replace try-except with stricter logic.
+            if arg[0] == 'install':
+                instructions.append(arg)
+                continue
+            try:
+                ii = (arg[0], {k: v for k, v in arg[1]})
+            except ValueError:
+                ii = arg
+            instructions.append(ii)
+    except AttributeError:
+        pass
+
+    # Convert string options that should be booleans to booleans.
+    for instruction, options in instructions:
+        if instruction in _installation_implementations.keys():
+            _string_vals_to_bool(options)
+            _string_vals_to_list(options)
+
+    specs = {'pkg_manager': namespace.pkg_manager,
+             'instructions': instructions, }
+
+    return specs
+
+
 def _base_add_copy(list_srcs_dest, cmd):
     srcs = list_srcs_dest[:-1]
     dest = list_srcs_dest[-1]
