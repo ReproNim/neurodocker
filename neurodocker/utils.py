@@ -65,7 +65,6 @@ def _namespace_to_specs(namespace):
             _string_vals_to_list(options)
 
     specs = {'pkg_manager': namespace.pkg_manager,
-             'check_urls': namespace.check_urls,
              'instructions': instructions, }
 
     return specs
