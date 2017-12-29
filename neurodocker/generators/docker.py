@@ -7,22 +7,25 @@ import os
 from neurodocker.generators.common import _installation_implementations
 
 
-# def _add_slashes(string):
-#     """Return string with slashes added to each line."""
-#     lines = string.strip().splitlines()
-#     return "\n".join(line if line.endswith('\\') or ii == len(lines) - 1
-#                      else line + " \\"
-#                      for ii, line in enumerate(lines))
-
-# TODO: add methods to insert '&&' where necessary and to not add extra
-# slashes.
-
-def _indent(string, indent=4, indent_first_line=False):
-    separator = " \\\n" + " " * indent
-    if not indent_first_line:
-        return separator.join(string.splitlines())
-    else:
-        return (" " * indent + separator.join(string.splitlines())).replace('\\  \\', '\\')
+def _indent(string, indent=4, add_list_op=False):
+    out = []
+    lines = string.splitlines()
+    for ii, line in enumerate(lines):
+        line = line.strip()
+        already_cont = line.startswith(('&&', '&', '||', '|'))
+        previous_cont = lines[ii-1].endswith('\\')
+        if ii:
+            if add_list_op and not already_cont and not previous_cont:
+                line = "&& " + line
+            if not already_cont and previous_cont:
+                line = " " * (indent + 3) + line
+            else:
+                line = " " * indent + line
+        if ii != len(lines) - 1:
+            if not line.endswith('\\'):
+                line += " \\"
+        out.append(line)
+    return "\n".join(out)
 
 
 def _dockerfile_base_add_copy(list_srcs_dest, cmd):
@@ -215,7 +218,7 @@ class _DockerfileInterfaceFormatter:
 
     def _render_run(self):
         """Return string of `RUN` instruction given string of instructions."""
-        return "RUN " + _indent(self.run)
+        return "RUN " + _indent(self.run, add_list_op=True)
 
 
 class Dockerfile:
