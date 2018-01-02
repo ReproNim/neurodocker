@@ -27,11 +27,11 @@ generic:
       yum: libXext.x86_64 libXt.x86_64
     env:
       MATLABCMD: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/toolbox/matlab"
-      LD_LIBRARY_PATH: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64:\
-        {{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64:\
-        {{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64:\
-        {{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/opengl/lib/glnxa64:\
-        $LD_LIBRARY_PATH"
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH\
+        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64\
+        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64\
+        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64\
+        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/opengl/lib/glnxa64"
     instructions: |
       {{ matlabmcr.install_dependencies() }}
       echo "Downloading MATLAB Compiler Runtime ..."
