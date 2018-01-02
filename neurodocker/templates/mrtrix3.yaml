@@ -6,7 +6,8 @@
 
 generic:
   binaries:
-    dependencies: null
+    urls:
+      "3.0": https://dl.dropbox.com/s/2g008aaaeht3m45/mrtrix3-Linux-centos6.tar.gz
     env:
       PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
     instructions: |

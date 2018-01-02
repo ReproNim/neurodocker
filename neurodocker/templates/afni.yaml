@@ -12,8 +12,7 @@ generic:
       latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
     env:
       PATH: "{{ afni.install_path }}:$PATH"
-      AFNI_CONFIG: "{{ afni.install_path }}:$PATH"
-      FOO: "BAR"
+      AFNI_PLUGINPATH: "{{ afni.install_path }}"
     dependencies:
       apt: >
         ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1
@@ -36,6 +35,9 @@ generic:
       {% endif %}
 
   source:
+    env:
+      PATH: "{{ afni.install_path }}:$PATH"
+      AFNI_PLUGINPATH: "{{ afni.install_path }}"
     dependencies:
       apt: >
         curl ed g++ gcc git libglib2.0-dev libglu1-mesa-dev libgsl-dev

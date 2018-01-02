@@ -12,7 +12,7 @@ generic:
     instructions: |
       echo "Downloading Miniconda installer ..."
       conda_installer="/tmp/miniconda.sh"
-      curl -sSL --retry 5 -o "$conda_installer" {{ miniconda.binaries_url }}
+      curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}
       bash "$conda_installer" -b -p {{ miniconda.install_path }}
       rm -f "$conda_installer"
       conda config --system --prepend channels conda-forge
