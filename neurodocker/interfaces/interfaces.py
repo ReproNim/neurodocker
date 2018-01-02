@@ -1,5 +1,7 @@
 """"""
 
+import jinja2
+
 from neurodocker.interfaces._base import _BaseInterface
 
 
@@ -205,3 +207,15 @@ class SPM12(_BaseInterface):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
+
+        matlabmcr_version = self.binaries_url[-9:-4]
+        self.matlabmcr_obj = MatlabMCR(matlabmcr_version, self.pkg_manager)
+
+    def render_run(self):
+        return "\n".join(
+            (self.matlabmcr_obj.render_run(), super().render_run())
+        )
+
+    def render_env(self):
+        """Return dictionary with rendered keys and values."""
+        return {**super().render_env(), **self.matlabmcr_obj.render_env()}
