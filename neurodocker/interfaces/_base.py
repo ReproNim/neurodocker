@@ -158,8 +158,11 @@ class _Resolver:
 
     def check_binaries_has_url(self, version):
         if not self.binaries_has_url(version):
+            version_key = self.get_version_key(version)
+            valid_vers = self._d[version_key]['binaries']['urls']
             raise ValueError(
-                "URL not found for version '{}'".format(version)
+                "URL not found for version '{}'. Valid versions are {}"
+                .format(version, ', '.join(valid_vers))
             )
 
     def binaries_url(self, version):
