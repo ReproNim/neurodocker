@@ -1,11 +1,6 @@
 # Instructions to install MATLAB Compiler Runtime.
 #
 # Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
-#
-# TODO: add version 2010 from SPM.
-#
-# The `LD_LIBRARY_PATH` variable depends on the version.
-# See https://www.mathworks.com/help/compiler/mcr-path-settings-for-run-time-deployment.html#btnytqp-6
 
 generic:
   binaries:
@@ -22,20 +17,26 @@ generic:
       2013a: http://ssd.mathworks.com/supportfiles/MCR_Runtime/R2013a/MCR_R2013a_glnxa64_installer.zip
       2012b: http://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012b/MCR_R2012b_glnxa64_installer.zip
       2012a: http://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
+      2010a: https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
     dependencies:
-      apt: libxext6 libxt6
-      yum: libXext.x86_64 libXt.x86_64
+      apt: bc libxext6 libxpm-dev libxt6
+      yum: bc libXext.x86_64 libXpm libXt.x86_64
     env:
       MATLABCMD: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/toolbox/matlab"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH\
-        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64\
-        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64\
-        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64\
-        :{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/opengl/lib/glnxa64"
     instructions: |
       {{ matlabmcr.install_dependencies() }}
       echo "Downloading MATLAB Compiler Runtime ..."
+      {% if matlabmcr.version == "2010a" -%}
+      curl {{ matlabmcr.curl_opts }} -o /tmp/MCRInstaller.bin {{ matlabmcr.binaries_url }}
+      chmod +x /tmp/MCRInstaller.bin
+      /tmp/MCRInstaller.bin -silent -P installLocation="{{ matlabmcr.install_path }}"
+      {% else -%}
       curl {{ matlabmcr.curl_opts }} -o /tmp/mcr.zip {{ matlabmcr.binaries_url }}
       unzip -q /tmp/mcr.zip -d /tmp/mcrtmp
       /tmp/mcrtmp/install -destinationFolder {{ matlabmcr.install_path }} -mode silent -agreeToLicense yes
+      {% endif -%}
+      echo "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64" >> /etc/ld.so.conf.d/zmatlabmcr-{{ matlabmcr.mcr_version }}.conf
+      echo "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64" >> /etc/ld.so.conf.d/zmatlabmcr-{{ matlabmcr.mcr_version }}.conf
+      echo "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/glnxa64" >> /etc/ld.so.conf.d/zmatlabmcr-{{ matlabmcr.mcr_version }}.conf
+      ldconfig
       rm -rf /tmp/*

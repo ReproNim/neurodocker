@@ -1,7 +1,5 @@
 """"""
 
-import jinja2
-
 from neurodocker.interfaces._base import _BaseInterface
 
 
@@ -119,6 +117,7 @@ class MatlabMCR(_BaseInterface):
         '2013a': '81',
         '2012b': '80',
         '2012a': '717',
+        '2010a': '713',
     }
 
     def __init__(self, *args, **kwargs):
