@@ -9,7 +9,6 @@ from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import sys
 
-import neurodocker
 from neurodocker import __version__, utils
 from neurodocker.generators import Dockerfile, SingularityRecipe
 from neurodocker.generators.common import _installation_implementations
@@ -323,7 +322,7 @@ def parse_args(args):
 def generate(namespace):
     """Run `neurodocker generate`."""
     if namespace.file is None:
-        specs = neurodocker.generate._namespace_to_specs(namespace)
+        specs = utils._namespace_to_specs(namespace)
     else:
         specs = utils.load_json(namespace.file)
 
