@@ -19,7 +19,7 @@ def _check_for_invalid_keys(keys, valid_keys, where):
                        "".format(where, invalid, valid_keys))
 
 
-class _SpecsParser(object):
+class _SpecsParser:
     """Class to parse specifications for Dockerfile.
 
     This class checks the dictionary of specifications for errors and raises
