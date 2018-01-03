@@ -5,7 +5,7 @@
 generic:
   binaries:
     urls:
-      latest: "FOOBAR"
+      latest: https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     env:
       CONDA_DIR: "{{ miniconda.install_path }}"
       PATH: "{{ miniconda.install_path }}/bin:$PATH"
