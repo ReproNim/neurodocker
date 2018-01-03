@@ -3,13 +3,19 @@
 from collections import OrderedDict
 import inspect
 
-from neurodocker.generators.common import _installation_implementations
+from neurodocker.generators.common import (
+    _add_to_entrypoint, _installation_implementations, _install,
+)
 
 
 class _SingularityRecipeImplementations:
 
     def __init__(self, singularity_recipe_object):
         self._singobj = singularity_recipe_object
+
+    def add_to_entrypoint(self, cmd):
+        bash_cmd = _add_to_entrypoint(cmd)
+        self._singobj._post.append(bash_cmd)
 
     def base(self, base):
         if base.startswith('docker://'):
@@ -29,11 +35,17 @@ class _SingularityRecipeImplementations:
     def copy(self, list_srcs_dest):
         self._singobj._files.append(list_srcs_dest)
 
+    def install(self, pkgs, pkg_manager, opts=None):
+        self._singobj._post.append(_install(pkgs, pkg_manager))
+
     def entrypoint(self, entrypoint):
         self._singobj._runscript.append(entrypoint)
 
     def env(self, d):
         self._singobj._environment.update(**d)
+
+    def user(self, user):
+        self._singobj._post.append(user)
 
 
 class SingularityRecipe:
@@ -94,16 +106,20 @@ class SingularityRecipe:
         return "%setup\n" + "\n".join(self._setup)
 
     def _render_post(self):
-        return "%post\n" + "\n".join(self._post)
+        return "%post\n" + "\n\n".join(self._post)
 
     def _render_environment(self):
-        return ("%environment\n"
-                + "\n".join("export {}={}".format(*kv)
-                            for kv in self._environment.items()))
+        return (
+            "%environment\n"
+            + "\n".join('export {}="{}"'.format(*kv)
+                        for kv in self._environment.items())
+        )
 
     def _render_files(self):
-        return ("%files\n"
-                + "\n".join("{} {}".format(*f) for f in self._files))
+        return (
+            "%files\n"
+            + "\n".join("{} {}".format(*f) for f in self._files)
+        )
 
     def _render_runscript(self):
         return "%runscript\n" + "\n".join(self._runscript)
@@ -115,12 +131,9 @@ class SingularityRecipe:
         return "%labels\n" + "\n".join(self._labels)
 
     def _add_neurodocker_header(self):
-        self._specs['instructions'].insert(1, ('_header', {'version': 'generic', 'method': 'custom'}))
-        # interface = _Header(
-        #     'generic', pkg_manager=self._specs['pkg_manager'], method='custom'
-        # )
-        # self._post.append(interface.render_run())
-        # self._environment.update(**interface.render_env())
+        self._specs['instructions'].insert(
+            1, ('_header', {'version': 'generic', 'method': 'custom'})
+        )
 
     def _fill_parts(self):
         pkg_man = self._specs['pkg_manager']
@@ -135,7 +148,10 @@ class SingularityRecipe:
                     if interface.run:
                         self._post.append(interface.render_run())
                 else:
-                    impl(params)
+                    if instruction == 'install':
+                        impl(params, pkg_manager=pkg_man)
+                    else:
+                        impl(params)
             else:
                 raise ValueError(
                     "instruction not understood: '{}'".format(instruction)

@@ -4,7 +4,9 @@ import inspect
 import json
 import os
 
-from neurodocker.generators.common import _installation_implementations
+from neurodocker.generators.common import (
+    _add_to_entrypoint, _installation_implementations, _install, _Users,
+)
 
 
 def _indent(string, indent=4, add_list_op=False):
@@ -66,6 +68,11 @@ class _DockerfileImplementations:
             directories.
         """
         return _dockerfile_base_add_copy(list_srcs_dest, "ADD")
+
+    @staticmethod
+    def add_to_entrypoint(cmd):
+        """Add command `cmd` to container entrypoint file."""
+        return _indent("RUN " + _add_to_entrypoint(cmd))
 
     @staticmethod
     def arg(arg_dict):
@@ -165,6 +172,13 @@ class _DockerfileImplementations:
         return "EXPOSE " + " ".join((str(p) for p in exposed_ports))
 
     @staticmethod
+    def install(pkgs, pkg_manager):
+        """Return Dockerfile RUN instruction to install system packages."""
+        return _indent(
+            "RUN " + _install(pkgs, pkg_manager), add_list_op=True
+        )
+
+    @staticmethod
     def label(labels):
         """Return Dockerfile LABEL instruction to set image labels.
 
@@ -178,7 +192,24 @@ class _DockerfileImplementations:
             newline = "\n" if out else ""
             v = json.dumps(v)  # Escape double quotes and other things.
             out += '{}{}={}'.format(newline, k, v)
-        return _indent("LABEL", out)
+        return _indent("LABEL " + out, indent=6)
+
+    @staticmethod
+    def user(user):
+        """Return Dockerfile instruction to create `user` if he/she does not
+        exist and switch to that user.
+
+        Parameters
+        ----------
+        user : str
+            Name of user to create and switch to.
+        """
+        user_cmd = "USER {}".format(user)
+        add_user_cmd = _Users.add(user)
+        if add_user_cmd:
+            return "RUN " + add_user_cmd + "\n" + user_cmd
+        else:
+            return user_cmd
 
     @staticmethod
     def volume(paths):
@@ -241,11 +272,9 @@ class Dockerfile:
         return "\n\n".join(self._ispecs_to_dockerfile_str())
 
     def _add_neurodocker_install_header_to_specs(self):
-        # self._specs['instructions'] _Header(
-        #     'generic', pkg_manager=self._specs['pkg_manager'], method='custom'
-        # )
-        self._specs['instructions'].insert(1, ('_header', {'version': 'generic', 'method': 'custom'}))
-        # return _DockerfileInterfaceFormatter(interface).render()
+        self._specs['instructions'].insert(
+            1, ('_header', {'version': 'generic', 'method': 'custom'})
+        )
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
@@ -257,7 +286,10 @@ class Dockerfile:
                     interface = impl(pkg_manager=pkg_man, **params)
                     yield _DockerfileInterfaceFormatter(interface).render()
                 else:
-                    yield impl(params)
+                    if instruction == 'install':
+                        yield impl(params, pkg_manager=pkg_man)
+                    else:
+                        yield impl(params)
             else:
                 raise ValueError(
                     "instruction not understood: '{}'".format(instruction)
