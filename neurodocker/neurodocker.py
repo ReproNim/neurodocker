@@ -42,6 +42,41 @@ def _list_of_kv(kv):
 def _add_generate_common_arguments(parser):
     p = parser
 
+    p.add_argument("-b", "--base", help="Base Docker image. Eg, ubuntu:17.04")
+    p.add_argument(
+        "-p", "--pkg-manager", choices={'apt', 'yum'},
+        help="Linux package manager."
+    )
+    p.add_argument(
+        '--add-to-entrypoint', action=OrderedArgs,
+        help=("Add a command to the file /neurodocker/startup.sh, which is the"
+              " container's default entrypoint.")
+    )
+    p.add_argument(
+        '--copy', action=OrderedArgs, nargs="+",
+        help="Copy files into container. Use format <src>... <dest>"
+    )
+    p.add_argument(
+        '--install', action=OrderedArgs, nargs="+",
+        help=("Install system packages with apt-get or yum, depending on the"
+              " package manager specified.")
+    )
+    p.add_argument(
+        '-e', '--env', action=OrderedArgs, nargs="+", type=_list_of_kv,
+        help="Set environment variable(s). Use the format KEY=VALUE"
+    )
+    p.add_argument(
+        '-r', '--run', action=OrderedArgs,
+        help="Run a command when building container"
+    )
+    p.add_argument(
+        '-u', '--user', action=OrderedArgs,
+        help="Switch current user (creates user if necessary)"
+    )
+    p.add_argument(
+        '-w', '--workdir', action=OrderedArgs, help="Set working directory"
+    )
+
     # To generate from file.
     p.add_argument(
         '-f', '--file', dest='file',
@@ -154,21 +189,10 @@ def _add_generate_docker_arguments(parser):
     """Add arguments to `parser` for sub-command `generate docker`."""
     p = parser
 
-    p.add_argument("-b", "--base", help="Base Docker image. Eg, ubuntu:17.04")
-    p.add_argument(
-        "-p", "--pkg-manager", choices={'apt', 'yum'},
-        help="Linux package manager."
-    )
-
     # Arguments that should be ordered.
     p.add_argument(
         '--add', action=OrderedArgs, nargs="+",
         help="Dockerfile ADD instruction. Use format <src>... <dest>"
-    )
-    p.add_argument(
-        '--add-to-entrypoint', action=OrderedArgs, nargs="+",
-        help=("Add a command to the file /neurodocker/startup.sh, which is the"
-              " container's default entrypoint.")
     )
     p.add_argument(
         '--arg', action=OrderedArgs, nargs="+", type=_list_of_kv,
@@ -179,25 +203,12 @@ def _add_generate_docker_arguments(parser):
         help="Dockerfile CMD instruction."
     )
     p.add_argument(
-        '--copy', action=OrderedArgs, nargs="+",
-        help="Dockerfile COPY instruction. Use format <src>... <dest>"
-    )
-    p.add_argument(
         '--entrypoint', action=OrderedArgs,
         help="Dockerfile ENTRYPOINT instruction."
     )
     p.add_argument(
-        '-e', '--env', action=OrderedArgs, nargs="+", type=_list_of_kv,
-        help="Dockerfile ENV instruction. Use the format KEY=VALUE ...",
-    )
-    p.add_argument(
         '--expose', nargs="+", action=OrderedArgs,
         help="Dockerfile EXPOSE instruction."
-    )
-    p.add_argument(
-        '--install', action=OrderedArgs, nargs="+",
-        help=("Install system packages with apt-get or yum, depending on the"
-              " package manager specified.")
     )
     p.add_argument(
         '--instruction', action=OrderedArgs,
@@ -208,21 +219,12 @@ def _add_generate_docker_arguments(parser):
         help="Dockerfile LABEL instruction."
     )
     p.add_argument(
-        '-r', '--run', action=OrderedArgs, help="Dockerfile RUN instruction"
-    )
-    p.add_argument(
         '--run-bash', action=OrderedArgs,
         help="Run BASH code in RUN instruction."
     )
     p.add_argument(
-        '-u', '--user', action=OrderedArgs, help="Dockerfile USER instruction."
-    )
-    p.add_argument(
         '--volume', action=OrderedArgs, nargs="+",
         help="Dockerfile VOLUME instruction."
-    )
-    p.add_argument(
-        '--workdir', action=OrderedArgs, help="Dockerfile WORKDIR instruction."
     )
 
 
@@ -230,13 +232,7 @@ def _add_generate_singularity_arguments(parser):
     """Add arguments to `parser` for sub-command `generate singularity`."""
     p = parser
 
-    p.add_argument(
-        "-b", "--base", help="Base image. Eg, `docker://ubuntu:17.04`"
-    )
-    p.add_argument(
-        "-p", "--pkg-manager", choices={'apt', 'yum'},
-        help="Linux package manager."
-    )
+    # p.add_argument('--add-to-entrypoint', help=)
 
 
 def _add_reprozip_trace_arguments(parser):
