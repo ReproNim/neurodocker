@@ -49,7 +49,7 @@ def _install(pkgs, pkg_manager):
 class _Users(object):
     """Object to hold memory of initialized users."""
 
-    initialized_users = ['root']
+    initialized_users = {'root'}
 
     @classmethod
     def add(cls, user):
@@ -57,7 +57,7 @@ class _Users(object):
         Otherwise, return False.
         """
         if user not in cls.initialized_users:
-            cls.initialized_users.append(user)
+            cls.initialized_users.add(user)
             return (
                 "useradd --no-user-group --create-home  --shell /bin/bash {0}"
                 .format(user)
@@ -67,4 +67,4 @@ class _Users(object):
 
     @classmethod
     def clear_memory(cls):
-        cls.initialized_users = ['root']
+        cls.initialized_users = {'root'}
