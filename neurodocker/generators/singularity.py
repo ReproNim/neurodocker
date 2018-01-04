@@ -4,7 +4,7 @@ from collections import OrderedDict
 import inspect
 
 from neurodocker.generators.common import (
-    _add_to_entrypoint, _installation_implementations, _install,
+    _add_to_entrypoint, _installation_implementations, _install, _Users,
 )
 
 
@@ -45,7 +45,13 @@ class _SingularityRecipeImplementations:
         self._singobj._environment.update(**d)
 
     def user(self, user):
-        self._singobj._post.append(user)
+        user_cmd = "su - {}".format(user)
+        add_user_cmd = _Users.add(user)
+        if add_user_cmd:
+            cmd = add_user_cmd + "\n" + user_cmd
+        else:
+            cmd = user_cmd
+        self._singobj._post.append(cmd)
 
 
 class SingularityRecipe:
