@@ -5,11 +5,12 @@
 generic:
   binaries:
     urls:
-      latest: https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+      latest: https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     env:
       CONDA_DIR: "{{ miniconda.install_path }}"
       PATH: "{{ miniconda.install_path }}/bin:$PATH"
     instructions: |
+      {% if not miniconda._installed -%}
       echo "Downloading Miniconda installer ..."
       conda_installer="/tmp/miniconda.sh"
       curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}
@@ -19,3 +20,33 @@ generic:
       conda config --system --set auto_update_conda false
       conda config --system --set show_channel_urls true
       sync && conda clean -tipsy && sync
+      {% endif -%}
+      {% if miniconda.env_name not in miniconda._environments -%}
+      conda create -y -q --name {{ miniconda.env_name }}
+      {% endif -%}
+      {% if miniconda.conda_install is not none -%}
+      conda install -y -q --name {{ miniconda.env_name }} \
+      {%- for pkg in miniconda.conda_install %}
+          {% if not loop.last -%}
+          {{ pkg }} \
+          {%- else -%}
+          {{ pkg }}
+          {%- endif -%}
+      {% endfor %}
+      sync && conda clean -tipsy && sync
+      {% endif -%}
+      {% if miniconda.pip_install is not none -%}
+      /bin/bash -c "source activate {{ miniconda.env_name }}
+        pip install -q --no-cache-dir \
+        {%- for pkg in miniconda.pip_install %}
+            {% if not loop.last -%}
+            {{ pkg }} \
+            {%- else -%}
+            {{ pkg }}
+            {%- endif -%}
+        {% endfor %}"
+      sync
+      {% endif -%}
+      {% if miniconda.activate -%}
+      sed -i '$isource activate {{ miniconda.env_name }}' $ND_ENTRYPOINT
+      {% endif -%}

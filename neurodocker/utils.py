@@ -18,10 +18,8 @@ def _count_key_occurence_list_of_tuples(list_of_tuples, key):
 
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
-    bool_vars = [
-        'use_binaries', 'use_installer', 'use_neurodebian', 'add_to_path',
-        'min',
-    ]
+    # TODO: remove unnecessary boolean variables.
+    bool_vars = {'min', 'activate', 'use_installer'}
     if dictionary is None:
         return
     for key in dictionary.keys():
@@ -40,9 +38,7 @@ def _string_vals_to_list(dictionary):
 
     for kk in list_keys:
         if kk in dictionary.keys():
-            dictionary[kk] = " ".join(
-                (jj.strip() for jj in dictionary[kk].split())
-            )
+            dictionary[kk] = dictionary[kk].split()
 
 
 def _namespace_to_specs(namespace):

@@ -150,8 +150,21 @@ class Miniconda(_BaseInterface):
     _name = 'miniconda'
     _pretty_name = 'Miniconda'
 
-    def __init__(self, *args, **kwargs):
+    _installed = False
+    _environments = set()
+
+    def __init__(self, *args, conda_install=None, pip_install=None, **kwargs):
+        self.conda_install = conda_install
+        self.pip_install = pip_install
+
+        kwargs.setdefault('version', 'latest')
         super().__init__(self._name, *args, **kwargs)
+
+    def render_run(self):
+        out = super().render_run()
+        Miniconda._installed = True
+        Miniconda._environments.add(self.env_name)
+        return out
 
 
 class MRtrix3(_BaseInterface):
