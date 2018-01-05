@@ -4,7 +4,8 @@ from collections import OrderedDict
 import inspect
 
 from neurodocker.generators.common import (
-    _add_to_entrypoint, _installation_implementations, _install, _Users,
+    _installation_implementations, _install, _Users,
+    NEURODOCKER_ENTRYPOINT,
 )
 
 
@@ -14,8 +15,7 @@ class _SingularityRecipeImplementations:
         self._singobj = singularity_recipe_object
 
     def add_to_entrypoint(self, cmd):
-        bash_cmd = _add_to_entrypoint(cmd)
-        self._singobj._post.append(bash_cmd)
+        self._singobj._runscript.insert(0, bash_cmd)
 
     def base(self, base):
         if base.startswith('docker://'):
@@ -162,4 +162,6 @@ class SingularityRecipe:
                 raise ValueError(
                     "instruction not understood: '{}'".format(instruction)
                 )
+        if not self._runscript:
+            self._runscript.append(NEURODOCKER_ENTRYPOINT)
         self._parts_filled = True
