@@ -62,6 +62,13 @@ def _add_generate_common_arguments(parser):
               " package manager specified.")
     )
     p.add_argument(
+        '--entrypoint', action=OrderedArgs,
+        help=(
+            "Set the container's entrypoint (Docker) / append to runscript"
+            " (Singularity)"
+        )
+    )
+    p.add_argument(
         '-e', '--env', action=OrderedArgs, nargs="+", type=_list_of_kv,
         help="Set environment variable(s). Use the format KEY=VALUE"
     )
@@ -201,10 +208,6 @@ def _add_generate_docker_arguments(parser):
     p.add_argument(
         '--cmd', action=OrderedArgs, nargs="+",
         help="Dockerfile CMD instruction."
-    )
-    p.add_argument(
-        '--entrypoint', action=OrderedArgs,
-        help="Dockerfile ENTRYPOINT instruction."
     )
     p.add_argument(
         '--expose', nargs="+", action=OrderedArgs,
