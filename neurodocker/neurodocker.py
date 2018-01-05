@@ -258,7 +258,14 @@ def _add_reprozip_merge_arguments(parser):
 
 def create_parser():
     """Return command-line argument parser."""
-    parser = ArgumentParser(description=__doc__,  # add_help=False,
+
+    class ParserShowsErrors(ArgumentParser):
+        def error(self, message):
+            sys.stderr.write('error: %s\n' % message)
+            self.print_help()
+            sys.exit(2)
+
+    parser = ParserShowsErrors(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
 
     verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
@@ -315,7 +322,24 @@ def create_parser():
 def parse_args(args):
     """Return namespace of command-line arguments."""
     parser = create_parser()
-    return parser.parse_args(args)
+    namespace = parser.parse_args(args)
+
+    if namespace.subparser_name is None:
+        parser.print_help()
+        parser.exit(1)
+    elif (namespace.subparser_name == 'generate'
+          and namespace.subsubparser_name is None):
+        parser.print_help()
+        parser.exit(1)
+    elif (namespace.subparser_name == 'reprozip'
+          and namespace.subsubparser_name is None):
+        parser.print_help()
+        parser.exit(1)
+    elif (namespace.subparser_name == 'generate'
+          and namespace.subsubparser_name in {'docker', 'singularity'}):
+        _validate_generate_args(namespace)
+
+    return namespace
 
 
 def generate(namespace):
@@ -353,7 +377,7 @@ def reprozip_merge(namespace):
     merge_pack_files(namespace.outfile, namespace.pack_files)
 
 
-def _validate_args(namespace):
+def _validate_generate_args(namespace):
     if (namespace.file is None and
        (namespace.base is None or namespace.pkg_manager is None)):
         raise ValueError("-b/--base and -p/--pkg-manager are required if not"
@@ -367,22 +391,17 @@ def main(args=None):
     else:
         namespace = parse_args(args)
 
-    if namespace.subparser_name == 'generate':
-        _validate_args(namespace)
-
     if namespace.verbosity is not None:
         utils.set_log_level(namespace.verbosity)
 
     logger.debug(vars(namespace))
 
-    subparser_functions = {'docker': generate,
-                           'singularity': generate,
-                           'reprozip-trace': reprozip_trace,
-                           'reprozip-merge': reprozip_merge}
-
-    if namespace.subsubparser_name not in subparser_functions.keys():
-        print(__doc__)
-        return
+    subparser_functions = {
+        'docker': generate,
+        'singularity': generate,
+        'reprozip-trace': reprozip_trace,
+        'reprozip-merge': reprozip_merge,
+    }
 
     subparser_functions[namespace.subsubparser_name](namespace)
 
