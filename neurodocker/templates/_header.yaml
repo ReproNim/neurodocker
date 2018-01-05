@@ -24,7 +24,7 @@ generic:
       mkdir -p /neurodocker
       if [ ! -f "$ND_ENTRYPOINT" ]; then
         echo '#!/usr/bin/env bash' >> "$ND_ENTRYPOINT"
-        echo 'set -ex' >> "$ND_ENTRYPOINT"
+        echo 'set -e' >> "$ND_ENTRYPOINT"
         echo 'if [ -n "$1" ]; then "$@"; else /usr/bin/env bash; fi' >> "$ND_ENTRYPOINT";
       fi
       chmod -R 777 /neurodocker && chmod a+s /neurodocker
