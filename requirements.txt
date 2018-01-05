@@ -1,2 +1,2 @@
 docker>=2.3
-requests>=2.0
+jinja2>=2.0
