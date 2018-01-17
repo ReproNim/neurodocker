@@ -130,7 +130,7 @@ class FSL(object):
     def _install_binaries_deps(self):
         """Return command to install FSL dependencies."""
         pkgs = {'apt': ("bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev"
-                        " libglu1-mesa-dev libgomp1 libice6 libmng1"
+                        " libglu1-mesa-dev libgomp1 libice6"
                         " libxcursor1 libxft2 libxinerama1 libxrandr2"
                         " libxrender1 libxt6"),
                 'yum': ("bc libGL libGLU libgomp libICE libjpeg libmng"
