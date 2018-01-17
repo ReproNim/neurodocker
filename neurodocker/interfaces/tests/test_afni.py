@@ -16,7 +16,7 @@ class TestAFNI(object):
     def test_build_image_afni_latest_binaries_stretch(self):
         """Install latest AFNI binaries on Debian stretch."""
         specs = {'pkg_manager': 'apt',
-                 'check_urls': True,
+                 'check_urls': False,
                  'instructions': [
                     ('base', 'debian:stretch'),
                     ('afni', {'version': 'latest', 'use_binaries': True}),
