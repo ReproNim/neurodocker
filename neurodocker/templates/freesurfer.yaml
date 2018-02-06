@@ -4,19 +4,16 @@
 # Website: https://surfer.nmr.mgh.harvard.edu/
 # Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki
 
-full:
-  binaries:
-    dependencies: null
-    instructions: |
-      RUN echo "todo"
 
-# See https://github.com/freesurfer/freesurfer/issues/70
-min-recon-all:
+generic:
   binaries:
     urls:
-      "6.0.0": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
+      "6.0.0": foobar
+      # See https://github.com/freesurfer/freesurfer/issues/70
+      "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
     dependencies:
       apt: bc libgomp1 libxmu6 libxt6 tcsh perl
+      yum: bc libgomp libXmu libXt tcsh perl
     env:
       FREESURFER_HOME: "{{ freesurfer.install_path }}"
     instructions: |
@@ -24,5 +21,9 @@ min-recon-all:
       echo "Downloading minimized FreeSurfer ..."
       mkdir -p {{ freesurfer.install_path }}
       curl {{ freesurfer.curl_opts }}  \
-      | tar -xz -C {install_path} --strip-components 1
-      && sed -i '$isource $FREESURFER_HOME/SetUpFreeSurfer.sh' $ND_ENTRYPOINT
+      | tar -xz -C {{ freesurfer.install_path }} --strip-components 1 {% if freesurfer.exclude_paths -%}\
+      {%- for exclude_path in freesurfer.exclude_paths %}
+        --exclude='{{ exclude_path }}' \
+      {%- endfor %}
+      {%- endif %}
+      && sed -i '$isource "{{ freesurfer.install_path }}"/SetUpFreeSurfer.sh' "$ND_ENTRYPOINT"
