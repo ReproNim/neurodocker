@@ -28,9 +28,12 @@ function build_singularity() {
     echo "must provide path to Singularity recipe"
     exit 11
   fi
-  image_name="$(basename "$1")"
+  image_name="${cache}/$(basename "$1").simg"
   singularity build "${image_name}" "$1"
 }
+
+export -f build_docker
+export -f build_singularity
 
 
 if [ "${CIRCLE_NODE_TOTAL:-}" != "2" ]; then
@@ -43,12 +46,12 @@ ${_base}/_generate_dockerfiles.py "$cache"
 case ${CIRCLE_NODE_INDEX} in
   0)
     find "$cache" -name '*.docker' \
-      | xargs -n1 -I {} bash -c "docker build -t $(basename {}) - < {}"
+      | xargs -n1 -I {} bash -c "build_docker "$@"" _ {}
     exitcode=$?
     ;;
   1)
     find "$cache" -name '*.singularity' \
-      | xargs -n1 -I {} bash -c "singularity build -t singularity/$(basename {}).simg {}"
+      | xargs -n1 -I {} bash -c "build_singularity "$@"" _ {}
     exitcode=$?
     ;;
 esac
