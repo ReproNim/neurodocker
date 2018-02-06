@@ -1,5 +1,7 @@
 """"""
 
+import posixpath
+
 from neurodocker.interfaces._base import _BaseInterface
 
 
@@ -84,8 +86,36 @@ class FreeSurfer(_BaseInterface):
     _name = 'freesurfer'
     _pretty_name = 'FreeSurfer'
 
+    _exclude_paths = (
+        'average/mult-comp-cor',
+        'lib/cuda',
+        'lib/qt',
+        'subjects/V1_average',
+        'subjects/bert',
+        'subjects/cvs_avg35',
+        'subjects/cvs_avg35_inMNI152',
+        'subjects/fsaverage3',
+        'subjects/fsaverage4',
+        'subjects/fsaverage5',
+        'subjects/fsaverage6',
+        'subjects/fsaverage_sym',
+        'trctrain',
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
+
+        if hasattr(self, 'exclude_paths'):
+            if isinstance(self.exclude_paths, str):
+                self.exclude_paths = self.exclude_paths.split()
+        elif 'min' in self.version:
+            self.exclude_paths = tuple()
+        else:
+            self.exclude_paths = FreeSurfer._exclude_paths
+
+        self.exclude_paths = tuple(
+            posixpath.join('freesurfer', path) for path in self.exclude_paths
+        )
 
 
 class FSL(_BaseInterface):
