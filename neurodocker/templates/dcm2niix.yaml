@@ -9,7 +9,7 @@ generic:
       apt: cmake g++ gcc git make pigz zlib1g-dev
       yum: cmake gcc-c++ git libstdc++-static make pigz zlib-devel
     env:
-      PATH: "{{ dcm2niix.install_path }}:$PATH"
+      PATH: "{{ dcm2niix.install_path }}/bin:$PATH"
     instructions: |
       {{ dcm2niix.install_dependencies() }}
       git clone https://github.com/rordenlab/dcm2niix /tmp/dcm2niix
