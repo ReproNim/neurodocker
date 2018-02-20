@@ -15,11 +15,11 @@ Implementation
 - If hashes match:
     - Pull Docker image.
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +66,14 @@ class Dropbox(object):
         self.client.files_upload(bytestring, path, mode=mode, **kwargs)
 
 
-
 def _prune_dockerfile(string, comment_char="#"):
     """Remove comments, emptylines, and last layer (serialize to JSON)."""
     string = string.strip()  # trim white space on both ends.
     json_removed = '\n\n'.join(string.split('\n\n')[:-1])
-    return '\n'.join(row for row in json_removed.split('\n')
-                      if not row.startswith(comment_char) and row)
+    return '\n'.join(
+        row for row in json_removed.split('\n') if not
+        row.startswith(comment_char) and row
+    )
 
 
 def _get_hash(bytestring):
@@ -127,5 +128,7 @@ def should_build_image(local_df, remote_path, remote_object):
             return False
         else:
             logger.info("Files are different. Updating remote Dockerfile.")
-            remote_object.upload(local_df.encode(), remote_path, overwrite=True)
+            remote_object.upload(
+                local_df.encode(), remote_path, overwrite=True
+            )
             return True

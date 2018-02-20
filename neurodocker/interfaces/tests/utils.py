@@ -4,8 +4,7 @@ from __future__ import absolute_import
 import logging
 import os
 
-from neurodocker import Dockerfile
-from neurodocker.docker import client, DockerContainer, DockerImage
+from neurodocker.docker import client, DockerImage
 from neurodocker.interfaces.tests import memory
 
 logger = logging.getLogger(__name__)
@@ -13,54 +12,48 @@ logger = logging.getLogger(__name__)
 
 # DockerHub repositories cannot have capital letters in them.
 DROPBOX_DOCKERHUB_MAPPING = {
-    'afni-latest_stretch': ('/Dockerfile.AFNI-latest_stretch',
-                            'kaczmarj/afni:latest_stretch'),
-
-    'ants-2.0.0_stretch': ('/Dockerfile.ANTs-2.2.0_stretch',
-                           'kaczmarj/ants:2.2.0_stretch'),
-
-    'convert3d_zesty': ('/Dockerfile.Convert3D-1.0.0_zesty',
-                        'kaczmarj/c3d:1.0.0_zesty'),
-
-    'dcm2niix-master_centos7': ('/Dockerfile.dcm2niix-master_centos7',
-                                'kaczmarj/dcm2niix:master_centos7'),
-
-    'freesurfer-min_zesty': ('/Dockerfile.FreeSurfer-min_zesty',
-                             'kaczmarj/freesurfer:min_zesty'),
-
-    'fsl-5.0.9_centos7': ('/Dockerfile.FSL-5.0.9_centos7',
-                          'kaczmarj/fsl:5.0.9_centos7'),
-
-    'fsl-5.0.10_centos7': ('/Dockerfile.FSL-5.0.10_centos7',
-                           'kaczmarj/fsl:5.0.10_centos7'),
-
-    'miniconda_centos7': ('/Dockerfile.Miniconda-latest_centos7',
-                          'kaczmarj/miniconda:latest_centos7'),
-
-    'mrtrix3_centos7': ('/Dockerfile.MRtrix3_centos7',
-                        'kaczmarj/mrtrix3:centos7'),
-
-    'neurodebian_stretch': ('/Dockerfile.NeuroDebian_stretch',
-                            'kaczmarj/neurodebian:stretch'),
-
-    'spm-12_zesty': ('/Dockerfile.SPM-12_zesty',
-                     'kaczmarj/spm:12_zesty'),
-
-    'minc_xenial': ('/Dockerfile.MINC_xenial',
-                     'kaczmarj/minc:1.9.15_xenial'),
-
-    'minc_centos7': ('/Dockerfile.MINC_centos7',
-                     'kaczmarj/minc:1.9.15_centos7'),
-
-    'petpvc_xenial': ('/Dockerfile.PETPVC_xenial',
-                     'kaczmarj/petpvc:1.2.0b_xenial'),
-
+    'afni-latest_stretch': (
+        '/Dockerfile.AFNI-latest_stretch', 'kaczmarj/afni:latest_stretch'
+    ),
+    'ants-2.0.0_stretch': (
+        '/Dockerfile.ANTs-2.2.0_stretch', 'kaczmarj/ants:2.2.0_stretch'
+    ),
+    'convert3d_xenial': (
+        '/Dockerfile.Convert3D-1.0.0_xenial', 'kaczmarj/c3d:1.0.0_xenial'
+    ),
+    'dcm2niix-master_centos7': (
+        '/Dockerfile.dcm2niix-master_centos7',
+        'kaczmarj/dcm2niix:master_centos7'
+    ),
+    'freesurfer-min_xenial': (
+        '/Dockerfile.FreeSurfer-min_xenial', 'kaczmarj/freesurfer:min_xenial'
+    ),
+    'fsl-5.0.10_centos7': (
+        '/Dockerfile.FSL-5.0.10_centos7', 'kaczmarj/fsl:5.0.10_centos7'
+    ),
+    'minc_xenial': (
+        '/Dockerfile.MINC_xenial', 'kaczmarj/minc:1.9.15_xenial'
+    ),
+    'miniconda_centos7': (
+        '/Dockerfile.Miniconda-latest_centos7',
+        'kaczmarj/miniconda:latest_centos7'
+    ),
+    'mrtrix3_centos7': (
+        '/Dockerfile.MRtrix3_centos7', 'kaczmarj/mrtrix3:centos7'
+    ),
+    'neurodebian_stretch': (
+        '/Dockerfile.NeuroDebian_stretch', 'kaczmarj/neurodebian:stretch'
+    ),
+    'petpvc_xenial': (
+        '/Dockerfile.PETPVC_xenial', 'kaczmarj/petpvc:1.2.0b_xenial'
+    ),
+    'spm-12_xenial': (
+        '/Dockerfile.SPM-12_xenial', 'kaczmarj/spm:12_xenial'
+    ),
 }
-
 
 here = os.path.dirname(os.path.realpath(__file__))
 volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
-
 
 
 def pull_image(name, **kwargs):
@@ -119,9 +112,10 @@ def _get_dbx_token():
     try:
         return os.environ['DROPBOX_TOKEN']
     except KeyError:
-        warnings.warn("Environment variable not found: DROPBOX_TOKEN."
-                      " Cannot interact with Dropbox API. Cannot compare "
-                      " Dockerfiles. Will pull existing Docker images ...")
+        warnings.warn(
+            "Environment variable not found: DROPBOX_TOKEN. Cannot interact"
+            " with Dropbox API. Cannot compare Dockerfiles."
+        )
         return None
 
 
@@ -145,8 +139,8 @@ def get_image_from_memory(df, remote_path, name, force_build=False):
     # Take into account other forks of the project. They cannot use the secret
     # environment variables in travis ci (e.g., the dropbox token).
     if token is None:
-        logger.info("Attempting to pull image...")
-        image = pull_image(name)
+        logger.info("Building image... DropBox token could not be found.")
+        image = build_image(df, name)
         if image is None:
             logger.info("Image not found. Building ...")
             image = build_image(df, name)
@@ -169,3 +163,19 @@ def get_image_from_memory(df, remote_path, name, force_build=False):
             image = build_image(df, name)
             push = True
     return image, push
+
+
+def get_image_from_memory_mapping(df, mapping_key, force_build=False):
+    """Calls `get_image_from_memory` but gets `remote_path` and `name` from
+    the mapping defined in this module.
+    """
+    try:
+        remote_path, name = DROPBOX_DOCKERHUB_MAPPING[mapping_key]
+    except KeyError:
+        raise ValueError(
+            "Key '{}' is not present in the mapping.".format(mapping_key)
+        )
+
+    return get_image_from_memory(
+        df=df, remote_path=remote_path, name=name, force_build=force_build
+    )
