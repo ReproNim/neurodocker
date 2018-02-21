@@ -15,7 +15,7 @@ class _SingularityRecipeImplementations:
         self._singobj = singularity_recipe_object
 
     def add_to_entrypoint(self, cmd):
-        self._singobj._runscript.insert(0, bash_cmd)
+        self._singobj._runscript.insert(0, cmd)
 
     def base(self, base):
         if base.startswith('docker://'):
