@@ -1,0 +1,22 @@
+---
+version: 2
+jobs:
+  build:
+    working_directory: /home/circleci
+    docker:
+      - image: kaczmarj/neurodocker:circleci
+    steps:
+      - checkout
+          path: /home/circleci/neurodocker
+      - pip3 install -e neurodocker
+      - setup_remote_docker
+      - pytest neurodocker
+
+# TODO: Fan out to parallelize docker builds in tests.
+
+# TODO: add deploy step
+#   - require the tests to pass before deploying.
+#   - include logic to update version based on git hash.
+#   - only deploy on pushes to master / releases.
+#   - deploy Docker image to DockerHub
+#   - upload wheels to PyPI.
