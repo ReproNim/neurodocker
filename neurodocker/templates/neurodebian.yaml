@@ -1,0 +1,13 @@
+# Instructions to install ANTs.
+#
+# Repository: https://github.com/ANTsX/ANTs
+# Website: http://stnava.github.io/ANTs/
+# Documentation:
+#   - https://github.com/ANTsX/ANTs/wiki
+#   - https://github.com/stnava/ANTsTutorial
+
+generic:
+  custom:
+    instructions: |
+      echo "Not implemented yet"
+      exit 1
