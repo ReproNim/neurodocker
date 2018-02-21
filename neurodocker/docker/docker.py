@@ -110,7 +110,9 @@ class DockerImage(object):
         from io import BytesIO
         try:
             try:
-                self.fileobj = BytesIO(dockerfile_or_str.cmd.encode('utf-8'))
+                self.fileobj = BytesIO(
+                    dockerfile_or_str.render().encode('utf-8')
+                )
             except AttributeError:
                 self.fileobj = BytesIO(dockerfile_or_str.encode('utf-8'))
         except AttributeError:
