@@ -34,7 +34,9 @@ class TestBuildOutputLogger(object):
 
     def test_start(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
-        logger = BuildOutputLogger(logs, console=False, filepath=self.filepath.strpath)
+        logger = BuildOutputLogger(
+            logs, console=False, filepath=self.filepath.strpath
+        )
         logger.start()
         living = logger.is_alive()
         assert living, "BuildOutputLogger not alive"

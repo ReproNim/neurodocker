@@ -19,6 +19,8 @@ class TestNeuroDebian(object):
                 (
                     'neurodebian',
                     {
+                        'version': 'generic',
+                        'method': 'custom',
                         'os_codename': 'stretch',
                         'download_server': 'usa-nh',
                         'full': True,
@@ -48,7 +50,8 @@ class TestNeuroDebian(object):
                 (
                     'neurodebian',
                     {
-                        'version': None,
+                        'version': 'generic',
+                        'method': 'custom',
                         'os_codename': 'stretch',
                         'download_server': 'usa-nh',
                         'full': True,
