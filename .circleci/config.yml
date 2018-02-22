@@ -7,7 +7,7 @@ jobs:
     working_directory: /home/circleci
     steps:
       - checkout:
-          path: /home/circleci/neurodocker
+          path: ~/neurodocker
       - run:
           command: |
             ls ~
