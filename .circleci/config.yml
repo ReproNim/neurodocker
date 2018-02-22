@@ -7,13 +7,12 @@ jobs:
     working_directory: /home/circleci
     steps:
       - checkout
-          path: /home/circleci/neurodocker
       - run:
           command: |
             pip3 install dropbox pytest-cov reprozip
             pip3 install -e neurodocker
-     - setup_remote_docker
-     - run: pytest neurodocker
+      - setup_remote_docker
+      - run: pytest neurodocker
 
 # TODO: Fan out to parallelize docker builds in tests.
 
