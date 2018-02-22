@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: kaczmarj/neurodocker:circleci
-    working_directory: ~
+    working_directory: /root
     steps:
       - checkout:
           path: ~/neurodocker
@@ -13,9 +13,9 @@ jobs:
             ls ~
             ls ~/neurodocker
             pip3 install dropbox pytest-cov reprozip
-            pip3 install -e neurodocker
+            pip3 install -e ~/neurodocker
       - setup_remote_docker
-      - run: pytest neurodocker
+      - run: pytest ~/neurodocker/neurodocker
 
 # TODO: Fan out to parallelize docker builds in tests.
 
