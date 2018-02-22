@@ -9,28 +9,30 @@ from neurodocker.neurodocker import main
 
 
 def test_generate():
-    args = ("generate docker -b ubuntu:17.04 -p apt"
-            " --arg FOO=BAR BAZ"
-            " --afni version=latest"
-            " --ants version=2.2.0"
-            " --freesurfer version=6.0.0"
-            " --fsl version=5.0.10"
-            " --user=neuro"
-            " --miniconda env_name=neuro conda_install=python=3.6.2"
-            " --user=root"
-            " --mrtrix3 version=3.0"
-            " --neurodebian os_codename=zesty download_server=usa-nh"
-            " --spm version=12 matlab_version=R2017a"
-            " --expose 1234 9000"
-            " --volume /var /usr/bin"
-            " --label FOO=BAR BAZ=CAT"
-            " --copy relpath/to/file.txt /tmp/file.txt"
-            " --add relpath/to/file2.txt /tmp/file2.txt"
-            " --cmd '--arg1' '--arg2'"
-            " --workdir /home"
-            " --install git"
-            " --user=neuro"
-            )
+    args = (
+        "generate docker -b ubuntu:17.04 -p apt"
+        " --arg FOO=BAR BAZ"
+        " --afni version=latest"
+        " --ants version=2.2.0"
+        " --freesurfer version=6.0.0"
+        " --fsl version=5.0.10"
+        " --user=neuro"
+        " --miniconda env_name=neuro conda_install=python=3.6.2"
+        " --user=root"
+        " --mrtrix3 version=3.0"
+        " --neurodebian version=generic method=custom os_codename=zesty"
+        "       download_server=usa-nh"
+        " --spm12 version=r7219 matlab_version=R2017a"
+        " --expose 1234 9000"
+        " --volume /var /usr/bin"
+        " --label FOO=BAR BAZ=CAT"
+        " --copy relpath/to/file.txt /tmp/file.txt"
+        " --add relpath/to/file2.txt /tmp/file2.txt"
+        " --cmd '--arg1' '--arg2'"
+        " --workdir /home"
+        " --install git"
+        " --user=neuro"
+    )
     main(args.split())
 
     with pytest.raises(SystemExit):
@@ -43,10 +45,6 @@ def test_generate():
 
     with pytest.raises(SystemExit):
         main()
-
-    args = "generate -b ubuntu -p apt --ants option=value"
-    with pytest.raises(ValueError):
-        main(args.split())
 
 
 def test_generate_opts(capsys):
@@ -106,15 +104,3 @@ def test_generate_from_json(capsys, tmpdir):
     # saves to JSON (with timestamp).
     sl = slice(8, -19)
     assert true.split('\n')[sl] == test.split('\n')[sl]
-
-
-def test_generate_no_print(capsys):
-    args = ['generate', 'docker', '-b', 'ubuntu:17.04', '-p', 'apt']
-    main(args)
-    out, _ = capsys.readouterr()
-    assert "FROM" in out and "RUN" in out
-
-    args.append('--no-print-df')
-    main(args)
-    out, _ = capsys.readouterr()
-    assert not out
