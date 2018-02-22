@@ -6,7 +6,7 @@ jobs:
       - image: kaczmarj/neurodocker:circleci
     working_directory: /home/circleci
     steps:
-      - checkout
+      - checkout:
           path: /home/circleci/neurodocker
       - run:
           command: |
