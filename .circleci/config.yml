@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: kaczmarj/neurodocker:circleci
-    working_directory: /home/circleci
+    working_directory: ~
     steps:
       - checkout:
           path: ~/neurodocker
