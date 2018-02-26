@@ -1,7 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Neurodocker command-line interface to generate Dockerfiles and minify
 existing containers.
+
+For help generating Dockerfiles and Singularity recipes, run
+
+$ neurodocker generate docker --help
+$ neurodocker generate singularity --help
 """
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
@@ -259,14 +264,9 @@ def _add_reprozip_merge_arguments(parser):
 def create_parser():
     """Return command-line argument parser."""
 
-    class ParserShowsErrors(ArgumentParser):
-        def error(self, message):
-            sys.stderr.write('error: %s\n' % message)
-            self.print_help()
-            sys.exit(2)
-
-    parser = ParserShowsErrors(description=__doc__,
-                            formatter_class=RawDescriptionHelpFormatter)
+    parser = ArgumentParser(
+        description=__doc__, formatter_class=RawDescriptionHelpFormatter
+    )
 
     verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
     parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
