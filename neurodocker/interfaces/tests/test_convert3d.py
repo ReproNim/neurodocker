@@ -13,7 +13,7 @@ class TestConvert3D(object):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'ubuntu:16.04'),
+                ('base', 'ubuntu:18.04'),
                 ('convert3d', {'version': '1.0.0'}),
                 ('user', 'neuro'),
             ]
