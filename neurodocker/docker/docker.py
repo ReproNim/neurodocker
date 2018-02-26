@@ -116,8 +116,10 @@ class DockerImage(object):
             except AttributeError:
                 self.fileobj = BytesIO(dockerfile_or_str.encode('utf-8'))
         except AttributeError:
-            raise TypeError("`dockerfile_or_str` must be an instance of "
-                            "`neurodocker.generators.docker.Dockerfile` or a string.")
+            raise TypeError(
+                "`dockerfile_or_str` must be an instance of"
+                " `neurodocker.generators.docker.Dockerfile` or a string."
+            )
 
     @require_docker
     def build(self, log_console=False, log_filepath=None, rm=True, **kwargs):
