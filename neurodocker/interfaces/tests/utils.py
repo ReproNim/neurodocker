@@ -33,6 +33,9 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'fsl-5.0.10_centos7': (
         '/Dockerfile.FSL-5.0.10_centos7', 'kaczmarj/fsl:5.0.10_centos7'
     ),
+    'matlabmcr-2010a_stretch': (
+        '/Dockerfile.MatlabMCR_stretch', 'kaczmarj/matlabmcr:stretch'
+    ),
     'minc_xenial': (
         '/Dockerfile.MINC_xenial', 'kaczmarj/minc:1.9.15_xenial'
     ),
