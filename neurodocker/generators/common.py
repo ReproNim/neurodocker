@@ -48,7 +48,7 @@ def _install(pkgs, pkg_manager):
     return installers[pkg_manager](pkgs, opts)
 
 
-class _Users(object):
+class _Users:
     """Object to hold memory of initialized users."""
 
     initialized_users = {'root'}
