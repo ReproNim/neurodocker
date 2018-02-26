@@ -1,5 +1,6 @@
 """"""
 
+import copy
 import inspect
 import json
 import os
@@ -264,7 +265,7 @@ class Dockerfile:
     }
 
     def __init__(self, specs):
-        self._specs = specs
+        self._specs = copy.deepcopy(specs)
 
         self._add_neurodocker_install_header_to_specs()
 

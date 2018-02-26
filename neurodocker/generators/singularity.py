@@ -57,7 +57,7 @@ class _SingularityRecipeImplementations:
 class SingularityRecipe:
 
     def __init__(self, specs):
-        self._specs = specs
+        self._specs = copy.deepcopy(specs)
 
         self._header = OrderedDict()
         self._help = []
