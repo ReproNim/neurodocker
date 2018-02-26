@@ -9,6 +9,8 @@ from neurodocker.interfaces.tests import memory
 
 logger = logging.getLogger(__name__)
 
+_NO_PUSH_IMAGES = os.environ.get('NEURODOCKERNOPUSHIMAGES', False)
+
 
 # DockerHub repositories cannot have capital letters in them.
 DROPBOX_DOCKERHUB_MAPPING = {
@@ -128,7 +130,7 @@ def _check_can_push():
 #   is set to some false value. This will prevent pushing on PRs, which
 #   should not happen because that behavior would affect other PRs.
 
-def get_image_from_memory(df, remote_path, name, force_build=False):
+def _get_image_from_memory(df, remote_path, name, force_build=False):
     """Return image and boolean indicating whether or not to push resulting
     image to DockerHub.
     """
@@ -180,6 +182,11 @@ def get_image_from_memory_mapping(df, mapping_key, force_build=False):
             "Key '{}' is not present in the mapping.".format(mapping_key)
         )
 
-    return get_image_from_memory(
+    image, push = _get_image_from_memory(
         df=df, remote_path=remote_path, name=name, force_build=force_build
     )
+
+    if _NO_PUSH_IMAGES:
+        push = False
+
+    return image, push
