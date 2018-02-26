@@ -10,7 +10,7 @@ import threading
 import docker
 import requests
 
-client = docker.from_env(timeout=30)
+client = docker.from_env(version='auto', timeout=30)
 
 
 def docker_is_running(client):
