@@ -26,4 +26,4 @@ generic:
         --exclude='{{ exclude_path }}' \
       {%- endfor %}
       {%- endif %}
-      && sed -i '$isource "{{ freesurfer.install_path }}"/SetUpFreeSurfer.sh' "$ND_ENTRYPOINT"
+      && sed -i '$isource "{{ freesurfer.install_path }}/SetUpFreeSurfer.sh"' "$ND_ENTRYPOINT"
