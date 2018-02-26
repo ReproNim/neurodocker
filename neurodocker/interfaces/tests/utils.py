@@ -124,6 +124,10 @@ def _check_can_push():
     pass
 
 
+# TODO: return `push=False` if an environment variable (ND_TEST_PUSH_IMAGES)
+#   is set to some false value. This will prevent pushing on PRs, which
+#   should not happen because that behavior would affect other PRs.
+
 def get_image_from_memory(df, remote_path, name, force_build=False):
     """Return image and boolean indicating whether or not to push resulting
     image to DockerHub.

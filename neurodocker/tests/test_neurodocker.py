@@ -12,8 +12,8 @@ def test_generate():
     args = (
         "generate docker -b ubuntu:17.04 -p apt"
         " --arg FOO=BAR BAZ"
-        " --afni version=latest"
-        " --ants version=2.2.0"
+        " --afni version=latest method=source"
+        " --ants version=2.2.0 method=source"
         " --freesurfer version=6.0.0"
         " --fsl version=5.0.10"
         " --user=neuro"
