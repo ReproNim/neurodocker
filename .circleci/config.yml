@@ -17,7 +17,7 @@ jobs:
       - run:
           command: |
             docker create -v /testscripts --name data-container alpine:3.7 /bin/true
-            docker cp ~/neurodocker/neurodocker/interfaces/tests/ data-container:/testscripts
+            docker cp ~/neurodocker/neurodocker/interfaces/tests/. data-container:/testscripts
       - run: pytest ~/neurodocker/neurodocker
 
 # TODO: Fan out to parallelize docker builds in tests.
