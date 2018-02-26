@@ -12,7 +12,7 @@ jobs:
           command: |
             pip3 install dropbox pytest-cov reprozip
             pip3 install -e ~/neurodocker
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 17.11.0-ce
       - run:
           command: |
