@@ -117,7 +117,7 @@ class DockerImage(object):
                 self.fileobj = BytesIO(dockerfile_or_str.encode('utf-8'))
         except AttributeError:
             raise TypeError("`dockerfile_or_str` must be an instance of "
-                            "`neurodocker.docker_api.Dockerfile` or a string.")
+                            "`neurodocker.generators.docker.Dockerfile` or a string.")
 
     @require_docker
     def build(self, log_console=False, log_filepath=None, rm=True, **kwargs):
@@ -175,7 +175,9 @@ class DockerImage(object):
                     return client.images.get(image_id)
 
         last_event = build_logger_obj.logs[-1]
-        raise BuildError(last_event.get('error') or last_event)
+        raise BuildError(
+            last_event.get('error') or last_event, build_logger_obj.logs
+        )
 
 
 class DockerContainer(object):
@@ -223,7 +225,7 @@ class DockerContainer(object):
             If `stream` is false, return output of the command as one string.
             If `stream` is true, return generator of command output.
         """
-        output = self.container.exec_run(cmd, **kwargs)
+        output = self.container.exec_run(cmd, **kwargs).output
         return output.decode('utf-8')
 
     @require_docker
@@ -283,7 +285,6 @@ def copy_file_to_container(container, src, dest):
     except AttributeError:
         container = client.containers.get(container)
 
-
     with BytesIO() as tar_stream:
         with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
             filename = os.path.split(src)[-1]
@@ -312,7 +313,6 @@ def copy_file_from_container(container, src, dest='.'):
     """
     import tarfile
     import tempfile
-    import traceback
 
     try:
         container.put_archive
@@ -323,7 +323,8 @@ def copy_file_from_container(container, src, dest='.'):
     tar_stream, tar_info = container.get_archive(src)
     try:
         with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(tar_stream.data)
+            for data in tar_stream:
+                tmp.write(data)
             tmp.flush()
             with tarfile.TarFile(tmp.name) as tar:
                 tar.extractall(path=dest)
