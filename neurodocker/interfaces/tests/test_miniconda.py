@@ -39,7 +39,7 @@ class TestMiniconda(object):
         )
 
         cmd = "bash /testscripts/test_miniconda.sh"
-        DockerContainer(image).run(cmd, volumes=utils.volumes)
+        DockerContainer(image).run(cmd, **utils._container_run_kwds)
 
         if push:
             utils.push_image(image)

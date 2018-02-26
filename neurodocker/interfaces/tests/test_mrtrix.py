@@ -30,7 +30,7 @@ class TestMRtrix3(object):
         )
 
         cmd = "bash /testscripts/test_mrtrix.sh"
-        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
 
         if push:
             utils.push_image(image)

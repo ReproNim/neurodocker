@@ -30,7 +30,7 @@ class TestAFNI(object):
         )
 
         cmd = "bash /testscripts/test_afni.sh"
-        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
 
         if push:
             utils.push_image(image)

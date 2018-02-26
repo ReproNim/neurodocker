@@ -54,8 +54,11 @@ DROPBOX_DOCKERHUB_MAPPING = {
     ),
 }
 
-here = os.path.dirname(os.path.realpath(__file__))
-volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
+_volumes_from = ["data-container"]
+
+_container_run_kwds = {
+    'volumes_from': _volumes_from,
+}
 
 
 def pull_image(name, **kwargs):
