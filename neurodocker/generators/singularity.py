@@ -1,6 +1,7 @@
 """"""
 
 from collections import OrderedDict
+import copy
 import inspect
 
 from neurodocker.generators.common import (
