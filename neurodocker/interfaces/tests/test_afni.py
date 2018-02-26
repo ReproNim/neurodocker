@@ -19,7 +19,7 @@ class TestAFNI(object):
             'pkg_manager': 'apt',
             'instructions': [
                 ('base', 'debian:stretch'),
-                ('afni', {'version': 'latest', 'use_binaries': True}),
+                ('afni', {'version': 'latest', 'method': 'binaries'}),
                 ('user', 'neuro'),
             ],
         }
@@ -41,7 +41,7 @@ class TestAFNI(object):
             'pkg_manager': 'apt',
             'instructions': [
                 ('base', 'docker://debian:stretch'),
-                ('afni', {'version': 'latest', 'use_binaries': True}),
+                ('afni', {'version': 'latest', 'method': 'binaries'}),
                 ('user', 'neuro'),
             ],
         }
