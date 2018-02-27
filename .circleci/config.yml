@@ -2,8 +2,8 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: kaczmarj/neurodocker:circleci
+    machine:
+      image: circleci/classic:201710-02
     working_directory: /root
     steps:
       - checkout:
