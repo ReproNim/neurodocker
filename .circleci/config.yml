@@ -12,10 +12,6 @@ jobs:
             pyenv global 3.5.2
             pip install dropbox pytest-cov reprozip
             pip install -e ~/neurodocker
-      - run:
-          command: |
-            docker create -v /testscripts --name data-container alpine:3.7 /bin/true
-            docker cp ~/neurodocker/neurodocker/interfaces/tests/. data-container:/testscripts
       - run: pytest ~/neurodocker/neurodocker
 
 # TODO: Fan out to parallelize docker builds in tests.

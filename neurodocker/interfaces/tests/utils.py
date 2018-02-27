@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 _NO_PUSH_IMAGES = os.environ.get('NEURODOCKERNOPUSHIMAGES', False)
 
+here = os.path.dirname(os.path.realpath(__file__))
+_volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
+
+_container_run_kwds = {'volumes': _volumes}
 
 # DockerHub repositories cannot have capital letters in them.
 DROPBOX_DOCKERHUB_MAPPING = {
@@ -55,12 +59,6 @@ DROPBOX_DOCKERHUB_MAPPING = {
     'spm-12_xenial': (
         '/Dockerfile.SPM-12_xenial', 'kaczmarj/spm:12_xenial'
     ),
-}
-
-_volumes_from = ["data-container"]
-
-_container_run_kwds = {
-    'volumes_from': _volumes_from,
 }
 
 
