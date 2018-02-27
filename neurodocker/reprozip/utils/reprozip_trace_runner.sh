@@ -49,7 +49,7 @@ function install_conda_reprozip()
   ls /tmp
   bash $TMP_CONDA_INSTALLER -b -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
-  ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.5 reprozip
+  ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.6 reprozip
 }
 
 
