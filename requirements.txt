@@ -1,2 +1,2 @@
-docker>=2.3
+docker>=2.3,<3.0
 requests>=2.0
