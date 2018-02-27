@@ -9,8 +9,9 @@ jobs:
           path: ~/neurodocker
       - run:
           command: |
-            pip3 install dropbox pytest-cov reprozip
-            pip3 install -e ~/neurodocker
+            pyenv global 3.5.2
+            pip install dropbox pytest-cov reprozip
+            pip install -e ~/neurodocker
       - run:
           command: |
             docker create -v /testscripts --name data-container alpine:3.7 /bin/true
