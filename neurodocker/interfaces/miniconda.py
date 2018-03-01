@@ -124,17 +124,19 @@ class Miniconda(object):
                    "\nPATH={0}/bin:$PATH".format(Miniconda.INSTALL_PATH))
         env_cmd = indent("ENV", env_cmd)
 
-        cmd = ('echo "Downloading Miniconda installer ..."'
-               "\n&& miniconda_installer=/tmp/miniconda.sh"
-               "\n&& curl -sSL --retry 5 -o $miniconda_installer {url}"
-               "\n&& /bin/bash $miniconda_installer -b -p $CONDA_DIR"
-               "\n&& rm -f $miniconda_installer"
-               "\n&& conda config --system --prepend channels conda-forge"
-               "\n&& conda config --system --set auto_update_conda false"
-               "\n&& conda config --system --set show_channel_urls true"
-               "\n&& conda clean -tipsy && sync"
-               "".format(Miniconda.INSTALL_PATH, url=install_url))
-        cmd = indent("RUN", cmd)
+        cmds = ['echo "Downloading Miniconda installer ..."',
+                "miniconda_installer=/tmp/miniconda.sh",
+                "curl -sSL --retry 5 -o $miniconda_installer {url}",
+                "/bin/bash $miniconda_installer -b -p $CONDA_DIR",
+                "rm -f $miniconda_installer",
+                "conda config --system --prepend channels conda-forge",
+                "conda config --system --set auto_update_conda false",
+                "conda config --system --set show_channel_urls true",
+                "conda clean -tipsy && sync",
+                ]
+        if self.miniconda_version == 'latest':
+            cmds.insert(-1, 'conda update -n base conda')
+        cmd = indent("RUN", '\n&& '.join(cmds).format(url=install_url))
 
         Miniconda.INSTALLED = True
 
