@@ -160,7 +160,10 @@ def _get_image_from_memory(df, remote_path, name, force_build=False):
     dbx_client = memory.Dropbox(token)
 
     if memory.should_build_image(df, remote_path, remote_object=dbx_client):
-        logger.info("Building image... Result should be pushed.")
+        logger.info(
+            "Building image... Result should be pushed if not on master"
+            " branch."
+        )
         image = build_image(df, name)
         push = True
     else:
@@ -168,8 +171,10 @@ def _get_image_from_memory(df, remote_path, name, force_build=False):
         image = pull_image(name)
         push = False
         if image is None:
-            logger.info("Image could not be pulled. Building ..."
-                        " Result should be pushed.")
+            logger.info(
+                "Image could not be pulled. Building now. Result should be"
+                " pushed if on master branch."
+            )
             image = build_image(df, name)
             push = True
     return image, push
