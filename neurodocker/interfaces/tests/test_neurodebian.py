@@ -1,9 +1,9 @@
 """Tests for neurodocker.interfaces.NeuroDebian"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import, division, print_function
-
-from neurodocker import DockerContainer, Dockerfile, SingularityRecipe
+from neurodocker import (
+    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
+)
 from neurodocker.interfaces.tests import utils
 
 
@@ -32,15 +32,10 @@ class TestNeuroDebian(object):
         }
 
         df = Dockerfile(specs).render()
-        image, push = utils.get_image_from_memory_mapping(
-            df=df, mapping_key='neurodebian_stretch',
-        )
+        image = DockerImage(df).build(log_console=True)
 
         cmd = "bash /testscripts/test_neurodebian.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
-
-        if push:
-            utils.push_image(image)
 
     def test_singularity(self):
         specs = {

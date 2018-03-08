@@ -3,7 +3,9 @@
 
 import pytest
 
-from neurodocker import DockerContainer, Dockerfile, SingularityRecipe
+from neurodocker import (
+    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
+)
 from neurodocker.interfaces import ANTs
 from neurodocker.interfaces.tests import utils
 
@@ -23,15 +25,10 @@ class TestANTs(object):
         }
 
         df = Dockerfile(specs).render()
-        image, push = utils.get_image_from_memory_mapping(
-            df=df, mapping_key='ants-2.0.0_stretch',
-        )
+        image = DockerImage(df).build(log_console=True)
 
         cmd = "bash /testscripts/test_ants.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
-
-        if push:
-            utils.push_image(image)
 
     def test_invalid_binaries(self):
         with pytest.raises(ValueError):

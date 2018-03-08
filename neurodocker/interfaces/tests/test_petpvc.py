@@ -1,11 +1,11 @@
 """Tests for neurodocker.interfaces.PETPVC"""
 # Author: Sulantha Mathotaarachchi <sulantha.s@gmail.com>
 
-from __future__ import absolute_import, division, print_function
-
 import pytest
 
-from neurodocker import DockerContainer, Dockerfile, SingularityRecipe
+from neurodocker import (
+    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
+)
 from neurodocker.interfaces.tests import utils
 
 
@@ -25,15 +25,10 @@ class TestPETPVC(object):
         }
 
         df = Dockerfile(specs).render()
-        image, push = utils.get_image_from_memory_mapping(
-            df=df, mapping_key='petpvc_xenial',
-        )
+        image = DockerImage(df).build(log_console=True)
 
         cmd = "bash /testscripts/test_petpvc.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
-
-        if push:
-            utils.push_image(image)
 
     @pytest.mark.skip("petpvc not implemented yet")
     def test_singularity(self):

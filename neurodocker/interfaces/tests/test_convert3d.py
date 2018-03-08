@@ -1,7 +1,9 @@
 """Tests for neurodocker.interfaces.Convert3D"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import DockerContainer, Dockerfile, SingularityRecipe
+from neurodocker import (
+    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
+)
 from neurodocker.interfaces.tests import utils
 
 
@@ -20,15 +22,10 @@ class TestConvert3D(object):
         }
 
         df = Dockerfile(specs).render()
-        image, push = utils.get_image_from_memory_mapping(
-            df=df, mapping_key='convert3d_xenial',
-        )
+        image = DockerImage(df).build(log_console=True)
 
         cmd = "bash /testscripts/test_convert3d.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
-
-        if push:
-            utils.push_image(image)
 
     def test_singularity(self):
         specs = {

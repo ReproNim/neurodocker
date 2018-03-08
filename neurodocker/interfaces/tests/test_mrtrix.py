@@ -1,12 +1,9 @@
 """Tests for neurodocker.interfaces.ANTs"""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import, division, print_function
-
-import pytest
-
-from neurodocker import DockerContainer, Dockerfile, SingularityRecipe
-from neurodocker.interfaces import MRtrix3
+from neurodocker import (
+    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
+)
 from neurodocker.interfaces.tests import utils
 
 
@@ -25,15 +22,10 @@ class TestMRtrix3(object):
         }
 
         df = Dockerfile(specs).render()
-        image, push = utils.get_image_from_memory_mapping(
-            df=df, mapping_key='mrtrix3_centos7',
-        )
+        image = DockerImage(df).build(log_console=True)
 
         cmd = "bash /testscripts/test_mrtrix.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
-
-        if push:
-            utils.push_image(image)
 
     def test_singularity(self):
         specs = {
