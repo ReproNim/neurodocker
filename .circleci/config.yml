@@ -10,6 +10,7 @@ jobs:
       - run:
           command: |
             pyenv global 3.5.2
+            pip install -U pip
             pip install dropbox pytest-cov reprozip
             pip install -e ~/neurodocker
       - run: pytest ~/neurodocker/neurodocker
