@@ -25,7 +25,7 @@ class TestAFNI(object):
         }
 
         df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
+        image = DockerImage(df).build(log_console=True, tag="afni")
 
         cmd = "bash /testscripts/test_afni.sh"
         assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
