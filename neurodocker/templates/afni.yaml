@@ -29,7 +29,7 @@ generic:
       echo "Downloading AFNI ..."
       mkdir -p {{ afni.install_path }}
       curl {{ afni.curl_opts }} {{ afni.binaries_url }} \
-      | tar -xz -C {{ self.install_path }} --strip-components 1
+      | tar -xz -C {{ afni.install_path }} --strip-components 1
       {% if afni.install_r_pkgs %}
       {{ afni._install_r_pkgs() }}
       {% endif %}
