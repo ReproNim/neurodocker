@@ -132,10 +132,10 @@ class FSL(object):
         pkgs = {'apt': ("bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev"
                         " libglu1-mesa-dev libgomp1 libice6"
                         " libxcursor1 libxft2 libxinerama1 libxrandr2"
-                        " libxrender1 libxt6"),
+                        " libxrender1 libxt6 file"),
                 'yum': ("bc libGL libGLU libgomp libICE libjpeg libmng"
                         " libpng12 libSM libX11 libXcursor libXext libXft"
-                        " libXinerama libXrandr libXt")}
+                        " libXinerama libXrandr libXt file")}
 
         cmd = "{install}\n&& {clean}".format(**manage_pkgs[self.pkg_manager])
         return cmd.format(pkgs=pkgs[self.pkg_manager])
