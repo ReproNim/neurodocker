@@ -6,7 +6,6 @@
 # Website: https://afni.nimh.nih.gov/
 # Documentation: https://afni.nimh.nih.gov/Documentation
 
-# TODO: libgsl not found. Other shared libraries might not be found.
 
 generic:
   binaries:
@@ -28,6 +27,9 @@ generic:
     instructions: |
       {{ afni.install_dependencies() }}
       {{ afni.install_debs() }}
+      gsl2_path="$(find / -name 'libgsl.so.19')"
+      if [ -n "$gsl2_path" ]; then ln -sfv "$gsl2_path" "$(dirname $gsl2_path)/libgsl.so.0"; fi
+      ldconfig
       echo "Downloading AFNI ..."
       mkdir -p {{ afni.install_path }}
       curl {{ afni.curl_opts }} {{ afni.binaries_url }} \
