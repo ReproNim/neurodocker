@@ -1,3 +1,4 @@
+---
 # Instructions to install FreeSurfer.
 #
 # Repository: https://github.com/freesurfer/freesurfer
@@ -16,10 +17,10 @@ generic:
       yum: bc libgomp libXmu libXt tcsh perl
     env:
       FREESURFER_HOME: "{{ freesurfer.install_path }}"
-      PATH: "{{ freesurfer.install_path }}:$PATH"
+      PATH: "{{ freesurfer.install_path }}/bin:$PATH"
     instructions: |
       {{ freesurfer.install_dependencies() }}
-      echo "Downloading minimized FreeSurfer ..."
+      echo "Downloading FreeSurfer ..."
       mkdir -p {{ freesurfer.install_path }}
       curl {{ freesurfer.curl_opts }} {{ freesurfer.binaries_url }} \
       | tar -xz -C {{ freesurfer.install_path }} --strip-components 1 {% if freesurfer.exclude_paths -%}\
