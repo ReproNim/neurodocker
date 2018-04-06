@@ -22,10 +22,6 @@ class TestANTs(object):
         utils.test_docker_container_from_specs(
             specs=specs, bash_test_file=bash_test_file)
 
-    def test_invalid_binaries(self):
-        with pytest.raises(ValueError):
-            ANTs(version='fakeversion', pkg_manager='apt', check_urls=False)
-
     def test_singularity(self):
         specs = {
             'pkg_manager': 'yum',
@@ -37,3 +33,7 @@ class TestANTs(object):
         }
 
         utils.test_singularity_container_from_specs(specs=specs)
+
+    def test_invalid_binaries(self):
+        with pytest.raises(ValueError):
+            ANTs(version='fakeversion', pkg_manager='apt', check_urls=False)

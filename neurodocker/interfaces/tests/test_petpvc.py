@@ -3,9 +3,6 @@
 
 import pytest
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
@@ -24,11 +21,9 @@ class TestPETPVC(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_petpvc.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_petpvc.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     @pytest.mark.skip("petpvc not implemented yet")
     def test_singularity(self):
@@ -41,4 +36,4 @@ class TestPETPVC(object):
             ]
         }
 
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)

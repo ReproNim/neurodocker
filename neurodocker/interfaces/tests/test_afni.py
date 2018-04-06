@@ -1,19 +1,14 @@
 """Tests for neurodocker.interfaces.AFNI"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
 import pytest
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces import AFNI
 from neurodocker.interfaces.tests import utils
 
 
 class TestAFNI(object):
-    """Tests for AFNI class."""
 
-    def test_build_image_afni_latest_binaries_stretch(self):
+    def test_docker(self):
         """Install latest AFNI binaries on Debian stretch."""
         specs = {
             'pkg_manager': 'apt',
@@ -24,14 +19,11 @@ class TestAFNI(object):
             ],
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True, tag="afni")
-
-        cmd = "bash /testscripts/test_afni.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_afni.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
-        """Test whether Singularity recipe generation fails."""
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
@@ -40,7 +32,7 @@ class TestAFNI(object):
                 ('user', 'neuro'),
             ],
         }
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)
 
     def test_invalid_binaries(self):
         with pytest.raises(ValueError):

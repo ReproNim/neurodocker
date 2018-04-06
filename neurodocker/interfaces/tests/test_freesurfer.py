@@ -1,17 +1,11 @@
 """Tests for neurodocker.interfaces.FreeSurfer"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestFreeSurfer(object):
-    """Tests for FreeSurfer class."""
 
-    def test_build_image_freesurfer_600_min_binaries_xenial(self):
-        """Install minimized FreeSurfer binaries on Ubuntu Xenial."""
+    def test_docker(self):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
@@ -21,11 +15,9 @@ class TestFreeSurfer(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_freesurfer.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_freesurfer.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -36,4 +28,4 @@ class TestFreeSurfer(object):
                 ('user', 'neuro'),
             ]
         }
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)

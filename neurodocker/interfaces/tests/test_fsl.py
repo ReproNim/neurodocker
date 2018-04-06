@@ -1,17 +1,11 @@
 """Tests for neurodocker.interfaces.FSL"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestFSL(object):
-    """Tests for FSL class."""
 
-    def test_build_image_fsl_5010_centos7(self):
-        """Install latest FSL with FSL's Python installer on CentOS 7."""
+    def test_docker(self):
         specs = {
             'pkg_manager': 'yum',
             'instructions': [
@@ -21,11 +15,9 @@ class TestFSL(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_fsl.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_fsl.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -36,4 +28,4 @@ class TestFSL(object):
                 ('user', 'neuro'),
             ]
         }
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)

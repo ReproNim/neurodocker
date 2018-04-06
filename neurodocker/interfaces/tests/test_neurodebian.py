@@ -1,17 +1,11 @@
 """Tests for neurodocker.interfaces.NeuroDebian"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestNeuroDebian(object):
-    """Tests for NeuroDebian class."""
 
     def test_build_image_neurodebian_dcm2niix_xenial(self):
-        """Install NeuroDebian on Ubuntu 16.04."""
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
@@ -31,11 +25,9 @@ class TestNeuroDebian(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_neurodebian.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_neurodebian.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -57,4 +49,4 @@ class TestNeuroDebian(object):
             ]
         }
 
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)

@@ -5,8 +5,11 @@ import logging
 import os
 import posixpath
 
-from neurodocker.docker import client, DockerContainer, DockerImage
-from neurodocker.generators import Dockerfile, SingularityRecipe
+from neurodocker.docker import client
+from neurodocker.docker import DockerContainer
+from neurodocker.docker import DockerImage
+from neurodocker.generators import Dockerfile
+from neurodocker.generators import SingularityRecipe
 from neurodocker.interfaces.tests import memory
 
 logger = logging.getLogger(__name__)

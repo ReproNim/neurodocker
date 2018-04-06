@@ -1,17 +1,11 @@
 """Tests for neurodocker.interfaces.SPM"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestSPM(object):
-    """Tests for SPM class."""
 
-    def test_build_image_spm_12_standalone_zesty(self):
-        """Install standalone SPM12 and MATLAB MCR R2017a."""
+    def test_docker(self):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
@@ -21,11 +15,9 @@ class TestSPM(object):
             ],
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_spm.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_spm.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -37,4 +29,4 @@ class TestSPM(object):
             ],
         }
 
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)
