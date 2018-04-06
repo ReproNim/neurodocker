@@ -10,7 +10,7 @@ class TestFSL(object):
             'pkg_manager': 'yum',
             'instructions': [
                 ('base', 'centos:7'),
-                ('fsl', {'version': '5.0.10', 'eddy_5011': True}),
+                ('fsl', {'version': '5.0.11'}),
                 ('user', 'neuro'),
             ]
         }
