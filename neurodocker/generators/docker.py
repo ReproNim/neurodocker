@@ -275,6 +275,8 @@ class Dockerfile:
     def _add_neurodocker_install_header_to_specs(self):
         self._specs['instructions'].insert(
             1, ('_header', {'version': 'generic', 'method': 'custom'}))
+        self._specs['instructions'].insert(
+            2, ('entrypoint', "/neurodocker/startup.sh"))
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
