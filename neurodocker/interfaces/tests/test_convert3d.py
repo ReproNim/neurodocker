@@ -1,17 +1,11 @@
 """Tests for neurodocker.interfaces.Convert3D"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestConvert3D(object):
-    """Tests for Convert3D class."""
 
-    def test_build_image_convert3d_100_binaries_zesty(self):
-        """Install Convert3D binaries on Ubuntu Zesty."""
+    def test_docker(self):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
@@ -21,11 +15,9 @@ class TestConvert3D(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_convert3d.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_convert3d.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -36,4 +28,5 @@ class TestConvert3D(object):
                 ('user', 'neuro'),
             ]
         }
-        assert SingularityRecipe(specs).render()
+
+        utils.test_singularity_container_from_specs(specs)

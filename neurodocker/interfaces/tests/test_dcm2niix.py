@@ -1,13 +1,11 @@
-"""Tests for neurodocker.interfaces.dcm2niix"""
+"""Tests for neurodocker.interfaces.Dcm2niix"""
 
 from neurodocker.interfaces.tests import utils
 
 
 class TestDcm2niix(object):
-    """Tests for dcm2niix class."""
 
     def test_docker(self):
-        """Install dcm2niix from source on CentOS 7."""
         specs = {
             'pkg_manager': 'yum',
             'instructions': [

@@ -1,20 +1,14 @@
 """Tests for neurodocker.interfaces.ANTs"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
 import pytest
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces import ANTs
 from neurodocker.interfaces.tests import utils
 
 
 class TestANTs(object):
-    """Tests for ANTs class."""
 
-    def test_build_image_ants_220_binaries_centos7(self):
-        """Install ANTs 2.2.0 binaries on CentOS 7."""
+    def test_docker(self):
         specs = {
             'pkg_manager': 'yum',
             'instructions': [
@@ -24,11 +18,9 @@ class TestANTs(object):
             ]
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True, tag="ants")
-
-        cmd = "bash /testscripts/test_ants.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_ants.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_invalid_binaries(self):
         with pytest.raises(ValueError):
@@ -44,4 +36,4 @@ class TestANTs(object):
             ]
         }
 
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs=specs)
