@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     machine:
-      image: circleci/classic:201710-02
+      image: circleci/classic:201711-01
     steps:
       - checkout:
           path: ~/neurodocker
@@ -13,7 +13,7 @@ jobs:
             pip install -U pip
             pip install dropbox pytest-cov reprozip
             pip install -e ~/neurodocker
-      - run: pytest ~/neurodocker/neurodocker/interfaces/tests/test_ants.py ~/neurodocker/neurodocker/interfaces/tests/test_convert3d.py ~/neurodocker/neurodocker/interfaces/tests/test_dcm2niix.py
+      - run: pytest -s ~/neurodocker/neurodocker/interfaces/tests/test_convert3d.py ~/neurodocker/neurodocker/interfaces/tests/test_dcm2niix.py
 
 # TODO: Fan out to parallelize docker builds in tests.
 
