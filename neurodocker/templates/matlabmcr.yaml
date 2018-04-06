@@ -1,3 +1,4 @@
+---
 # Instructions to install MATLAB Compiler Runtime.
 #
 # Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
@@ -5,6 +6,7 @@
 generic:
   binaries:
     urls:
+      2018a: http://ssd.mathworks.com/supportfiles/downloads/R2018a/deployment_files/R2018a/installers/glnxa64/MCR_R2018a_glnxa64_installer.zip
       2017b: http://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip
       2017a: http://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
       2016b: http://ssd.mathworks.com/supportfiles/downloads/R2016b/deployment_files/R2016b/installers/glnxa64/MCR_R2016b_glnxa64_installer.zip
