@@ -5,9 +5,10 @@ import inspect
 import json
 import os
 
-from neurodocker.generators.common import (
-    _add_to_entrypoint, _installation_implementations, _install, _Users,
-)
+from neurodocker.generators.common import _add_to_entrypoint
+from neurodocker.generators.common import _installation_implementations
+from neurodocker.generators.common import _install
+from neurodocker.generators.common import _Users
 
 
 def _indent(string, indent=4, add_list_op=False):
@@ -18,8 +19,7 @@ def _indent(string, indent=4, add_list_op=False):
         line = line.rstrip()
         already_cont = line.startswith(('&&', '&', '||', '|', 'fi'))
         previous_cont = (
-            lines[ii - 1].endswith('\\') or lines[ii - 1].startswith('if')
-        )
+            lines[ii - 1].endswith('\\') or lines[ii - 1].startswith('if'))
         if ii:
             if add_list_op and not already_cont and not previous_cont:
                 line = "&& " + line
@@ -176,8 +176,7 @@ class _DockerfileImplementations:
     def install(pkgs, pkg_manager):
         """Return Dockerfile RUN instruction to install system packages."""
         return _indent(
-            "RUN " + _install(pkgs, pkg_manager), add_list_op=True
-        )
+            "RUN " + _install(pkgs, pkg_manager), add_list_op=True)
 
     @staticmethod
     def label(labels):
@@ -268,14 +267,14 @@ class Dockerfile:
         self._specs = copy.deepcopy(specs)
 
         self._add_neurodocker_install_header_to_specs()
+        _Users.clear_memory()
 
     def render(self):
         return "\n\n".join(self._ispecs_to_dockerfile_str())
 
     def _add_neurodocker_install_header_to_specs(self):
         self._specs['instructions'].insert(
-            1, ('_header', {'version': 'generic', 'method': 'custom'})
-        )
+            1, ('_header', {'version': 'generic', 'method': 'custom'}))
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
@@ -293,5 +292,4 @@ class Dockerfile:
                         yield impl(params)
             else:
                 raise ValueError(
-                    "instruction not understood: '{}'".format(instruction)
-                )
+                    "instruction not understood: '{}'".format(instruction))
