@@ -1,16 +1,12 @@
 """Tests for neurodocker.interfaces.dcm2niix"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from neurodocker import (
-    DockerContainer, Dockerfile, DockerImage, SingularityRecipe
-)
 from neurodocker.interfaces.tests import utils
 
 
 class TestDcm2niix(object):
-    """Tests for ANTs class."""
+    """Tests for dcm2niix class."""
 
-    def test_build_image_dcm2niix_master_source_centos7(self):
+    def test_docker(self):
         """Install dcm2niix from source on CentOS 7."""
         specs = {
             'pkg_manager': 'yum',
@@ -21,11 +17,9 @@ class TestDcm2niix(object):
             ],
         }
 
-        df = Dockerfile(specs).render()
-        image = DockerImage(df).build(log_console=True)
-
-        cmd = "bash /testscripts/test_dcm2niix.sh"
-        assert DockerContainer(image).run(cmd, **utils._container_run_kwds)
+        bash_test_file = "test_dcm2niix.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
     def test_singularity(self):
         specs = {
@@ -37,4 +31,4 @@ class TestDcm2niix(object):
             ],
         }
 
-        assert SingularityRecipe(specs).render()
+        utils.test_singularity_container_from_specs(specs)

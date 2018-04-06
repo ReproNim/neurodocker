@@ -3,8 +3,10 @@ from __future__ import absolute_import
 
 import logging
 import os
+import posixpath
 
-from neurodocker.docker import client, DockerImage
+from neurodocker.docker import client, DockerContainer, DockerImage
+from neurodocker.generators import Dockerfile, SingularityRecipe
 from neurodocker.interfaces.tests import memory
 
 logger = logging.getLogger(__name__)
@@ -60,6 +62,21 @@ DROPBOX_DOCKERHUB_MAPPING = {
         '/Dockerfile.SPM-12_xenial', 'kaczmarj/spm:12_xenial'
     ),
 }
+
+
+def test_docker_container_from_specs(specs, bash_test_file):
+    """"""
+    df = Dockerfile(specs).render()
+    image = DockerImage(df).build(log_console=True)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    assert DockerContainer(image).run(test_cmd, **_container_run_kwds)
+
+
+def test_singularity_container_from_specs(specs):
+    assert SingularityRecipe(specs).render()
 
 
 def pull_image(name, **kwargs):
