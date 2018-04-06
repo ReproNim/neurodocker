@@ -6,6 +6,8 @@
 # Website: https://afni.nimh.nih.gov/
 # Documentation: https://afni.nimh.nih.gov/Documentation
 
+# TODO: libgsl not found. Other shared libraries might not be found.
+
 generic:
   binaries:
     urls:

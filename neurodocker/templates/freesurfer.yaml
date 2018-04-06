@@ -16,6 +16,7 @@ generic:
       yum: bc libgomp libXmu libXt tcsh perl
     env:
       FREESURFER_HOME: "{{ freesurfer.install_path }}"
+      PATH: "{{ freesurfer.install_path }}:$PATH"
     instructions: |
       {{ freesurfer.install_dependencies() }}
       echo "Downloading minimized FreeSurfer ..."

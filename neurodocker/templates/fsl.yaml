@@ -24,7 +24,7 @@ generic:
       {{ fsl.install_dependencies() }}
       echo "Downloading FSL ..."
       curl {{ fsl.curl_opts }} {{ fsl.binaries_url }} \
-      | tar -xz -C {install_path} --strip-components 1
+      | tar -xz -C {{ fsl.install_path }} --strip-components 1
       sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
       sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
       sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
