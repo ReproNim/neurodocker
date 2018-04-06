@@ -24,6 +24,7 @@ generic:
     instructions: |
       {{ fsl.install_dependencies() }}
       echo "Downloading FSL ..."
+      mkdir -p {{ fsl.install_path }}
       curl {{ fsl.curl_opts }} {{ fsl.binaries_url }} \
       | tar -xz -C {{ fsl.install_path }} --strip-components 1
       sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
