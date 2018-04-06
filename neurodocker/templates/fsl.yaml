@@ -11,6 +11,7 @@
 generic:
   binaries:
     urls:
+      "5.0.11": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.11-centos6_64.tar.gz
       "5.0.10": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz
       "5.0.9": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
       "5.0.8": https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
@@ -29,7 +30,7 @@ generic:
       sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
       sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
       sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
-      {% if fsl.version in ("4.0.10", ) -%}
+      {% if fsl.version in ("5.0.11", "5.0.10") -%}
       echo "Installing FSL conda environment ..."
       bash {{ fsl.install_path }}/etc/fslconf/fslpython_install.sh -q -f {{ fsl.install_path }}
       {% endif -%}
