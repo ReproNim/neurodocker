@@ -16,6 +16,9 @@ generic:
       curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}
       bash "$conda_installer" -b -p {{ miniconda.install_path }}
       rm -f "$conda_installer"
+      {%- if miniconda.version == "latest" %}
+      conda update -yq -nbase conda
+      {% endif -%}
       conda config --system --prepend channels conda-forge
       conda config --system --set auto_update_conda false
       conda config --system --set show_channel_urls true
@@ -36,7 +39,7 @@ generic:
       sync && conda clean -tipsy && sync
       {% endif -%}
       {% if miniconda.pip_install is not none -%}
-      /bin/bash -c "source activate {{ miniconda.env_name }}
+      bash -c "source activate {{ miniconda.env_name }}
         pip install -q --no-cache-dir \
         {%- for pkg in miniconda.pip_install %}
             {% if not loop.last -%}
