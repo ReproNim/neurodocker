@@ -183,9 +183,18 @@ class Miniconda(_BaseInterface):
     _installed = False
     _environments = set()
 
-    def __init__(self, *args, conda_install=None, pip_install=None, **kwargs):
+    def __init__(self, *args, env_name, conda_install=None, pip_install=None,
+                 preinstalled=False, **kwargs):
+        self.env_name = env_name
         self.conda_install = conda_install
         self.pip_install = pip_install
+        self.preinstalled = preinstalled
+
+        if self.preinstalled:
+            Miniconda._installed = True
+
+        if not self.env_name:
+            raise ValueError("env_name is required")
 
         kwargs.setdefault('version', 'latest')
         super().__init__(self._name, *args, **kwargs)
