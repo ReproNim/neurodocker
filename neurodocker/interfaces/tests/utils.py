@@ -75,7 +75,8 @@ def test_docker_container_from_specs(specs, bash_test_file):
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
 
-    assert DockerContainer(image).run(test_cmd, **_container_run_kwds)
+    res = DockerContainer(image).run(test_cmd, **_container_run_kwds)
+    assert res.decode().endswith('passed')
 
 
 def test_singularity_container_from_specs(specs):
