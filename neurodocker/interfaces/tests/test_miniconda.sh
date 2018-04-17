@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-# set -x
-
-source activate default
+set -ex
 
 if [ "$(python --version)" != "Python 3.5.1" ]; then
   echo "Python version incorrect."

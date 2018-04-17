@@ -15,13 +15,17 @@ class TestMiniconda(object):
                     'miniconda',
                     {
                         'env_name': 'default',
-                        'conda_install': ['python=3.5.1', 'traits'],
+                        'conda_install': ['python=3.6.5', 'traits'],
                         'pip_install': ['nipype'],
+                        'activate': True,
                     }
                 ),
                 (
                     'miniconda',
-                    {'env_name': 'default', 'pip_install': ['pylsl']}
+                    {
+                        'env_name': 'default',
+                        'pip_install': ['pylsl'],
+                    }
                 ),
             ],
         }
