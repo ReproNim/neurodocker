@@ -246,7 +246,7 @@ class _BaseInterface:
     @property
     def install_path(self):
         if self._install_path is None:
-            path = posixpath.join(posixpath.sep, 'opt', '{}-v{}')
+            path = posixpath.join(posixpath.sep, 'opt', '{}-{}')
             return path.format(self._name, self._version)
         return self._install_path
 
