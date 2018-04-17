@@ -13,5 +13,5 @@ generic:
     instructions: |
       echo "Downloading MRtrix3 ..."
       mkdir -p {{ mrtrix3.install_path }}
-      curl {{ mrtrix3.curl_opts }} {binaries_url} \
+      curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
       | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
