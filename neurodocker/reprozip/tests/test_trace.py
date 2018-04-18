@@ -7,8 +7,15 @@ import tempfile
 
 import pytest
 
-from neurodocker.docker import client
+try:
+    import docker
+except ImportError:
+    raise ImportError(
+        "the docker python package is required to run interface tests")
+
 from neurodocker.reprozip.trace import ReproZipMinimizer
+
+client = docker.from_env()
 
 
 @pytest.mark.skip(reason="seccomp not available in ubuntu trusty (travis)")
