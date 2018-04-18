@@ -67,6 +67,7 @@ jobs:
             pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
 
 
+
 workflows:
   version: 2
   build_test_deploy:
