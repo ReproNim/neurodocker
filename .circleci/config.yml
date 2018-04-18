@@ -30,6 +30,34 @@ jobs:
           command: |
             pytest -k 'test_docker' ~/neurodocker/neurodocker
 
+  test_singularity:
+    machine:
+      *machine_kwds
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - run:
+          name: Test singularity image builds
+          no_output_timeout: 360m
+          command: |
+            pytest -k 'test_singularity' ~/neurodocker/neurodocker
+
+  test_others:
+    machine:
+      *machine_kwds
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - run:
+          name: Test others (not docker or singularity)
+          no_output_timeout: 30m
+          command: |
+            pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
+
 workflows:
   version: 2
   build_test_deploy:
