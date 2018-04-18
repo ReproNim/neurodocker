@@ -63,5 +63,7 @@ workflows:
   build_test_deploy:
     jobs:
       - test_docker
+      - test_singularity
+      - test_others
 
 # TODO(kaczmarj): add test_singularity step
