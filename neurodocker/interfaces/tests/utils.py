@@ -83,6 +83,7 @@ def _prune_dockerfile(string, comment_char="#"):
     """Remove comments, emptylines, and last layer (serialize to JSON)."""
     string = string.strip()  # trim white space on both ends.
     json_removed = '\n\n'.join(string.split('\n\n')[:-1])
+    json_removed = "".join(json_removed.split())
     return '\n'.join(
         row for row in json_removed.split('\n') if not
         row.startswith(comment_char) and row)
