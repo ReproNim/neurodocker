@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 .ipynb_checkpoints
 dockerfile_tests
+/scraper
 *.egg-info
 
 *.ipynb
