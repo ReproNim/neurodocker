@@ -7,9 +7,16 @@ import os
 import tarfile
 import tempfile
 
-from neurodocker.docker import client
+try:
+    import docker
+except ImportError:
+    raise ImportError(
+        "the docker python package is required to run interface tests")
+
 from neurodocker.reprozip.trace import ReproZipMinimizer
 from neurodocker.reprozip.merge import merge_pack_files
+
+client = docker.from_env()
 
 
 def _create_packfile(commands, dir):

@@ -22,7 +22,7 @@ def test_ReproZipMinimizer_no_ptrace():
                                       packfile_save_dir=tmpdir)
         with pytest.raises(RuntimeError):  # ptrace should fail
             minimizer.run()
-    except:
+    except Exception:
         raise
     finally:
         container.stop()
@@ -36,10 +36,10 @@ def test_ReproZipMinimizer():
     commands = ["du --help", "ls --help"]
     tmpdir = tempfile.mkdtemp()
     try:
-        minimizer = ReproZipMinimizer(container.id, commands,
-                                      packfile_save_dir=tmpdir)
+        minimizer = ReproZipMinimizer(
+            container.id, commands, packfile_save_dir=tmpdir)
         packfile_path = minimizer.run()
-    except:
+    except Exception:
         raise
     finally:
         container.stop()
