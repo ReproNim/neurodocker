@@ -209,7 +209,7 @@ class _BaseInterface:
         self._env = self._instance_specs.get('env', None)
 
         # Set default curl options for all interfaces.
-        self.__dict__.setdefault("curl_opts", "-sSL --retry 5")
+        self.__dict__.setdefault("curl_opts", "-fsSL --retry 5")
 
     @property
     def _pretty_name(self):
