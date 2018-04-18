@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -ex
 
-# --help returns non-zero status code (causes error in pytest).
+# --help returns non-zero status code
 mri_coreg --version
 recon-all --version
+
+printf 'passed'

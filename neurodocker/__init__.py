@@ -7,7 +7,7 @@ import sys
 from neurodocker.version import __version__
 
 from neurodocker.docker import DockerContainer, DockerImage
-from neurodocker.generate import Dockerfile
+from neurodocker.generators import Dockerfile, SingularityRecipe
 from neurodocker.utils import set_log_level
 
 if sys.version_info[0] < 3:

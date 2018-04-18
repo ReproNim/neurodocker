@@ -1,66 +1,40 @@
 """Utility functions for `neurodocker.interfaces.tests`."""
-from __future__ import absolute_import
 
+import hashlib
 import logging
 import os
+import posixpath
 
-from neurodocker import Dockerfile
-from neurodocker.docker import client, DockerContainer, DockerImage
-from neurodocker.interfaces.tests import memory
+from neurodocker.docker import client
+from neurodocker.docker import DockerContainer
+from neurodocker.docker import DockerImage
+from neurodocker.generators import Dockerfile
+from neurodocker.generators import SingularityRecipe
 
 logger = logging.getLogger(__name__)
 
-
-# DockerHub repositories cannot have capital letters in them.
-DROPBOX_DOCKERHUB_MAPPING = {
-    'afni-latest_stretch': ('/Dockerfile.AFNI-latest_stretch',
-                            'kaczmarj/afni:latest_stretch'),
-
-    'ants-2.0.0_stretch': ('/Dockerfile.ANTs-2.2.0_stretch',
-                           'kaczmarj/ants:2.2.0_stretch'),
-
-    'convert3d_zesty': ('/Dockerfile.Convert3D-1.0.0_zesty',
-                        'kaczmarj/c3d:1.0.0_zesty'),
-
-    'dcm2niix-master_centos7': ('/Dockerfile.dcm2niix-master_centos7',
-                                'kaczmarj/dcm2niix:master_centos7'),
-
-    'freesurfer-min_zesty': ('/Dockerfile.FreeSurfer-min_zesty',
-                             'kaczmarj/freesurfer:min_zesty'),
-
-    'fsl-5.0.9_centos7': ('/Dockerfile.FSL-5.0.9_centos7',
-                          'kaczmarj/fsl:5.0.9_centos7'),
-
-    'fsl-5.0.10_centos7': ('/Dockerfile.FSL-5.0.10_centos7',
-                           'kaczmarj/fsl:5.0.10_centos7'),
-
-    'miniconda_centos7': ('/Dockerfile.Miniconda-latest_centos7',
-                          'kaczmarj/miniconda:latest_centos7'),
-
-    'mrtrix3_centos7': ('/Dockerfile.MRtrix3_centos7',
-                        'kaczmarj/mrtrix3:centos7'),
-
-    'neurodebian_stretch': ('/Dockerfile.NeuroDebian_stretch',
-                            'kaczmarj/neurodebian:stretch'),
-
-    'spm-12_zesty': ('/Dockerfile.SPM-12_zesty',
-                     'kaczmarj/spm:12_zesty'),
-
-    'minc_xenial': ('/Dockerfile.MINC_xenial',
-                     'kaczmarj/minc:1.9.15_xenial'),
-
-    'minc_centos7': ('/Dockerfile.MINC_centos7',
-                     'kaczmarj/minc:1.9.15_centos7'),
-
-    'petpvc_xenial': ('/Dockerfile.PETPVC_xenial',
-                     'kaczmarj/petpvc:1.2.0b_xenial'),
-
-}
-
+_NO_PUSH_IMAGES = os.environ.get('NEURODOCKERNOPUSHIMAGES', False)
 
 here = os.path.dirname(os.path.realpath(__file__))
-volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
+_volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
 
+_container_run_kwds = {'volumes': _volumes}
+
+
+def test_docker_container_from_specs(specs, bash_test_file):
+    """"""
+    df = Dockerfile(specs).render()
+    image = DockerImage(df).build(log_console=True)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    res = DockerContainer(image).run(test_cmd, **_container_run_kwds)
+    assert res.decode().endswith('passed')
+
+
+def test_singularity_container_from_specs(specs):
+    assert SingularityRecipe(specs).render()
 
 
 def pull_image(name, **kwargs):
@@ -83,21 +57,6 @@ def pull_image(name, **kwargs):
         return None
 
 
-def build_image(df, name):
-    """Build and return image.
-
-    Parameters
-    ----------
-    df : str
-        String representation of Dockerfile.
-    name : str
-        Name of Docker image to build. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
-    """
-    logger.info("Building image: {} ...".format(name))
-    return DockerImage(df).build(log_console=True, tag=name)
-
-
 def push_image(name):
     """Push image to DockerHub.
 
@@ -109,63 +68,35 @@ def push_image(name):
     """
     logger.info("Pushing image to DockerHub: {} ...".format(name))
     client.images.push(name)
+    return True
 
 
-def _get_dbx_token():
-    """Get access token for Dopbox API."""
-    import os
-    import warnings
-
-    try:
-        return os.environ['DROPBOX_TOKEN']
-    except KeyError:
-        warnings.warn("Environment variable not found: DROPBOX_TOKEN."
-                      " Cannot interact with Dropbox API. Cannot compare "
-                      " Dockerfiles. Will pull existing Docker images ...")
-        return None
+def _prune_dockerfile(string, comment_char="#"):
+    """Remove comments, emptylines, and last layer (serialize to JSON)."""
+    string = string.strip()  # trim white space on both ends.
+    json_removed = '\n\n'.join(string.split('\n\n')[:-1])
+    return '\n'.join(
+        row for row in json_removed.split('\n') if not
+        row.startswith(comment_char) and row
+    )
 
 
-def _check_can_push():
-    """Raise error if user cannot push to DockerHub."""
-    pass
+def _get_hash(bytestring):
+    """Get sha256 hash of `bytestring`."""
+    return hashlib.sha256(bytestring).hexdigest()
 
 
-def get_image_from_memory(df, remote_path, name, force_build=False):
-    """Return image and boolean indicating whether or not to push resulting
-    image to DockerHub.
+def _dockerfiles_equivalent(df_a, df_b):
+    """Return True if unicode strings `df_a` and `df_b` are equivalent. Does
+    not consider comments or empty lines.
     """
-    if force_build:
-        logger.info("Building image (forced) ... Result should be pushed.")
-        image = build_image(df, name)
-        push = True
-        return image, push
+    df_a_clean = _prune_dockerfile(df_a)
+    hash_a = _get_hash(df_a_clean.encode())
 
-    token = _get_dbx_token()
+    df_b_clean = _prune_dockerfile(df_b)
+    hash_b = _get_hash(df_b_clean.encode())
 
-    # Take into account other forks of the project. They cannot use the secret
-    # environment variables in travis ci (e.g., the dropbox token).
-    if token is None:
-        logger.info("Attempting to pull image...")
-        image = pull_image(name)
-        if image is None:
-            logger.info("Image not found. Building ...")
-            image = build_image(df, name)
-        push = False
-        return image, push
+    print(df_a_clean)
+    print(df_b_clean)
 
-    dbx_client = memory.Dropbox(token)
-
-    if memory.should_build_image(df, remote_path, remote_object=dbx_client):
-        logger.info("Building image... Result should be pushed.")
-        image = build_image(df, name)
-        push = True
-    else:
-        logger.info("Attempting to pull image ...")
-        image = pull_image(name)
-        push = False
-        if image is None:
-            logger.info("Image could not be pulled. Building ..."
-                        " Result should be pushed.")
-            image = build_image(df, name)
-            push = True
-    return image, push
+    return hash_a == hash_b

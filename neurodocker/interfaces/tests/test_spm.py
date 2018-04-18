@@ -1,30 +1,32 @@
 """Tests for neurodocker.interfaces.SPM"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
-from __future__ import absolute_import, division, print_function
 
-from neurodocker import DockerContainer, Dockerfile
-from neurodocker.interfaces import SPM
 from neurodocker.interfaces.tests import utils
 
+
 class TestSPM(object):
-    """Tests for SPM class."""
 
-    def test_build_image_spm_12_standalone_zesty(self):
-        """Install standalone SPM12 and MATLAB MCR R2017a."""
-        specs = {'pkg_manager': 'apt',
-                 'check_urls': True,
-                 'instructions': [
-                    ('base', 'ubuntu:zesty'),
-                    ('spm', {'version': '12', 'matlab_version': 'R2017a'}),
-                    ('user', 'neuro'),
-                 ]}
+    def test_docker(self):
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'ubuntu:16.04'),
+                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('user', 'neuro'),
+            ],
+        }
 
-        df = Dockerfile(specs).cmd
-        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['spm-12_zesty']
-        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+        bash_test_file = "test_spm.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
-        cmd = "bash /testscripts/test_spm.sh"
-        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+    def test_singularity(self):
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'docker://ubuntu:16.04'),
+                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('user', 'neuro'),
+            ],
+        }
 
-        if push:
-            utils.push_image(image_name)
+        utils.test_singularity_container_from_specs(specs=specs)

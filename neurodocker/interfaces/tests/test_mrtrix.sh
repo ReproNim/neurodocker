@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -ex
 
 mrthreshold --help
+
+printf 'passed'

@@ -11,3 +11,5 @@ dockerfile_tests
 *.pyc
 *.tar
 *.tar.gz
+
+Dockerfile

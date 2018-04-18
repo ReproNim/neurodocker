@@ -7,6 +7,8 @@ import os
 import tarfile
 import tempfile
 
+import pytest
+
 from neurodocker.docker import client
 from neurodocker.reprozip.trace import ReproZipMinimizer
 from neurodocker.reprozip.merge import merge_pack_files
@@ -21,7 +23,7 @@ def _create_packfile(commands, dir):
         minimizer = ReproZipMinimizer(container.id, commands,
                                       packfile_save_dir=dir)
         packfile_path = minimizer.run()
-    except:
+    except Exception:
         raise
     finally:
         container.stop()

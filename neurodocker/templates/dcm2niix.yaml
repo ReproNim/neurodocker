@@ -1,0 +1,21 @@
+# Instructions to install dcm2niix.
+#
+# Repository: https://github.com/rordenlab/dcm2niix
+# Documentation: https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
+
+generic:
+  source:
+    dependencies:
+      apt: cmake g++ gcc git make pigz zlib1g-dev
+      yum: cmake gcc-c++ git libstdc++-static make pigz zlib-devel
+    env:
+      PATH: "{{ dcm2niix.install_path }}/bin:$PATH"
+    instructions: |
+      {{ dcm2niix.install_dependencies() }}
+      git clone https://github.com/rordenlab/dcm2niix /tmp/dcm2niix
+      mkdir /tmp/dcm2niix/build
+      cd /tmp/dcm2niix/build
+      cmake {{ dcm2niix.cmake_opts }} -DCMAKE_INSTALL_PREFIX:PATH={{ dcm2niix.install_path }} ..
+      make {{ dcm2niix.make_opts }}
+      make install
+      rm -rf /tmp/dcm2niix

@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function
 from io import BytesIO
 import os
 import tempfile
-import threading
 
 import docker
 import pytest
@@ -34,7 +33,9 @@ class TestBuildOutputLogger(object):
 
     def test_start(self):
         logs = client.api.build(fileobj=self.fileobj, rm=True)
-        logger = BuildOutputLogger(logs, console=False, filepath=self.filepath.strpath)
+        logger = BuildOutputLogger(
+            logs, console=False, filepath=self.filepath.strpath
+        )
         logger.start()
         living = logger.is_alive()
         assert living, "BuildOutputLogger not alive"
@@ -61,10 +62,12 @@ class TestDockerImage(object):
         with pytest.raises(TypeError):
             DockerImage(dict())
 
-        specs = {'pkg_manager': 'apt',
-                 'instructions': [
-                    ('base', 'debian:jessie',)],
-                 }
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'debian:jessie',)
+            ],
+        }
         df = Dockerfile(specs=specs)
         # Test that fileobj is a file object.
         image = DockerImage(df)
@@ -124,7 +127,7 @@ def test_copy_file_from_container():
         filepath = posixpath.join("", "tmp", "newfile.txt")
         container.exec_run("touch {}".format(filepath))
         assert not os.path.isfile(os.path.join(tempdir, filename))
-        path = copy_file_from_container(container, filepath, tempdir)
+        copy_file_from_container(container, filepath, tempdir)
 
         local_path = os.path.join(tempdir, filename)
         assert os.path.isfile(local_path)
@@ -132,7 +135,7 @@ def test_copy_file_from_container():
         assert not os.path.isfile(local_path)
         copy_file_from_container(container.id, filepath, tempdir)
         assert os.path.isfile(local_path)
-    except:
+    except Exception:
         raise
     finally:
         container.stop()
@@ -140,7 +143,6 @@ def test_copy_file_from_container():
 
 
 def test_copy_file_to_container():
-    import posixpath
 
     tempdir = tempfile.mkdtemp()
     container = client.containers.run('debian:stretch', detach=True, tty=True)
@@ -154,13 +156,13 @@ def test_copy_file_to_container():
         container_dir = "/tmp"
         cmd = 'ls {}'.format(container_dir)
 
-        assert not fname.encode() in container.exec_run(cmd)
+        assert not fname.encode() in container.exec_run(cmd).output
         copy_file_to_container(container.id, path, dest=container_dir)
-        assert fname.encode() in container.exec_run(cmd)
+        assert fname.encode() in container.exec_run(cmd).output
 
         copy_file_to_container(container, path, dest=container_dir)
-        assert fname.encode() in container.exec_run(cmd)
-    except:
+        assert fname.encode() in container.exec_run(cmd).output
+    except Exception:
         raise
     finally:
         container.stop()

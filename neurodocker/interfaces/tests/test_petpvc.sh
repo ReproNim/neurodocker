@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -ex
 
 ls /opt/petpvc/bin/petpvc
+
+printf 'passed'
