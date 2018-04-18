@@ -7,8 +7,6 @@ import os
 import tarfile
 import tempfile
 
-import pytest
-
 from neurodocker.docker import client
 from neurodocker.reprozip.trace import ReproZipMinimizer
 from neurodocker.reprozip.merge import merge_pack_files
@@ -17,11 +15,11 @@ from neurodocker.reprozip.merge import merge_pack_files
 def _create_packfile(commands, dir):
     """Create packfile from list `commands` in debian:stretch container."""
     image = "debian@sha256:427752aa7da803378f765f5a8efba421df5925cbde8ab011717f3642f406fb15"
-    container = client.containers.run(image, detach=True, tty=True,
-                                      security_opt=['seccomp:unconfined'])
+    container = client.containers.run(
+        image, detach=True, tty=True, security_opt=['seccomp:unconfined'])
     try:
-        minimizer = ReproZipMinimizer(container.id, commands,
-                                      packfile_save_dir=dir)
+        minimizer = ReproZipMinimizer(
+            container.id, commands, packfile_save_dir=dir)
         packfile_path = minimizer.run()
     except Exception:
         raise

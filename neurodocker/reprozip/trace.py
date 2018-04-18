@@ -94,7 +94,7 @@ class ReproZipMinimizer(object):
 
         Raises
         ------
-        RuntimeError : error occurs while running shell script within container.
+        RuntimeError : error occurs while running trace script in container.
         """
         import docker
 
@@ -106,22 +106,21 @@ class ReproZipMinimizer(object):
         logger.debug("running command within container {}: {}"
                      "".format(self.container.id, trace_cmd))
 
-        for log in self.container.exec_run(trace_cmd, stream=True):
+        _, log_gen = self.container.exec_run(trace_cmd, stream=True)
+        for log in log_gen:
             log = log.decode().strip()
             logger.debug(log)
-            # TODO: improve error handling. Look into exec_inspect in docker-py.
             if (("REPROZIP" in log and "couldn't use ptrace" in log)
-                or "NEURODOCKER (in container): error" in log):
+                    or "NEURODOCKER (in container): error" in log):
                 raise RuntimeError("Error: {}".format(log))
-
 
         self.pack_filepath = log.split()[-1].strip()
         try:
-            rel_pack_filepath = copy_file_from_container(self.container,
-                                                         self.pack_filepath,
-                                                         self.packfile_save_dir)
+            rel_pack_filepath = copy_file_from_container(
+                self.container, self.pack_filepath, self.packfile_save_dir)
         except docker.errors.NotFound:
-            raise RuntimeError("ReproZip pack file was not found in the "
-                               "container. `reprozip trace` might have failed.")
+            raise RuntimeError(
+                "ReproZip pack file was not found in the container. `reprozip"
+                " trace` might have failed.")
 
         return os.path.abspath(rel_pack_filepath)
