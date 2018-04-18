@@ -1,6 +1,5 @@
 """Utilities for `neurodocker.interfaces.tests`."""
 
-import hashlib
 import io
 import logging
 import os
@@ -80,34 +79,13 @@ def test_singularity_container_from_specs(specs):
     assert SingularityRecipe(specs).render()
 
 
-def push_image(image):
-    """Push image to DockerHub.
-
-    Parameters
-    ----------
-    image : str
-        Name of Docker image to push. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
-    """
-    client = get_docker_client()
-    logger.info("Pushing image to DockerHub: {} ...".format(image))
-    client.images.push(image)
-    return True
-
-
 def _prune_dockerfile(string, comment_char="#"):
     """Remove comments, emptylines, and last layer (serialize to JSON)."""
     string = string.strip()  # trim white space on both ends.
     json_removed = '\n\n'.join(string.split('\n\n')[:-1])
     return '\n'.join(
         row for row in json_removed.split('\n') if not
-        row.startswith(comment_char) and row
-    )
-
-
-def _get_hash(bytestring):
-    """Get sha256 hash of `bytestring`."""
-    return hashlib.sha256(bytestring).hexdigest()
+        row.startswith(comment_char) and row)
 
 
 def _dockerfiles_equivalent(df_a, df_b):
