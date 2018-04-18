@@ -47,6 +47,7 @@ from neurodocker.utils import get_docker_client
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = logging.getLogger(__name__)
 
+
 def copy_file_to_container(container, src, dest):
     """Copy `local_filepath` into `container`:`container_path`.
 
@@ -151,7 +152,7 @@ class ReproZipMinimizer(object):
             container.put_archive
             self.container = container
         except AttributeError:
-            from neurodocker.docker import client
+            client = get_docker_client()
             self.container = client.containers.get(container)
 
         if isinstance(commands, str):

@@ -62,8 +62,9 @@ def test_generate_opts(capsys):
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert 'ENV KEY="VAL" \\' in out
-    assert '  KEY2="VAL"' in out
+    assert (
+        ('ENV KEY="VAL" \\' in out and 'KEY="VAL"' in out)
+        or ('ENV KEY2="VAL" \\' in out and 'KEY="VAL"'))
 
     main(args.format('--expose 1230 1231').split())
     out, _ = capsys.readouterr()
