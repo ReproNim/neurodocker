@@ -13,14 +13,12 @@ class TestNeuroDebian(object):
                 (
                     'neurodebian',
                     {
-                        'version': 'generic',
-                        'method': 'custom',
                         'os_codename': 'stretch',
-                        'download_server': 'usa-nh',
+                        'server': 'usa-nh',
                         'full': True,
-                        'pkgs': ['dcm2niix']
                     }
                 ),
+                ('install', ['dcm2niix']),
                 ('user', 'neuro'),
             ]
         }
@@ -37,14 +35,12 @@ class TestNeuroDebian(object):
                 (
                     'neurodebian',
                     {
-                        'version': 'generic',
-                        'method': 'custom',
                         'os_codename': 'stretch',
-                        'download_server': 'usa-nh',
+                        'server': 'usa-nh',
                         'full': True,
-                        'pkgs': ['dcm2niix']
                     }
                 ),
+                ('install', ['dcm2niix']),
                 ('user', 'neuro'),
             ]
         }

@@ -1,13 +1,13 @@
-# Instructions to install ANTs.
-#
-# Repository: https://github.com/ANTsX/ANTs
-# Website: http://stnava.github.io/ANTs/
-# Documentation:
-#   - https://github.com/ANTsX/ANTs/wiki
-#   - https://github.com/stnava/ANTsTutorial
+# Instructions to add NeuroDebian repositories.
 
 generic:
   custom:
+    dependencies:
+      apt: dirmngr gnupg2
     instructions: |
-      echo "Not implemented yet"
-      exit 1
+      {{ neurodebian.install_dependencies() }}
+      curl {{ neurodebian.curl_opts }} {{ neurodebian.url }} \
+      > /etc/apt/sources.list.d/neurodebian.sources.list
+      curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | apt-key add -
+      (apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+      apt-get -qq update

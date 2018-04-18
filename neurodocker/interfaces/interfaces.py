@@ -236,8 +236,25 @@ class NeuroDebian(_BaseInterface):
         'usa-tn': 'us-tn',
     }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self._name, *args, **kwargs)
+    def __init__(self, os_codename, server, full=True, **kwargs):
+        self.os_codename = os_codename
+        self.server = server
+
+        self._server = NeuroDebian._servers.get(server, None)
+        if self._server is None:
+            msg = (
+                "Server '{}' not found. Choices are "
+                + ', '.join(NeuroDebian._servers.keys()))
+            raise ValueError(msg.format(server))
+
+        self._full = 'full' if full else 'libre'
+
+        self.url = 'http://neuro.debian.net/lists/{os}.{srv}.{full}'.format(
+            os=self.os_codename, srv=self._server, full=self._full)
+
+        super().__init__(
+            self._name, version='generic', method='custom',
+            os_codename=os_codename, server=server, **kwargs)
 
 
 class PETPVC(_BaseInterface):
