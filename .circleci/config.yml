@@ -14,7 +14,7 @@ _setup_env: &setup_kwds
     pip install -e ~/neurodocker
 
 _save_cache_kwds: &save_cache_kwds
-  key: dockerfiles-v0-{{ .Branch }}-{{ .Revision }}
+  key: dfs-sfs-v0-{{ .Branch }}-{{ .Revision }}
   paths:
     - /tmp/cache
 
