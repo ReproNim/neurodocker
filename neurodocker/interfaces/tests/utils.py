@@ -1,19 +1,25 @@
-"""Utility functions for `neurodocker.interfaces.tests`."""
+"""Utilities for `neurodocker.interfaces.tests`."""
 
 import hashlib
+import io
 import logging
 import os
 import posixpath
 
-from neurodocker.docker import client
-from neurodocker.docker import DockerContainer
-from neurodocker.docker import DockerImage
+try:
+    import docker
+except ImportError:
+    raise ImportError(
+        "the docker python package is required to run interface tests")
+
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
 
+client = docker.from_env()
+
 logger = logging.getLogger(__name__)
 
-_NO_PUSH_IMAGES = os.environ.get('NEURODOCKERNOPUSHIMAGES', False)
+PUSH_IMAGES = os.environ.get('ND_PUSH_IMAGES', False)
 
 here = os.path.dirname(os.path.realpath(__file__))
 _volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
@@ -21,15 +27,38 @@ _volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
 _container_run_kwds = {'volumes': _volumes}
 
 
+def docker_is_running(client):
+    """Return true if Docker server is responsive.
+
+    Parameters
+    ----------
+    client : docker.client.DockerClient
+        The Docker client. E.g., `client = docker.from_env()`.
+
+    Returns
+    -------
+    running : bool
+        True if Docker server is responsive.
+    """
+    try:
+        client.ping()
+        return True
+    except Exception:
+        return False
+
+
 def test_docker_container_from_specs(specs, bash_test_file):
     """"""
+    docker_is_running(client)
+
     df = Dockerfile(specs).render()
-    image = DockerImage(df).build(log_console=True)
+    image, build_logs = client.images.build(
+        fileobj=io.BytesIO(df.encode()), rm=True)
 
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
 
-    res = DockerContainer(image).run(test_cmd, **_container_run_kwds)
+    res = client.containers.run(image, test_cmd, **_container_run_kwds)
     assert res.decode().endswith('passed')
 
 
@@ -37,37 +66,17 @@ def test_singularity_container_from_specs(specs):
     assert SingularityRecipe(specs).render()
 
 
-def pull_image(name, **kwargs):
-    """Pull image from DockerHub. Return None if image is not found.
-
-    This does not stream the raw output of the pull.
-
-    Parameters
-    ----------
-    name : str
-        Name of Docker image to pull. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
-
-    """
-    import docker
-
-    try:
-        return client.images.pull(name, **kwargs)
-    except docker.errors.NotFound:
-        return None
-
-
-def push_image(name):
+def push_image(image):
     """Push image to DockerHub.
 
     Parameters
     ----------
-    name : str
+    image : str
         Name of Docker image to push. Should include repository and tag.
         Example: 'kaczmarj/neurodocker:latest'.
     """
-    logger.info("Pushing image to DockerHub: {} ...".format(name))
-    client.images.push(name)
+    logger.info("Pushing image to DockerHub: {} ...".format(image))
+    client.images.push(image)
     return True
 
 
