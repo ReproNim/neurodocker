@@ -71,6 +71,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
     assert passed
 
     if passed:
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
         with open(refpath, 'w') as fp:
             fp.write(df)
 
