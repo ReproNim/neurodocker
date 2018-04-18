@@ -8,7 +8,7 @@ import tempfile
 import pytest
 
 from neurodocker.reprozip.trace import ReproZipMinimizer
-from neurodocker.reprozip.trace import get_docker_client
+from neurodocker.utils import get_docker_client
 
 
 @pytest.mark.skip(reason="seccomp not available in ubuntu trusty (travis)")

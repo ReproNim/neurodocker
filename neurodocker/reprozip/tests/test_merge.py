@@ -8,7 +8,7 @@ import tarfile
 import tempfile
 
 from neurodocker.reprozip.trace import ReproZipMinimizer
-from neurodocker.reprozip.trace import get_docker_client
+from neurodocker.utils import get_docker_client
 from neurodocker.reprozip.merge import merge_pack_files
 
 

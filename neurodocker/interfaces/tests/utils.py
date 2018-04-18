@@ -6,16 +6,9 @@ import logging
 import os
 import posixpath
 
-try:
-    import docker
-except ImportError:
-    raise ImportError(
-        "the docker python package is required to run interface tests")
-
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
-
-client = docker.from_env()
+from neurodocker.utils import get_docker_client
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +42,7 @@ def docker_is_running(client):
 
 def test_docker_container_from_specs(specs, bash_test_file):
     """"""
+    client = get_docker_client()
     docker_is_running(client)
 
     df = Dockerfile(specs).render()
@@ -75,6 +69,7 @@ def push_image(image):
         Name of Docker image to push. Should include repository and tag.
         Example: 'kaczmarj/neurodocker:latest'.
     """
+    client = get_docker_client()
     logger.info("Pushing image to DockerHub: {} ...".format(image))
     client.images.push(image)
     return True

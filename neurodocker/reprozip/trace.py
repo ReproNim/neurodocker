@@ -42,17 +42,10 @@ Notes
 import logging
 import os
 
+from neurodocker.utils import get_docker_client
+
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = logging.getLogger(__name__)
-
-
-def get_docker_client(**kwargs):
-    try:
-        import docker
-    except ImportError:
-        raise ImportError("the docker python package is required for this")
-    return docker.from_env(**kwargs)
-
 
 def copy_file_to_container(container, src, dest):
     """Copy `local_filepath` into `container`:`container_path`.
