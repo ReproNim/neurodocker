@@ -33,7 +33,7 @@ jobs:
           no_output_timeout: 360m
           command: |
             ls /tmp/cache
-            pytest -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py ~/neurodocker/neurodocker/interfaces/tests/test_miniconda.py
+            pytest -s -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py ~/neurodocker/neurodocker/interfaces/tests/test_miniconda.py
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
           paths:
