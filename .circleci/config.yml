@@ -34,7 +34,7 @@ jobs:
           command: |
             pytest -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py
       - save_cache:
-          key: dfs-sfs-v0-{{ .Branch }}-{{ .Revision }}
+          key: dfs-v0-{{ .Branch }}-{{ .Revision }}
           paths:
             - /tmp/cache
 
