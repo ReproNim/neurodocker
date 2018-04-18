@@ -13,6 +13,16 @@ _setup_env: &setup_kwds
     pip install --no-cache-dir dropbox pytest-cov reprozip
     pip install -e ~/neurodocker
 
+_save_cache_kwds: &save_cache_kwds
+  key: dockerfiles-v0-{{ .Branch }}-{{ .Revision }}
+  paths:
+    - /tmp/cache
+
+_restore_cache_kwds: &restore_cache_kwds
+  keys:
+    - dockerfiles-v0-{{ .Branch }}-{{ .Revision }}
+    - dockerfiles-v0-{{ .Branch }}
+
 
 version: 2
 jobs:
@@ -24,11 +34,15 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          *restore_cache_kwds
       - run:
           name: Test docker image builds
           no_output_timeout: 360m
           command: |
             pytest -k 'test_docker' ~/neurodocker/neurodocker
+      - save_cache:
+          *save_cache_kwds
 
   test_singularity:
     machine:
@@ -38,11 +52,16 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          *restore_cache_kwds
       - run:
           name: Test singularity image builds
           no_output_timeout: 360m
           command: |
             pytest -k 'test_singularity' ~/neurodocker/neurodocker
+      - save_cache:
+          *save_cache_kwds
+
 
   test_others:
     machine:
@@ -52,11 +71,16 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          *restore_cache_kwds
       - run:
           name: Test others (not docker or singularity)
           no_output_timeout: 30m
           command: |
             pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
+      - save_cache:
+          *save_cache_kwds
+
 
 workflows:
   version: 2
