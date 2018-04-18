@@ -7,20 +7,14 @@ import os
 import tarfile
 import tempfile
 
-try:
-    import docker
-except ImportError:
-    raise ImportError(
-        "the docker python package is required to run interface tests")
-
 from neurodocker.reprozip.trace import ReproZipMinimizer
+from neurodocker.reprozip.trace import get_docker_client
 from neurodocker.reprozip.merge import merge_pack_files
-
-client = docker.from_env()
 
 
 def _create_packfile(commands, dir):
     """Create packfile from list `commands` in debian:stretch container."""
+    client = get_docker_client()
     image = "debian@sha256:427752aa7da803378f765f5a8efba421df5925cbde8ab011717f3642f406fb15"
     container = client.containers.run(
         image, detach=True, tty=True, security_opt=['seccomp:unconfined'])

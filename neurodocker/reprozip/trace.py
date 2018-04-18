@@ -38,23 +38,20 @@ Notes
       B. See https://github.com/moby/moby/issues/332
       C. See https://github.com/moby/moby/pull/22641
 """
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
-
-from __future__ import absolute_import, division, print_function
 
 import logging
 import os
 
-try:
-    import docker
-except ImportError:
-    raise ImportError(
-        "the docker python package is required to run interface tests")
-
-client = docker.from_env()
-
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = logging.getLogger(__name__)
+
+
+def get_docker_client(**kwargs):
+    try:
+        import docker
+    except ImportError:
+        raise ImportError("the docker python package is required for this")
+    return docker.from_env(**kwargs)
 
 
 def copy_file_to_container(container, src, dest):
@@ -78,6 +75,8 @@ def copy_file_to_container(container, src, dest):
 
     from io import BytesIO
     import tarfile
+
+    client = get_docker_client()
 
     try:
         container.put_archive
@@ -113,6 +112,8 @@ def copy_file_from_container(container, src, dest='.'):
     """
     import tarfile
     import tempfile
+
+    client = get_docker_client()
 
     try:
         container.put_archive
