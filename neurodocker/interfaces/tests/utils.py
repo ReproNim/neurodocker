@@ -92,4 +92,6 @@ def _dockerfiles_equivalent(df_a, df_b):
     """Return True if unicode strings `df_a` and `df_b` are equivalent. Does
     not consider comments or empty lines.
     """
+    print(_prune_dockerfile(df_a))
+    print(_prune_dockerfile(df_b))
     return _prune_dockerfile(df_a) == _prune_dockerfile(df_b)
