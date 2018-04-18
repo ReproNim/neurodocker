@@ -20,8 +20,8 @@ _save_cache_kwds: &save_cache_kwds
 
 _restore_cache_kwds: &restore_cache_kwds
   keys:
-    - dockerfiles-v0-{{ .Branch }}-{{ .Revision }}
-    - dockerfiles-v0-{{ .Branch }}
+    - dfs-sfs-v0-{{ .Branch }}-{{ .Revision }}
+    - dfs-sfs-v0-{{ .Branch }}
 
 
 version: 2
@@ -40,7 +40,7 @@ jobs:
           name: Test docker image builds
           no_output_timeout: 360m
           command: |
-            pytest -k 'test_docker' ~/neurodocker/neurodocker
+            pytest -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py
       - save_cache:
           *save_cache_kwds
 
@@ -61,7 +61,6 @@ jobs:
             pytest -k 'test_singularity' ~/neurodocker/neurodocker
       - save_cache:
           *save_cache_kwds
-
 
   test_others:
     machine:
