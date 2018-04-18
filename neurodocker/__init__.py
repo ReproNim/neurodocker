@@ -11,7 +11,8 @@ from neurodocker.generators import Dockerfile, SingularityRecipe
 from neurodocker.utils import set_log_level
 
 if sys.version_info[0] < 3:
-    raise RuntimeError("Neurodocker requires Python 3. Install Python 3 or use"
-                       " Neurodocker's Docker image.")
+    raise RuntimeError(
+        "Neurodocker requires Python 3. Use Neurodocker's Docker image or"
+        " install Python 3.")
 
 set_log_level('info')
