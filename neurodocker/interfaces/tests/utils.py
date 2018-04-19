@@ -108,7 +108,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
 
     # TODO(kaczmarj): replace the exec with a singularity python client
     # command.
-    cmd = "singularity exec --bind {s}:{d} {img} {args}"
+    cmd = "singularity run --bind {s}:{d} {img} {args}"
     cmd = cmd.format(s=here, d=_volumes[here]['bind'], img=img, args=test_cmd)
 
     output = subprocess.check_output(cmd.split())
