@@ -22,7 +22,7 @@ generic:
       2010a: https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
     dependencies:
       apt: bc libxext6 libxpm-dev libxt6
-      yum: bc libXext.x86_64 libXpm libXt.x86_64
+      yum: bc libXext.x86_64 libXmu libXpm libXt.x86_64
     env:
       MATLABCMD: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/toolbox/matlab"
     instructions: |

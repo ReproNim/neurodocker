@@ -36,16 +36,17 @@ class TestMiniconda(object):
 
     def test_singularity(self):
         specs = {
-            'pkg_manager': 'yum',
+            'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'docker://centos:7'),
+                ('base', 'docker://debian:stretch-slim'),
                 ('user', 'neuro'),
                 (
                     'miniconda',
                     {
                         'env_name': 'default',
-                        'conda_install': ['python=3.5.1', 'traits'],
+                        'conda_install': ['python=3.6.5', 'traits'],
                         'pip_install': ['nipype'],
+                        'activate': True,
                     }
                 ),
                 (

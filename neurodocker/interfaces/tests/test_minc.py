@@ -22,7 +22,7 @@ class TestMINC(object):
 
     def test_singularity(self):
         specs = {
-            'pkg_manager': 'apt',
+            'pkg_manager': 'yum',
             'instructions': [
                 ('base', 'docker://centos:7'),
                 ('minc', {'version': '1.9.15'}),
