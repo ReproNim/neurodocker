@@ -8,7 +8,14 @@ _checkout_kwds: &checkout_kwds
 _setup_env: &setup_kwds
   name: Setup environment
   command: |
-    pyenv global 3.5.2
+    curl -fsSLO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p ~/conda
+    echo "export PATH=~/conda/bin:$PATH" >> ~/.bashrc
+    source ~/.bashrc
+    conda config --system --prepend channels conda-forge
+    conda update -n base -yq conda
+    conda update -yq --all
+
     pip install -U --no-cache-dir pip
     pip install --no-cache-dir dropbox pytest-cov reprozip
     pip install -e ~/neurodocker
@@ -24,16 +31,57 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          keys:
+            - dfs-v0-{{ .Branch }}-{{ .Revision }}
+            - dfs-v0-{{ .Branch }}
+            - dfs-v0
       - run:
           name: Test docker image builds
           no_output_timeout: 360m
           command: |
+            source ~/.bashrc
             pytest -k 'test_docker' ~/neurodocker/neurodocker
+      - save_cache:
+          key: dfs-v0-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /tmp/cache
+
+  test_singularity:
+    machine:
+      *machine_kwds
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - run:
+          name: Test singularity image builds
+          no_output_timeout: 360m
+          command: |
+            source ~/.bashrc
+            pytest -k 'test_singularity' ~/neurodocker/neurodocker
+
+  test_others:
+    machine:
+      *machine_kwds
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - run:
+          name: Test others (not docker or singularity)
+          no_output_timeout: 30m
+          command: |
+            source ~/.bashrc
+            pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
+
 
 workflows:
   version: 2
   build_test_deploy:
     jobs:
       - test_docker
-
-# TODO(kaczmarj): add test_singularity step
+      - test_singularity
+      - test_others

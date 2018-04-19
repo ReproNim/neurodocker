@@ -6,6 +6,7 @@ import json
 import os
 
 from neurodocker.generators.common import _add_to_entrypoint
+from neurodocker.generators.common import _get_json_spec_str
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
 from neurodocker.generators.common import _Users
@@ -195,6 +196,16 @@ class _DockerfileImplementations:
         return _indent("LABEL " + out, indent=6)
 
     @staticmethod
+    def run(cmd):
+        """Return Dockerfile RUN instruction to run `cmd`."""
+        return _indent("RUN " + cmd)
+
+    @staticmethod
+    def shell(sh):
+        """Return Dockerfile SHELL instruction to set shell."""
+        return 'SHELL ["{}", "-c"]'.format(sh)
+
+    @staticmethod
     def user(user):
         """Return Dockerfile instruction to create `user` if he/she does not
         exist and switch to that user.
@@ -266,13 +277,17 @@ class Dockerfile:
     def __init__(self, specs):
         self._specs = copy.deepcopy(specs)
 
-        self._add_neurodocker_install_header_to_specs()
+        self._prep()
         _Users.clear_memory()
 
     def render(self):
         return "\n\n".join(self._ispecs_to_dockerfile_str())
 
-    def _add_neurodocker_install_header_to_specs(self):
+    def _prep(self):
+        self._add_json()
+        self._add_header()
+
+    def _add_header(self):
         self._specs['instructions'].insert(
             1, ('arg', {'DEBIAN_FRONTEND': 'noninteractive'})
         )
@@ -298,3 +313,7 @@ class Dockerfile:
             else:
                 raise ValueError(
                     "instruction not understood: '{}'".format(instruction))
+
+    def _add_json(self):
+        jsonstr = _get_json_spec_str(self._specs)
+        self._specs['instructions'].append(('run', jsonstr))

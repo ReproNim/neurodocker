@@ -136,3 +136,11 @@ def set_log_level(level):
         logger.setLevel(level)
     except KeyError:
         raise ValueError("invalid level '{}'".format(level))
+
+
+def get_docker_client(version='auto', **kwargs):
+    try:
+        import docker
+    except ImportError:
+        raise ImportError("the docker python package is required for this")
+    return docker.from_env(version='auto', **kwargs)

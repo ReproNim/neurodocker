@@ -5,7 +5,7 @@ from neurodocker.interfaces.tests import utils
 
 class TestNeuroDebian(object):
 
-    def test_build_image_neurodebian_dcm2niix_xenial(self):
+    def test_docker(self):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [

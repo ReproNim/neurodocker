@@ -7,21 +7,20 @@ import os
 import tarfile
 import tempfile
 
-import pytest
-
-from neurodocker.docker import client
 from neurodocker.reprozip.trace import ReproZipMinimizer
+from neurodocker.utils import get_docker_client
 from neurodocker.reprozip.merge import merge_pack_files
 
 
 def _create_packfile(commands, dir):
     """Create packfile from list `commands` in debian:stretch container."""
+    client = get_docker_client()
     image = "debian@sha256:427752aa7da803378f765f5a8efba421df5925cbde8ab011717f3642f406fb15"
-    container = client.containers.run(image, detach=True, tty=True,
-                                      security_opt=['seccomp:unconfined'])
+    container = client.containers.run(
+        image, detach=True, tty=True, security_opt=['seccomp:unconfined'])
     try:
-        minimizer = ReproZipMinimizer(container.id, commands,
-                                      packfile_save_dir=dir)
+        minimizer = ReproZipMinimizer(
+            container.id, commands, packfile_save_dir=dir)
         packfile_path = minimizer.run()
     except Exception:
         raise
@@ -34,7 +33,7 @@ def _create_packfile(commands, dir):
 def test_merge_pack_files():
     tmpdir = tempfile.mkdtemp()
 
-    cmd = ["du -sh /usr", "rm --help"]
+    cmd = ["du --help", "ls --help"]
     packpath = _create_packfile(cmd, tmpdir)
     new_name = "first-pack.rpz"
     os.rename(packpath, os.path.join(tmpdir, new_name))
@@ -62,6 +61,6 @@ def test_merge_pack_files():
             assert os.path.isfile(os.path.join(usr_bin_path, 'du'))
             assert os.path.isfile(os.path.join(bin_path, 'grep'))
             assert os.path.isfile(os.path.join(bin_path, 'ls'))
-            assert os.path.isfile(os.path.join(bin_path, 'rm'))
+            assert not os.path.isfile(os.path.join(bin_path, 'rm'))
             assert not os.path.isfile(os.path.join(bin_path, 'sed'))
             assert not os.path.isfile(os.path.join(bin_path, 'tar'))

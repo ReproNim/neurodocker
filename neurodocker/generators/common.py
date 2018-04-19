@@ -1,6 +1,7 @@
 """"""
 
 import json
+import posixpath
 
 from neurodocker.interfaces._base import (
     _BaseInterface, apt_install, yum_install
@@ -10,7 +11,9 @@ _installation_implementations = {
     ii._name: ii for ii in _BaseInterface.__subclasses__()
 }
 
-NEURODOCKER_ENTRYPOINT = "/neurodocker/startup.sh"
+ND_DIRECTORY = posixpath.join(posixpath.sep, 'neurodocker')
+NEURODOCKER_ENTRYPOINT = posixpath.join(ND_DIRECTORY, 'startup.sh')
+SPEC_FILE = posixpath.join(ND_DIRECTORY, 'neurodocker_specs.json')
 
 # TODO: add common methods like `--install` here. Reference them in the
 # Dockerfile and SingularityRecipe implementation classes.
@@ -70,3 +73,17 @@ class _Users:
     @classmethod
     def clear_memory(cls):
         cls.initialized_users = {'root'}
+
+
+def _get_json_spec_str(specs):
+    """Return instruction to write out specs dictionary to JSON file."""
+    json_specs = json.dumps(specs, indent=2)
+    json_specs = json_specs.replace('\\n', '__TO_REPLACE_NEWLINE__')
+    json_specs = "\n\\n".join(json_specs.split("\n"))
+    # Escape newline characters that the user provided.
+    json_specs = json_specs.replace('__TO_REPLACE_NEWLINE__', '\\\\n')
+    # Workaround to escape single quotes in a single-quoted string.
+    # https://stackoverflow.com/a/1250279/5666087
+    json_specs = json_specs.replace("'", """'"'"'""")
+    cmd = "echo '{string}' > {path}".format(string=json_specs, path=SPEC_FILE)
+    return cmd

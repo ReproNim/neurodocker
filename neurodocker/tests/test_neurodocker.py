@@ -20,8 +20,7 @@ def test_generate():
         " --miniconda env_name=neuro conda_install=python=3.6.2"
         " --user=root"
         " --mrtrix3 version=3.0"
-        " --neurodebian version=generic method=custom os_codename=zesty"
-        "       download_server=usa-nh"
+        " --neurodebian os_codename=zesty server=usa-nh"
         " --spm12 version=r7219 matlab_version=R2017a"
         " --expose 1234 9000"
         " --volume /var /usr/bin"
@@ -63,8 +62,9 @@ def test_generate_opts(capsys):
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert 'ENV KEY="VAL" \\' in out
-    assert '  KEY2="VAL"' in out
+    assert (
+        ('ENV KEY="VAL" \\' in out and 'KEY="VAL"' in out)
+        or ('ENV KEY2="VAL" \\' in out and 'KEY="VAL"'))
 
     main(args.format('--expose 1230 1231').split())
     out, _ = capsys.readouterr()
