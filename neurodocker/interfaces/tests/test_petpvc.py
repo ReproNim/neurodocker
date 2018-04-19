@@ -10,7 +10,7 @@ class TestPETPVC(object):
     """Tests for PETPVC class."""
 
     @pytest.mark.skip("petpvc not implemented yet")
-    def test_build_image_petpvc_120b_binaries_xenial(self):
+    def test_docker(self):
         """Install PETPVC binaries on Ubuntu Xenial."""
         specs = {
             'pkg_manager': 'apt',
