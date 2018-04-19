@@ -79,13 +79,14 @@ def test_docker_container_from_specs(specs, bash_test_file):
 def test_singularity_container_from_specs(specs, bash_test_file):
     """"""
     singularity_def_location = os.path.join(os.path.sep, "tmp", "sing")
-    client = get_singularity_client()
-    client
+    os.makedirs(singularity_def_location, exist_ok=True)
 
-    sr = SingularityRecipe(specs).render()
+    client = get_singularity_client()
 
     intname = bash_test_file[5:].split('.')[0]
     refpath = os.path.join(CACHE_LOCATION, "Singularity." + intname)
+
+    sr = SingularityRecipe(specs).render()
 
     if os.path.exists(refpath):
         logger.info("loading cached reference singularity spec")
@@ -97,6 +98,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
 
     logger.info("building singularity image")
     filename = os.path.join(singularity_def_location, "Singularity." + intname)
+
     with open(filename, 'w') as fp:
         fp.write(sr)
 
