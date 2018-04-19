@@ -24,8 +24,8 @@ See https://github.com/kaczmarj/neurodocker/issues/23#issuecomment-307863219.
 
 Notes
 -----
-1. To use the reprozip trace within a Docker container, the image/container must
-   be built/run with `--security-opt seccomp:unconfined`.
+1. To use the reprozip trace within a Docker container, the image/container
+   must be built/run with `--security-opt seccomp:unconfined`.
       A. `docker build` does not allow --security-opt seccomp:unconfined on
           macOS.
 2. Docker's use of layers means that even if a smaller container is committed
@@ -194,6 +194,8 @@ class ReproZipMinimizer(object):
                 raise RuntimeError("Error: {}".format(log))
 
         self.pack_filepath = log.split()[-1].strip()
+        print(log)
+        print(self.pack_filepath)
         try:
             rel_pack_filepath = copy_file_from_container(
                 self.container, self.pack_filepath, self.packfile_save_dir)
