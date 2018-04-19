@@ -33,7 +33,7 @@ def _create_packfile(commands, dir):
 def test_merge_pack_files():
     tmpdir = tempfile.mkdtemp()
 
-    cmd = ["du -sh /usr", "rm --help"]
+    cmd = ["du --help", "ls --help"]
     packpath = _create_packfile(cmd, tmpdir)
     new_name = "first-pack.rpz"
     os.rename(packpath, os.path.join(tmpdir, new_name))
