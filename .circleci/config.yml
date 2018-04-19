@@ -55,6 +55,11 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          keys:
+            - srs-v0-{{ .Branch }}-{{ .Revision }}
+            - srs-v0-{{ .Branch }}
+            - srs-v0
       - run:
           name: Install singularity
           command: |
@@ -72,6 +77,10 @@ jobs:
           command: |
             source ~/.bashrc
             pytest -k 'test_singularity' ~/neurodocker/neurodocker
+      - save_cache:
+          key: srs-v0-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /tmp/cache
 
   test_others:
     machine:
