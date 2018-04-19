@@ -1,7 +1,5 @@
 """Tests for trace.py."""
 
-from __future__ import absolute_import, division, print_function
-
 import os
 import tempfile
 
@@ -11,6 +9,7 @@ from neurodocker.reprozip.trace import ReproZipMinimizer
 from neurodocker.utils import get_docker_client
 
 
+@pytest.mark.skip(reason="seccomp not available in CI")
 def test_ReproZipMinimizer_no_ptrace():
     client = get_docker_client()
     container = client.containers.run('debian:stretch', detach=True, tty=True)
