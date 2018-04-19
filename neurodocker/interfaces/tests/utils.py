@@ -117,8 +117,6 @@ def test_singularity_container_from_specs(specs, bash_test_file):
         assert False
 
 
-
-
 def _prune_dockerfile(string, comment_char="#"):
     """Remove comments, emptylines, and last layer (serialize to JSON)."""
     string = string.strip()  # trim white space on both ends.
