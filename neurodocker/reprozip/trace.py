@@ -190,7 +190,8 @@ class ReproZipMinimizer(object):
             log = log.decode().strip()
             logger.debug(log)
             if (("REPROZIP" in log and "couldn't use ptrace" in log)
-                    or "NEURODOCKER (in container): error" in log):
+                    or "neurodocker (in container): error" in log.lower()
+                    or "_pytracer.Error" in log):
                 raise RuntimeError("Error: {}".format(log))
 
         self.pack_filepath = log.split()[-1].strip()

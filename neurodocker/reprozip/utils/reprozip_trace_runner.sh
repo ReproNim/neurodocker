@@ -9,24 +9,21 @@
 # variable with the command string and to pass that environment variable to
 # this script.
 
-set -e
-set -x
+set -ex
 
-REPROZIP_CONDA=/opt/reprozip-miniconda
-REPROZIP_TRACE_DIR=/neurodocker-reprozip-trace
-CONDA_URL=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+REPROZIP_CONDA="/opt/reprozip-miniconda"
+REPROZIP_TRACE_DIR="/neurodocker-reprozip-trace"
+CONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 # This log prefix is used in trace.py.
 NEURODOCKER_LOG_PREFIX="NEURODOCKER (in container)"
 
 
-function program_exists()
-{
+function program_exists() {
   hash "$1" 2>/dev/null;
 }
 
 
-function install_missing_dependencies()
-{
+function install_missing_dependencies() {
   if program_exists "apt-get"; then
     echo "${NEURODOCKER_LOG_PREFIX}: installing $1 with apt-get"
     apt-get update -qq
@@ -41,20 +38,18 @@ function install_missing_dependencies()
 }
 
 
-function install_conda_reprozip()
-{
+function install_conda_reprozip() {
   TMP_CONDA_INSTALLER=/tmp/miniconda.sh
   ls /tmp
   curl -sSL -o "$TMP_CONDA_INSTALLER" "$CONDA_URL"
   ls /tmp
   bash $TMP_CONDA_INSTALLER -b -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
-  ${REPROZIP_CONDA}/bin/conda install -yq --channel vida-nyu python=3.6 reprozip
+  ${REPROZIP_CONDA}/bin/conda install -yq python=3.6 reprozip
 }
 
 
-function run_reprozip_trace()
-{
+function run_reprozip_trace() {
   # https://askubuntu.com/a/674347
   cmds=("$@")
   reprozip_base_cmd="${REPROZIP_CONDA}/bin/reprozip trace -d ${REPROZIP_TRACE_DIR} --dont-identify-packages"
@@ -71,6 +66,10 @@ function run_reprozip_trace()
     reprozip_cmd="${reprozip_base_cmd} ${continue_} ${cmd}"
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
     $reprozip_cmd
+
+    if [ "$?" != 0 ]; then
+        printf "${NEURODOCKER_LOG_PREFIX}: ERROR : error running reprozip"
+    fi
   done
 }
 
