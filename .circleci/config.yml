@@ -58,6 +58,7 @@ jobs:
           name: Test singularity image builds
           no_output_timeout: 360m
           command: |
+            source ~/.bashrc
             pytest -k 'test_singularity' ~/neurodocker/neurodocker
 
   test_others:
@@ -72,6 +73,7 @@ jobs:
           name: Test others (not docker or singularity)
           no_output_timeout: 30m
           command: |
+            source ~/.bashrc
             pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
 
 
