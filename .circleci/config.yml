@@ -13,8 +13,8 @@ _setup_env: &setup_kwds
     echo "export PATH=~/conda/bin:$PATH" >> ~/.bashrc
     source ~/.bashrc
     conda config --system --prepend channels conda-forge
-    conda update -n base -y conda
-    conda update -y --all
+    conda update -n base -yq conda
+    conda update -yq --all
 
     pip install -U --no-cache-dir pip
     pip install --no-cache-dir dropbox pytest-cov reprozip
@@ -39,7 +39,7 @@ jobs:
           name: Test docker image builds
           no_output_timeout: 360m
           command: |
-            ls /tmp/cache
+            source ~/.bashrc
             pytest -s -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py ~/neurodocker/neurodocker/interfaces/tests/test_miniconda.py
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
