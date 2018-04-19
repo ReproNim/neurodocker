@@ -40,7 +40,7 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            pytest -s -k 'test_docker' ~/neurodocker/neurodocker/interfaces/tests/test_mrtrix.py ~/neurodocker/neurodocker/interfaces/tests/test_miniconda.py
+            pytest -k 'test_docker' ~/neurodocker/neurodocker
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
           paths:
@@ -82,7 +82,5 @@ workflows:
   build_test_deploy:
     jobs:
       - test_docker
-      # - test_singularity
-      # - test_others
-
-# TODO(kaczmarj): add test_singularity step
+      - test_singularity
+      - test_others
