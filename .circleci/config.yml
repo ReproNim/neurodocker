@@ -64,12 +64,12 @@ jobs:
           name: Install singularity
           command: |
             source ~/.bashrc
-            curl -fsSL --retry 5 http://neuro.debian.net/lists/trusty.us-nh.full \
+            sudo curl -fsSL --retry 5 http://neuro.debian.net/lists/trusty.us-nh.full \
             > /etc/apt/sources.list.d/neurodebian.sources.list
-            curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | apt-key add -
-            (apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
-            apt-get -qq update
-            apt-get install -yq singularity-container
+            curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
+            (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+            sudo apt-get -qq update
+            sudo apt-get install -yq singularity-container
             pip install --no-cache-dir singularity
       - run:
           name: Test singularity image builds
@@ -102,6 +102,6 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - test_docker
+      # - test_docker
       - test_singularity
-      - test_others
+      # - test_others
