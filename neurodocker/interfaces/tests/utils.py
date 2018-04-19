@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import posixpath
+import subprocess
 
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
@@ -78,6 +79,9 @@ def test_docker_container_from_specs(specs, bash_test_file):
 
 def test_singularity_container_from_specs(specs, bash_test_file):
     """"""
+    sr_dir = os.path.abspath("singcache")
+    os.makedirs(sr_dir, exist_ok=True)
+
     intname = bash_test_file[5:].split('.')[0]
     refpath = os.path.join(CACHE_LOCATION, "Singularity." + intname)
 
@@ -92,26 +96,29 @@ def test_singularity_container_from_specs(specs, bash_test_file):
             return  # do not build and test because nothing has changed
 
     logger.info("building singularity image")
-    filename = "Singularity." + intname
+    filename = os.path.join(sr_dir,  "Singularity." + intname)
     with open(filename, 'w') as fp:
         fp.write(sr)
 
     client = get_singularity_client()
-    image = client.build(intname + ".sqfs", filename)
+    img = client.build(intname + ".sqfs", filename)
 
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
 
-    try:
-        output = client.execute(image, command=test_cmd)
-        passed = output.endswith('passed')
-        assert passed
-        if passed:
-            os.makedirs(os.path.dirname(refpath), exist_ok=True)
-            with open(refpath, 'w') as fp:
-                fp.write(sr)
-    except SystemExit:
-        assert False
+    # TODO(kaczmarj): replace the exec with a singularity python client
+    # command.
+    cmd = "singularity exec --bind {s}:{d} {img} {args}"
+    cmd = cmd.format(s=here, d=_volumes[here]['bind'], img=img, args=test_cmd)
+
+    output = subprocess.check_output(cmd.split())
+    passed = output.decode().endswith('passed')
+    assert passed
+    if passed:
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
+        with open(refpath, 'w') as fp:
+            fp.write(sr)
+    os.remove(img)
 
 
 def _prune_dockerfile(string, comment_char="#"):
