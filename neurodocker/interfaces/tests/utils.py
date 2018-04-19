@@ -8,6 +8,7 @@ import posixpath
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
 from neurodocker.utils import get_docker_client
+from neurodocker.utils import get_singularity_client
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +76,47 @@ def test_docker_container_from_specs(specs, bash_test_file):
             fp.write(df)
 
 
-def test_singularity_container_from_specs(specs):
-    assert SingularityRecipe(specs).render()
+def test_singularity_container_from_specs(specs, bash_test_file):
+    """"""
+    singularity_def_location = os.path.join(os.path.sep, "tmp", "sing")
+    client = get_singularity_client()
+    client
+
+    sr = SingularityRecipe(specs).render()
+
+    intname = bash_test_file[5:].split('.')[0]
+    refpath = os.path.join(CACHE_LOCATION, "Singularity." + intname)
+
+    if os.path.exists(refpath):
+        logger.info("loading cached reference singularity spec")
+        with open(refpath, 'r') as fp:
+            reference = fp.read()
+        if _dockerfiles_equivalent(sr, reference):
+            logger.info("test equal to reference singularity spec, passing")
+            return  # do not build and test because nothing has changed
+
+    logger.info("building singularity image")
+    filename = os.path.join(singularity_def_location, "Singularity." + intname)
+    with open(filename, 'w') as fp:
+        fp.write(sr)
+
+    image = client.build(intname + ".sqfs", filename)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    try:
+        output = client.execute(image, command=test_cmd)
+        passed = output.endswith('passed')
+        assert passed
+        if passed:
+            os.makedirs(os.path.dirname(refpath), exist_ok=True)
+            with open(refpath, 'w') as fp:
+                fp.write(sr)
+    except SystemExit:
+        assert False
+
+
 
 
 def _prune_dockerfile(string, comment_char="#"):
