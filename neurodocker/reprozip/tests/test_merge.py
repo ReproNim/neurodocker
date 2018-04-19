@@ -61,6 +61,6 @@ def test_merge_pack_files():
             assert os.path.isfile(os.path.join(usr_bin_path, 'du'))
             assert os.path.isfile(os.path.join(bin_path, 'grep'))
             assert os.path.isfile(os.path.join(bin_path, 'ls'))
-            assert os.path.isfile(os.path.join(bin_path, 'rm'))
+            assert not os.path.isfile(os.path.join(bin_path, 'rm'))
             assert not os.path.isfile(os.path.join(bin_path, 'sed'))
             assert not os.path.isfile(os.path.join(bin_path, 'tar'))
