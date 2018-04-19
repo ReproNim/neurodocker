@@ -82,6 +82,6 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - test_docker
-      - test_singularity
+      # - test_docker
+      # - test_singularity
       - test_others
