@@ -35,6 +35,7 @@ jobs:
           keys:
             - dfs-v0-{{ .Branch }}-{{ .Revision }}
             - dfs-v0-{{ .Branch }}
+            - dfs-v0
       - run:
           name: Test docker image builds
           no_output_timeout: 360m
