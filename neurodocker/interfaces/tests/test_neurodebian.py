@@ -45,4 +45,6 @@ class TestNeuroDebian(object):
             ]
         }
 
-        utils.test_singularity_container_from_specs(specs=specs)
+        bash_test_file = "test_neurodebian.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)

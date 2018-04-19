@@ -29,4 +29,6 @@ class TestConvert3D(object):
             ]
         }
 
-        utils.test_singularity_container_from_specs(specs)
+        bash_test_file = "test_convert3d.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)

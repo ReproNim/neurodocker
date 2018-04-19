@@ -29,4 +29,6 @@ class TestMINC(object):
                 ('user', 'neuro'),
             ]
         }
-        utils.test_singularity_container_from_specs(specs=specs)
+        bash_test_file = "test_minc.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
