@@ -3,6 +3,7 @@
 import io
 import logging
 import os
+from pathlib import Path
 import posixpath
 import subprocess
 
@@ -83,7 +84,8 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     os.makedirs(sr_dir, exist_ok=True)
 
     intname = bash_test_file[5:].split('.')[0]
-    refpath = os.path.join(CACHE_LOCATION, "Singularity." + intname)
+    refpath = os.path.join(
+        Path.home(), "tmp", "cache", "Singularity." + intname)
 
     sr = SingularityRecipe(specs).render()
 

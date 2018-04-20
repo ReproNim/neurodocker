@@ -81,7 +81,7 @@ jobs:
           key: srs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
           paths:
-            - /tmp/cache
+            - ~/tmp/cache
 
   test_others:
     machine:
