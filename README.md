@@ -31,50 +31,60 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 
 # Supported Software
 
-Valid options for each software package are the keyword arguments for the class that installs that package. These classes live in [`neurodocker.interfaces`](neurodocker/interfaces/). The default installation behavior for every software package (except Miniconda) is to install by downloading and un-compressing the binaries.
-
-
 | software | argument | description |
 | -------- | -------- | ----------- |
-| **AFNI** | version* | Either 17.2.02 or latest. |
-|          | install_r | If true, install R and AFNI R packages. False by default. |
+| **AFNI** | version* | latest |
+|          | method   | binaries (default), source. Install pre-compiled binaries or build form source. |
+|          | install_path | Installation path. Default `/opt/afni-{version}`. |
+|          | install_r | If true, install R. |
+|          | install_r_pkgs | If true, install R and AFNI's R packages. |
 |          | install_python2 | If true, install Python 2. |
 |          | install_python3 | If true, install Python 3. |
-| **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0 |
-|          | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
-|          | git_hash  | Git hash to checkout to before building from source (only used if use_binaries is false). |
-| **Convert3D** | version* | "1.0.0" or "nightly". |
-| **dcm2niix** | version* | "latest", "master", git commit hash, or git tag. |
-| **FreeSurfer** | version* | Any version for which binaries are provided. |
+| **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch. |
+|          | method   | binaries (default), source. |
+|          | install_path | Installation path. Default `/opt/ants-{version}`. |
+|          | cmake_opts | If `method=source`, options for `cmake`. |
+|          | make_opts | If `method=source`, options for `make`. |
+| **Convert3D** | version* | 1.0.0 or nightly. |
+|               | method | binaries (default) |
+|               | install_path | Installation path. Default `/opt/convert3d-{version}`. |
+| **dcm2niix** | version* | latest, git commit hash or branch. |
+|              | method | source (default) |
+|              | install_path | Installation path. Default `/opt/dcm2niix-{version}`. |
+|              | cmake_opts | If `method=source`, options for `cmake`. |
+|              | make_opts | If `method=source`, options for `make`. |
+| **FreeSurfer** | version* | 6.0.0-min |
+|                | method | binaries (default) |
+|                | install_path | Installation path. Default `/opt/freesurfer-{version}`. |
+|                | exclude_paths | Sequence of path(s) to exclude when inflating the tarball. |
 |                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
-|                | min | If true, install a version of FreeSurfer minimized for recon-all. See [freesurfer/freesurfer#70](https://github.com/freesurfer/freesurfer/issues/70). False by default. |
-| **FSL**** | version* | Any version for which binaries are provided. |
-|           | eddy_5011 | If true, use pre-release version of FSL eddy v5.0.11 |
-|           | eddy_5011_cuda | 6.5, 7.0, 7.5, 8.0; only valid if using eddy pre-release |
-|           | use_binaries | If true (default), use pre-compiled binaries. Building from source is not available now but might be added in the future. |
-|           | use_installer | If true, use FSL's Python installer. Only valid on CentOS images. |
+| **FSL**** | version* | 5.0.11, 5.0.10, 5.0.9, 5.0.8 |
+|           | method | binaries (default) |
+|           | install_path | Installation path. Default `/opt/fsl-{version}`. |
+| **Matlab Compiler Runtime** | version* | 2018a, 2012-17[a-b], 2010a |
+|                             | method | binaries (default) |
+|                             | install_path | Installation path. Default `/opt/matlabmcr-{version}`. |
 | **MINC** | version* | 1.9.15 |
-| **Miniconda** | env_name* | Name of this conda environment. |
-|               | yaml_file | Environment specification file. Can be path on host or URL. |
-|               | conda_install | Packages to install with conda. e.g., `conda_install="python=3.6 numpy traits"` |
-|               | pip_install | Packages to install with pip. |
-|               | conda_opts  | Command-line options to pass to [`conda create`](https://conda.io/docs/commands/conda-create.html). e.g., `conda_opts="-c vida-nyu"` |
-|               | pip_opts    | Command-line options to pass to [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#options). |
+|          | method | binaries (default) |
+|          | install_path | Installation path. Default `/opt/minc-{version}`. |
+| **Miniconda** | version | latest (default), all other hosted versions. |
+|               | install_path | Installation path. Default `/opt/miniconda-{version}`. |
+|               | env_name* | Name of this conda environment. |
+|               | conda_install | Packages to install with `conda`. E.g., `conda_install="python=3.6 numpy traits"` |
+|               | pip_install | Packages to install with `pip`. |
 |               | activate | If true (default), activate this environment in container entrypoint. |
-|               | miniconda_version | Version of Miniconda. Latest by default. |
-| **MRtrix3** | use_binaries | If true (default), use pre-compiled binaries. If false, build from source. |
-|             | git_hash | Git hash to checkout to before building from source (only used if use_binaries is false). |
+| **MRtrix3** | version* | 3.0 |
+|             | method | binaries (default) |
+|             | install_path | Installation path. Default `/opt/mrtrix3-{version}`. |
 | **NeuroDebian** | os_codename* | Codename of the operating system (e.g., stretch, zesty). |
-|                 | download_server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate --help` for the full list of servers. |
-|                 | pkgs | Packages to download from NeuroDebian. |
+|                 | server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate docker --help` for the full list of servers. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
-| **PETPVC** | version* | 1.2.0-b, 1.2.0-a, 1.1.0, 1.0.0 |
-| **SPM** | version*        | 12 (earlier versions will be supported in the future). |
-|         | matlab_version* | R2017a (other MCR versions will be supported once earlier SPM versions are supported). |
+| **SPM12** | version* | r7219, r6914, r6685, r6472, r6225 |
+|           | install_path | Installation path. Default `/opt/spm12-{version}`. |
+|           |              | _Note: Matlab Compiler Runtime is installed when SPM12 is installed._ |
 
 
-\* required argument.
-
+\* required argument.  
 ** FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
 
 
