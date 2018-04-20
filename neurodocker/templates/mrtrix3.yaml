@@ -15,3 +15,5 @@ generic:
       mkdir -p {{ mrtrix3.install_path }}
       curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
       | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
+
+#TODO(kaczmarj): add option to build from source.

@@ -36,9 +36,9 @@ generic:
       mkdir -p {{ afni.install_path }}
       curl {{ afni.curl_opts }} {{ afni.binaries_url }} \
       | tar -xz -C {{ afni.install_path }} --strip-components 1
-      {% if afni.install_r_pkgs %}
-      {{ afni._install_r_pkgs() }}
-      {% endif %}
+      {%- if afni.install_r_pkgs %}
+      {{ afni.install_path }}/rPkgsInstall -pkgs ALL
+      {% endif -%}
 
   source:
     env:
@@ -76,3 +76,6 @@ generic:
       perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile
       perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile
       make INSTALLDIR="{{ afni.install_path }}" vastness
+      {%- if afni.install_r_pkgs %}
+      {{ afni.install_path }}/rPkgsInstall -pkgs ALL
+      {% endif -%}
