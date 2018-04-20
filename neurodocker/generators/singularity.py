@@ -65,7 +65,7 @@ class SingularityRecipe:
         self._post = []
         self._environment = OrderedDict()
         self._files = []
-        self._runscript = ["/neurodocker/startup.sh"]
+        self._runscript = ['/neurodocker/startup.sh "$@"']
         self._test = []
         self._labels = []
 
