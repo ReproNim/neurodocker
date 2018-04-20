@@ -2,8 +2,6 @@
 
 set -ex
 
-notfound
-
 if [ "$(python --version)" != "Python 3.6.5" ]; then
   echo "Python version incorrect."
   exit 1
