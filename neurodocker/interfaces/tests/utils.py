@@ -96,9 +96,6 @@ def test_singularity_container_from_specs(specs, bash_test_file):
         if _dockerfiles_equivalent(sr, reference):
             logger.info("test equal to reference singularity spec, passing")
             return  # do not build and test because nothing has changed
-        else:
-            print(sr)
-            print(reference)
 
     logger.info("building singularity image")
     filename = os.path.join(sr_dir,  "Singularity." + intname)
@@ -120,7 +117,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     passed = output.decode().endswith('passed')
     assert passed
     if passed:
-        os.makedirs(os.path.dirname(refpath), exist_ok=True)
+        os.makedirs(cache_location, exist_ok=True)
         with open(refpath, 'w') as fp:
             fp.write(sr)
     os.remove(img)

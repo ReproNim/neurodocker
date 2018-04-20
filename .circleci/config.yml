@@ -76,9 +76,7 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            cat ~/tmp/cache/Singularity.miniconda
             pytest -k 'test_singularity' ~/neurodocker/neurodocker/interfaces/tests/test_miniconda.py
-            cat ~/tmp/cache/Singularity.miniconda
       - save_cache:
           key: srs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
