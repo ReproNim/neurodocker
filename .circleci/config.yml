@@ -16,9 +16,9 @@ _setup_env: &setup_kwds
     conda update -n base -yq conda
     conda update -yq --all
 
-    pip install -U --no-cache-dir pip
-    pip install --no-cache-dir dropbox pytest-cov reprozip
-    pip install -e ~/neurodocker
+    pip install -q --no-cache-dir -U pip
+    pip install -q --no-cache-dir dropbox pytest-cov reprozip
+    pip install -q --no-cache-dir -e ~/neurodocker
 
 
 version: 2
@@ -44,6 +44,7 @@ jobs:
             pytest -k 'test_docker' ~/neurodocker/neurodocker
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
+          when: always
           paths:
             - /tmp/cache
 
@@ -55,12 +56,32 @@ jobs:
           *checkout_kwds
       - run:
           *setup_kwds
+      - restore_cache:
+          keys:
+            - srs-v0-{{ .Branch }}-{{ .Revision }}
+            - srs-v0-{{ .Branch }}
+            - srs-v0
+      - run:
+          name: Install singularity
+          command: |
+            source ~/.bashrc
+            curl -fsSL http://neuro.debian.net/lists/trusty.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+            curl -fsSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
+            (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+            sudo apt-get -qq update
+            sudo apt-get install -yq singularity-container
+            pip install -q --no-cache-dir singularity
       - run:
           name: Test singularity image builds
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
             pytest -k 'test_singularity' ~/neurodocker/neurodocker
+      - save_cache:
+          key: srs-v0-{{ .Branch }}-{{ .Revision }}
+          when: always
+          paths:
+            - ~/tmp/cache
 
   test_others:
     machine:

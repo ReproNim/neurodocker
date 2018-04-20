@@ -3,16 +3,21 @@
 import io
 import logging
 import os
+from pathlib import Path
 import posixpath
+import subprocess
 
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
 from neurodocker.utils import get_docker_client
+from neurodocker.utils import get_singularity_client
 
 logger = logging.getLogger(__name__)
 
 PUSH_IMAGES = os.environ.get('ND_PUSH_IMAGES', False)
-CACHE_LOCATION = os.path.join(os.path.sep, 'tmp', 'cache')
+DOCKER_CACHEDIR = os.path.join(os.path.sep, 'tmp', 'cache')
+# Singularity builds clear the /tmp directory
+SINGULARITY_CACHEDIR = os.path.join(Path.home(), 'tmp', 'cache')
 
 here = os.path.dirname(os.path.realpath(__file__))
 _volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
@@ -48,7 +53,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
     df = Dockerfile(specs).render()
 
     refpath = bash_test_file[5:].split('.')[0]
-    refpath = os.path.join(CACHE_LOCATION, "Dockerfile." + refpath)
+    refpath = os.path.join(DOCKER_CACHEDIR, "Dockerfile." + refpath)
 
     if os.path.exists(refpath):
         logger.info("loading cached reference dockerfile")
@@ -75,8 +80,48 @@ def test_docker_container_from_specs(specs, bash_test_file):
             fp.write(df)
 
 
-def test_singularity_container_from_specs(specs):
-    assert SingularityRecipe(specs).render()
+def test_singularity_container_from_specs(specs, bash_test_file):
+    """"""
+    sr_dir = "singularity_cache"
+    os.makedirs(sr_dir, exist_ok=True)
+
+    intname = bash_test_file[5:].split('.')[0]
+    refpath = os.path.join(SINGULARITY_CACHEDIR, "Singularity." + intname)
+
+    sr = SingularityRecipe(specs).render()
+
+    if os.path.exists(refpath):
+        logger.info("loading cached reference singularity spec")
+        with open(refpath, 'r') as fp:
+            reference = fp.read()
+        if _dockerfiles_equivalent(sr, reference):
+            logger.info("test equal to reference singularity spec, passing")
+            return  # do not build and test because nothing has changed
+
+    logger.info("building singularity image")
+    filename = os.path.join(sr_dir,  "Singularity." + intname)
+    with open(filename, 'w') as fp:
+        fp.write(sr)
+
+    client = get_singularity_client()
+    img = client.build(os.path.join(sr_dir, intname + ".sqsh"), filename)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    # TODO(kaczmarj): replace the exec with a singularity python client
+    # command.
+    cmd = "singularity run --bind {s}:{d} {img} {args}"
+    cmd = cmd.format(s=here, d=_volumes[here]['bind'], img=img, args=test_cmd)
+
+    output = subprocess.check_output(cmd.split())
+    passed = output.decode().endswith('passed')
+    assert passed
+    if passed:
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
+        with open(refpath, 'w') as fp:
+            fp.write(sr)
+    os.remove(img)
 
 
 def _prune_dockerfile(string, comment_char="#"):

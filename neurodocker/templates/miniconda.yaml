@@ -11,6 +11,7 @@ generic:
       PATH: "{{ miniconda.install_path }}/bin:$PATH"
     instructions: |
       {% if not miniconda._installed -%}
+      export PATH="{{ miniconda.install_path }}/bin:$PATH"
       echo "Downloading Miniconda installer ..."
       conda_installer="/tmp/miniconda.sh"
       curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}

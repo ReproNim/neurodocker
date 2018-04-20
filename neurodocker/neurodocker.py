@@ -8,27 +8,23 @@ For help generating Dockerfiles and Singularity recipes, run
 $ neurodocker generate docker --help
 $ neurodocker generate singularity --help
 """
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
 from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import sys
 
-from neurodocker import __version__, utils
-from neurodocker.generators import Dockerfile, SingularityRecipe
+from neurodocker import __version__
+from neurodocker import utils
+from neurodocker.generators import Dockerfile
+from neurodocker.generators import SingularityRecipe
 from neurodocker.generators.common import _installation_implementations
 
 logger = logging.getLogger(__name__)
 
 
+# https://stackoverflow.com/a/9028031/5666087
 class OrderedArgs(Action):
-    """
-    Object to preserve order in which command-line arguments are given.
-
-    Notes
-    -----
-    From https://stackoverflow.com/a/9028031/5666087
-    """
+    """Object to preserve order in which command-line arguments are given."""
     def __call__(self, parser, namespace, values, option_string=None):
         if 'ordered_args' not in namespace:
             setattr(namespace, 'ordered_args', [])

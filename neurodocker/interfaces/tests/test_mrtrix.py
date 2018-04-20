@@ -29,4 +29,6 @@ class TestMRtrix3(object):
             ],
         }
 
-        utils.test_singularity_container_from_specs(specs=specs)
+        bash_test_file = "test_mrtrix.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)

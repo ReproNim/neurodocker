@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -exu
 
 echo 'fprintf("testing")' > /tmp/test.m
 $SPMMCRCMD /tmp/test.m
