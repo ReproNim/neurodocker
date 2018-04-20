@@ -32,22 +32,12 @@ class AFNI(_BaseInterface):
             self._dependencies.append('python')
         if self.install_python3:
             self._dependencies.append('python3')
-        if self.install_r:
+        if self.install_r or self.install_r_pkgs:
             r = {
                 'apt': ['r-base', 'r-base-dev'],
                 'yum': ['R-devel'],
             }
             self._dependencies.extend(r[self._pkg_manager])
-
-        if self.install_r_pkgs and not self.install_r:
-            raise ValueError(
-                "option `install_r=True` must be specified if"
-                " `install_r_pkgs=True`."
-            )
-
-    def _install_r_pkgs(self):
-        """Return string of instructions to install AFNI's R packages."""
-        return "{{ afni.install_path }}/rPkgsInstall -pkgs ALL"
 
 
 class ANTs(_BaseInterface):
@@ -101,6 +91,8 @@ class FreeSurfer(_BaseInterface):
         'subjects/fsaverage_sym',
         'trctrain',
     )
+
+    # TODO(kaczmarj): add option to add license file.
 
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
@@ -183,6 +175,9 @@ class Miniconda(_BaseInterface):
     _installed = False
     _environments = set()
 
+    # TODO(kaczmarj): use create_env and use_env options.
+    # TODO(kaczmarj): add method to create environment from file.
+    # TODO(kaczmarj): add conda_opts and pip_opts
     def __init__(self, *args, env_name, conda_install=None, pip_install=None,
                  preinstalled=False, **kwargs):
         self.env_name = env_name
