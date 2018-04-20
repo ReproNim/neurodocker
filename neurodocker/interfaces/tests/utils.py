@@ -79,7 +79,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
 
 def test_singularity_container_from_specs(specs, bash_test_file):
     """"""
-    sr_dir = os.path.join(os.path.sep, "tmp", "singcache")
+    sr_dir = "singularity_cache"
     os.makedirs(sr_dir, exist_ok=True)
 
     intname = bash_test_file[5:].split('.')[0]
