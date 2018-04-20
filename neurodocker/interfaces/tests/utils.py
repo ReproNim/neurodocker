@@ -79,7 +79,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
 
 def test_singularity_container_from_specs(specs, bash_test_file):
     """"""
-    sr_dir = os.path.abspath("singcache")
+    sr_dir = os.path.join(os.path.sep, "tmp", "singcache")
     os.makedirs(sr_dir, exist_ok=True)
 
     intname = bash_test_file[5:].split('.')[0]
@@ -101,7 +101,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
         fp.write(sr)
 
     client = get_singularity_client()
-    img = client.build(intname + ".sqfs", filename)
+    img = client.build(os.path.join(sr_dir, intname + ".sqsh"), filename)
 
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
