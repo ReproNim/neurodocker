@@ -15,7 +15,9 @@ from neurodocker.utils import get_singularity_client
 logger = logging.getLogger(__name__)
 
 PUSH_IMAGES = os.environ.get('ND_PUSH_IMAGES', False)
-CACHE_LOCATION = os.path.join(os.path.sep, 'tmp', 'cache')
+DOCKER_CACHEDIR = os.path.join(os.path.sep, 'tmp', 'cache')
+# Singularity builds clear the /tmp directory
+SINGULARITY_CACHEDIR = os.path.join(Path.home(), 'tmp', 'cache')
 
 here = os.path.dirname(os.path.realpath(__file__))
 _volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
@@ -51,7 +53,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
     df = Dockerfile(specs).render()
 
     refpath = bash_test_file[5:].split('.')[0]
-    refpath = os.path.join(CACHE_LOCATION, "Dockerfile." + refpath)
+    refpath = os.path.join(DOCKER_CACHEDIR, "Dockerfile." + refpath)
 
     if os.path.exists(refpath):
         logger.info("loading cached reference dockerfile")
@@ -84,8 +86,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     os.makedirs(sr_dir, exist_ok=True)
 
     intname = bash_test_file[5:].split('.')[0]
-    cache_location = os.path.join(Path.home(), CACHE_LOCATION)
-    refpath = os.path.join(cache_location, "Singularity." + intname)
+    refpath = os.path.join(SINGULARITY_CACHEDIR, "Singularity." + intname)
 
     sr = SingularityRecipe(specs).render()
 
@@ -117,7 +118,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     passed = output.decode().endswith('passed')
     assert passed
     if passed:
-        os.makedirs(cache_location, exist_ok=True)
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
         with open(refpath, 'w') as fp:
             fp.write(sr)
     os.remove(img)
