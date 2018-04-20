@@ -27,7 +27,7 @@ generic:
     instructions: |
       {{ afni.install_dependencies() }}
       {{ afni.install_debs() }}
-      gsl2_path="$(find / -name 'libgsl.so.19')"
+      gsl2_path="$(find / -name 'libgsl.so.19' || printf '')"
       if [ -n "$gsl2_path" ]; then
         ln -sfv "$gsl2_path" "$(dirname $gsl2_path)/libgsl.so.0";
       fi
