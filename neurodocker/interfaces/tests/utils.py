@@ -96,6 +96,9 @@ def test_singularity_container_from_specs(specs, bash_test_file):
         if _dockerfiles_equivalent(sr, reference):
             logger.info("test equal to reference singularity spec, passing")
             return  # do not build and test because nothing has changed
+        else:
+            print(sr)
+            print(reference)
 
     logger.info("building singularity image")
     filename = os.path.join(sr_dir,  "Singularity." + intname)
