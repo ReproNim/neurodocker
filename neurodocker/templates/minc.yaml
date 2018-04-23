@@ -6,8 +6,6 @@
 # Dockerfile:
 # https://github.com/BIC-MNI/build_packages/blob/master/build_centos_6.9_x64/Dockerfile
 
-# TODO: Replace mni urls with string formatting keys.
-
 generic:
   binaries:
     urls:
