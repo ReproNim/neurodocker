@@ -3,8 +3,7 @@
 [![Build Status](https://travis-ci.org/kaczmarj/neurodocker.svg?branch=master)](https://travis-ci.org/kaczmarj/neurodocker)
 [![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
-
-_Neurodocker_ is a Python project that generates custom Dockerfiles for neuroimaging and minifies existing Docker images (using [ReproZip](https://www.reprozip.org/)). The package can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles and minifies Docker images, but interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)), and minify Docker images. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
+_Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
 Examples:
   - [Generate Dockerfile](#generate-dockerfile)
@@ -94,12 +93,21 @@ Please see the [examples](examples) directory.
 
 ## Canonical example
 
-Generate a Dockerfile which will install ANTs on Ubuntu 17.04. The result can be piped to `docker build` to build the Docker image.
+Generate a Dockerfile which will install ANTs on Ubuntu 18.04. The result can be piped to `docker build` to build the Docker image.
 
 ```shell
-docker run --rm kaczmarj/neurodocker:v0.3.2 generate -b ubuntu:17.04 -p apt --ants version=2.2.0
+docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 
-docker run --rm kaczmarj/neurodocker:v0.3.2 generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
+docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
+```
+
+Generate a Singularity recipe which will install ANTs on Ubuntu 18.04.
+
+```shell
+docker run --rm kaczmarj/neurodocker:v0.4.0 generate singularity \
+    --base ubuntu:18.04 --pkag-manager apt --ants version=2.2.0
 ```
 
 
@@ -117,18 +125,17 @@ In the following example, a Docker image is built with ANTs version 2.2.0 and a 
 
 ```shell
 # Create a Docker image with ANTs, and download a functional scan.
-download_cmd="RUN curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
-neurodocker generate -b centos:7 -p yum --ants version=2.2.0 --instruction="$download_cmd" | docker build -t ants:2.2.0 -
+$ download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
+$ neurodocker generate docker -b centos:7 -p yum --ants version=2.2.0 --run="$download_cmd" | docker build -t ants:2.2.0 -
 
 # Run the container.
-docker run --rm -it --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
+$ docker run --rm -itd --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
 
-# (in a new terminal window)
 # Output a ReproZip pack file in ~/neurodocker-reprozip-output with the files
 # necessary to run antsMotionCorr.
 # See https://github.com/stnava/ANTs/blob/master/Scripts/antsMotionCorrExample
-cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
-neurodocker reprozip-trace ants-reprozip-container "$cmd"
-
-reprounzip docker setup neurodocker-reprozip.rpz test
+$ cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
+$ neurodocker reprozip-trace ants-reprozip-container "$cmd"
+# Create a Docker container with the contents of ReproZip's trace.
+$ reprounzip docker setup neurodocker-reprozip.rpz test
 ```
