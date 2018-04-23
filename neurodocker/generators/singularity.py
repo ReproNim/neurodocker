@@ -4,6 +4,7 @@ from collections import OrderedDict
 import copy
 import inspect
 
+from neurodocker.generators.common import _add_to_entrypoint
 from neurodocker.generators.common import _get_json_spec_str
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
@@ -17,7 +18,7 @@ class _SingularityRecipeImplementations:
         self._singobj = singularity_recipe_object
 
     def add_to_entrypoint(self, cmd):
-        self._singobj._runscript.insert(0, cmd)
+        self._singobj._post.append(_add_to_entrypoint(cmd))
 
     def base(self, base):
         if base.startswith('docker://'):
@@ -56,6 +57,9 @@ class _SingularityRecipeImplementations:
         else:
             cmd = user_cmd
         self._singobj._post.append(cmd)
+
+    def workdir(self, path):
+        self._singobj._post.append("cd {}".format(path))
 
 
 class SingularityRecipe:
