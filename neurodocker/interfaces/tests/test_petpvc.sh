@@ -2,6 +2,6 @@
 
 set -ex
 
-which petpv
+which petpvc
 
 printf 'passed'
