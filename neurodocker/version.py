@@ -3,7 +3,7 @@
 Copied from https://github.com/nipy/nipype/blob/master/nipype/info.py.
 """
 
-__version__ = '0.4.0.dev0'
+__version__ = '0.4.0rc0'
 
 
 def get_gitversion():
