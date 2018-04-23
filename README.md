@@ -77,6 +77,9 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **NeuroDebian** | os_codename* | Codename of the operating system (e.g., stretch, zesty). |
 |                 | server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate docker --help` for the full list of servers. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
+| **PETPVC** | version* | 1.2.2, 1.2.1, 1.2.0-b, 1.2.0-a, 1.1.0, 1.0.0 |
+|            | method | binaries (default) |
+|            | install_path | Installation path. Default `/opt/petpvc-{version}`. |
 | **SPM12** | version* | r7219, r6914, r6685, r6472, r6225 |
 |           | install_path | Installation path. Default `/opt/spm12-{version}`. |
 |           |              | _Note: Matlab Compiler Runtime is installed when SPM12 is installed._ |
