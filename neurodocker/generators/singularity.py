@@ -4,6 +4,7 @@ from collections import OrderedDict
 import copy
 import inspect
 
+from neurodocker.generators.common import _get_json_spec_str
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
 from neurodocker.generators.common import _Users
@@ -39,10 +40,13 @@ class _SingularityRecipeImplementations:
         self._singobj._post.append(_install(pkgs, pkg_manager))
 
     def entrypoint(self, entrypoint):
-        self._singobj._runscript.append(entrypoint)
+        self._singobj._runscript = entrypoint
 
     def env(self, d):
         self._singobj._environment.update(**d)
+
+    def run(self, s):
+        self._singobj._post.append(s)
 
     def user(self, user):
         user_cmd = "su - {}".format(user)
@@ -65,7 +69,7 @@ class SingularityRecipe:
         self._post = []
         self._environment = OrderedDict()
         self._files = []
-        self._runscript = ['/neurodocker/startup.sh "$@"']
+        self._runscript = '/neurodocker/startup.sh "$@"'
         self._test = []
         self._labels = []
 
@@ -89,6 +93,7 @@ class SingularityRecipe:
         self._parts_filled = False
         _Users.clear_memory()
         self._add_neurodocker_header()
+        self._add_json()
 
     def render(self):
         def _render_one(section):
@@ -125,7 +130,7 @@ class SingularityRecipe:
             + "\n".join("{} {}".format(*f) for f in self._files))
 
     def _render_runscript(self):
-        return "%runscript\n" + "\n".join(self._runscript)
+        return "%runscript\n" + self._runscript
 
     def _render_test(self):
         return "%test\n" + "\n".join(self._test)
@@ -160,3 +165,7 @@ class SingularityRecipe:
         if not self._runscript:
             self._runscript.append(NEURODOCKER_ENTRYPOINT)
         self._parts_filled = True
+
+    def _add_json(self):
+        jsonstr = _get_json_spec_str(self._specs)
+        self._specs['instructions'].append(("run", jsonstr))
