@@ -1,7 +1,7 @@
 # Neurodocker
 
-[![Build Status](https://travis-ci.org/kaczmarj/neurodocker.svg?branch=master)](https://travis-ci.org/kaczmarj/neurodocker)
-[![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
+[![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
+[![codecov](https://img.shields.io/codecov/c/github/kaczmarj/neurodocker/master.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
@@ -28,7 +28,7 @@ docker run --rm kaczmarj/neurodocker:v0.3.1 --help
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
 
 
-# Supported Software
+# Supported software
 
 | software | argument | description |
 | -------- | -------- | ----------- |
