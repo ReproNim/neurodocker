@@ -17,8 +17,8 @@ _setup_env: &setup_kwds
     conda update -yq --all
 
     pip install -q --no-cache-dir -U pip
-    pip install -q --no-cache-dir dropbox pytest-cov reprozip
-    pip install -q --no-cache-dir -e ~/neurodocker
+    pip install -q --no-cache-dir reprozip
+    pip install -q --no-cache-dir -e ~/neurodocker[dev]
 
 
 version: 2
@@ -41,7 +41,7 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            pytest -k 'test_docker' ~/neurodocker/neurodocker
+            pytest --cov=~/neurodocker/neurodocker -k 'test_docker' ~/neurodocker/neurodocker
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
@@ -76,7 +76,7 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            pytest -k 'test_singularity' ~/neurodocker/neurodocker
+            pytest --cov=~/neurodocker/neurodocker -k 'test_singularity' ~/neurodocker/neurodocker
       - save_cache:
           key: srs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
@@ -96,7 +96,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             source ~/.bashrc
-            pytest -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
+            pytest --cov=~/neurodocker/neurodocker -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
 
 
 workflows:
