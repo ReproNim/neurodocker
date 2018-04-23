@@ -17,8 +17,11 @@ _setup_env: &setup_kwds
     conda update -yq --all
 
     pip install -q --no-cache-dir -U pip
-    pip install -q --no-cache-dir reprozip
+    pip install -q --no-cache-dir reprozip codecov
     pip install -q --no-cache-dir -e ~/neurodocker[dev]
+
+_store_test_results_kwds: &store_test_results_kwds
+  path: ~/neurodocker/test_results
 
 
 version: 2
@@ -26,6 +29,7 @@ jobs:
   test_docker:
     machine:
       *machine_kwds
+    working_directory: ~/neurodocker
     steps:
       - checkout:
           *checkout_kwds
@@ -41,7 +45,11 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            pytest --cov=~/neurodocker/neurodocker -k 'test_docker' ~/neurodocker/neurodocker
+            pytest --cov -k 'test_docker' neurodocker
+            coverage -o test_results/coverage.xml
+            codecov
+      - store_test_results:
+          *store_test_results_kwds
       - save_cache:
           key: dfs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
@@ -51,6 +59,7 @@ jobs:
   test_singularity:
     machine:
       *machine_kwds
+    working_directory: ~/neurodocker
     steps:
       - checkout:
           *checkout_kwds
@@ -76,7 +85,11 @@ jobs:
           no_output_timeout: 360m
           command: |
             source ~/.bashrc
-            pytest --cov=~/neurodocker/neurodocker -k 'test_singularity' ~/neurodocker/neurodocker
+            pytest --cov -k 'test_singularity' neurodocker
+            coverage -o test_results/coverage.xml
+            codecov
+      - store_test_results:
+          *store_test_results_kwds
       - save_cache:
           key: srs-v0-{{ .Branch }}-{{ .Revision }}
           when: always
@@ -86,6 +99,7 @@ jobs:
   test_others:
     machine:
       *machine_kwds
+    working_directory: ~/neurodocker
     steps:
       - checkout:
           *checkout_kwds
@@ -96,7 +110,11 @@ jobs:
           no_output_timeout: 30m
           command: |
             source ~/.bashrc
-            pytest --cov=~/neurodocker/neurodocker -k 'not test_docker and not test_singularity' ~/neurodocker/neurodocker
+            pytest --cov -k 'not test_docker and not test_singularity' neurodocker
+            coverage -o test_results/coverage.xml
+            codecov
+      - store_test_results:
+          *store_test_results_kwds
 
 
 workflows:
