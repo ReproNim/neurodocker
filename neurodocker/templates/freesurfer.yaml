@@ -9,7 +9,8 @@
 generic:
   binaries:
     urls:
-      "6.0.0": foobar
+      "6.0.1": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz
+      "6.0.0": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
       # See https://github.com/freesurfer/freesurfer/issues/70
       "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
     dependencies:
