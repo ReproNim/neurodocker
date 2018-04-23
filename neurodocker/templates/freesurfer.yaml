@@ -11,7 +11,7 @@ generic:
     urls:
       "6.0.0": foobar
       # See https://github.com/freesurfer/freesurfer/issues/70
-      "6.0.0-min": "https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz"
+      "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
     dependencies:
       apt: bc libgomp1 libxmu6 libxt6 tcsh perl
       yum: bc libgomp libXmu libXt tcsh perl
