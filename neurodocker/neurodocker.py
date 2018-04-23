@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""
-Neurodocker command-line interface to generate Dockerfiles and minify
-existing containers.
+"""Neurodocker is a command-line interface to generate custom Dockerfiles and
+Singularity recipes.
 
 For help generating Dockerfiles and Singularity recipes, run
 
@@ -46,60 +45,46 @@ def _add_generate_common_arguments(parser):
     p.add_argument("-b", "--base", help="Base Docker image. Eg, ubuntu:17.04")
     p.add_argument(
         "-p", "--pkg-manager", choices={'apt', 'yum'},
-        help="Linux package manager."
-    )
+        help="Linux package manager.")
     p.add_argument(
         '--add-to-entrypoint', action=OrderedArgs,
         help=("Add a command to the file /neurodocker/startup.sh, which is the"
-              " container's default entrypoint.")
-    )
+              " container's default entrypoint."))
     p.add_argument(
         '--copy', action=OrderedArgs, nargs="+",
-        help="Copy files into container. Use format <src>... <dest>"
-    )
+        help="Copy files into container. Use format <src>... <dest>")
     p.add_argument(
         '--install', action=OrderedArgs, nargs="+",
         help=("Install system packages with apt-get or yum, depending on the"
-              " package manager specified.")
-    )
+              " package manager specified."))
     p.add_argument(
         '--entrypoint', action=OrderedArgs,
-        help=(
-            "Set the container's entrypoint (Docker) / append to runscript"
-            " (Singularity)"
-        )
-    )
+        help="Set the container's entrypoint (Docker) / append to runscript"
+             " (Singularity)")
     p.add_argument(
         '-e', '--env', action=OrderedArgs, nargs="+", type=_list_of_kv,
-        help="Set environment variable(s). Use the format KEY=VALUE"
-    )
+        help="Set environment variable(s). Use the format KEY=VALUE")
     p.add_argument(
         '-r', '--run', action=OrderedArgs,
-        help="Run a command when building container"
-    )
+        help="Run a command when building container")
     p.add_argument(
         '-u', '--user', action=OrderedArgs,
-        help="Switch current user (creates user if necessary)"
-    )
+        help="Switch current user (creates user if necessary)")
     p.add_argument(
-        '-w', '--workdir', action=OrderedArgs, help="Set working directory"
-    )
+        '-w', '--workdir', action=OrderedArgs, help="Set working directory")
 
     # To generate from file.
     p.add_argument(
         '-f', '--file', dest='file',
-        help="Generate file from JSON. Overrides other `generate` arguments"
-    )
+        help="Generate file from JSON. Overrides other `generate` arguments")
 
     # Other arguments (no order).
     p.add_argument(
         '-o', '--output', dest="output",
-        help="If specified, save Dockerfile to file with this name."
-    )
+        help="If specified, save Dockerfile to file with this name.")
     p.add_argument(
         '--no-print', dest='no_print', action="store_true",
-        help="Do not print the generated file"
-    )
+        help="Do not print the generated file")
 
     _ndeb_servers = ", ".join(
         _installation_implementations['neurodebian']._servers.keys()
@@ -107,74 +92,49 @@ def _add_generate_common_arguments(parser):
 
     # Software package options.
     pkgs_help = {
-        "all": (
-            "Install software packages. Each argument takes a list of"
-            " key=value pairs. Where applicable, the default installation"
-            " behavior is to install by downloading and uncompressing"
-            " binaries."
-        ),
-        "afni": (
-            "Install AFNI. Valid keys are version (required), install_r,"
-            " install_python2, and install_python3. Only the latest"
-            " version and version 17.2.02 are supported at this time."
-        ),
-        "ants": (
-            "Install ANTs. Valid keys are version (required), use_binaries"
-            " (default true), and git_hash. If use_binaries=true, installs"
-            " pre-compiled binaries; if use_binaries=false, builds ANTs from"
-            " source. If git_hash is specified, build from source from that"
-            " commit."
-        ),
-        "convert3d": (
-            "Install Convert3D. The only valid key is version (required)."
-        ),
-        "dcm2niix": (
-            "Install dcm2niix. The only valid key is version (required)."
-        ),
-        "freesurfer": (
-            "Install FreeSurfer. Valid keys are version (required),"
-            " license_path (relative path to license), min (if true, install"
-            " binaries minimized for recon-all) and use_binaries (default true"
-            "). A FreeSurfer license is required to run the software and is"
-            " not provided by Neurodocker."
-        ),
-        "fsl": (
-            "Install FSL. Valid keys are version (required), use_binaries"
-            " (default true) and use_installer."
-        ),
-        "matlabmcr": (
-            "Install Matlab Compiler Runtime."
-        ),
-        "miniconda": (
-            "Install Miniconda. Valid keys are env_name (required),"
-            " conda_install, pip_install, conda_opts, pip_opts, activate"
-            " (default false) and miniconda_version (defaults to latest). The"
-            " options conda_install and pip_install accept strings of"
-            ' packages: conda_install="python=3.6 numpy traits".'
-        ),
-        "mrtrix3": (
-            "Install MRtrix3. Valid keys are use_binaries (default true) and"
-            " git_hash. If git_hash is specified and use_binaries is false,"
-            " will checkout to that commit before building."
-        ),
-        "neurodebian": (
-            "Add NeuroDebian repository and optionally install NeuroDebian"
-            " packages. Valid keys are os_codename (required; e.g., 'zesty'),"
-            " download_server (required), full (if true, default, use non-free"
-            " packages), and pkgs (list of packages to install). Valid"
-            " download servers are {}.".format(_ndeb_servers)
-        ),
-        "spm12": (
-            "Install SPM (and its dependency, Matlab Compiler Runtime). Valid"
-            " keys are version and matlab_version."
-        ),
-        "minc": (
-            "Install MINC. Valid keys is version (required). Only version"
-            " 1.9.15 is supported at this time."
-        ),
-        "petpvc": (
-            "Install PETPVC. Valid keys are version (required)."
-        ),
+        "all": "Install software packages. Each argument takes a list of"
+               " key=value pairs. Where applicable, the default installation"
+               " behavior is to install by downloading and uncompressing"
+               " binaries. Some programs can be built from source.",
+        "afni": "Install AFNI. Valid keys are version (required), method,"
+                " install_path, install_r, install_r_pkgs, install_python2,"
+                " and install_python3. Only the latest version and version"
+                " 17.2.02 are supported at this time.",
+        "ants": "Install ANTs. Valid keys are version (required), method"
+                " install_path, cmake_opts, and make_opts. Version can be a "
+                " git commit hash if building from source.",
+        "convert3d": "Install Convert3D. Valid keys are version (required),"
+                     " method, and install_path.",
+        "dcm2niix": "Install dcm2niix. Valid keys are version, method,"
+                    " install_path, cmake_opts, and make_opts",
+        "freesurfer": "Install FreeSurfer. Valid keys are version (required),"
+                      " method, install_path, exclude_paths, and license_path"
+                      " (relative path to license). A FreeSurfer license is"
+                      " required to run the software and is not provided by"
+                      " Neurodocker.",
+        "fsl": "Install FSL. Valid keys are version (required), method, and"
+               " install_path.",
+        "matlabmcr": "Install Matlab Compiler Runtime. Valid keys are version,"
+                     " method, and install_path",
+        "miniconda": "Install Miniconda. Valid keys are install_path,"
+                     " env_name, conda_install, pip_install, conda_opts,"
+                     " pip_opts, activate (default false), and version"
+                     " (defaults to latest). The options conda_install and"
+                     " pip_install accept strings of packages: conda_install="
+                     '"python=3.6 numpy traits".',
+        "mrtrix3": "Install MRtrix3. Valid keys are version (required),"
+                   " method, and install_path",
+        "neurodebian": "Add NeuroDebian repository. Valid keys are "
+                       "os_codename (eg zesty), server (eg usa-nh), and full"
+                       " (if true, use non-free packages). Valid download"
+                       " servers are {}.".format(_ndeb_servers),
+        "spm12": "Install SPM12 and its dependency, Matlab Compiler Runtime."
+                 " Valid keys are version and install_path.",
+        "minc": "Install MINC. Valid keys is version (required), method, and"
+                " install_path. Only version 1.9.15 is supported at this"
+                " time.",
+        "petpvc": "Install PETPVC. Valid keys are version (required), method,"
+                  " and install_path."
     }
 
     pkgs = p.add_argument_group(
@@ -200,43 +160,30 @@ def _add_generate_docker_arguments(parser):
     # Arguments that should be ordered.
     p.add_argument(
         '--add', action=OrderedArgs, nargs="+",
-        help="Dockerfile ADD instruction. Use format <src>... <dest>"
-    )
+        help="Dockerfile ADD instruction. Use format <src>... <dest>")
     p.add_argument(
         '--arg', action=OrderedArgs, nargs="+", type=_list_of_kv,
-        help="Dockerfile ARG instruction. Use format KEY[=DEFAULT_VALUE] ...",
-    )
+        help="Dockerfile ARG instruction. Use format KEY[=DEFAULT_VALUE] ...")
     p.add_argument(
         '--cmd', action=OrderedArgs, nargs="+",
-        help="Dockerfile CMD instruction."
-    )
+        help="Dockerfile CMD instruction.")
     p.add_argument(
         '--expose', nargs="+", action=OrderedArgs,
-        help="Dockerfile EXPOSE instruction."
-    )
-    p.add_argument(
-        '--instruction', action=OrderedArgs,
-        help="Arbitrary text to write to Dockerfile."
-    )
+        help="Dockerfile EXPOSE instruction.")
     p.add_argument(
         '--label', action=OrderedArgs, nargs="+", type=_list_of_kv,
-        help="Dockerfile LABEL instruction."
-    )
+        help="Dockerfile LABEL instruction.")
     p.add_argument(
         '--run-bash', action=OrderedArgs,
-        help="Run BASH code in RUN instruction."
-    )
+        help="Run BASH code in RUN instruction.")
     p.add_argument(
         '--volume', action=OrderedArgs, nargs="+",
-        help="Dockerfile VOLUME instruction."
-    )
+        help="Dockerfile VOLUME instruction.")
 
 
 def _add_generate_singularity_arguments(parser):
     """Add arguments to `parser` for sub-command `generate singularity`."""
-    p = parser
-
-    # p.add_argument('--add-to-entrypoint', help=)
+    pass
 
 
 def _add_reprozip_trace_arguments(parser):

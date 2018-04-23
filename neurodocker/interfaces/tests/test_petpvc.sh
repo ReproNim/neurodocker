@@ -2,6 +2,6 @@
 
 set -ex
 
-ls /opt/petpvc/bin/petpvc
+which petpvc
 
 printf 'passed'

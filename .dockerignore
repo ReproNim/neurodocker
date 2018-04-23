@@ -3,10 +3,16 @@ __pycache__
 **/.DS_Store
 .DS_Store
 /scraper
+tests
+**/tests
 .cache
+.pytest_cache
 .ipynb_checkpoints
 dockerfile_tests
 *.egg-info
+
+.coverage
+coverage.xml
 
 *.ipynb
 *.pyc

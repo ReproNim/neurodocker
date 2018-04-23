@@ -77,13 +77,13 @@ class _Users:
 
 def _get_json_spec_str(specs):
     """Return instruction to write out specs dictionary to JSON file."""
-    json_specs = json.dumps(specs, indent=2)
-    json_specs = json_specs.replace('\\n', '__TO_REPLACE_NEWLINE__')
-    json_specs = "\n\\n".join(json_specs.split("\n"))
+    js = json.dumps(specs, indent=2)
+    js = js.replace('\\n', '__TO_REPLACE_NEWLINE__')
+    js = "\n\\n".join(js.split("\n"))
     # Escape newline characters that the user provided.
-    json_specs = json_specs.replace('__TO_REPLACE_NEWLINE__', '\\\\n')
+    js = js.replace('__TO_REPLACE_NEWLINE__', '\\\\n')
     # Workaround to escape single quotes in a single-quoted string.
     # https://stackoverflow.com/a/1250279/5666087
-    json_specs = json_specs.replace("'", """'"'"'""")
-    cmd = "echo '{string}' > {path}".format(string=json_specs, path=SPEC_FILE)
+    js = js.replace("'", """'"'"'""")
+    cmd = "echo '{string}' > {path}".format(string=js, path=SPEC_FILE)
     return cmd

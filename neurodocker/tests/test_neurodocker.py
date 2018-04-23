@@ -83,13 +83,13 @@ def test_generate_opts(capsys):
 def test_generate_from_json(capsys, tmpdir):
     import json
 
-    cmd = "generate docker -b debian:stretch -p apt --c3d version=1.0.0"
+    cmd = "generate docker -b debian:stretch -p apt --convert3d version=1.0.0"
     main(cmd.split())
     true, _ = capsys.readouterr()
 
     specs = {'generation_timestamp': '2017-08-31 21:49:04',
              'instructions': [['base', 'debian:stretch'],
-                              ['c3d', {'version': '1.0.0'}]],
+                              ['convert3d', {'version': '1.0.0'}]],
              'neurodocker_version': '0.2.0-18-g9227b17',
              'pkg_manager': 'apt'}
     str_specs = json.dumps(specs)

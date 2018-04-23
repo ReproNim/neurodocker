@@ -1,21 +1,16 @@
 # Neurodocker
 
-[![Build Status](https://travis-ci.org/kaczmarj/neurodocker.svg?branch=master)](https://travis-ci.org/kaczmarj/neurodocker)
-[![codecov](https://codecov.io/gh/kaczmarj/neurodocker/branch/master/graph/badge.svg)](https://codecov.io/gh/kaczmarj/neurodocker)
+[![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
 
-
-_Neurodocker_ is a Python project that generates custom Dockerfiles for neuroimaging and minifies existing Docker images (using [ReproZip](https://www.reprozip.org/)). The package can be used from the command-line or within a Python script. The command-line interface generates Dockerfiles and minifies Docker images, but interaction with the Docker Engine is left to the various `docker` commands. Within a Python script, however, _Neurodocker_ can generate Dockerfiles, build Docker images, run commands within resulting containers (using the [`docker` Python package](https://github.com/docker/docker-py)), and minify Docker images. The project is used for regression testing of [Nipype](https://github.com/nipy/nipype/) interfaces.
+_Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
 Examples:
-  - [Generate Dockerfile](#generate-dockerfile)
-  - [Generate Dockerfile (full)](#generate-dockerfile-full)
+  - [Canonical examples](#canonical-examples)
+    - [Docker](#docker)
+    - [Singularity](#singularity)
+  - [Assorted examples](./examples)
   - [Minimize existing Docker image](#minimize-existing-docker-image)
   - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
-
-
-# Note to users
-
-This software is still in the early stages of development. If you come across an issue or a way to improve _Neurodocker_, please submit an issue or a pull request.
 
 
 # Installation
@@ -23,13 +18,13 @@ This software is still in the early stages of development. If you come across an
 Use the _Neurodocker_ Docker image:
 
 ```
-docker run --rm kaczmarj/neurodocker:v0.3.1 --help
+docker run --rm kaczmarj/neurodocker:0.4.0 --help
 ```
 
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
 
 
-# Supported Software
+# Supported software
 
 | software | argument | description |
 | -------- | -------- | ----------- |
@@ -79,6 +74,9 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **NeuroDebian** | os_codename* | Codename of the operating system (e.g., stretch, zesty). |
 |                 | server* | Server to download NeuroDebian packages from. Choose the one closest to you. See `neurodocker generate docker --help` for the full list of servers. |
 |                 | full | If true (default), use non-free sources. If false, use libre sources. |
+| **PETPVC** | version* | 1.2.2, 1.2.1, 1.2.0-b, 1.2.0-a, 1.1.0, 1.0.0 |
+|            | method | binaries (default) |
+|            | install_path | Installation path. Default `/opt/petpvc-{version}`. |
 | **SPM12** | version* | r7219, r6914, r6685, r6472, r6225 |
 |           | install_path | Installation path. Default `/opt/spm12-{version}`. |
 |           |              | _Note: Matlab Compiler Runtime is installed when SPM12 is installed._ |
@@ -92,14 +90,28 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 
 Please see the [examples](examples) directory.
 
-## Canonical example
+## Canonical examples
 
-Generate a Dockerfile which will install ANTs on Ubuntu 17.04. The result can be piped to `docker build` to build the Docker image.
+The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
+
+### Docker
 
 ```shell
-docker run --rm kaczmarj/neurodocker:v0.3.2 generate -b ubuntu:17.04 -p apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 
-docker run --rm kaczmarj/neurodocker:v0.3.2 generate -b ubuntu:17.04 -p apt --ants version=2.2.0 | docker build -
+# Build image by piping Dockerfile to `docker build`
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
+```
+
+### Singularity
+
+Install ANTs on Ubuntu 18.04.
+
+```shell
+$ docker run --rm kaczmarj/neurodocker:v0.4.0 generate singularity \
+    --base ubuntu:18.04 --pkag-manager apt --ants version=2.2.0
 ```
 
 
@@ -117,18 +129,17 @@ In the following example, a Docker image is built with ANTs version 2.2.0 and a 
 
 ```shell
 # Create a Docker image with ANTs, and download a functional scan.
-download_cmd="RUN curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
-neurodocker generate -b centos:7 -p yum --ants version=2.2.0 --instruction="$download_cmd" | docker build -t ants:2.2.0 -
+$ download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
+$ neurodocker generate docker -b centos:7 -p yum --ants version=2.2.0 --run="$download_cmd" | docker build -t ants:2.2.0 -
 
 # Run the container.
-docker run --rm -it --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
+$ docker run --rm -itd --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
 
-# (in a new terminal window)
 # Output a ReproZip pack file in ~/neurodocker-reprozip-output with the files
 # necessary to run antsMotionCorr.
 # See https://github.com/stnava/ANTs/blob/master/Scripts/antsMotionCorrExample
-cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
-neurodocker reprozip-trace ants-reprozip-container "$cmd"
-
-reprounzip docker setup neurodocker-reprozip.rpz test
+$ cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
+$ neurodocker reprozip-trace ants-reprozip-container "$cmd"
+# Create a Docker container with the contents of ReproZip's trace.
+$ reprounzip docker setup neurodocker-reprozip.rpz test
 ```
