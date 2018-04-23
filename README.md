@@ -5,15 +5,12 @@
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
 Examples:
-  - [Generate Dockerfile](#generate-dockerfile)
-  - [Generate Dockerfile (full)](#generate-dockerfile-full)
+  - [Canonical example](#canonical-example)
+    - [Docker](#docker)
+    - [Singularity](#singularity)
+  - [Assorted examples](./examples)
   - [Minimize existing Docker image](#minimize-existing-docker-image)
   - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
-
-
-# Note to users
-
-This software is still in the early stages of development. If you come across an issue or a way to improve _Neurodocker_, please submit an issue or a pull request.
 
 
 # Installation
@@ -21,7 +18,7 @@ This software is still in the early stages of development. If you come across an
 Use the _Neurodocker_ Docker image:
 
 ```
-docker run --rm kaczmarj/neurodocker:v0.3.1 --help
+docker run --rm kaczmarj/neurodocker:0.4.0 --help
 ```
 
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
@@ -93,22 +90,27 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 
 Please see the [examples](examples) directory.
 
-## Canonical example
+## Canonical examples
 
-Generate a Dockerfile which will install ANTs on Ubuntu 18.04. The result can be piped to `docker build` to build the Docker image.
+The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
+
+### Docker
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 
-docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+# Build image by piping Dockerfile to `docker build`
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
 
-Generate a Singularity recipe which will install ANTs on Ubuntu 18.04.
+### Singularity
+
+Install ANTs on Ubuntu 18.04.
 
 ```shell
-docker run --rm kaczmarj/neurodocker:v0.4.0 generate singularity \
+$ docker run --rm kaczmarj/neurodocker:v0.4.0 generate singularity \
     --base ubuntu:18.04 --pkag-manager apt --ants version=2.2.0
 ```
 
