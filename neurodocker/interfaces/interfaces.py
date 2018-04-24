@@ -127,6 +127,7 @@ class MatlabMCR(_BaseInterface):
     _pretty_name = "MATLAB MCR"
 
     _mcr_versions = {
+        '2018a': '94',
         '2017b': '93',
         '2017a': '92',
         '2016b': '91',
@@ -263,7 +264,7 @@ class PETPVC(_BaseInterface):
 
 
 class SPM12(_BaseInterface):
-    """Create instance of SPM object."""
+    """Create instance of SPM12 object."""
 
     _name = 'spm12'
     _pretty_name = 'SPM12'
@@ -273,11 +274,12 @@ class SPM12(_BaseInterface):
 
         matlabmcr_version = self.binaries_url[-9:-4]
         self.matlabmcr_obj = MatlabMCR(matlabmcr_version, self.pkg_manager)
+        self.mcr_path = posixpath.join(
+            self.matlabmcr_obj.install_path, self.matlabmcr_obj.mcr_version)
 
     def render_run(self):
         return "\n".join(
-            (self.matlabmcr_obj.render_run(), super().render_run())
-        )
+            (self.matlabmcr_obj.render_run(), super().render_run()))
 
     def render_env(self):
         """Return dictionary with rendered keys and values."""
