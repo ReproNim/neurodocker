@@ -10,7 +10,7 @@ class TestSPM(object):
             'pkg_manager': 'apt',
             'instructions': [
                 ('base', 'ubuntu:16.04'),
-                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('spm12', {'version': 'dev'}),
                 ('user', 'neuro'),
             ],
         }
@@ -24,7 +24,7 @@ class TestSPM(object):
             'pkg_manager': 'apt',
             'instructions': [
                 ('base', 'docker://ubuntu:16.04'),
-                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('spm12', {'version': 'r7219'}),
                 ('user', 'neuro'),
             ],
         }
