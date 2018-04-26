@@ -1,6 +1,9 @@
 # Neurodocker
 
 [![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
+[![build status](https://img.shields.io/docker/build/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
+[![build status](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
+[![build status](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker//)
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
