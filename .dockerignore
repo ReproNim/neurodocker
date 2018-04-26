@@ -2,24 +2,12 @@ __pycache__
 **/__pycache__
 **/.DS_Store
 .DS_Store
-/scraper
-tests
-**/tests
 .cache
-.pytest_cache
 .ipynb_checkpoints
 dockerfile_tests
 *.egg-info
-
-.coverage
-coverage.xml
-
-examples
-.circleci
 
 *.ipynb
 *.pyc
 *.tar
 *.tar.gz
-
-Dockerfile

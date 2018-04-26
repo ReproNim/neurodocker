@@ -1,50 +1,35 @@
 """Tests for neurodocker.interfaces.NeuroDebian"""
+# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
+from __future__ import absolute_import, division, print_function
+
+from neurodocker import DockerContainer, Dockerfile
+from neurodocker.interfaces import NeuroDebian
 from neurodocker.interfaces.tests import utils
 
 
 class TestNeuroDebian(object):
+    """Tests for NeuroDebian class."""
 
-    def test_docker(self):
-        specs = {
-            'pkg_manager': 'apt',
-            'instructions': [
-                ('base', 'ubuntu:16.04'),
-                (
-                    'neurodebian',
-                    {
-                        'os_codename': 'stretch',
-                        'server': 'usa-nh',
-                        'full': True,
-                    }
-                ),
-                ('install', ['dcm2niix']),
-                ('user', 'neuro'),
-            ]
-        }
+    def test_build_image_neurodebian_dcm2niix_xenial(self):
+        """Install NeuroDebian on Ubuntu 16.04."""
+        specs = {'pkg_manager': 'apt',
+                 'check_urls': False,
+                 'instructions': [
+                    ('base', 'ubuntu:16.04'),
+                    ('neurodebian', {'os_codename': 'stretch',
+                                    'download_server': 'usa-nh',
+                                    'full': True,
+                                    'pkgs': ['dcm2niix']}),
+                    ('user', 'neuro'),
+                ]}
 
-        bash_test_file = "test_neurodebian.sh"
-        utils.test_docker_container_from_specs(
-            specs=specs, bash_test_file=bash_test_file)
+        df = Dockerfile(specs).cmd
+        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['neurodebian_stretch']
+        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
 
-    def test_singularity(self):
-        specs = {
-            'pkg_manager': 'apt',
-            'instructions': [
-                ('base', 'docker://ubuntu:16.04'),
-                (
-                    'neurodebian',
-                    {
-                        'os_codename': 'stretch',
-                        'server': 'usa-nh',
-                        'full': True,
-                    }
-                ),
-                ('install', ['dcm2niix']),
-                ('user', 'neuro'),
-            ]
-        }
+        cmd = "bash /testscripts/test_neurodebian.sh"
+        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
 
-        bash_test_file = "test_neurodebian.sh"
-        utils.test_singularity_container_from_specs(
-            specs=specs, bash_test_file=bash_test_file)
+        if push:
+            utils.push_image(image_name)

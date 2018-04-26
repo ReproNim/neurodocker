@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
+set -x
 
 bet2 -h
 flirt -version
-
-printf 'passed'

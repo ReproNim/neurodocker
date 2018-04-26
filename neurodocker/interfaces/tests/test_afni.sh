@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
+set -x
 
 3dSkullStrip -help
-
-printf 'passed'

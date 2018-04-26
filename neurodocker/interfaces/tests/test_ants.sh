@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
+set -x
 
 Atropos --help
 antsRegistration --version
-
-printf 'passed'
