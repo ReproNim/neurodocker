@@ -9,13 +9,13 @@ class TestSPM(object):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'ubuntu:16.04'),
-                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('base', 'ubuntu:18.04'),
+                ('spm12', {'version': 'dev'}),
                 ('user', 'neuro'),
             ],
         }
 
-        bash_test_file = "test_spm.sh"
+        bash_test_file = "test_spm12.sh"
         utils.test_docker_container_from_specs(
             specs=specs, bash_test_file=bash_test_file)
 
@@ -24,11 +24,11 @@ class TestSPM(object):
             'pkg_manager': 'apt',
             'instructions': [
                 ('base', 'docker://ubuntu:16.04'),
-                ('spm12', {'version': 'r7219', 'matlab_version': 'R2017a'}),
+                ('spm12', {'version': 'r7219'}),
                 ('user', 'neuro'),
             ],
         }
 
-        bash_test_file = "test_spm.sh"
+        bash_test_file = "test_spm12.sh"
         utils.test_singularity_container_from_specs(
             specs=specs, bash_test_file=bash_test_file)

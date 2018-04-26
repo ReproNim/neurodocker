@@ -27,10 +27,11 @@ class _SingularityRecipeImplementations:
         elif base.startswith('shub://'):
             bootstrap = 'shub'
             from_ = base.split('shub://', 1)[1]
+        # If no prefix given, assume base is a Docker image.
         else:
-            raise ValueError(
-                "singularity base must be in the form `docker://...` or"
-                " `shub://...`")
+            bootstrap = 'docker'
+            from_ = base
+
         self._singobj._header['Bootstrap'] = bootstrap
         self._singobj._header['From'] = from_
 
