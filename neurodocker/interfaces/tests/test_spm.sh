@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-set -exu
+set -e
+set -x
 
 echo 'fprintf("testing")' > /tmp/test.m
 $SPMMCRCMD /tmp/test.m
-
-printf 'passed'

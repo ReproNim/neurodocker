@@ -1,12 +1,12 @@
 """Class to parse specifications for Dockerfile."""
 # Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
+from __future__ import absolute_import
+
 import inspect
 
 from neurodocker import utils
-from neurodocker.generators.common import _installation_implementations
-from neurodocker.generators.docker import Dockerfile
-from neurodocker.generators.singularity import SingularityRecipe
+from neurodocker.generate import dockerfile_implementations
 
 
 def _check_for_invalid_keys(keys, valid_keys, where):
@@ -19,7 +19,7 @@ def _check_for_invalid_keys(keys, valid_keys, where):
                        "".format(where, invalid, valid_keys))
 
 
-class _SpecsParser:
+class _SpecsParser(object):
     """Class to parse specifications for Dockerfile.
 
     This class checks the dictionary of specifications for errors and raises
@@ -45,9 +45,12 @@ class _SpecsParser:
     >>> SpecsParser(specs)
     """
     VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
-                            'generation_timestamp', 'neurodocker_version']
+                            'generation_timestamp', 'neurodocker_version',]
+    VALID_INSTRUCTIONS_KEYS = list(dockerfile_implementations['other'].keys())
 
-    VALID_INSTRUCTIONS_KEYS = Dockerfile._implementations.keys()
+    SUPPORTED_SOFTWARE = dockerfile_implementations['software'].keys()
+    VALID_INSTRUCTIONS_KEYS.extend(SUPPORTED_SOFTWARE)
+    VALID_INSTRUCTIONS_KEYS.sort()
 
     def __init__(self, specs):
         self.specs = specs
@@ -92,10 +95,17 @@ class _SpecsParser:
         """Raise ValueError if a key is present that does not belong in a
         function's signature.
         """
+        supported_software = dockerfile_implementations['software']
         for pkg, opts in self.specs['instructions']:
-            if pkg in _installation_implementations.keys():
-                func = _installation_implementations[pkg]
-                params = list(inspect.signature(func).parameters)
+            if pkg in supported_software.keys():
+                func = supported_software[pkg]
+                try:
+                    params = list(inspect.signature(func).parameters)
+                # Python 2.7 does not have inspect.signature
+                except AttributeError:
+                    params = inspect.getargspec(func.__init__)[0]
+                    params.remove('self')
+
                 bad_opts = [opt for opt in opts if opt not in params]
                 if bad_opts:
                     bad_opts = ', '.join(bad_opts)
