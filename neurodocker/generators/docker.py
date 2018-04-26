@@ -10,6 +10,7 @@ from neurodocker.generators.common import _get_json_spec_str
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
 from neurodocker.generators.common import _Users
+from neurodocker.generators.common import ContainerSpecGenerator
 
 
 def _indent(string, indent=4, add_list_op=False):
@@ -201,6 +202,12 @@ class _DockerfileImplementations:
         return _indent("RUN " + cmd)
 
     @staticmethod
+    def run_bash(cmd):
+        """Return bash command in Dockerfile RUN instruction."""
+        cmd = "bash -c '{}'".format(cmd)
+        return _DockerfileImplementations.run(cmd)
+
+    @staticmethod
     def shell(sh):
         """Return Dockerfile SHELL instruction to set shell."""
         return 'SHELL ["{}", "-c"]'.format(sh)
@@ -266,7 +273,7 @@ class _DockerfileInterfaceFormatter:
         return "RUN " + _indent(self.run, add_list_op=True)
 
 
-class Dockerfile:
+class Dockerfile(ContainerSpecGenerator):
 
     _implementations = {
         **_installation_implementations,
@@ -281,7 +288,8 @@ class Dockerfile:
         _Users.clear_memory()
 
     def render(self):
-        return "\n\n".join(self._ispecs_to_dockerfile_str())
+        return self.commented_header + "\n\n".join(
+            self._ispecs_to_dockerfile_str())
 
     def _prep(self):
         self._add_json()
@@ -289,10 +297,11 @@ class Dockerfile:
 
     def _add_header(self):
         self._specs['instructions'].insert(
-            1, ('arg', {'DEBIAN_FRONTEND': 'noninteractive'})
-        )
-        self._specs['instructions'].insert(
-            2, ('_header', {'version': 'generic', 'method': 'custom'}))
+            1, ('arg', {'DEBIAN_FRONTEND': 'noninteractive'}))
+        kwds = {
+            'version': 'generic',
+            'method': 'custom'}
+        self._specs['instructions'].insert(2, ('_header', kwds))
         self._specs['instructions'].insert(
             3, ('entrypoint', "/neurodocker/startup.sh"))
 

@@ -9,6 +9,7 @@ from neurodocker.generators.common import _get_json_spec_str
 from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
 from neurodocker.generators.common import _Users
+from neurodocker.generators.common import ContainerSpecGenerator
 from neurodocker.generators.common import NEURODOCKER_ENTRYPOINT
 
 
@@ -50,6 +51,10 @@ class _SingularityRecipeImplementations:
     def run(self, s):
         self._singobj._post.append(s)
 
+    def run_bash(self, s):
+        s = "bash -c '{}'".format(s)
+        self.run(s)
+
     def user(self, user):
         user_cmd = "su - {}".format(user)
         add_user_cmd = _Users.add(user)
@@ -63,7 +68,7 @@ class _SingularityRecipeImplementations:
         self._singobj._post.append("cd {}".format(path))
 
 
-class SingularityRecipe:
+class SingularityRecipe(ContainerSpecGenerator):
 
     def __init__(self, specs):
         self._specs = copy.deepcopy(specs)
@@ -107,7 +112,7 @@ class SingularityRecipe:
 
         if not self._parts_filled:
             self._fill_parts()
-        return "\n\n".join(
+        return self.commented_header + "\n\n".join(
             map(_render_one, (sec for sec, con in self._order if con)))
 
     def _render_header(self):
@@ -144,8 +149,10 @@ class SingularityRecipe:
         return "%labels\n" + "\n".join(self._labels)
 
     def _add_neurodocker_header(self):
-        self._specs['instructions'].insert(
-            1, ('_header', {'version': 'generic', 'method': 'custom'}))
+        kwds = {
+            'version': 'generic',
+            'method': 'custom'}
+        self._specs['instructions'].insert(1, ('_header', kwds))
 
     def _fill_parts(self):
         pkg_man = self._specs['pkg_manager']
