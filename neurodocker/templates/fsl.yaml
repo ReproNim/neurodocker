@@ -1,0 +1,37 @@
+# Instructions to install FSL.
+#
+# *****************************************************************************
+# FSL is non-free. If you are considering commercial use of FSL, please consult
+# the relevant license.
+# *****************************************************************************
+#
+# Website: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
+# License: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+
+generic:
+  binaries:
+    urls:
+      "5.0.11": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.11-centos6_64.tar.gz
+      "5.0.10": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz
+      "5.0.9": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
+      "5.0.8": https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
+    dependencies:
+      apt: bc dc file libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng1 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6 wget
+      yum: bc file libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt wget
+    env:
+      FSLDIR: "{{ fsl.install_path }}"
+      PATH: "{{ fsl.install_path }}/bin:$PATH"
+    instructions: |
+      {{ fsl.install_dependencies() }}
+      echo "Downloading FSL ..."
+      mkdir -p {{ fsl.install_path }}
+      curl {{ fsl.curl_opts }} {{ fsl.binaries_url }} \
+      | tar -xz -C {{ fsl.install_path }} --strip-components 1
+      sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
+      sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
+      sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
+      sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
+      {% if fsl.version in ("5.0.11", "5.0.10") -%}
+      echo "Installing FSL conda environment ..."
+      bash {{ fsl.install_path }}/etc/fslconf/fslpython_install.sh -f {{ fsl.install_path }}
+      {% endif -%}

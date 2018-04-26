@@ -1,0 +1,81 @@
+---
+
+# Instructions to install AFNI.
+#
+# Repository: https://github.com/afni/afni
+# Website: https://afni.nimh.nih.gov/
+# Documentation: https://afni.nimh.nih.gov/Documentation
+
+
+generic:
+  binaries:
+    urls:
+      latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
+    env:
+      PATH: "{{ afni.install_path }}:$PATH"
+      AFNI_PLUGINPATH: "{{ afni.install_path }}"
+    dependencies:
+      apt: >
+        ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1
+        libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb
+      yum: >
+        ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif
+        tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
+      debs:
+        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        - http://mirrors.kernel.org/debian/pool/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
+    instructions: |
+      {{ afni.install_dependencies() }}
+      {{ afni.install_debs() }}
+      gsl2_path="$(find / -name 'libgsl.so.19' || printf '')"
+      if [ -n "$gsl2_path" ]; then
+        ln -sfv "$gsl2_path" "$(dirname $gsl2_path)/libgsl.so.0";
+      fi
+      ldconfig
+      echo "Downloading AFNI ..."
+      mkdir -p {{ afni.install_path }}
+      curl {{ afni.curl_opts }} {{ afni.binaries_url }} \
+      | tar -xz -C {{ afni.install_path }} --strip-components 1
+      {%- if afni.install_r_pkgs %}
+      {{ afni.install_path }}/rPkgsInstall -pkgs ALL
+      {% endif -%}
+
+  source:
+    env:
+      PATH: "{{ afni.install_path }}:$PATH"
+      AFNI_PLUGINPATH: "{{ afni.install_path }}"
+    dependencies:
+      apt: >
+        curl ed g++ gcc git libglib2.0-dev libglu1-mesa-dev libgsl-dev
+        libmotif-dev libnetpbm10-dev libxext-dev libxi-dev libxpm-dev libxt-dev
+        m4 make nlibxmu-headers nmesa-common-dev r-base r-base-dev tcsh
+        zlib1g-dev
+      yum: >
+        compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel
+        gsl-devel libXext-devel libXi-devel libXmu-devel libXpm-devel
+        libXt-devel m4 make mesa-libGL-devel mesa-libGLU-devel netpbm-devel
+        openmotif-devel R R-devel tcsh zlib-devel
+      debs:
+        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        - http://mirrors.kernel.org/debian/pool/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
+    instructions: |
+      {{ afni.install_dependencies() }}
+      {{ afni.install_debs() }}
+      git clone https://github.com/afni/afni.git {{ afni.install_path }}
+      cd {{ afni.install_path }}
+      git checkout {{ afni.version }}
+      cd src
+      cp Makefile.linux_openmp_64 Makefile
+      perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile
+      perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile
+      perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile
+      perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile
+      perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile
+      perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+      perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+      perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile
+      perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile
+      make INSTALLDIR="{{ afni.install_path }}" vastness
+      {%- if afni.install_r_pkgs %}
+      {{ afni.install_path }}/rPkgsInstall -pkgs ALL
+      {% endif -%}

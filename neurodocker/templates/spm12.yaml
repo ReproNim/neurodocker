@@ -1,0 +1,26 @@
+# Instructions to install SPM.
+#
+# Website: http://www.fil.ion.ucl.ac.uk/spm/
+# Documentation: http://www.fil.ion.ucl.ac.uk/spm/doc/
+
+generic:
+  binaries:
+    urls:
+      dev: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2018a.zip
+      r7219: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
+      r6914: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6914_R2010a.zip
+      r6685: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6685_R2010a.zip
+      r6472: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6472_R2010a.zip
+      r6225: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6225_R2010a.zip
+    env:
+      FORCE_SPMMCR: "1"
+    instructions: |
+      echo "Downloading standalone SPM ..."
+      curl {{ spm12.curl_opts }} -o /tmp/spm12.zip {{ spm12.binaries_url }}
+      unzip -q /tmp/spm12.zip -d /tmp
+      mkdir -p {{ spm12.install_path }}
+      mv /tmp/spm12/* {{ spm12.install_path }}/
+      chmod -R 777 {{ spm12.install_path }}
+      rm -rf /tmp/*
+      {{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} quit
+      sed -i '$iexport SPMMCRCMD=\"{{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} script\"' $ND_ENTRYPOINT

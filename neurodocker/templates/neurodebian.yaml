@@ -1,0 +1,13 @@
+# Instructions to add NeuroDebian repositories.
+
+generic:
+  custom:
+    dependencies:
+      apt: dirmngr gnupg2
+    instructions: |
+      {{ neurodebian.install_dependencies() }}
+      curl {{ neurodebian.curl_opts }} {{ neurodebian.url }} \
+      > /etc/apt/sources.list.d/neurodebian.sources.list
+      curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | apt-key add -
+      (apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+      apt-get -qq update

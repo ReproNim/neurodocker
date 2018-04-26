@@ -1,0 +1,19 @@
+# Instructions to install MRtrix3.
+#
+# Repository: https://github.com/MRtrix3/mrtrix3
+# Website: http://www.mrtrix.org/
+# Documentation: http://mrtrix.readthedocs.io/en/latest/
+
+generic:
+  binaries:
+    urls:
+      "3.0": https://dl.dropbox.com/s/2g008aaaeht3m45/mrtrix3-Linux-centos6.tar.gz
+    env:
+      PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
+    instructions: |
+      echo "Downloading MRtrix3 ..."
+      mkdir -p {{ mrtrix3.install_path }}
+      curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
+      | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
+
+#TODO(kaczmarj): add option to build from source.

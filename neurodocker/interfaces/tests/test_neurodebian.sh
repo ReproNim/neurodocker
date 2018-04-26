@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -ex
 
 dcm2niix -h
+
+printf 'passed'

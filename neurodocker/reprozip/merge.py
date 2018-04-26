@@ -20,10 +20,6 @@ Assumptions
 - If the same files exist in different traces, the contents of those files are
   identical.
 """
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
-
-from __future__ import absolute_import, division, print_function
-
 from glob import glob
 import logging
 import os
