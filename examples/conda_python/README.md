@@ -17,4 +17,3 @@ You can test the script and `Dockerfile`
  - building a Docker image (this will take a few minutes): `docker build -t test/conda .`
  - running a Docker container: `docker run -it --rm -p8888:8888 test/conda` (container should start `jupyter-notebook`, you can copy the link and paste to your browser)
  - you can still start container with `bash` instead of `jupyter-notebook`: `docker run -it --rm test/conda bash`
- 
