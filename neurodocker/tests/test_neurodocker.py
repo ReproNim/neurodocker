@@ -3,37 +3,35 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import sys
-
 import pytest
 
-from neurodocker.neurodocker import create_parser, parse_args, main
+from neurodocker.neurodocker import main
 
 
 def test_generate():
-    args = ("generate -b ubuntu:17.04 -p apt"
-            " --arg FOO=BAR BAZ"
-            " --afni version=latest"
-            " --ants version=2.2.0"
-            " --freesurfer version=6.0.0"
-            " --fsl version=5.0.10"
-            " --user=neuro"
-            " --miniconda env_name=neuro conda_install=python=3.6.2"
-            " --user=root"
-            " --mrtrix3"
-            " --neurodebian os_codename=zesty download_server=usa-nh"
-            " --spm version=12 matlab_version=R2017a"
-            " --no-check-urls"
-            " --expose 1234 9000"
-            " --volume /var /usr/bin"
-            " --label FOO=BAR BAZ=CAT"
-            " --copy relpath/to/file.txt /tmp/file.txt"
-            " --add relpath/to/file2.txt /tmp/file2.txt"
-            " --cmd '--arg1' '--arg2'"
-            " --workdir /home"
-            " --install git"
-            " --user=neuro"
-            )
+    args = (
+        "generate docker -b ubuntu:17.04 -p apt"
+        " --arg FOO=BAR BAZ"
+        " --afni version=latest method=source"
+        " --ants version=2.2.0 method=source"
+        " --freesurfer version=6.0.0"
+        " --fsl version=5.0.10"
+        " --user=neuro"
+        " --miniconda env_name=neuro conda_install=python=3.6.2"
+        " --user=root"
+        " --mrtrix3 version=3.0"
+        " --neurodebian os_codename=zesty server=usa-nh"
+        " --spm12 version=r7219 matlab_version=R2017a"
+        " --expose 1234 9000"
+        " --volume /var /usr/bin"
+        " --label FOO=BAR BAZ=CAT"
+        " --copy relpath/to/file.txt /tmp/file.txt"
+        " --add relpath/to/file2.txt /tmp/file2.txt"
+        " --cmd '--arg1' '--arg2'"
+        " --workdir /home"
+        " --install git"
+        " --user=neuro"
+    )
     main(args.split())
 
     with pytest.raises(SystemExit):
@@ -47,13 +45,9 @@ def test_generate():
     with pytest.raises(SystemExit):
         main()
 
-    args = "generate -b ubuntu -p apt --ants option=value"
-    with pytest.raises(ValueError):
-        main(args.split())
-
 
 def test_generate_opts(capsys):
-    args = "generate -b ubuntu:17.04 -p apt --no-check-urls {}"
+    args = "generate docker -b ubuntu:17.04 -p apt {}"
     main(args.format('--user=neuro').split())
     out, _ = capsys.readouterr()
     assert "USER neuro" in out
@@ -68,8 +62,9 @@ def test_generate_opts(capsys):
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert 'ENV KEY="VAL" \\' in out
-    assert '  KEY2="VAL"' in out
+    assert (
+        ('ENV KEY="VAL" \\' in out and 'KEY="VAL"' in out)
+        or ('ENV KEY2="VAL" \\' in out and 'KEY="VAL"'))
 
     main(args.format('--expose 1230 1231').split())
     out, _ = capsys.readouterr()
@@ -83,22 +78,18 @@ def test_generate_opts(capsys):
     out, _ = capsys.readouterr()
     assert "vi" in out
 
-    main(args.format('--instruction RUNecho').split())
-    out, _ = capsys.readouterr()
-    assert "RUNecho" in out
 
-
+@pytest.mark.xfail
 def test_generate_from_json(capsys, tmpdir):
     import json
 
-    cmd = "generate -b debian:stretch -p apt --c3d version=1.0.0"
+    cmd = "generate docker -b debian:stretch -p apt --convert3d version=1.0.0"
     main(cmd.split())
     true, _ = capsys.readouterr()
 
-    specs = {'check_urls': True,
-             'generation_timestamp': '2017-08-31 21:49:04',
+    specs = {'generation_timestamp': '2017-08-31 21:49:04',
              'instructions': [['base', 'debian:stretch'],
-                              ['c3d', {'version': '1.0.0'}]],
+                              ['convert3d', {'version': '1.0.0'}]],
              'neurodocker_version': '0.2.0-18-g9227b17',
              'pkg_manager': 'apt'}
     str_specs = json.dumps(specs)
@@ -113,25 +104,3 @@ def test_generate_from_json(capsys, tmpdir):
     # saves to JSON (with timestamp).
     sl = slice(8, -19)
     assert true.split('\n')[sl] == test.split('\n')[sl]
-
-
-def test_generate_no_print(capsys):
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--no-check-urls']
-    main(args)
-    out, _ = capsys.readouterr()
-    assert "FROM" in out and "RUN" in out
-
-    args.append('--no-print-df')
-    main(args)
-    out, _ = capsys.readouterr()
-    assert not out
-
-
-def test_generate_save(tmpdir):
-    outfile = tmpdir.join("test.txt")
-    args = ['generate', '-b', 'ubuntu:17.04', '-p', 'apt', '--mrtrix3',
-            'use_binaries=false', '--no-print-df', '-o', outfile.strpath,
-            '--no-check-urls']
-    main(args)
-    assert outfile.read(), "saved Dockerfile is empty"
-    assert "git clone https://github.com/MRtrix3/mrtrix3.git" in outfile.read()

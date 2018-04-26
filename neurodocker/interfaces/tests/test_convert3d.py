@@ -1,33 +1,34 @@
 """Tests for neurodocker.interfaces.Convert3D"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import, division, print_function
-
-import pytest
-
-from neurodocker import DockerContainer, Dockerfile
-from neurodocker.interfaces import Convert3D
 from neurodocker.interfaces.tests import utils
 
 
 class TestConvert3D(object):
-    """Tests for Convert3D class."""
 
-    def test_build_image_convert3d_100_binaries_zesty(self):
-        """Install Convert3D binaries on Ubuntu Zesty."""
-        specs = {'pkg_manager': 'apt',
-                 'check_urls': True,
-                 'instructions': [
-                    ('base', 'ubuntu:zesty'),
-                    ('c3d', {'version': '1.0.0'}),
-                    ('user', 'neuro'),
-                 ]}
-        df = Dockerfile(specs).cmd
-        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['convert3d_zesty']
-        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+    def test_docker(self):
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'ubuntu:18.04'),
+                ('convert3d', {'version': '1.0.0'}),
+                ('user', 'neuro'),
+            ]
+        }
 
-        cmd = "bash /testscripts/test_convert3d.sh"
-        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+        bash_test_file = "test_convert3d.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
-        if push:
-            utils.push_image(image_name)
+    def test_singularity(self):
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'docker://ubuntu:16.04'),
+                ('convert3d', {'version': '1.0.0'}),
+                ('user', 'neuro'),
+            ]
+        }
+
+        bash_test_file = "test_convert3d.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)

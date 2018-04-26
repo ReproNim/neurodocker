@@ -1,0 +1,114 @@
+---
+_machine_kwds: &machine_kwds
+  image: circleci/classic:201711-01
+
+_checkout_kwds: &checkout_kwds
+  path: ~/neurodocker
+
+_setup_env: &setup_kwds
+  name: Setup environment
+  command: |
+    curl -fsSLO https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p ~/conda
+    echo "export PATH=~/conda/bin:$PATH" >> ~/.bashrc
+    source ~/.bashrc
+    conda config --system --prepend channels conda-forge
+    conda update -n base -yq conda
+    conda update -yq --all
+
+    pip install -q --no-cache-dir -U pip
+    pip install -q --no-cache-dir reprozip codecov
+    pip install -q --no-cache-dir -e ~/neurodocker[dev]
+
+
+version: 2
+jobs:
+  test_docker:
+    machine:
+      *machine_kwds
+    working_directory: ~/neurodocker
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - restore_cache:
+          keys:
+            - dfs-v0-{{ .Branch }}-{{ .Revision }}
+            - dfs-v0-{{ .Branch }}
+            - dfs-v0
+      - run:
+          name: Test docker image builds
+          no_output_timeout: 360m
+          command: |
+            source ~/.bashrc
+            pytest --cov -k 'test_docker' neurodocker
+            codecov
+      - save_cache:
+          key: dfs-v0-{{ .Branch }}-{{ .Revision }}
+          when: always
+          paths:
+            - /tmp/cache
+
+  test_singularity:
+    machine:
+      *machine_kwds
+    working_directory: ~/neurodocker
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - restore_cache:
+          keys:
+            - srs-v0-{{ .Branch }}-{{ .Revision }}
+            - srs-v0-{{ .Branch }}
+            - srs-v0
+      - run:
+          name: Install singularity
+          command: |
+            source ~/.bashrc
+            curl -fsSL http://neuro.debian.net/lists/trusty.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+            curl -fsSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
+            (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+            sudo apt-get -qq update
+            sudo apt-get install -yq singularity-container
+            pip install -q --no-cache-dir singularity
+      - run:
+          name: Test singularity image builds
+          no_output_timeout: 360m
+          command: |
+            source ~/.bashrc
+            pytest --cov -k 'test_singularity' neurodocker
+            codecov
+      - save_cache:
+          key: srs-v0-{{ .Branch }}-{{ .Revision }}
+          when: always
+          paths:
+            - ~/tmp/cache
+
+  test_others:
+    machine:
+      *machine_kwds
+    working_directory: ~/neurodocker
+    steps:
+      - checkout:
+          *checkout_kwds
+      - run:
+          *setup_kwds
+      - run:
+          name: Test others (not docker or singularity)
+          no_output_timeout: 30m
+          command: |
+            source ~/.bashrc
+            pytest --cov -k 'not test_docker and not test_singularity' neurodocker
+            codecov
+
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - test_docker
+      - test_singularity
+      - test_others

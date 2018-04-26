@@ -2,8 +2,13 @@ __pycache__
 .cache
 .DS_Store
 .ipynb_checkpoints
+.pytest_cache
 dockerfile_tests
+/scraper
 *.egg-info
+
+.coverage
+coverage.xml
 
 *.ipynb
 *.pyc

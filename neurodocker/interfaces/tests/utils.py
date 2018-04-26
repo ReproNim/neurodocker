@@ -1,171 +1,143 @@
-"""Utility functions for `neurodocker.interfaces.tests`."""
-from __future__ import absolute_import
+"""Utilities for `neurodocker.interfaces.tests`."""
 
+import io
 import logging
 import os
+from pathlib import Path
+import posixpath
+import subprocess
 
-from neurodocker import Dockerfile
-from neurodocker.docker import client, DockerContainer, DockerImage
-from neurodocker.interfaces.tests import memory
+from neurodocker.generators import Dockerfile
+from neurodocker.generators import SingularityRecipe
+from neurodocker.utils import get_docker_client
+from neurodocker.utils import get_singularity_client
 
 logger = logging.getLogger(__name__)
 
-
-# DockerHub repositories cannot have capital letters in them.
-DROPBOX_DOCKERHUB_MAPPING = {
-    'afni-latest_stretch': ('/Dockerfile.AFNI-latest_stretch',
-                            'kaczmarj/afni:latest_stretch'),
-
-    'ants-2.0.0_stretch': ('/Dockerfile.ANTs-2.2.0_stretch',
-                           'kaczmarj/ants:2.2.0_stretch'),
-
-    'convert3d_zesty': ('/Dockerfile.Convert3D-1.0.0_zesty',
-                        'kaczmarj/c3d:1.0.0_zesty'),
-
-    'dcm2niix-master_centos7': ('/Dockerfile.dcm2niix-master_centos7',
-                                'kaczmarj/dcm2niix:master_centos7'),
-
-    'freesurfer-min_zesty': ('/Dockerfile.FreeSurfer-min_zesty',
-                             'kaczmarj/freesurfer:min_zesty'),
-
-    'fsl-5.0.9_centos7': ('/Dockerfile.FSL-5.0.9_centos7',
-                          'kaczmarj/fsl:5.0.9_centos7'),
-
-    'fsl-5.0.10_centos7': ('/Dockerfile.FSL-5.0.10_centos7',
-                           'kaczmarj/fsl:5.0.10_centos7'),
-
-    'miniconda_centos7': ('/Dockerfile.Miniconda-latest_centos7',
-                          'kaczmarj/miniconda:latest_centos7'),
-
-    'mrtrix3_centos7': ('/Dockerfile.MRtrix3_centos7',
-                        'kaczmarj/mrtrix3:centos7'),
-
-    'neurodebian_stretch': ('/Dockerfile.NeuroDebian_stretch',
-                            'kaczmarj/neurodebian:stretch'),
-
-    'spm-12_zesty': ('/Dockerfile.SPM-12_zesty',
-                     'kaczmarj/spm:12_zesty'),
-
-    'minc_xenial': ('/Dockerfile.MINC_xenial',
-                     'kaczmarj/minc:1.9.15_xenial'),
-
-    'minc_centos7': ('/Dockerfile.MINC_centos7',
-                     'kaczmarj/minc:1.9.15_centos7'),
-
-    'petpvc_xenial': ('/Dockerfile.PETPVC_xenial',
-                     'kaczmarj/petpvc:1.2.0b_xenial'),
-
-}
-
+PUSH_IMAGES = os.environ.get('ND_PUSH_IMAGES', False)
+DOCKER_CACHEDIR = os.path.join(os.path.sep, 'tmp', 'cache')
+# Singularity builds clear the /tmp directory
+SINGULARITY_CACHEDIR = os.path.join(Path.home(), 'tmp', 'cache')
 
 here = os.path.dirname(os.path.realpath(__file__))
-volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
+_volumes = {here: {'bind': '/testscripts', 'mode': 'ro'}}
+
+_container_run_kwds = {'volumes': _volumes}
 
 
-
-def pull_image(name, **kwargs):
-    """Pull image from DockerHub. Return None if image is not found.
-
-    This does not stream the raw output of the pull.
+def docker_is_running(client):
+    """Return true if Docker server is responsive.
 
     Parameters
     ----------
-    name : str
-        Name of Docker image to pull. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
+    client : docker.client.DockerClient
+        The Docker client. E.g., `client = docker.from_env()`.
 
+    Returns
+    -------
+    running : bool
+        True if Docker server is responsive.
     """
-    import docker
-
     try:
-        return client.images.pull(name, **kwargs)
-    except docker.errors.NotFound:
-        return None
+        client.ping()
+        return True
+    except Exception:
+        return False
 
 
-def build_image(df, name):
-    """Build and return image.
+def test_docker_container_from_specs(specs, bash_test_file):
+    """"""
+    client = get_docker_client()
+    docker_is_running(client)
 
-    Parameters
-    ----------
-    df : str
-        String representation of Dockerfile.
-    name : str
-        Name of Docker image to build. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
+    df = Dockerfile(specs).render()
+
+    refpath = bash_test_file[5:].split('.')[0]
+    refpath = os.path.join(DOCKER_CACHEDIR, "Dockerfile." + refpath)
+
+    if os.path.exists(refpath):
+        logger.info("loading cached reference dockerfile")
+        with open(refpath, 'r') as fp:
+            reference = fp.read()
+        if _dockerfiles_equivalent(df, reference):
+            logger.info("test equal to reference dockerfile, passing")
+            return  # do not build and test because nothing has changed
+
+    logger.info("building docker image")
+    image, build_logs = client.images.build(
+        fileobj=io.BytesIO(df.encode()), rm=True)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    res = client.containers.run(image, test_cmd, **_container_run_kwds)
+    passed = res.decode().endswith('passed')
+    assert passed
+
+    if passed:
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
+        with open(refpath, 'w') as fp:
+            fp.write(df)
+
+
+def test_singularity_container_from_specs(specs, bash_test_file):
+    """"""
+    sr_dir = "singularity_cache"
+    os.makedirs(sr_dir, exist_ok=True)
+
+    intname = bash_test_file[5:].split('.')[0]
+    refpath = os.path.join(SINGULARITY_CACHEDIR, "Singularity." + intname)
+
+    sr = SingularityRecipe(specs).render()
+
+    if os.path.exists(refpath):
+        logger.info("loading cached reference singularity spec")
+        with open(refpath, 'r') as fp:
+            reference = fp.read()
+        if _dockerfiles_equivalent(sr, reference):
+            logger.info("test equal to reference singularity spec, passing")
+            return  # do not build and test because nothing has changed
+
+    logger.info("building singularity image")
+    filename = os.path.join(sr_dir,  "Singularity." + intname)
+    with open(filename, 'w') as fp:
+        fp.write(sr)
+
+    client = get_singularity_client()
+    img = client.build(os.path.join(sr_dir, intname + ".sqsh"), filename)
+
+    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    test_cmd = "bash " + bash_test_file
+
+    # TODO(kaczmarj): replace the exec with a singularity python client
+    # command.
+    cmd = "singularity run --bind {s}:{d} {img} {args}"
+    cmd = cmd.format(s=here, d=_volumes[here]['bind'], img=img, args=test_cmd)
+
+    output = subprocess.check_output(cmd.split())
+    passed = output.decode().endswith('passed')
+    assert passed
+    if passed:
+        os.makedirs(os.path.dirname(refpath), exist_ok=True)
+        with open(refpath, 'w') as fp:
+            fp.write(sr)
+    os.remove(img)
+
+
+def _prune_dockerfile(string, comment_char="#"):
+    """Remove comments, emptylines, and last layer (serialize to JSON)."""
+    string = string.strip()  # trim white space on both ends.
+    json_removed = '\n\n'.join(string.split('\n\n')[:-1])
+    json_removed = "".join(json_removed.split())
+    return '\n'.join(
+        row for row in json_removed.split('\n') if not
+        row.startswith(comment_char) and row)
+
+
+def _dockerfiles_equivalent(df_a, df_b):
+    """Return True if unicode strings `df_a` and `df_b` are equivalent. Does
+    not consider comments or empty lines.
     """
-    logger.info("Building image: {} ...".format(name))
-    return DockerImage(df).build(log_console=True, tag=name)
-
-
-def push_image(name):
-    """Push image to DockerHub.
-
-    Parameters
-    ----------
-    name : str
-        Name of Docker image to push. Should include repository and tag.
-        Example: 'kaczmarj/neurodocker:latest'.
-    """
-    logger.info("Pushing image to DockerHub: {} ...".format(name))
-    client.images.push(name)
-
-
-def _get_dbx_token():
-    """Get access token for Dopbox API."""
-    import os
-    import warnings
-
-    try:
-        return os.environ['DROPBOX_TOKEN']
-    except KeyError:
-        warnings.warn("Environment variable not found: DROPBOX_TOKEN."
-                      " Cannot interact with Dropbox API. Cannot compare "
-                      " Dockerfiles. Will pull existing Docker images ...")
-        return None
-
-
-def _check_can_push():
-    """Raise error if user cannot push to DockerHub."""
-    pass
-
-
-def get_image_from_memory(df, remote_path, name, force_build=False):
-    """Return image and boolean indicating whether or not to push resulting
-    image to DockerHub.
-    """
-    if force_build:
-        logger.info("Building image (forced) ... Result should be pushed.")
-        image = build_image(df, name)
-        push = True
-        return image, push
-
-    token = _get_dbx_token()
-
-    # Take into account other forks of the project. They cannot use the secret
-    # environment variables in travis ci (e.g., the dropbox token).
-    if token is None:
-        logger.info("Attempting to pull image...")
-        image = pull_image(name)
-        if image is None:
-            logger.info("Image not found. Building ...")
-            image = build_image(df, name)
-        push = False
-        return image, push
-
-    dbx_client = memory.Dropbox(token)
-
-    if memory.should_build_image(df, remote_path, remote_object=dbx_client):
-        logger.info("Building image... Result should be pushed.")
-        image = build_image(df, name)
-        push = True
-    else:
-        logger.info("Attempting to pull image ...")
-        image = pull_image(name)
-        push = False
-        if image is None:
-            logger.info("Image could not be pulled. Building ..."
-                        " Result should be pushed.")
-            image = build_image(df, name)
-            push = True
-    return image, push
+    print(_prune_dockerfile(df_a))
+    print(_prune_dockerfile(df_b))
+    return _prune_dockerfile(df_a) == _prune_dockerfile(df_b)

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -ex
 
 c3d -h
+
+printf 'passed'

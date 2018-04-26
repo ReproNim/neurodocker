@@ -1,33 +1,37 @@
 """Tests for neurodocker.interfaces.PETPVC"""
 # Author: Sulantha Mathotaarachchi <sulantha.s@gmail.com>
 
-from __future__ import absolute_import, division, print_function
-
-import pytest
-
-from neurodocker import DockerContainer, Dockerfile
-from neurodocker.interfaces import petpvc
 from neurodocker.interfaces.tests import utils
 
 
 class TestPETPVC(object):
     """Tests for PETPVC class."""
 
-    def test_build_image_petpvc_120b_binaries_xenial(self):
+    def test_docker(self):
         """Install PETPVC binaries on Ubuntu Xenial."""
-        specs = {'pkg_manager': 'apt',
-                 'check_urls': True,
-                 'instructions': [
-                     ('base', 'ubuntu:xenial'),
-                     ('petpvc', {'version': '1.2.0-b', 'use_binaries': True}),
-                     ('user', 'neuro'),
-                 ]}
-        df = Dockerfile(specs).cmd
-        dbx_path, image_name = utils.DROPBOX_DOCKERHUB_MAPPING['petpvc_xenial']
-        image, push = utils.get_image_from_memory(df, dbx_path, image_name)
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'ubuntu:xenial'),
+                ('petpvc', {'version': '1.2.2'}),
+                ('user', 'neuro'),
+            ]
+        }
 
-        cmd = "bash /testscripts/test_petpvc.sh"
-        assert DockerContainer(image).run(cmd, volumes=utils.volumes)
+        bash_test_file = "test_petpvc.sh"
+        utils.test_docker_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)
 
-        if push:
-            utils.push_image(image_name)
+    def test_singularity(self):
+        specs = {
+            'pkg_manager': 'apt',
+            'instructions': [
+                ('base', 'docker://ubuntu:xenial'),
+                ('petpvc', {'version': '1.2.2'}),
+                ('user', 'neuro'),
+            ]
+        }
+
+        bash_test_file = "test_petpvc.sh"
+        utils.test_singularity_container_from_specs(
+            specs=specs, bash_test_file=bash_test_file)

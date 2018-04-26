@@ -1,0 +1,32 @@
+---
+# Instructions to install FreeSurfer.
+#
+# Repository: https://github.com/freesurfer/freesurfer
+# Website: https://surfer.nmr.mgh.harvard.edu/
+# Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki
+
+
+generic:
+  binaries:
+    urls:
+      "6.0.1": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz
+      "6.0.0": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+      # See https://github.com/freesurfer/freesurfer/issues/70
+      "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
+    dependencies:
+      apt: bc libgomp1 libxmu6 libxt6 tcsh perl
+      yum: bc libgomp libXmu libXt tcsh perl
+    env:
+      FREESURFER_HOME: "{{ freesurfer.install_path }}"
+      PATH: "{{ freesurfer.install_path }}/bin:$PATH"
+    instructions: |
+      {{ freesurfer.install_dependencies() }}
+      echo "Downloading FreeSurfer ..."
+      mkdir -p {{ freesurfer.install_path }}
+      curl {{ freesurfer.curl_opts }} {{ freesurfer.binaries_url }} \
+      | tar -xz -C {{ freesurfer.install_path }} --strip-components 1 {% if freesurfer.exclude_paths -%}\
+      {%- for exclude_path in freesurfer.exclude_paths %}
+        --exclude='{{ exclude_path }}' \
+      {%- endfor %}
+      {%- endif %}
+      sed -i '$isource "{{ freesurfer.install_path }}/SetUpFreeSurfer.sh"' "$ND_ENTRYPOINT"

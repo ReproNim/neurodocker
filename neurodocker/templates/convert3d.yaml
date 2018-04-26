@@ -1,0 +1,19 @@
+# Instructions to install Convert3D.
+#
+# Repository: https://sourceforge.net/projects/c3d/
+# Website: http://www.itksnap.org/c3d/
+# Documentation: https://sourceforge.net/p/c3d/git/ci/master/tree/doc/c3d.md
+
+generic:
+  binaries:
+    urls:
+      nightly: https://sourceforge.net/projects/c3d/files/c3d/Nightly/c3d-nightly-Linux-x86_64.tar.gz/download
+      "1.0.0": https://sourceforge.net/projects/c3d/files/c3d/1.0.0/c3d-1.0.0-Linux-x86_64.tar.gz/download
+    env:
+      C3DPATH: "{{ convert3d.install_path }}"
+      PATH: "{{ convert3d.install_path }}/bin:$PATH"
+    instructions: |
+      echo "Downloading Convert3D ..."
+      mkdir -p {{ convert3d.install_path }}
+      curl {{ convert3d.curl_opts }} {{ convert3d.binaries_url }} \
+      | tar -xz -C {{ convert3d.install_path }} --strip-components 1
