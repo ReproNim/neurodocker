@@ -15,7 +15,7 @@ class TestSPM(object):
             ],
         }
 
-        bash_test_file = "test_spm.sh"
+        bash_test_file = "test_spm12.sh"
         utils.test_docker_container_from_specs(
             specs=specs, bash_test_file=bash_test_file)
 
@@ -29,6 +29,6 @@ class TestSPM(object):
             ],
         }
 
-        bash_test_file = "test_spm.sh"
+        bash_test_file = "test_spm12.sh"
         utils.test_singularity_container_from_specs(
             specs=specs, bash_test_file=bash_test_file)
