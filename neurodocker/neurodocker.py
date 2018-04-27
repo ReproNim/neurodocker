@@ -68,6 +68,8 @@ def _add_generate_common_arguments(parser):
         '-r', '--run', action=OrderedArgs,
         help="Run a command when building container")
     p.add_argument(
+        '--run-bash', action=OrderedArgs, help="Run a command in bash")
+    p.add_argument(
         '-u', '--user', action=OrderedArgs,
         help="Switch current user (creates user if necessary)")
     p.add_argument(
@@ -173,9 +175,6 @@ def _add_generate_docker_arguments(parser):
     p.add_argument(
         '--label', action=OrderedArgs, nargs="+", type=_list_of_kv,
         help="Dockerfile LABEL instruction.")
-    p.add_argument(
-        '--run-bash', action=OrderedArgs,
-        help="Run BASH code in RUN instruction.")
     p.add_argument(
         '--volume', action=OrderedArgs, nargs="+",
         help="Dockerfile VOLUME instruction.")

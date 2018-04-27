@@ -1,18 +1,38 @@
-In this directory you can find a `Dockerfile` with `FSL`.
+# FSL
 
-The bash script `create_dockerfile.sh` contains a `neurodocker` command that was used to create the `Dockerfile`.
+In this directory you can find a `Dockerfile` and `Singularity` file with `FSL`.
 
-The `Dockerfile` contains:
+The shell script `generate.sh` contains a `neurodocker` command that was used to create both files.
 
- - using `neurodebian:stretch-non-free` as a base image
- - installing fsl and text editors
- - creating a user `neuro` and a home directory `/home/neuro`
- - setting `/home/neuro` as a working directory
+Both specs:
 
+ - use `neurodebian:stretch-non-free` as a base image
+ - install fsl and text editors
+ - create a non-root user `neuro` and a home directory `/home/neuro`
+ - set `/home/neuro` as a working directory
 
-You can test the script and `Dockerfile`
+## Docker
 
- - creating a `Dockerfile`: `bash create_dockerfile.sh`
- - building a Docker image: `docker build -t test/fsl .`
- - running a Docker container: `docker run -it --rm test/fsl`
- - within the container you can try to run `BET` command: `bet`
+```shell
+# Generate Dockerfile
+$ ./generate.sh
+# Build Docker image
+$ docker build -t test/fsl .
+# Start an interactive bash shell
+$ docker run --rm -it test/fsl
+# Run bet inside the container
+(in-container)$ bet
+```
+
+## Singularity
+
+```shell
+# Generate Singularity file
+$ ./generate.sh
+# Build Singularity image
+$ singularity build fsl.sqsh Singularity
+# Start interactive bash shell
+$ singularity run fsl.sqsh
+# Run bet inside the container
+(in-container)$ bet
+```

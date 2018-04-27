@@ -1,21 +1,41 @@
-In this directory you can find a `Dockerfile` used to run [Nipype Tutorial](https://github.com/miykael/nipype_tutorial).
+In this directory you can find a `Dockerfile` and `Singularity` file used to run [Nipype Tutorial](https://github.com/miykael/nipype_tutorial).
 
-The bash script `create_dockerfile.sh` contains a `neurodocker` command that was used to create the `Dockerfile`.
+The shell script `generate.sh` contains a `neurodocker` command that was used to create the `Dockerfile` and `Singularity` file.
 
-The `Dockerfile` contains:
+Both specs:
 
- - using `neurodebian:stretch-non-free` as a base image
- - installing ants, fsl, spm
- - creating a conda environment and installing various python library, including `nipype` from source
- - creating directory and changing permission
- - using datalad to download data
- - copying a current directory to the container (so don't expect the [Nipype Tutorial notebooks](https://github.com/miykael/nipype_tutorial/tree/master/notebooks) if you're not in the specific directory)
- - using `jupyter-notebook` as a default command
+ - use `neurodebian:stretch-non-free` as a base image
+ - install ants, fsl, spm
+ - create a conda environment and install various python library, including `nipype` from source
+ - create directory and changing permission
+ - use datalad to download data
+ - copy a current directory to the container (so don't expect the [Nipype Tutorial notebooks](https://github.com/miykael/nipype_tutorial/tree/master/notebooks) if you're not in the specific directory)
+
+The `Dockerfile` sets `jupyter-notebook` as the default command. The `Singularity` file will run a bash shell by default.
 
 
-You can test the script and `Dockerfile`
+## Docker
 
- - creating a `Dockerfile`: `bash create_dockerfile.sh`
- - building a Docker image (this will take a while): `docker build -t test/nipype_tutorial .`
- - running a Docker container: `docker run -it --rm -p8888:8888 test/nipype_tutorial`
- - container should start `jupyter-notebook`, you can copy the link and paste to your browser
+```shell
+# Generate Dockerfile
+$ ./generate.sh
+# Build Docker image
+$ docker build -t test/nipype_tutorial .
+# Start jupyter-notebook
+$ docker run -it --rm -p8888:8888 test/nipype_tutorial
+# Start interactive bash shell
+$ docker run -it --rm test/nipype_tutorial bash
+```
+
+## Singularity
+
+```shell
+# Generate Singularity file
+$ ./generate.sh
+# Build Singularity image
+$ singularity build nipype_tutorial.sqsh Singularity
+# Start jupyter-notebook
+$ singularity run nipype_tutorial.sqsh jupyter-notebook
+# Start interactive bash shell
+$ singularity run nipype_tutorial.sqsh
+```

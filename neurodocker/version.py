@@ -3,7 +3,7 @@
 Copied from https://github.com/nipy/nipype/blob/master/nipype/info.py.
 """
 
-__version__ = '0.4.0rc0'
+__version__ = '0.4.0.dev1'
 
 
 def get_gitversion():
@@ -19,8 +19,9 @@ def get_gitversion():
 
     here = os.path.abspath(os.path.dirname(__file__))
     try:
-        cmd = "git describe"
-        return subprocess.check_output(cmd.split(), cwd=here).decode().strip()
+        cmd = "git describe".split()
+        return subprocess.check_output(
+            cmd, cwd=here, stderr=subprocess.DEVNULL).decode().strip()
     except subprocess.CalledProcessError:
         return None
 
