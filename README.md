@@ -20,7 +20,7 @@ Examples:
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.4.0rc1 --help
+$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 --help
 ```
 
 This project can also be installed with `pip`:
@@ -28,6 +28,12 @@ This project can also be installed with `pip`:
 ```shell
 $ pip install neurodocker
 $ neurodocker --help
+```
+
+If the `pip install` command above gives a permissions error, install as a non-root user:
+
+```shell
+$ pip install --user neurodocker
 ```
 
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
