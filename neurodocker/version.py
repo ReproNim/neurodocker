@@ -19,8 +19,9 @@ def get_gitversion():
 
     here = os.path.abspath(os.path.dirname(__file__))
     try:
-        cmd = "git describe"
-        return subprocess.check_output(cmd.split(), cwd=here).decode().strip()
+        cmd = "git describe".split()
+        return subprocess.check_output(
+            cmd, cwd=here, stderr=subprocess.DEVNULL).decode().strip()
     except subprocess.CalledProcessError:
         return None
 
