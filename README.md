@@ -1,9 +1,8 @@
 # Neurodocker
 
 [![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
-[![build status](https://img.shields.io/docker/build/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
 [![build status](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
-[![build status](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker//)
+[![build status](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
@@ -18,10 +17,17 @@ Examples:
 
 # Installation
 
-Use the _Neurodocker_ Docker image:
+Use the _Neurodocker_ Docker image (recommended):
 
+```shell
+docker run --rm kaczmarj/neurodocker:0.4.0rc1 --help
 ```
-docker run --rm kaczmarj/neurodocker:0.4.0 --help
+
+This project can also be installed with `pip`:
+
+```shell
+$ pip install neurodocker
+$ neurodocker --help
 ```
 
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
@@ -100,11 +106,11 @@ The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate docker \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate docker \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
 
@@ -113,19 +119,14 @@ $ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
 Install ANTs on Ubuntu 18.04.
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate singularity \
+$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate singularity \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 ```
 
 
 ## Minimize existing Docker image
 
-The _Neurodocker_ Python package will have to be installed for container minimization:
-
-```shell
-pip install --no-cache-dir https://github.com/kaczmarj/neurodocker/tarball/master
-```
-
+_Neurodocker_ must be `pip` installed for container minimization.
 
 In the following example, a Docker image is built with ANTs version 2.2.0 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
 
