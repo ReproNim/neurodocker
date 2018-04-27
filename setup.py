@@ -26,11 +26,6 @@ def main():
     with open(os.path.join(here, 'README.md'), encoding='utf-8') as fp:
         long_description = fp.read()
 
-    # https://github.com/nipy/nipype/blob/master/setup.py#L114-L120
-    # ldict = locals()
-    # with open(os.path.join(here, 'neurodocker', 'version.py')) as fp:
-    #     exec(fp.read(), globals(), ldict)
-
     with open(os.path.join(here, 'requirements.txt')) as fp:
         requirements = [r.strip() for r in fp.readlines()]
 
@@ -55,8 +50,11 @@ def main():
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
         ],
-        keywords='containers, neuroimaging reproducibility research',
-        packages=find_packages(exclude=["tests"]),
+        keywords='containers neuroimaging reproducibility research',
+        packages=find_packages(),
+        package_data={
+            'neurodocker': ['templates/*.yaml']
+        },
         install_requires=requirements,
         entry_points={
             "console_scripts": [
