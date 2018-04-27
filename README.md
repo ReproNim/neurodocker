@@ -100,11 +100,11 @@ The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
     --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
 
@@ -113,8 +113,8 @@ $ docker run --rm kaczmarj/neurodocker:0.4.0 generate \
 Install ANTs on Ubuntu 18.04.
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:v0.4.0 generate singularity \
-    --base ubuntu:18.04 --pkag-manager apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate singularity \
+    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
 ```
 
 
