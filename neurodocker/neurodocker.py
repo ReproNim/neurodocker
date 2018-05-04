@@ -222,18 +222,14 @@ def create_parser():
 
     # `neurodocker gnerate` parsers.
     generate_parser = subparsers.add_parser(
-        'generate', help="generate recipes"
-    )
+        'generate', help="generate recipes")
     generate_subparsers = generate_parser.add_subparsers(
         dest="subsubparser_name", title="subcommands",
-        description="valid subcommands"
-    )
+        description="valid subcommands")
     generate_docker_parser = generate_subparsers.add_parser(
-        'docker', help="generate Dockerfile"
-    )
+        'docker', help="generate Dockerfile")
     generate_singularity_parser = generate_subparsers.add_parser(
-        'singularity', help="generate Singularity recipe"
-    )
+        'singularity', help="generate Singularity recipe")
     _add_generate_common_arguments(generate_docker_parser)
     _add_generate_docker_arguments(generate_docker_parser)
     _add_generate_common_arguments(generate_singularity_parser)
@@ -243,14 +239,11 @@ def create_parser():
     reprozip_parser = subparsers.add_parser('reprozip', help="")
     reprozip_subparsers = reprozip_parser.add_subparsers(
         dest="subsubparser_name", title="subcommands",
-        description="valid subcommands"
-    )
+        description="valid subcommands")
     reprozip_trace_parser = reprozip_subparsers.add_parser(
-        'trace', help="minify container for traced command(s)"
-    )
+        'trace', help="minify container for traced command(s)")
     reprozip_merge_parser = reprozip_subparsers.add_parser(
-        'merge', help="merge reprozip pack files"
-    )
+        'merge', help="merge reprozip pack files")
     _add_reprozip_trace_arguments(reprozip_trace_parser)
     _add_reprozip_merge_arguments(reprozip_merge_parser)
 
@@ -341,8 +334,8 @@ def main(args=None):
     subparser_functions = {
         'docker': generate,
         'singularity': generate,
-        'reprozip-trace': reprozip_trace,
-        'reprozip-merge': reprozip_merge,
+        'trace': reprozip_trace,
+        'merge': reprozip_merge,
     }
 
     subparser_functions[namespace.subsubparser_name](namespace)
