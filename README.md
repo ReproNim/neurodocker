@@ -1,8 +1,8 @@
 # Neurodocker
 
 [![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
-[![build status](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
-[![build status](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
+[![docker pulls](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
+[![python versions](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
@@ -79,7 +79,8 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |          | install_path | Installation path. Default `/opt/minc-{version}`. |
 | **Miniconda** | version | latest (default), all other hosted versions. |
 |               | install_path | Installation path. Default `/opt/miniconda-{version}`. |
-|               | env_name* | Name of this conda environment. |
+|               | create_env | Name of conda environment to create. |
+|               | use_env | Name of previously installed environment. |
 |               | conda_install | Packages to install with `conda`. E.g., `conda_install="python=3.6 numpy traits"` |
 |               | pip_install | Packages to install with `pip`. |
 |               | activate | If true (default), activate this environment in container entrypoint. |
