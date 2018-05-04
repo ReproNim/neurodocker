@@ -26,7 +26,11 @@ generic:
       curl {{ freesurfer.curl_opts }} {{ freesurfer.binaries_url }} \
       | tar -xz -C {{ freesurfer.install_path }} --strip-components 1 {% if freesurfer.exclude_paths -%}\
       {%- for exclude_path in freesurfer.exclude_paths %}
+        {% if not loop.last -%}
         --exclude='{{ exclude_path }}' \
+        {%- else -%}
+        --exclude='{{ exclude_path }}'
+        {%- endif -%}
       {%- endfor %}
       {%- endif %}
       sed -i '$isource "{{ freesurfer.install_path }}/SetUpFreeSurfer.sh"' "$ND_ENTRYPOINT"
