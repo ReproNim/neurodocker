@@ -143,14 +143,15 @@ In the following example, a Docker image is built with ANTs version 2.2.0 and a 
 $ download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
 $ neurodocker generate docker -b centos:7 -p yum --ants version=2.2.0 --run="$download_cmd" | docker build -t ants:2.2.0 -
 
-# Run the container.
-$ docker run --rm -itd --name ants-reprozip-container --security-opt=seccomp:unconfined ants:2.2.0
+# Run the container in the background.
+# The option --security-opt=seccomp:unconfined is important. Without this,
+# the trace will not be able to run in the container.
+$ docker run --rm -itd --name ants-container --security-opt=seccomp:unconfined ants:2.2.0
 
-# Output a ReproZip pack file in ~/neurodocker-reprozip-output with the files
+# Output a ReproZip pack file in the current directory with the files
 # necessary to run antsMotionCorr.
-# See https://github.com/stnava/ANTs/blob/master/Scripts/antsMotionCorrExample
 $ cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
-$ neurodocker reprozip-trace ants-reprozip-container "$cmd"
+$ neurodocker reprozip trace ants-container "$cmd"
 # Create a Docker container with the contents of ReproZip's trace.
 $ reprounzip docker setup neurodocker-reprozip.rpz test
 ```
