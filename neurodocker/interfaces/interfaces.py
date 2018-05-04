@@ -2,6 +2,8 @@
 
 import posixpath
 
+import jinja2
+
 from neurodocker.interfaces._base import _BaseInterface
 
 
@@ -176,21 +178,44 @@ class Miniconda(_BaseInterface):
     _installed = False
     _environments = set()
 
-    # TODO(kaczmarj): use create_env and use_env options.
+    # TODO(kaczmarj): only prepend to PATH once.
     # TODO(kaczmarj): add method to create environment from file.
-    # TODO(kaczmarj): add conda_opts and pip_opts
-    def __init__(self, *args, env_name, conda_install=None, pip_install=None,
-                 preinstalled=False, **kwargs):
-        self.env_name = env_name
+    def __init__(self, *args, create_env=None, use_env=None,
+                 conda_install=None, pip_install=None, yaml_file=None,
+                 **kwargs):
+        self.create_env = create_env
+        self.use_env = use_env
         self.conda_install = conda_install
         self.pip_install = pip_install
-        self.preinstalled = preinstalled
+        self.yaml_file = yaml_file
 
-        if self.preinstalled:
+        if create_env is None and use_env is None:
+            raise ValueError("create_env or use_env must be provided")
+
+        if create_env in Miniconda._environments:
+            raise ValueError("environment already installed. use `use_env`")
+
+        if not any((conda_install, pip_install, yaml_file)):
+            raise ValueError(
+                "must conda or pip install packages, or create environment"
+                " from yaml file")
+
+        if use_env is not None and yaml_file is not None:
+            raise ValueError(
+                "cannot use `use_env` with `yaml_file`. `use_env` is meant"
+                " for existing environments, and `yaml_file` creates a new"
+                " environment.")
+
+        if (yaml_file and conda_install) or (yaml_file and pip_install):
+            raise ValueError(
+                "cannot conda or pip install when creating environment from"
+                " yaml file")
+
+        if self.use_env is not None and not Miniconda._installed:
+            self._environments.add(self.use_env)
             Miniconda._installed = True
 
-        if not self.env_name:
-            raise ValueError("env_name is required")
+        self.env_name = use_env if use_env is not None else create_env
 
         kwargs.setdefault('version', 'latest')
         super().__init__(self._name, *args, **kwargs)
@@ -200,6 +225,10 @@ class Miniconda(_BaseInterface):
         Miniconda._installed = True
         Miniconda._environments.add(self.env_name)
         return out
+
+    def render_env(self):
+        if not Miniconda._installed:
+            return super().render_env()
 
 
 class MRtrix3(_BaseInterface):
