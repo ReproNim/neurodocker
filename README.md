@@ -102,6 +102,121 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 ** FSL is non-free. If you are considering commercial use of FSL, please consult the [relevant license](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence).
 
 
+# Generate Dockerfile
+
+```
+usage: neurodocker generate docker [-h] [-b BASE] [-p {apt,yum}]
+                                   [--add-to-entrypoint ADD_TO_ENTRYPOINT]
+                                   [--copy COPY [COPY ...]]
+                                   [--install INSTALL [INSTALL ...]]
+                                   [--entrypoint ENTRYPOINT]
+                                   [-e ENV [ENV ...]] [-r RUN]
+                                   [--run-bash RUN_BASH] [-u USER]
+                                   [-w WORKDIR] [-f FILE] [-o OUTPUT]
+                                   [--no-print] [--afni  [...]]
+                                   [--ants  [...]] [--convert3d  [...]]
+                                   [--dcm2niix  [...]] [--freesurfer  [...]]
+                                   [--fsl  [...]] [--matlabmcr  [...]]
+                                   [--minc  [...]] [--miniconda  [...]]
+                                   [--mrtrix3 [[...]]] [--neurodebian  [...]]
+                                   [--petpvc  [...]] [--spm12  [...]]
+                                   [--add ADD [ADD ...]] [--arg ARG [ARG ...]]
+                                   [--cmd CMD [CMD ...]]
+                                   [--expose EXPOSE [EXPOSE ...]]
+                                   [--label LABEL [LABEL ...]]
+                                   [--volume VOLUME [VOLUME ...]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BASE, --base BASE  Base Docker image. Eg, ubuntu:17.04
+  -p {apt,yum}, --pkg-manager {apt,yum}
+                        Linux package manager.
+  --add-to-entrypoint ADD_TO_ENTRYPOINT
+                        Add a command to the file /neurodocker/startup.sh,
+                        which is the container's default entrypoint.
+  --copy COPY [COPY ...]
+                        Copy files into container. Use format <src>... <dest>
+  --install INSTALL [INSTALL ...]
+                        Install system packages with apt-get or yum, depending
+                        on the package manager specified.
+  --entrypoint ENTRYPOINT
+                        Set the container's entrypoint (Docker) / append to
+                        runscript (Singularity)
+  -e ENV [ENV ...], --env ENV [ENV ...]
+                        Set environment variable(s). Use the format KEY=VALUE
+  -r RUN, --run RUN     Run a command when building container
+  --run-bash RUN_BASH   Run a command in bash
+  -u USER, --user USER  Switch current user (creates user if necessary)
+  -w WORKDIR, --workdir WORKDIR
+                        Set working directory
+  -f FILE, --file FILE  Generate file from JSON. Overrides other `generate`
+                        arguments
+  -o OUTPUT, --output OUTPUT
+                        If specified, save Dockerfile to file with this name.
+  --no-print            Do not print the generated file
+  --add ADD [ADD ...]   Dockerfile ADD instruction. Use format <src>... <dest>
+  --arg ARG [ARG ...]   Dockerfile ARG instruction. Use format
+                        KEY[=DEFAULT_VALUE] ...
+  --cmd CMD [CMD ...]   Dockerfile CMD instruction.
+  --expose EXPOSE [EXPOSE ...]
+                        Dockerfile EXPOSE instruction.
+  --label LABEL [LABEL ...]
+                        Dockerfile LABEL instruction.
+  --volume VOLUME [VOLUME ...]
+                        Dockerfile VOLUME instruction.
+```
+
+# Generate Singularity recipe
+
+```
+usage: neurodocker generate singularity [-h] [-b BASE] [-p {apt,yum}]
+                                        [--add-to-entrypoint ADD_TO_ENTRYPOINT]
+                                        [--copy COPY [COPY ...]]
+                                        [--install INSTALL [INSTALL ...]]
+                                        [--entrypoint ENTRYPOINT]
+                                        [-e ENV [ENV ...]] [-r RUN]
+                                        [--run-bash RUN_BASH] [-u USER]
+                                        [-w WORKDIR] [-f FILE] [-o OUTPUT]
+                                        [--no-print] [--afni  [...]]
+                                        [--ants  [...]] [--convert3d  [...]]
+                                        [--dcm2niix  [...]]
+                                        [--freesurfer  [...]] [--fsl  [...]]
+                                        [--matlabmcr  [...]] [--minc  [...]]
+                                        [--miniconda  [...]]
+                                        [--mrtrix3 [[...]]]
+                                        [--neurodebian  [...]]
+                                        [--petpvc  [...]] [--spm12  [...]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BASE, --base BASE  Base Docker image. Eg, ubuntu:17.04
+  -p {apt,yum}, --pkg-manager {apt,yum}
+                        Linux package manager.
+  --add-to-entrypoint ADD_TO_ENTRYPOINT
+                        Add a command to the file /neurodocker/startup.sh,
+                        which is the container's default entrypoint.
+  --copy COPY [COPY ...]
+                        Copy files into container. Use format <src>... <dest>
+  --install INSTALL [INSTALL ...]
+                        Install system packages with apt-get or yum, depending
+                        on the package manager specified.
+  --entrypoint ENTRYPOINT
+                        Set the container's entrypoint (Docker) / append to
+                        runscript (Singularity)
+  -e ENV [ENV ...], --env ENV [ENV ...]
+                        Set environment variable(s). Use the format KEY=VALUE
+  -r RUN, --run RUN     Run a command when building container
+  --run-bash RUN_BASH   Run a command in bash
+  -u USER, --user USER  Switch current user (creates user if necessary)
+  -w WORKDIR, --workdir WORKDIR
+                        Set working directory
+  -f FILE, --file FILE  Generate file from JSON. Overrides other `generate`
+                        arguments
+  -o OUTPUT, --output OUTPUT
+                        If specified, save Dockerfile to file with this name.
+  --no-print            Do not print the generated file
+```
+
 # Examples
 
 Please see the [examples](examples) directory.
