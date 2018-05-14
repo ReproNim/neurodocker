@@ -108,14 +108,11 @@ def test_generate_from_json(capsys, tmpdir):
 
 def test_miniconda_env(capsys):
     """Test that environment is appropriately for Miniconda."""
-    base = "generate docker --base=debian:stretch --pkg-manager=apt "
-
-    main((base + "--miniconda create_env=foobar conda_install=foobar").split())
+    cmd = (
+        "generate docker --base=debian:stretch --pkg-manager=apt"
+        " --miniconda create_env=foobar conda_install=foobar"
+        " --miniconda use_env=foobar conda_install=foobaz")
+    main(cmd.split())
     out, _ = capsys.readouterr()
-    assert "CONDA_DIR" in out
-    assert "repo.continuum.io" in out
-
-    main((base + "--miniconda use_env=foobar conda_install=foobar").split())
-    out, _ = capsys.readouterr()
-    assert "CONDA_DIR" not in out
-    assert "repo.continuum.io" not in out
+    assert out.count("CONDA_DIR") == 1
+    assert out.count("repo.continuum.io") == 1
