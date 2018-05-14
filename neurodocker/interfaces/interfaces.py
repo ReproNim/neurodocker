@@ -2,8 +2,6 @@
 
 import posixpath
 
-import jinja2
-
 from neurodocker.interfaces._base import _BaseInterface
 
 
@@ -177,9 +175,8 @@ class Miniconda(_BaseInterface):
 
     _installed = False
     _environments = set()
+    _env_set = False
 
-    # TODO(kaczmarj): only prepend to PATH once.
-    # TODO(kaczmarj): add method to create environment from file.
     def __init__(self, *args, create_env=None, use_env=None,
                  conda_install=None, pip_install=None, yaml_file=None,
                  **kwargs):
@@ -188,6 +185,9 @@ class Miniconda(_BaseInterface):
         self.conda_install = conda_install
         self.pip_install = pip_install
         self.yaml_file = yaml_file
+        self.env_name = use_env if use_env is not None else create_env
+        kwargs.setdefault('version', 'latest')
+        super().__init__(self._name, *args, **kwargs)
 
         if create_env is None and use_env is None:
             raise ValueError("create_env or use_env must be provided")
@@ -214,11 +214,7 @@ class Miniconda(_BaseInterface):
         if self.use_env is not None and not Miniconda._installed:
             self._environments.add(self.use_env)
             Miniconda._installed = True
-
-        self.env_name = use_env if use_env is not None else create_env
-
-        kwargs.setdefault('version', 'latest')
-        super().__init__(self._name, *args, **kwargs)
+            Miniconda._env_set = True
 
     def render_run(self):
         out = super().render_run()
@@ -227,7 +223,8 @@ class Miniconda(_BaseInterface):
         return out
 
     def render_env(self):
-        if not Miniconda._installed:
+        if not Miniconda._env_set:
+            Miniconda._env_set = True
             return super().render_env()
 
 
