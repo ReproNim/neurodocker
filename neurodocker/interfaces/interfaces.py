@@ -226,6 +226,8 @@ class Miniconda(_BaseInterface):
         if not Miniconda._env_set:
             Miniconda._env_set = True
             return super().render_env()
+        else:
+            return {}
 
 
 class MRtrix3(_BaseInterface):
