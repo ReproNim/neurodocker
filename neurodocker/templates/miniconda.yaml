@@ -25,11 +25,15 @@ generic:
       conda config --system --set show_channel_urls true
       sync && conda clean -tipsy && sync
       {% endif -%}
+      {% if miniconda.yaml_file -%}
+      conda env create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
+      rm -rf ~/.cache/pip/*
+      {% else -%}
       {% if miniconda.env_name not in miniconda._environments -%}
-      conda create -y -q --name {{ miniconda.env_name }}
+      conda create -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }}
       {% endif -%}
       {% if miniconda.conda_install is not none -%}
-      conda install -y -q --name {{ miniconda.env_name }} \
+      conda install -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} \
       {%- for pkg in miniconda.conda_install %}
           {% if not loop.last -%}
           {{ pkg }} \
@@ -41,7 +45,7 @@ generic:
       {% endif -%}
       {% if miniconda.pip_install is not none -%}
       bash -c "source activate {{ miniconda.env_name }}
-        pip install -q --no-cache-dir \
+        pip install {{ miniconda.pip_opts }} --no-cache-dir \
         {%- for pkg in miniconda.pip_install %}
             {% if not loop.last -%}
             {{ pkg }} \
@@ -49,8 +53,10 @@ generic:
             {{ pkg }}
             {%- endif -%}
         {% endfor %}"
+      rm -rf ~/.cache/pip/*
       sync
       {% endif -%}
       {% if miniconda.activate -%}
       sed -i '$isource activate {{ miniconda.env_name }}' $ND_ENTRYPOINT
+      {% endif -%}
       {% endif -%}

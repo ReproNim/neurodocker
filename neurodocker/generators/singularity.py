@@ -163,7 +163,9 @@ class SingularityRecipe(ContainerSpecGenerator):
                 if impl in _installation_implementations.values():
                     interface = impl(pkg_manager=pkg_man, **params)
                     if interface.env:
-                        self._environment.update(**interface.render_env())
+                        _this_env = interface.render_env()
+                        if _this_env is not None:
+                            self._environment.update(**_this_env)
                     if interface.run:
                         self._post.append(interface.render_run())
                 else:
