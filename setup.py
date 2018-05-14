@@ -53,7 +53,9 @@ def main():
         keywords='containers neuroimaging reproducibility research',
         packages=find_packages(),
         package_data={
-            'neurodocker': ['templates/*.yaml']
+            'neurodocker': [
+                'templates/*.yaml',
+                'reprozip/utils/reprozip_trace_runner.sh']
         },
         install_requires=requirements,
         entry_points={
