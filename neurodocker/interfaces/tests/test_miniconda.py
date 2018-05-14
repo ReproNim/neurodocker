@@ -14,7 +14,7 @@ class TestMiniconda(object):
                 (
                     'miniconda',
                     {
-                        'env_name': 'default',
+                        'create_env': 'default',
                         'conda_install': ['python=3.6.5', 'traits'],
                         'pip_install': ['nipype'],
                         'activate': True,
@@ -23,7 +23,7 @@ class TestMiniconda(object):
                 (
                     'miniconda',
                     {
-                        'env_name': 'default',
+                        'use_env': 'default',
                         'pip_install': ['pylsl'],
                     }
                 ),
@@ -43,7 +43,7 @@ class TestMiniconda(object):
                 (
                     'miniconda',
                     {
-                        'env_name': 'default',
+                        'create_env': 'default',
                         'conda_install': ['python=3.6.5', 'traits'],
                         'pip_install': ['nipype'],
                         'activate': True,
@@ -51,7 +51,7 @@ class TestMiniconda(object):
                 ),
                 (
                     'miniconda',
-                    {'env_name': 'default', 'pip_install': ['pylsl']}
+                    {'use_env': 'default', 'pip_install': ['pylsl']}
                 ),
             ],
         }
