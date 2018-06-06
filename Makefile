@@ -3,3 +3,5 @@ clean-pyc:
 	find . -name "__pycache__" -type d -exec rm -rf {} +
 
 clean: clean-pyc
+	rm -f examples/Dockerfile
+	rm -f examples/Singularity
