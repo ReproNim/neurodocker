@@ -210,7 +210,8 @@ neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
 This option adds a Docker `CMD` layer and does not apply to Singularity. The `CMD` can be thought of as command-line arguments to the `ENTRYPOINT`.
 
 ```shell
-neurodocker generate docker --base=debian:stretch --pkg-manager=apt --cmd echo "i am in the container"
+neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
+  --cmd echo "i am in the container"
 ```
 
 ## `--expose`
