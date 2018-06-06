@@ -7,10 +7,10 @@
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
 Examples:
+  - [Examples gallery](./examples)
   - [Canonical examples](#canonical-examples)
     - [Docker](#docker)
     - [Singularity](#singularity)
-  - [Assorted examples](./examples)
   - [Minimize existing Docker image](#minimize-existing-docker-image)
   - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 
