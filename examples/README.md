@@ -67,7 +67,7 @@ Docker images that involve copying files must be built with some context, for ex
 neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
   --copy environment.yml /opt/environment.yml
 
-# SIngularity -- copy the local environment.yml file into the container to /opt/environment.yml.
+# Singularity -- copy the local environment.yml file into the container to /opt/environment.yml.
 neurodocker generate singularity --base=debian:stretch --pkg-manager=apt \
   --copy environment.yml /opt/environment.yml
 ```
@@ -174,7 +174,7 @@ This option changes the current user (and adds a new user if necessary) and appl
 neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
   --user=neuro
 
-# Singularity -- change to non-root user neurod
+# Singularity -- change to non-root user neuro
 neurodocker generate singularity --base=debian:stretch --pkg-manager=apt \
   --user=neuro
 ```
@@ -200,7 +200,7 @@ neurodocker generate singularity --base=debian:stretch --pkg-manager=apt \
 This option adds a Docker `ARG` layer and does not apply to Singularity. These can be used at container build-time.
 
 ```shell
-# $FOO is equal to 'bar' by default and $BAZ is unset by default.
+# $FOO is set to 'bar' by default and $BAZ is unset by default.
 neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
   --arg FOO=bar BAZ
 ```
