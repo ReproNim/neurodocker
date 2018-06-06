@@ -106,6 +106,7 @@ jobs:
       - run:
           name: Test examples in /examples directory
           command: |
+            source ~/.bashrc
             cd examples
             bash test_examples.sh
 
