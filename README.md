@@ -23,6 +23,8 @@ Use the _Neurodocker_ Docker image (recommended):
 $ docker run --rm kaczmarj/neurodocker:0.4.0rc1 --help
 ```
 
+_Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
+
 This project can also be installed with `pip`:
 
 ```shell
@@ -224,6 +226,9 @@ Please see the [examples](examples) directory.
 ## Canonical examples
 
 The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
+
+_Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
+
 
 ### Docker
 
