@@ -19,7 +19,7 @@ generate_docker() {
     pip_install="https://github.com/nipy/nipype/tarball/master
                  https://github.com/INCF/pybids/tarball/master
                  nilearn datalad[full] nipy duecredit" \
-    env_name="neuro" \
+    create_env="neuro" \
     activate=true \
   --run-bash 'source activate neuro && jupyter nbextension enable exercise2/main && jupyter nbextension enable spellchecker/main' \
   --run 'mkdir -p ~/.jupyter && echo c.NotebookApp.ip = "0.0.0.0" > ~/.jupyter/jupyter_notebook_config.py' \
@@ -62,7 +62,7 @@ generate_singularity() {
     pip_install="https://github.com/nipy/nipype/tarball/master
                  https://github.com/INCF/pybids/tarball/master
                  nilearn datalad[full] nipy duecredit" \
-    env_name="neuro" \
+    create_env="neuro" \
     activate=true \
   --run-bash 'source activate neuro && jupyter nbextension enable exercise2/main && jupyter nbextension enable spellchecker/main' \
   --run 'mkdir -p ~/.jupyter && echo c.NotebookApp.ip = "0.0.0.0" > ~/.jupyter/jupyter_notebook_config.py' \
