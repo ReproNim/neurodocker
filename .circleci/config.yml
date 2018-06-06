@@ -108,7 +108,7 @@ jobs:
           command: |
             source ~/.bashrc
             cd examples
-            bash test_examples.sh
+            python3 test_examples.py
 
 
 workflows:
