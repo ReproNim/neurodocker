@@ -146,11 +146,10 @@ def get_docker_client(version='auto', **kwargs):
     return docker.from_env(version='auto', **kwargs)
 
 
-def get_singularity_client(**kwargs):
+def get_singularity_client():
     try:
-        import singularity
-        from singularity.cli import Singularity
+        import spython.main
     except ImportError:
         raise ImportError(
-            "the singularity python package is required for this")
-    return Singularity(**kwargs)
+            "the singularity python (spython) package is required for this")
+    return spython.main.Client
