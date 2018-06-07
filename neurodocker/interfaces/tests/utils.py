@@ -104,7 +104,9 @@ def test_singularity_container_from_specs(specs, bash_test_file):
         fp.write(sr)
 
     client = get_singularity_client()
-    img = client.build(os.path.join(sr_dir, intname + ".sqsh"), filename)
+    img = client.build(
+        recipe=filename,
+        image=os.path.join(sr_dir, intname + ".sqsh"))
 
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
