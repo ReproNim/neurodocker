@@ -6,13 +6,14 @@
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
 
-Examples:
+- Examples:
   - [Examples gallery](./examples)
   - [Canonical examples](#canonical-examples)
     - [Docker](#docker)
     - [Singularity](#singularity)
   - [Minimize existing Docker image](#minimize-existing-docker-image)
   - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
+- [Known issues](#known-issues)
 
 
 # Installation
@@ -275,3 +276,11 @@ $ neurodocker reprozip trace ants-container "$cmd"
 # Create a Docker container with the contents of ReproZip's trace.
 $ reprounzip docker setup neurodocker-reprozip.rpz test
 ```
+
+
+# Known issues
+
+- Using the `-t/--tty` option in `docker run` produces non-printable characters in the generated Dockerfile or Singularity recipe (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
+  - Solution: do not use the `-t/--tty` flag, unless using the container interactively.
+- Attempting to rebuild into an existing Singularity image may raise an error.
+  - Solution: remove the existing image or build a new image file.
