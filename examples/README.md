@@ -81,7 +81,7 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
   --entrypoint curl
 ```
 
-In many cases, it is not desirable to overwrite the default entrypoint (`/neurodocker/startup.sh`) because that file sets certain environment variables and activates conda environments. In these cases, they entrypoint can be set as `/neurodocker/startup.sh <your_entrypoint>`. The default entrypoint will be run prior to `<your_entrypoint>`.
+In many cases, it is not desirable to overwrite the default entrypoint (`/neurodocker/startup.sh`) because that file sets certain environment variables and activates conda environments. In these cases, the entrypoint can be set as `/neurodocker/startup.sh <your_entrypoint>`. The default entrypoint will be run prior to `<your_entrypoint>`.
 
 In the command below the conda environment `neuro` will be activated prior to running `python`.
 
