@@ -21,7 +21,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 --help
+$ docker run --rm kaczmarj/neurodocker:0.4.0 --help
 ```
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
@@ -226,7 +226,7 @@ Please see the [examples](examples) directory.
 
 ## Canonical examples
 
-The canonical examples install ANTs version 2.2.0 on Ubuntu 18.04.
+The canonical examples install ANTs version 2.2.0 on Debian 9 (Stretch).
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
 
@@ -234,21 +234,21 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate docker \
-    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+    --base debian:stretch --pkg-manager apt --ants version=2.2.0
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate docker \
-    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0 | docker build -
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+    --base debian:stretch --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
 
 ### Singularity
 
-Install ANTs on Ubuntu 18.04.
+Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0rc1 generate singularity \
-    --base ubuntu:18.04 --pkg-manager apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.0 generate singularity \
+    --base debian:stretch --pkg-manager apt --ants version=2.2.0
 ```
 
 

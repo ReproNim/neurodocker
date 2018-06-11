@@ -42,7 +42,8 @@ def _list_of_kv(kv):
 def _add_generate_common_arguments(parser):
     p = parser
 
-    p.add_argument("-b", "--base", help="Base Docker image. Eg, ubuntu:17.04")
+    p.add_argument(
+        "-b", "--base", help="Base Docker image. E.g., debian:stretch")
     p.add_argument(
         "-p", "--pkg-manager", choices={'apt', 'yum'},
         help="Linux package manager.")
@@ -127,8 +128,8 @@ def _add_generate_common_arguments(parser):
         "mrtrix3": "Install MRtrix3. Valid keys are version (required),"
                    " method, and install_path",
         "neurodebian": "Add NeuroDebian repository. Valid keys are "
-                       "os_codename (eg zesty), server (eg usa-nh), and full"
-                       " (if true, use non-free packages). Valid download"
+                       "os_codename (e.g., zesty), server (e.g., usa-nh), and"
+                       " full (if true, use non-free packages). Valid download"
                        " servers are {}.".format(_ndeb_servers),
         "spm12": "Install SPM12 and its dependency, Matlab Compiler Runtime."
                  " Valid keys are version and install_path.",
@@ -140,8 +141,7 @@ def _add_generate_common_arguments(parser):
     }
 
     pkgs = p.add_argument_group(
-        title="software package arguments", description=pkgs_help['all']
-    )
+        title="software package arguments", description=pkgs_help['all'])
 
     for pkg in _installation_implementations.keys():
         if pkg == '_header':
@@ -151,8 +151,7 @@ def _add_generate_common_arguments(parser):
         nargs = "*" if pkg == "mrtrix3" else "+"
         pkgs.add_argument(
             flag, dest=pkg, nargs=nargs, action=OrderedArgs, metavar="",
-            type=_list_of_kv, help=pkgs_help[pkg]
-        )
+            type=_list_of_kv, help=pkgs_help[pkg])
 
 
 def _add_generate_docker_arguments(parser):
@@ -207,8 +206,7 @@ def create_parser():
     """Return command-line argument parser."""
 
     parser = ArgumentParser(
-        description=__doc__, formatter_class=RawDescriptionHelpFormatter
-    )
+        description=__doc__, formatter_class=RawDescriptionHelpFormatter)
 
     verbosity_choices = ('debug', 'info', 'warning', 'error', 'critical')
     parser.add_argument("-v", "--verbosity", choices=verbosity_choices)
@@ -217,10 +215,9 @@ def create_parser():
 
     subparsers = parser.add_subparsers(
         dest="subparser_name", title="subcommands",
-        description="valid subcommands"
-    )
+        description="valid subcommands")
 
-    # `neurodocker gnerate` parsers.
+    # `neurodocker generate` parsers.
     generate_parser = subparsers.add_parser(
         'generate', help="generate recipes")
     generate_subparsers = generate_parser.add_subparsers(
