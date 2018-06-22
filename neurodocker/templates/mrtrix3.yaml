@@ -7,7 +7,8 @@
 generic:
   binaries:
     urls:
-      "3.0": https://dl.dropbox.com/s/2g008aaaeht3m45/mrtrix3-Linux-centos6.tar.gz
+      "3.0_RC3": https://dl.dropbox.com/s/2oh339ehcxcf8xf/mrtrix3-3.0_RC3-Linux-centos6.9-x86_64.tar.gz
+      "3.0_RC2": https://dl.dropbox.com/s/f6y0l472wuio70x/mrtrix3-3.0_RC2-Linux-centos6.9-x86_64.tar.gz
     env:
       PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
     instructions: |
@@ -16,4 +17,21 @@ generic:
       curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
       | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
 
-#TODO(kaczmarj): add option to build from source.
+  source:
+    dependencies:
+      apt: g++ gcc git python make zlib1g-dev
+      yum: gcc-c++ git python make zlib-devel
+    env:
+      ANTSPATH: "{{ ants.install_path }}/bin"
+      PATH: "{{ ants.install_path }}/bin:$PATH"
+      LD_LIBRARY_PATH: "{{ ants.install_path }}/lib:$LD_LIBRARY_PATH"
+    instructions: |
+      {{ mrtrix3.install_dependencies() }}
+      mkdir -p {{ mrtrix3.install_path }}
+      git clone https://github.com/MRtrix3/mrtrix3.git {{ mrtrix3.install_path }}
+      cd {{ mrtrix3.install_path }}
+      {% if mrtrix3.version != "master" and mrtrix3.version != "latest" -%}
+      git checkout {{ mrtrix3.version }}
+      {% endif -%}
+      ./configure -nogui
+      ./build
