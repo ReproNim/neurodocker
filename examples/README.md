@@ -304,7 +304,7 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --mrtrix3 version=3.0
+  --mrtrix3 version=3.0_RC3
 ```
 
 ## NeuroDebian

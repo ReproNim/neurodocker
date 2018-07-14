@@ -10,7 +10,7 @@ class TestMRtrix3(object):
             'pkg_manager': 'yum',
             'instructions': [
                 ('base', 'centos:7'),
-                ('mrtrix3', {'version': '3.0'}),
+                ('mrtrix3', {'version': '3.0_RC3'}),
                 ('user', 'neuro'),
             ],
         }
@@ -24,7 +24,7 @@ class TestMRtrix3(object):
             'pkg_manager': 'yum',
             'instructions': [
                 ('base', 'docker://centos:7'),
-                ('mrtrix3', {'version': '3.0'}),
+                ('mrtrix3', {'version': '3.0_RC2'}),
                 ('user', 'neuro'),
             ],
         }
