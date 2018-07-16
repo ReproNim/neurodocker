@@ -11,7 +11,7 @@ from neurodocker.utils import load_yaml
 GENERIC_VERSION = 'generic'
 
 apt_install = """apt-get update -qq
-apt-get install -y {{ apt_opts|default('-q --no-install-recommends', false) }} \\\
+apt-get install -y {{ apt_opts|default('-q', true) }} \\\
 {% for pkg in pkgs %}
     {% if not loop.last -%}
     {{ pkg }} \\\
