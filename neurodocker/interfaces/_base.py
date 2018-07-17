@@ -11,7 +11,7 @@ from neurodocker.utils import load_yaml
 GENERIC_VERSION = 'generic'
 
 apt_install = """apt-get update -qq
-apt-get install -y {{ apt_opts|default('-q --no-install-recommends', true) }} \\\
+apt-get install -y {{ apt_opts|default('-q --no-install-recommends', boolean=false) }} \\\
 {% for pkg in pkgs %}
     {% if not loop.last -%}
     {{ pkg }} \\\
@@ -24,7 +24,7 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 """
 apt_install = jinja2.Template(apt_install)
 
-yum_install = """yum install -y {{ yum_opts|default('-q', true) }} \\\
+yum_install = """yum install -y {{ yum_opts|default('-q', boolean=false) }} \\\
 {% for pkg in pkgs %}
     {% if not loop.last -%}
     {{ pkg }} \\\
@@ -84,6 +84,7 @@ class _Resolver:
     ----------
     d : dict
     """
+
     def __init__(self, d):
         self._d = d
         self._generic_only = self._d.keys() == {GENERIC_VERSION}
