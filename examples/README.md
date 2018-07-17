@@ -72,6 +72,14 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
   --install git vim
 ```
 
+by default --install uses --no-install-recommends to minimize container sizes. In few cases this can lead to unexpected behaviours and one can try to build a container without this option.
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --install apt_opts='--quiet' git vim
+  ```
+
+
 ## `--entrypoint`
 
 This option sets the container's default entrypoint and applies to Docker and Singularity. It adds an `ENTRYPOINT` layer for Docker and replaces the `%runscript` section for Singularity.
