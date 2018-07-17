@@ -35,7 +35,7 @@ def _apt_install(pkgs, apt_opts=None):
         return apt_install.render(pkgs=pkgs, apt_opts=apt_opts)
 
 
-def _yum_install(pkgs, yum_opts=""):
+def _yum_install(pkgs, yum_opts=None):
     return yum_install.render(pkgs=pkgs, yum_opts=yum_opts)
 
 
