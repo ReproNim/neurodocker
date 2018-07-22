@@ -26,7 +26,7 @@ generic:
       sync && conda clean -tipsy && sync
       {% endif -%}
       {% if miniconda.yaml_file -%}
-      conda env create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
+      conda create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
       rm -rf ~/.cache/pip/*
       {% else -%}
       {% if miniconda.env_name not in miniconda._environments -%}
