@@ -28,8 +28,7 @@ generic:
       {% if miniconda.yaml_file -%}
       conda env create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
       rm -rf ~/.cache/pip/*
-      {% else -%}
-      {% if miniconda.env_name not in miniconda._environments -%}
+      {% elif miniconda.env_name not in miniconda._environments -%}
       conda create -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }}
       {% endif -%}
       {% if miniconda.conda_install is not none -%}
@@ -58,5 +57,4 @@ generic:
       {% endif -%}
       {% if miniconda.activate -%}
       sed -i '$isource activate {{ miniconda.env_name }}' $ND_ENTRYPOINT
-      {% endif -%}
       {% endif -%}
