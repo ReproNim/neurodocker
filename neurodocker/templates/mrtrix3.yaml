@@ -6,8 +6,12 @@
 
 generic:
   binaries:
+    depndencies:
+      apt: python python-numpy
+      yum: numpy python
     urls:
-      "3.0": https://dl.dropbox.com/s/2g008aaaeht3m45/mrtrix3-Linux-centos6.tar.gz
+      "3.0_RC3": https://dl.dropbox.com/s/2oh339ehcxcf8xf/mrtrix3-3.0_RC3-Linux-centos6.9-x86_64.tar.gz
+      "3.0_RC2": https://dl.dropbox.com/s/f6y0l472wuio70x/mrtrix3-3.0_RC2-Linux-centos6.9-x86_64.tar.gz
     env:
       PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
     instructions: |
@@ -16,4 +20,20 @@ generic:
       curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
       | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
 
-#TODO(kaczmarj): add option to build from source.
+  source:
+    dependencies:
+      apt: g++ gcc git libeigen3-dev make python python-numpy zlib1g-dev
+      yum: eigen3-devel gcc-c++ git make numpy python zlib-devel
+    env:
+      PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
+    instructions: |
+      {{ mrtrix3.install_dependencies() }}
+      mkdir -p {{ mrtrix3.install_path }}
+      git clone https://github.com/MRtrix3/mrtrix3.git {{ mrtrix3.install_path }}
+      cd {{ mrtrix3.install_path }}
+      {% if mrtrix3.version != "master" and mrtrix3.version != "latest" -%}
+      git checkout {{ mrtrix3.version }}
+      {% endif -%}
+      ./configure -nogui
+      echo "Compiling MRtrix3 ..."
+      ./build

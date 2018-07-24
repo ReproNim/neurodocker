@@ -11,7 +11,7 @@ from neurodocker.utils import load_yaml
 GENERIC_VERSION = 'generic'
 
 apt_install = """apt-get update -qq
-apt-get install -y {{ apt_opts|default('-q --no-install-recommends', true) }} \\\
+apt-get install -y {{ apt_opts|default('-q --no-install-recommends') }} \\\
 {% for pkg in pkgs %}
     {% if not loop.last -%}
     {{ pkg }} \\\
@@ -24,7 +24,7 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 """
 apt_install = jinja2.Template(apt_install)
 
-yum_install = """yum install -y {{ yum_opts|default('-q', true) }} \\\
+yum_install = """yum install -y {{ yum_opts|default('-q') }} \\\
 {% for pkg in pkgs %}
     {% if not loop.last -%}
     {{ pkg }} \\\
@@ -84,6 +84,7 @@ class _Resolver:
     ----------
     d : dict
     """
+
     def __init__(self, d):
         self._d = d
         self._generic_only = self._d.keys() == {GENERIC_VERSION}
@@ -285,17 +286,28 @@ class _BaseInterface:
         pkgs = sorted(self.dependencies) if sort else self.dependencies
 
         if self.pkg_manager == 'apt':
-            return apt_install.render(
-                pkgs=pkgs,
-                apt_opts=self.__dict__.get('apt_opts'),
-                sort=True,
-            )
+            # Do not render with `apt_opts` or `yum_opts` if they are not
+            # provided, because otherwise, instructions are misprinted.
+            apt_opts = self.__dict__.get('apt_opts', None)
+            if apt_opts is not None:
+                out = apt_install.render(
+                    pkgs=pkgs,
+                    apt_opts=apt_opts,
+                    sort=True)
+            else:
+                out = apt_install.render(pkgs=pkgs, sort=True)
+
         elif self.pkg_manager == 'yum':
-            return yum_install.render(
-                pkgs=pkgs,
-                yum_opts=self.__dict__.get('yum_opts'),
-                sort=True,
-            )
+            yum_opts = self.__dict__.get('yum_opts', None)
+            if yum_opts is not None:
+                out = yum_install.render(
+                    pkgs=pkgs,
+                    yum_opts=yum_opts,
+                    sort=True)
+            else:
+                out = yum_install.render(pkgs=pkgs, sort=True)
+
+        return out
 
     def install_debs(self):
         debs = self._get_debs()

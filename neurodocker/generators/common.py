@@ -29,7 +29,10 @@ def _add_to_entrypoint(cmd):
 
 
 def _apt_install(pkgs, apt_opts=None):
-    return apt_install.render(pkgs=pkgs, apt_opts=apt_opts)
+    if apt_opts is None:
+        return apt_install.render(pkgs=pkgs)
+    else:
+        return apt_install.render(pkgs=pkgs, apt_opts=apt_opts)
 
 
 def _yum_install(pkgs, yum_opts=None):

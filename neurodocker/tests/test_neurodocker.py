@@ -19,7 +19,7 @@ def test_generate():
         " --user=neuro"
         " --miniconda create_env=neuro conda_install=python=3.6.2"
         " --user=root"
-        " --mrtrix3 version=3.0"
+        " --mrtrix3 version=3.0_RC3"
         " --neurodebian os_codename=zesty server=usa-nh"
         " --spm12 version=r7219 matlab_version=R2017a"
         " --expose 1234 9000"
