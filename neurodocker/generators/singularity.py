@@ -46,7 +46,7 @@ class _SingularityRecipeImplementations:
         self._singobj._runscript = entrypoint
 
     def env(self, d):
-        self._singobj._environment.update(**d)
+        self._singobj._environment.extend(d.items())
 
     def run(self, s):
         self._singobj._post.append(s)
@@ -77,7 +77,7 @@ class SingularityRecipe(ContainerSpecGenerator):
         self._help = []
         self._setup = []
         self._post = []
-        self._environment = OrderedDict()
+        self._environment = []
         self._files = []
         self._runscript = '/neurodocker/startup.sh "$@"'
         self._test = []
@@ -132,7 +132,7 @@ class SingularityRecipe(ContainerSpecGenerator):
         return (
             "%environment\n"
             + "\n".join('export {}="{}"'.format(*kv)
-                        for kv in self._environment.items()))
+                        for kv in self._environment))
 
     def _render_files(self):
         return (
@@ -165,7 +165,7 @@ class SingularityRecipe(ContainerSpecGenerator):
                     if interface.env:
                         _this_env = interface.render_env()
                         if _this_env is not None:
-                            self._environment.update(**_this_env)
+                            self._environment.extend(_this_env.items())
                     if interface.run:
                         self._post.append(interface.render_run())
                 else:
