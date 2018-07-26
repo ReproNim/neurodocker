@@ -46,6 +46,7 @@ function install_conda_reprozip() {
   bash $TMP_CONDA_INSTALLER -b -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
   ${REPROZIP_CONDA}/bin/conda install -yq --channel='conda-forge' python=3.6 reprozip
+  ${REPROZIP_CONDA}/bin/conda install -yq sqlite
 }
 
 
@@ -65,11 +66,13 @@ function run_reprozip_trace() {
 
     reprozip_cmd="${reprozip_base_cmd} ${continue_} ${cmd}"
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
-    $reprozip_cmd
-
-    if [ "$?" != 0 ]; then
-        printf "${NEURODOCKER_LOG_PREFIX}: ERROR : error running reprozip"
-    fi
+    {
+      $reprozip_cmd
+    } || {
+      # Show relatively specific error message if a particular trace fails.
+      printf "${NEURODOCKER_LOG_PREFIX}: ERROR: reprozip trace command exited with non-zero code. Command: $reprozip_cmd"
+      exit 1
+    }
   done
 }
 
@@ -80,12 +83,13 @@ if [ ${#*} -eq 0 ]; then
 fi
 
 if [ -d $REPROZIP_TRACE_DIR ]; then
-  echo "${NEURODOCKER_LOG_PREFIX}: error: reprozip trace directory already exists: ${REPROZIP_TRACE_DIR}"
-  exit 1
+  echo "${NEURODOCKER_LOG_PREFIX}: WARN: overwriting reprozip trace directory: ${REPROZIP_TRACE_DIR}"
 fi
 
 
-install_missing_dependencies "bzip2 curl"
+if ! program_exists "bzip2" || ! program_exists "curl"; then
+  install_missing_dependencies "bzip2 curl";
+fi
 
 
 if [ ! -f "${REPROZIP_CONDA}/bin/reprozip" ]; then
