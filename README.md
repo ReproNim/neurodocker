@@ -77,7 +77,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **Matlab Compiler Runtime** | version* | 2018a, 2012-17[a-b], 2010a |
 |                             | method | binaries (default) |
 |                             | install_path | Installation path. Default `/opt/matlabmcr-{version}`. |
-| **MINC** | version* | 1.9.15 |
+| **MINC** | version* | 1.9.15, 1.9.16 |
 |          | method | binaries (default) |
 |          | install_path | Installation path. Default `/opt/minc-{version}`. |
 | **Miniconda** | version | latest (default), all other hosted versions. |
