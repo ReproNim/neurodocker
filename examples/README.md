@@ -290,7 +290,7 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --minc version=1.9.15 method=binaries
+  --minc version=1.9.16 method=binaries
 ```
 
 ## Miniconda
