@@ -72,6 +72,22 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
   --install git vim
 ```
 
+one can use apt_opts to set options for apt-get install and yum_opts to set options for yum install:
+
+```shell
+neurodocker generate [docker|singularity] --base=centos:7 --pkg-manager=yum \
+  --install yum_opts='--debug' git vim
+```
+
+
+By default --install apt_opts uses --no-install-recommends to minimize container sizes. In few cases this can lead to unexpected behaviours and one can try to build a container without this option.
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --install apt_opts='--quiet' git vim
+  ```
+
+
 ## `--entrypoint`
 
 This option sets the container's default entrypoint and applies to Docker and Singularity. It adds an `ENTRYPOINT` layer for Docker and replaces the `%runscript` section for Singularity.
