@@ -14,10 +14,21 @@ generic:
     dependencies:
       apt: >
         libgl1-mesa-dev libice6 libsm6 libx11-6 libxext6 libxi6 libxmu6
-        libgomp1 libjpeg62
+        libgomp1 libjpeg62 libglu1-mesa libgl1-mesa-glx perl imagemagick libjpeg8
       yum: >
         libICE libSM libX11 libXext libXi libXmu libgomp libjpeg-turbo
         mesa-libGL-devel
+    env:
+      MINC_TOOLKIT: "{{ minc.install_path }}"
+      MINC_TOOLKIT_VERSION: "1.9.16-20180117"
+      PATH: "{{ minc.install_path }}/bin:{{ minc.install_path }}/pipeline:$PATH"
+      PERL5LIB: "{{ minc.install_path }}/perl:{{ minc.install_path }}/pipeline:$PERL5LIB"
+      LD_LIBRARY_PATH: "{{ minc.install_path }}/lib:{{ minc.install_path }}/lib/InsightToolkit:$LD_LIBRARY_PATH"
+      MNI_DATAPATH: "{{ minc.install_path }}/../share"
+      MINC_FORCE_V2: "1"
+      MINC_COMPRESS: "4"
+      VOLUME_CACHE_THRESHOLD: "-1"
+      MANPATH: "{{ minc.install_path }}/man:$MANPATH"
     instructions: |
       {{ minc.install_dependencies() }}
       echo "Downloading MINC, BEASTLIB, and MODELS..."
