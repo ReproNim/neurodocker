@@ -285,4 +285,5 @@ $ reprounzip docker setup neurodocker-reprozip.rpz test
 - Attempting to rebuild into an existing Singularity image may raise an error.
   - Solution: remove the existing image or build a new image file.
 - The default apt --install option "--no-install-recommends" (that aims at minimizing container sizes) can cause a strange behaviour for cython inside the container
-  - Solution: use "--install apt_opts='--quiet' "
+  - Solution: use "--install apt_opts=`--quiet` "
+  - more information: [examples](examples#--install)
