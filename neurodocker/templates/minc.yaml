@@ -14,7 +14,7 @@ generic:
     dependencies:
       apt: >
         libgl1-mesa-dev libice6 libsm6 libx11-6 libxext6 libxi6 libxmu6
-        libgomp1 libjpeg62 libglu1-mesa libgl1-mesa-glx perl imagemagick 
+        libgomp1 libjpeg62 libglu1-mesa libgl1-mesa-glx perl imagemagick bc ed libxm12-dev
       yum: >
         libICE libSM libX11 libXext libXi libXmu libgomp libjpeg-turbo
         mesa-libGL-devel
