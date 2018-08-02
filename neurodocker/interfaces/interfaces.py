@@ -310,3 +310,18 @@ class SPM12(_BaseInterface):
     def render_env(self):
         """Return dictionary with rendered keys and values."""
         return {**super().render_env(), **self.matlabmcr_obj.render_env()}
+
+
+class VNC(_BaseInterface):
+    """Create instance of SPM12 object."""
+
+    _name = 'vnc'
+    _pretty_name = 'VNC'
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(
+            self._name, *args, version='generic', method='system', **kwargs)
+
+        if not hasattr(self, "passwd"):
+            raise ValueError("`passwd` argument is required for VNC.")

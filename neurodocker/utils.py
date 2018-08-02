@@ -19,7 +19,7 @@ def _count_key_occurence_list_of_tuples(list_of_tuples, key):
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     # TODO: remove unnecessary boolean variables.
-    bool_vars = {'activate', 'full'}
+    bool_vars = {'activate', 'full', 'start_at_runtime'}
     if dictionary is None:
         return
     for key in dictionary.keys():

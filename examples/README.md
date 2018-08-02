@@ -36,6 +36,7 @@ Table of contents
   * [NeuroDebian](#neurodebian)
   * [PETPVC](#petpvc)
   * [SPM12](#spm12)
+  * [VNC](#vnc)
 
 
 # Docker and Singularity options
@@ -346,3 +347,19 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
   --spm12 version=r7219 method=binaries
 ```
+
+
+## VNC
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --vnc passwd=hunter2 start_at_runtime=true geometry=1920x1080
+```
+
+If a Docker image is built with this command, one can run a GUI application like this:
+
+```shell
+docker run --rm -it -p 5901:5901 my_vnc_image my_gui_program
+```
+
+In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container.

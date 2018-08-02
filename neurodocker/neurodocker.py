@@ -137,7 +137,9 @@ def _add_generate_common_arguments(parser):
                 " install_path. Only version 1.9.15 is supported at this"
                 " time.",
         "petpvc": "Install PETPVC. Valid keys are version (required), method,"
-                  " and install_path."
+                  " and install_path.",
+        "vnc": "Install a VNC server. Valid keys are passwd (required),"
+               " start_at_runtime, and geometry."
     }
 
     pkgs = p.add_argument_group(
