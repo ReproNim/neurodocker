@@ -353,13 +353,14 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --vnc passwd=hunter2 start_at_runtime=true geometry=1920x1080
+  --vnc passwd=hunter2 start_at_runtime=true geometry=1920x1080 \
+  --install xterm
 ```
 
-If a Docker image is built with this command, one can run a GUI application like this:
+If a Docker image (e.g., `vnc_image`) is built with this command, one can run a GUI application like this:
 
 ```shell
-docker run --rm -it -p 5901:5901 my_vnc_image my_gui_program
+docker run --rm -it -p 5901:5901 vnc_image xterm
 ```
 
-In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container.
+In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container. `xterm` is a graphical terminal. It is used only as an example. Any GUI program can be used (e.g., Firefox).
