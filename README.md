@@ -99,6 +99,9 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **SPM12** | version* | r7219, r6914, r6685, r6472, r6225 |
 |           | install_path | Installation path. Default `/opt/spm12-{version}`. |
 |           |              | _Note: Matlab Compiler Runtime is installed when SPM12 is installed._ |
+| **VNC** | passwd* | Choose a password for this VNC server. |
+|         | start_at_runtime | If true, start the VNC server at container runtime. False by default. |
+|         | geometry | The geometry of the VNC session (e.g., `1920x1080`). |
 
 
 \* required argument.  
