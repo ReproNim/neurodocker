@@ -21,7 +21,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 --help
+$ docker run --rm kaczmarj/neurodocker:0.4.1 --help
 ```
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
@@ -126,15 +126,15 @@ usage: neurodocker generate docker [-h] [-b BASE] [-p {apt,yum}]
                                    [--minc  [...]] [--miniconda  [...]]
                                    [--mrtrix3 [[...]]] [--neurodebian  [...]]
                                    [--petpvc  [...]] [--spm12  [...]]
-                                   [--add ADD [ADD ...]] [--arg ARG [ARG ...]]
-                                   [--cmd CMD [CMD ...]]
+                                   [--vnc  [...]] [--add ADD [ADD ...]]
+                                   [--arg ARG [ARG ...]] [--cmd CMD [CMD ...]]
                                    [--expose EXPOSE [EXPOSE ...]]
                                    [--label LABEL [LABEL ...]]
                                    [--volume VOLUME [VOLUME ...]]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -b BASE, --base BASE  Base Docker image. Eg, ubuntu:17.04
+  -b BASE, --base BASE  Base Docker image. E.g., debian:stretch
   -p {apt,yum}, --pkg-manager {apt,yum}
                         Linux package manager.
   --add-to-entrypoint ADD_TO_ENTRYPOINT
@@ -175,7 +175,7 @@ optional arguments:
 # Generate Singularity recipe
 
 ```
-usage: neurodocker generate singularity [-h] [-b BASE] [-p {apt,yum}]
+usage: neurodocker generate singularity [-h] [-b BASE] [-p {yum,apt}]
                                         [--add-to-entrypoint ADD_TO_ENTRYPOINT]
                                         [--copy COPY [COPY ...]]
                                         [--install INSTALL [INSTALL ...]]
@@ -192,10 +192,11 @@ usage: neurodocker generate singularity [-h] [-b BASE] [-p {apt,yum}]
                                         [--mrtrix3 [[...]]]
                                         [--neurodebian  [...]]
                                         [--petpvc  [...]] [--spm12  [...]]
+                                        [--vnc  [...]]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -b BASE, --base BASE  Base Docker image. Eg, ubuntu:17.04
+  -b BASE, --base BASE  Base Docker image. E.g., debian:stretch
   -p {apt,yum}, --pkg-manager {apt,yum}
                         Linux package manager.
   --add-to-entrypoint ADD_TO_ENTRYPOINT
@@ -237,11 +238,11 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.2.0
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
 
@@ -250,7 +251,7 @@ $ docker run --rm kaczmarj/neurodocker:0.4.0 generate docker \
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.0 generate singularity \
+$ docker run --rm kaczmarj/neurodocker:0.4.1 generate singularity \
     --base debian:stretch --pkg-manager apt --ants version=2.2.0
 ```
 
