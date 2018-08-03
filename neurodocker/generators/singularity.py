@@ -13,6 +13,9 @@ from neurodocker.generators.common import ContainerSpecGenerator
 from neurodocker.generators.common import NEURODOCKER_ENTRYPOINT
 
 
+import logging
+logger = logging.getLogger(__name__)
+
 class _SingularityRecipeImplementations:
 
     def __init__(self, singularity_recipe_object):
@@ -161,7 +164,11 @@ class SingularityRecipe(ContainerSpecGenerator):
             if instruction in self._implementations.keys():
                 impl = self._implementations[instruction]
                 if impl in _installation_implementations.values():
-                    interface = impl(pkg_manager=pkg_man, **params)
+                    try:
+                        interface = impl(pkg_manager=pkg_man, **params)
+                    except Exception as exc:
+                        logger.error("Failed to instantiate %s: %s", impl, exc)
+                        raise
                     if interface.env:
                         _this_env = interface.render_env()
                         if _this_env is not None:
