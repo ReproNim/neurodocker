@@ -105,9 +105,10 @@ class FreeSurfer(_BaseInterface):
         else:
             self.exclude_paths = FreeSurfer._exclude_paths
 
-        self.exclude_paths = tuple(
-            posixpath.join('freesurfer', path) for path in self.exclude_paths
-        )
+        if self.exclude_paths:
+            self.exclude_paths = tuple(
+                posixpath.join('freesurfer', path)
+                for path in self.exclude_paths)
 
 
 class FSL(_BaseInterface):
@@ -118,6 +119,16 @@ class FSL(_BaseInterface):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
+
+        if hasattr(self, 'exclude_paths'):
+            if isinstance(self.exclude_paths, str):
+                self.exclude_paths = self.exclude_paths.split()
+        else:
+            self.exclude_paths = tuple()
+
+        if self.exclude_paths:
+            self.exclude_paths = tuple(
+                posixpath.join('fsl', path) for path in self.exclude_paths)
 
 
 class MatlabMCR(_BaseInterface):
