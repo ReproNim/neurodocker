@@ -69,11 +69,12 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **FreeSurfer** | version* | 6.0.0-min |
 |                | method | binaries (default) |
 |                | install_path | Installation path. Default `/opt/freesurfer-{version}`. |
-|                | exclude_paths | Sequence of path(s) to exclude when inflating the tarball. |
+|                | exclude_paths | Sequence of space-separated path(s) to exclude when inflating the tarball. |
 |                | license_path | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context. |
 | **FSL**** | version* | 5.0.11, 5.0.10, 5.0.9, 5.0.8 |
 |           | method | binaries (default) |
 |           | install_path | Installation path. Default `/opt/fsl-{version}`. |
+|           | exclude_paths | Sequence of space-separated path(s) to exclude when inflating the tarball. |
 | **Matlab Compiler Runtime** | version* | 2018a, 2012-17[a-b], 2010a |
 |                             | method | binaries (default) |
 |                             | install_path | Installation path. Default `/opt/matlabmcr-{version}`. |

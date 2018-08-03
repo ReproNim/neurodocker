@@ -111,12 +111,11 @@ def _add_generate_common_arguments(parser):
         "dcm2niix": "Install dcm2niix. Valid keys are version, method,"
                     " install_path, cmake_opts, and make_opts",
         "freesurfer": "Install FreeSurfer. Valid keys are version (required),"
-                      " method, install_path, exclude_paths, and license_path"
-                      " (relative path to license). A FreeSurfer license is"
-                      " required to run the software and is not provided by"
-                      " Neurodocker.",
-        "fsl": "Install FSL. Valid keys are version (required), method, and"
-               " install_path.",
+                      " method, install_path, and exclude_paths. A FreeSurfer"
+                      " license is required to run the software and is not"
+                      " provided by Neurodocker.",
+        "fsl": "Install FSL. Valid keys are version (required), method,"
+               " install_path, and exclude_paths.",
         "matlabmcr": "Install Matlab Compiler Runtime. Valid keys are version,"
                      " method, and install_path",
         "miniconda": "Install Miniconda. Valid keys are install_path,"

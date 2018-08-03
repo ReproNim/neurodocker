@@ -26,7 +26,15 @@ generic:
       echo "Downloading FSL ..."
       mkdir -p {{ fsl.install_path }}
       curl {{ fsl.curl_opts }} {{ fsl.binaries_url }} \
-      | tar -xz -C {{ fsl.install_path }} --strip-components 1
+      | tar -xz -C {{ fsl.install_path }} --strip-components 1 {% if fsl.exclude_paths -%}\
+      {%- for exclude_path in fsl.exclude_paths %}
+        {% if not loop.last -%}
+        --exclude='{{ exclude_path }}' \
+        {%- else -%}
+        --exclude='{{ exclude_path }}'
+        {%- endif -%}
+      {%- endfor %}
+      {%- endif %}
       sed -i '$iecho Some packages in this Docker container are non-free' $ND_ENTRYPOINT
       sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
       sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
