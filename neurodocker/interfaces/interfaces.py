@@ -34,7 +34,7 @@ class AFNI(_BaseInterface):
             self._dependencies.append('python3')
         if self.install_r or self.install_r_pkgs:
             r = {
-                'apt': ['r-base', 'r-base-dev'],
+                'apt': ['r-base', 'r-base-dev', 'libnlopt-dev'],
                 'yum': ['R-devel'],
             }
             self._dependencies.extend(r[self._pkg_manager])
