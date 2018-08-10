@@ -37,7 +37,7 @@ generic:
       curl {{ afni.curl_opts }} {{ afni.binaries_url }} \
       | tar -xz -C {{ afni.install_path }} --strip-components 1
       {%- if afni.install_r_pkgs %}
-      {{ afni.install_path }}/rPkgsInstall -pkgs ALL
+      PATH=$PATH:{{ afni.install_path }} rPkgsInstall -pkgs ALL
       {% endif -%}
 
   source:
