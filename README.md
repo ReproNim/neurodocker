@@ -18,28 +18,8 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 
 # Installation
 
-Use the _Neurodocker_ Docker image (recommended):
-
-```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 --help
-```
-
-_Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
-
-This project can also be installed with `pip`:
-
-```shell
-$ pip install neurodocker
-$ neurodocker --help
-```
-
-If the `pip install` command above gives a permissions error, install as a non-root user:
-
-```shell
-$ pip install --user neurodocker
-```
-
-Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
+Use the _Neurodocker_ Singularity image
+singularity run shub://tjhendrckson/neurodocker
 
 
 # Supported software
@@ -233,26 +213,19 @@ Please see the [examples](examples) directory.
 
 The canonical examples install ANTs version 2.2.0 on Debian 9 (Stretch).
 
-_Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
-
 
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
+$ singularity exec --rm kaczmarj/neurodocker:0.4.1 neurodocker generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.2.0
-
-# Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
-    --base debian:stretch --pkg-manager apt --ants version=2.2.0 | docker build -
 ```
-
 ### Singularity
 
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate singularity \
+$ singularity exec --rm kaczmarj/neurodocker:0.4.1 neurodocker generate singularity \
     --base debian:stretch --pkg-manager apt --ants version=2.2.0
 ```
 
