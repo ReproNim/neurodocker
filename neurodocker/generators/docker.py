@@ -3,6 +3,7 @@
 import copy
 import inspect
 import json
+import logging
 import os
 
 from neurodocker.generators.common import _add_to_entrypoint
@@ -11,6 +12,8 @@ from neurodocker.generators.common import _installation_implementations
 from neurodocker.generators.common import _install
 from neurodocker.generators.common import _Users
 from neurodocker.generators.common import ContainerSpecGenerator
+
+logger = logging.getLogger(__name__)
 
 
 def _indent(string, indent=4, add_list_op=False):
@@ -312,7 +315,12 @@ class Dockerfile(ContainerSpecGenerator):
             if instruction in self._implementations.keys():
                 impl = self._implementations[instruction]
                 if impl in _installation_implementations.values():
-                    interface = impl(pkg_manager=pkg_man, **params)
+                    try:
+                        interface = impl(pkg_manager=pkg_man, **params)
+                    except Exception as exc:
+                        logger.error(
+                            "Failed to instantiate {}: {}".format(impl, exc))
+                        raise
                     yield _DockerfileInterfaceFormatter(interface).render()
                 else:
                     if instruction == 'install':

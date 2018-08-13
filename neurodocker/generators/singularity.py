@@ -3,6 +3,7 @@
 from collections import OrderedDict
 import copy
 import inspect
+import logging
 
 from neurodocker.generators.common import _add_to_entrypoint
 from neurodocker.generators.common import _get_json_spec_str
@@ -12,9 +13,8 @@ from neurodocker.generators.common import _Users
 from neurodocker.generators.common import ContainerSpecGenerator
 from neurodocker.generators.common import NEURODOCKER_ENTRYPOINT
 
-
-import logging
 logger = logging.getLogger(__name__)
+
 
 class _SingularityRecipeImplementations:
 
@@ -167,7 +167,8 @@ class SingularityRecipe(ContainerSpecGenerator):
                     try:
                         interface = impl(pkg_manager=pkg_man, **params)
                     except Exception as exc:
-                        logger.error("Failed to instantiate %s: %s", impl, exc)
+                        logger.error(
+                            "Failed to instantiate {}: {}".format(impl, exc))
                         raise
                     if interface.env:
                         _this_env = interface.render_env()
