@@ -3,8 +3,8 @@
 generic:
   system:
     dependencies:
-      apt: tightvncserver xfonts-base xvfb
-      yum: tightvnc-server xorg-x11-fonts xorg-x11-server-Xvfb
+      apt: tightvncserver xfonts-base xvfb xterm openbox
+      yum: tightvnc-server xorg-x11-fonts xorg-x11-server-Xvfb xterm openbox
     instructions: |
       {{ vnc.install_dependencies() }}
       echo 'Configuring VNC password ...'
