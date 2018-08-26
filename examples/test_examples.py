@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Run the neurodocker examples and check for failures."""
 
 import glob
@@ -29,17 +28,26 @@ def test_examples_readme():
 
     print("Testing {} commands from the examples README".format(len(cmds)))
 
-    for c in cmds:
-        subprocess.run(c, shell=True, check=True)
+    with TemporaryChDir(here):
+        for c in cmds:
+            subprocess.run(c, shell=True, check=True)
 
 
 def test_specialized_examples():
     files = glob.glob(os.path.join(here, "**", "generate.sh"))
     print("Testing {} commands from specialized examples".format(len(files)))
-    for f in files:
-        subprocess.run(f, shell=True, check=True)
+    with TemporaryChDir(here):
+        for f in files:
+            subprocess.run(f, shell=True, check=True)
 
 
-if __name__ == '__main__':
-    test_examples_readme()
-    test_specialized_examples()
+class TemporaryChDir:
+    def __init__(self, wd):
+        self.wd = wd
+        self._wd_orig = os.getcwd()
+
+    def __enter__(self):
+        os.chdir(self.wd)
+
+    def __exit__(self, exc_type, exc_value, tb):
+        os.chdir(self._wd_orig)
