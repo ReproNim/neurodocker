@@ -367,7 +367,7 @@ docker run --rm -it -p 5901:5901 vnc_image xterm
 In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container. `xterm` is a graphical terminal. It is used only as an example. Any GUI program can be used (e.g., Firefox).
 
 
-## JSON
+# JSON
 
 Neurodocker can generate Dockerfiles and Singularity files from JSON. For example, the file `example_specs.json` (contents below) can be used to with `neurodocker generate` as follows:
 
