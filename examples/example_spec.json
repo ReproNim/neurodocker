@@ -1,0 +1,15 @@
+{
+	"pkg_manager": "apt",
+	"instructions": [
+		["base", "debian"],
+		["ants", {
+			"version": "2.2.0"
+		}],
+		["install", ["git"]],
+		["miniconda", {
+			"create_env": "neuro",
+			"conda_install": ["numpy", "traits"],
+			"pip_install": ["nipype"]
+		}]
+	]
+}

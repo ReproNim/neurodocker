@@ -8,7 +8,10 @@ $ neurodocker generate docker --help
 $ neurodocker generate singularity --help
 """
 
-from argparse import Action, ArgumentParser, RawDescriptionHelpFormatter
+from argparse import Action
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
+import json
 import logging
 import sys
 
@@ -78,8 +81,10 @@ def _add_generate_common_arguments(parser):
 
     # To generate from file.
     p.add_argument(
-        '-f', '--file', dest='file',
+        'file', nargs='?',
         help="Generate file from JSON. Overrides other `generate` arguments")
+    p.add_argument(
+        '--json', action="store_true", help="Print Neurodocker JSON spec")
 
     # Other arguments (no order).
     p.add_argument(
@@ -288,7 +293,9 @@ def generate(namespace):
     }
 
     recipe_obj = recipe_objs[namespace.subsubparser_name](specs)
-    if not namespace.no_print:
+    if namespace.json:
+        print(json.dumps(specs))
+    elif not namespace.no_print:
         print(recipe_obj.render())
     if namespace.output:
         recipe_obj.save(filepath=namespace.output)

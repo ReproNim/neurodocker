@@ -107,8 +107,7 @@ jobs:
           name: Test examples in /examples directory
           command: |
             source ~/.bashrc
-            cd examples
-            python3 test_examples.py
+            pytest --cov -k examples/
 
 
 workflows:

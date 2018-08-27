@@ -37,6 +37,7 @@ Table of contents
   * [PETPVC](#petpvc)
   * [SPM12](#spm12)
   * [VNC](#vnc)
+- [JSON](#json)
 
 
 # Docker and Singularity options
@@ -364,3 +365,42 @@ docker run --rm -it -p 5901:5901 vnc_image xterm
 ```
 
 In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container. `xterm` is a graphical terminal. It is used only as an example. Any GUI program can be used (e.g., Firefox).
+
+
+# JSON
+
+Neurodocker can generate Dockerfiles and Singularity files from JSON. For example, the file `example_specs.json` (contents below) can be used to with `neurodocker generate` as follows:
+
+```json
+{
+	"pkg_manager": "apt",
+	"instructions": [
+		["base", "debian"],
+		["ants", {
+			"version": "2.2.0"
+		}],
+		["install", ["git"]],
+		["miniconda", {
+			"create_env": "neuro",
+			"conda_install": ["numpy", "traits"],
+			"pip_install": ["nipype"]
+		}]
+	]
+}
+```
+
+```shell
+neurodocker generate [docker|singularity] example_spec.json
+```
+
+The JSON representation of a particular `neurodocker generate` command can be printed by adding the `--json` flag. The JSON representation above was found using the code snippet below.
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --ants version=2.2.0 \
+  --install git \
+  --miniconda create_env=neuro \
+              conda_install='numpy traits' \
+              pip_install='nipype' \
+  --json
+```
