@@ -21,7 +21,7 @@ generic:
       2012a: https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
       2010a: https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
     dependencies:
-      apt: bc libxext6 libxpm-dev libxt6
+      apt: bc libncurses5 libxext6 libxpm-dev libxt6
       yum: bc libXext.x86_64 libXmu libXpm libXt.x86_64
     env:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/extern/bin/glnxa64"
