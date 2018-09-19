@@ -44,7 +44,7 @@ generic:
       {% endif -%}
       {% if miniconda.pip_install is not none -%}
       bash -c "source activate {{ miniconda.env_name }}
-        pip install {{ miniconda.pip_opts }} --no-cache-dir \
+        pip install --no-cache-dir {{ miniconda.pip_opts }} \
         {%- for pkg in miniconda.pip_install %}
             {% if not loop.last -%}
             {{ pkg }} \
