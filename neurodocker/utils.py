@@ -4,11 +4,20 @@ import json
 import logging
 import re
 
-import yaml
 try:
-    from yaml import CLoader as Loader
+    # ruamel.yaml preserves map key order which helps to assure
+    # consistent use of templates etc in specification of the env variables
+    import ruamel.yaml as yaml
+    try:
+        from ruamel.yaml import CLoader as Loader
+    except ImportError:
+        from ruamel.yaml import Loader
 except ImportError:
-    from yaml import Loader
+    import yaml as yaml
+    try:
+        from yaml import CLoader as Loader
+    except ImportError:
+        from yaml import Loader
 
 
 def _count_key_occurence_list_of_tuples(list_of_tuples, key):
