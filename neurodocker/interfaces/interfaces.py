@@ -138,6 +138,7 @@ class MatlabMCR(_BaseInterface):
     _pretty_name = "MATLAB MCR"
 
     _mcr_versions = {
+        '2018b': '95',
         '2018a': '94',
         '2017b': '93',
         '2017a': '92',
