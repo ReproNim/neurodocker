@@ -11,8 +11,8 @@
 
 set -ex
 
-REPROZIP_CONDA="/opt/reprozip-miniconda"
-REPROZIP_TRACE_DIR="/neurodocker-reprozip-trace"
+REPROZIP_CONDA="/tmp/reprozip-miniconda"
+REPROZIP_TRACE_DIR="/tmp/neurodocker-reprozip-trace"
 CONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 # This log prefix is used in trace.py.
 NEURODOCKER_LOG_PREFIX="NEURODOCKER (in container)"
@@ -54,6 +54,8 @@ function run_reprozip_trace() {
   # https://askubuntu.com/a/674347
   cmds=("$@")
   reprozip_base_cmd="${REPROZIP_CONDA}/bin/reprozip trace -d ${REPROZIP_TRACE_DIR} --dont-identify-packages"
+
+  rm -r $REPROZIP_TRACE_DIR
 
   for cmd in "${cmds[@]}";
   do
