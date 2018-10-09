@@ -6,6 +6,7 @@
 generic:
   binaries:
     urls:
+      2018b: https://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/glnxa64/MCR_R2018b_glnxa64_installer.zip
       2018a: https://ssd.mathworks.com/supportfiles/downloads/R2018a/deployment_files/R2018a/installers/glnxa64/MCR_R2018a_glnxa64_installer.zip
       2017b: https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip
       2017a: https://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
@@ -21,8 +22,10 @@ generic:
       2012a: https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
       2010a: https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
     dependencies:
-      apt: bc libncurses5 libxext6 libxpm-dev libxt6
+      apt: bc libncurses5 libxext6 libxmu6 libxpm-dev libxt6
       yum: bc libXext.x86_64 libXmu libXpm libXt.x86_64
+      debs:
+        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
     env:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/extern/bin/glnxa64"
       MATLABCMD: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/toolbox/matlab"
@@ -30,6 +33,7 @@ generic:
       {{ matlabmcr.install_dependencies() }}
       echo "Downloading MATLAB Compiler Runtime ..."
       {% if matlabmcr.version == "2010a" -%}
+      {{ matlabmcr.install_debs() }}
       curl {{ matlabmcr.curl_opts }} -o /tmp/MCRInstaller.bin {{ matlabmcr.binaries_url }}
       chmod +x /tmp/MCRInstaller.bin
       /tmp/MCRInstaller.bin -silent -P installLocation="{{ matlabmcr.install_path }}"
