@@ -55,18 +55,10 @@ function run_reprozip_trace() {
   cmds=("$@")
   reprozip_base_cmd="${REPROZIP_CONDA}/bin/reprozip trace -d ${REPROZIP_TRACE_DIR} --dont-identify-packages"
 
-  rm -r $REPROZIP_TRACE_DIR
-
   for cmd in "${cmds[@]}";
   do
-    # Only add --continue if it is not the first command.
-    if [ "$cmd" == "${cmds[0]}" ]; then
-        continue_=""
-    else
-        continue_="--continue"
-    fi
 
-    reprozip_cmd="${reprozip_base_cmd} ${continue_} ${cmd}"
+    reprozip_cmd="${reprozip_base_cmd} --continue ${cmd}"
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
     {
       $reprozip_cmd
