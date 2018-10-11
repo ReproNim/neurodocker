@@ -57,8 +57,14 @@ function run_reprozip_trace() {
 
   for cmd in "${cmds[@]}";
   do
+    # Only add --continue if it is not the first command.
+    if [ "$cmd" == "${cmds[0]}" ]; then
+        continue_="--overwrite"
+    else
+        continue_="--continue"
+    fi
 
-    reprozip_cmd="${reprozip_base_cmd} --continue ${cmd}"
+    reprozip_cmd="${reprozip_base_cmd} ${continue_} ${cmd}"
     printf "${NEURODOCKER_LOG_PREFIX}: executing command:\t${reprozip_cmd}\n"
     {
       $reprozip_cmd
