@@ -186,7 +186,7 @@ class Miniconda(_BaseInterface):
     _pretty_name = 'Miniconda'
 
     _installed = False
-    _environments = set()
+    _environments = {'base'}
     _env_set = False
 
     def __init__(self, *args, create_env=None, use_env=None,
@@ -223,7 +223,7 @@ class Miniconda(_BaseInterface):
                 "cannot conda or pip install when creating environment from"
                 " yaml file")
 
-        if self.use_env is not None and not Miniconda._installed:
+        if self.use_env is not None and self.use_env != "base" and not Miniconda._installed:
             self._environments.add(self.use_env)
             Miniconda._installed = True
             Miniconda._env_set = True
