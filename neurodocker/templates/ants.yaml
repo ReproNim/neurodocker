@@ -9,6 +9,8 @@
 generic:
   binaries:
     urls:
+      "2.3.1": https://dl.dropbox.com/s/1xfhydsf4t4qoxg/ants-Linux-centos6_x86_64-v2.3.1.tar.gz
+      "2.3.0": https://dl.dropbox.com/s/b3iymb9ml36ecp9/ants-Linux-centos6_x86_64-v2.3.0.tar.gz
       "2.2.0": https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz
       "2.1.0": https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz
       "2.0.3": https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz
