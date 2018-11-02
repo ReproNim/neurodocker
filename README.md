@@ -21,7 +21,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 --help
+$ docker run --rm kaczmarj/neurodocker:0.4.2 --help
 ```
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
@@ -53,7 +53,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |          | install_r_pkgs | If true, install R and AFNI's R packages. |
 |          | install_python2 | If true, install Python 2. |
 |          | install_python3 | If true, install Python 3. |
-| **ANTs** | version* | 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch. |
+| **ANTs** | version* | 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch. |
 |          | method   | binaries (default), source. |
 |          | install_path | Installation path. Default `/opt/ants-{version}`. |
 |          | cmake_opts | If `method=source`, options for `cmake`. |
@@ -231,7 +231,7 @@ Please see the [examples](examples) directory.
 
 ## Canonical examples
 
-The canonical examples install ANTs version 2.2.0 on Debian 9 (Stretch).
+The canonical examples install ANTs version 2.3.1 on Debian 9 (Stretch).
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
 
@@ -239,12 +239,12 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
-    --base debian:stretch --pkg-manager apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.2 generate docker \
+    --base debian:stretch --pkg-manager apt --ants version=2.3.1
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
-    --base debian:stretch --pkg-manager apt --ants version=2.2.0 | docker build -
+$ docker run --rm kaczmarj/neurodocker:0.4.2 generate docker \
+    --base debian:stretch --pkg-manager apt --ants version=2.3.1 | docker build -
 ```
 
 ### Singularity
@@ -252,8 +252,8 @@ $ docker run --rm kaczmarj/neurodocker:0.4.1 generate docker \
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.4.1 generate singularity \
-    --base debian:stretch --pkg-manager apt --ants version=2.2.0
+$ docker run --rm kaczmarj/neurodocker:0.4.2 generate singularity \
+    --base debian:stretch --pkg-manager apt --ants version=2.3.1
 ```
 
 
@@ -261,18 +261,18 @@ $ docker run --rm kaczmarj/neurodocker:0.4.1 generate singularity \
 
 _Neurodocker_ must be `pip` installed for container minimization.
 
-In the following example, a Docker image is built with ANTs version 2.2.0 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
+In the following example, a Docker image is built with ANTs version 2.3.1 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
 
 
 ```shell
 # Create a Docker image with ANTs, and download a functional scan.
 $ download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
-$ neurodocker generate docker -b centos:7 -p yum --ants version=2.2.0 --run="$download_cmd" | docker build -t ants:2.2.0 -
+$ neurodocker generate docker -b centos:7 -p yum --ants version=2.3.1 --run="$download_cmd" | docker build -t ants:2.3.1 -
 
 # Run the container in the background.
 # The option --security-opt=seccomp:unconfined is important. Without this,
 # the trace will not be able to run in the container.
-$ docker run --rm -itd --name ants-container --security-opt=seccomp:unconfined ants:2.2.0
+$ docker run --rm -itd --name ants-container --security-opt=seccomp:unconfined ants:2.3.1
 
 # Output a ReproZip pack file in the current directory with the files
 # necessary to run antsMotionCorr.
