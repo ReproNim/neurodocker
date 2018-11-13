@@ -10,7 +10,8 @@ from neurodocker.interfaces._base import apt_install
 from neurodocker.interfaces._base import yum_install
 
 _installation_implementations = {
-    ii._name: ii for ii in _BaseInterface.__subclasses__()
+    ii._name: ii
+    for ii in _BaseInterface.__subclasses__()
 }
 
 ND_DIRECTORY = posixpath.join(posixpath.sep, 'neurodocker')
@@ -47,8 +48,7 @@ def _install(pkgs, pkg_manager):
     }
     if pkg_manager not in installers.keys():
         raise ValueError(
-            "package manager '{}' not recognized".format(pkg_manager)
-        )
+            "package manager '{}' not recognized".format(pkg_manager))
     opts_key = "{}_opts=".format(pkg_manager)
     opts = [jj for jj in pkgs if jj.startswith(opts_key)]
     pkgs = [kk for kk in pkgs if kk not in opts]
@@ -69,9 +69,8 @@ class _Users:
         if user not in cls.initialized_users:
             cls.initialized_users.add(user)
             return (
-                "useradd --no-user-group --create-home --shell /bin/bash {0}"
-                .format(user)
-            )
+                "useradd --no-user-group --create-home --shell /bin/bash {0}".
+                format(user))
         else:
             return False
 
