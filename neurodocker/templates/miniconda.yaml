@@ -7,8 +7,8 @@ generic:
     urls:
       latest: https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     env:
-      CONDA_DIR: "{{ miniconda.install_path }}"
-      PATH: "{{ miniconda.install_path }}/bin:$PATH"
+      CONDA_DIR: '{{ miniconda.install_path }}'
+      PATH: '{{ miniconda.install_path }}/bin:$PATH'
     instructions: |
       {% if not miniconda._installed -%}
       export PATH="{{ miniconda.install_path }}/bin:$PATH"
@@ -35,9 +35,9 @@ generic:
       conda install -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} \
       {%- for pkg in miniconda.conda_install %}
           {% if not loop.last -%}
-          {{ pkg }} \
+          '{{ pkg }}' \
           {%- else -%}
-          {{ pkg }}
+          '{{ pkg }}'
           {%- endif -%}
       {% endfor %}
       sync && conda clean -tipsy && sync
@@ -47,9 +47,9 @@ generic:
         pip install --no-cache-dir {{ miniconda.pip_opts }} \
         {%- for pkg in miniconda.pip_install %}
             {% if not loop.last -%}
-            {{ pkg }} \
+            '{{ pkg }}' \
             {%- else -%}
-            {{ pkg }}
+            '{{ pkg }}'
             {%- endif -%}
         {% endfor %}"
       rm -rf ~/.cache/pip/*
