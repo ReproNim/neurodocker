@@ -260,7 +260,7 @@ class MRtrix3(_BaseInterface):
 
 
 class NDFreeze(_BaseInterface):
-    """Create instance of NDFreeze oject."""
+    """Create instance of NDFreeze object."""
 
     _name = "ndfreeze"
 
