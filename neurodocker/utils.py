@@ -1,5 +1,6 @@
 """Package utility functions."""
 
+import sys
 import json
 import logging
 import re
@@ -93,6 +94,9 @@ def load_json(filepath, **kwargs):
     """Load JSON file `filepath` as dictionary. `kwargs` are keyword arguments
     for `json.load()`.
     """
+    if filepath == '-':
+        return json.load(sys.stdin, **kwargs)
+
     with open(filepath, 'r') as fp:
         return json.load(fp, **kwargs)
 
