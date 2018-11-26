@@ -95,7 +95,7 @@ def load_json(filepath, **kwargs):
     for `json.load()`.
     """
     if filepath == '-':
-        filepath = sys.stdin.fileno()
+        return json.load(sys.stdin, **kwargs)
 
     with open(filepath, 'r') as fp:
         return json.load(fp, **kwargs)

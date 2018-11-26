@@ -1,7 +1,7 @@
 """Tests for neurodocker.main"""
-# Author: Jakub Kaczmarzyk <jakubk@mit.edu>
 
-from __future__ import absolute_import, unicode_literals
+import json
+import io
 
 import pytest
 
@@ -82,23 +82,16 @@ def test_generate_opts(capsys):
     assert out.find("nd_freeze") < out.find("ND_ENTRYPOINT")
 
 
-@pytest.mark.xfail
 def test_generate_from_json(capsys, tmpdir):
-    import json
-
     cmd = "generate docker -b debian:stretch -p apt --convert3d version=1.0.0"
     main(cmd.split())
     true, _ = capsys.readouterr()
 
     specs = {
-        'generation_timestamp':
-        '2017-08-31 21:49:04',
         'instructions': [['base', 'debian:stretch'],
                          ['convert3d', {
                              'version': '1.0.0'
                          }]],
-        'neurodocker_version':
-        '0.2.0-18-g9227b17',
         'pkg_manager':
         'apt'
     }
@@ -106,11 +99,41 @@ def test_generate_from_json(capsys, tmpdir):
     filepath = tmpdir.join("specs.json")
     filepath.write(str_specs)
 
-    gen_cmd = "generate --file {}".format(filepath)
+    gen_cmd = "generate docker {}".format(filepath)
     main(gen_cmd.split())
     test, _ = capsys.readouterr()
 
-    # These indices chop off the header (with timestamp) and the layer that
-    # saves to JSON (with timestamp).
-    sl = slice(8, -19)
-    assert true.split('\n')[sl] == test.split('\n')[sl]
+    # Remove last RUN instruction (it contains saving to JSON and order is not guaranteed).
+    true = "RUN".join(true.split("RUN")[:-1])
+    test = "RUN".join(test.split("RUN")[:-1])
+
+    # Remove comments.
+    true = [t for t in true.splitlines() if not t.startswith('#')]
+    test = [t for t in test.splitlines() if not t.startswith('#')]
+
+    assert true == test
+
+
+def test_generate_from_json_stdin(capsys, monkeypatch):
+    specs = {
+        'instructions': [['base', 'debian:stretch'],
+                         ['install', ['git', 'vim']]],
+        'pkg_manager': 'apt',
+    }
+    monkeypatch.setattr('sys.stdin', io.StringIO(json.dumps(specs)))
+    main("generate docker -".split())
+    test, _ = capsys.readouterr()
+
+    true_cmd = "generate docker -b debian:stretch -p apt --install git vim"
+    main(true_cmd.split())
+    true, _ = capsys.readouterr()
+
+    # Remove last RUN instruction (it contains saving to JSON and order is not guaranteed).
+    true = "RUN".join(true.split("RUN")[:-1])
+    test = "RUN".join(test.split("RUN")[:-1])
+
+    # Remove comments.
+    true = [t for t in true.splitlines() if not t.startswith('#')]
+    test = [t for t in test.splitlines() if not t.startswith('#')]
+
+    assert true == test
