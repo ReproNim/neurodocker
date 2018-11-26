@@ -20,8 +20,13 @@ class AFNI(_BaseInterface):
     _name = 'afni'
     _pretty_name = 'AFNI'
 
-    def __init__(self, *args, install_python2=False, install_python3=False,
-                 install_r=False, install_r_pkgs=False, **kwargs):
+    def __init__(self,
+                 *args,
+                 install_python2=False,
+                 install_python3=False,
+                 install_r=False,
+                 install_r_pkgs=False,
+                 **kwargs):
         self.install_python2 = install_python2
         self.install_python3 = install_python3
         self.install_r = install_r
@@ -164,9 +169,8 @@ class MatlabMCR(_BaseInterface):
             return "v{}".format(self._mcr_versions[self.version])
         except KeyError:
             raise ValueError(
-                "Matlab MCR version not known for Matlab version '{}'."
-                .format(self.version)
-            )
+                "Matlab MCR version not known for Matlab version '{}'.".format(
+                    self.version))
 
 
 class MINC(_BaseInterface):
@@ -189,8 +193,13 @@ class Miniconda(_BaseInterface):
     _environments = {'base'}
     _env_set = False
 
-    def __init__(self, *args, create_env=None, use_env=None,
-                 conda_install=None, pip_install=None, yaml_file=None,
+    def __init__(self,
+                 *args,
+                 create_env=None,
+                 use_env=None,
+                 conda_install=None,
+                 pip_install=None,
+                 yaml_file=None,
                  **kwargs):
         self.create_env = create_env
         self.use_env = use_env
@@ -250,6 +259,20 @@ class MRtrix3(_BaseInterface):
         super().__init__(self._name, *args, **kwargs)
 
 
+class NDFreeze(_BaseInterface):
+    """Create instance of NDFreeze object."""
+
+    _name = "ndfreeze"
+
+    def __init__(self, date, *args, **kwargs):
+        self.date = date
+        super().__init__(
+            self._name, version='latest', method='custom', *args, **kwargs)
+        if self.pkg_manager != 'apt':
+            raise ValueError(
+                "nd_freeze cannot be used with a non-apt package manager")
+
+
 class NeuroDebian(_BaseInterface):
     """Create instance of NeuroDebian object."""
 
@@ -276,9 +299,8 @@ class NeuroDebian(_BaseInterface):
 
         self._server = NeuroDebian._servers.get(server, None)
         if self._server is None:
-            msg = (
-                "Server '{}' not found. Choices are "
-                + ', '.join(NeuroDebian._servers.keys()))
+            msg = ("Server '{}' not found. Choices are " + ', '.join(
+                NeuroDebian._servers.keys()))
             raise ValueError(msg.format(server))
 
         self._full = 'full' if full else 'libre'
@@ -287,8 +309,12 @@ class NeuroDebian(_BaseInterface):
             os=self.os_codename, srv=self._server, full=self._full)
 
         super().__init__(
-            self._name, version='generic', method='custom',
-            os_codename=os_codename, server=server, **kwargs)
+            self._name,
+            version='generic',
+            method='custom',
+            os_codename=os_codename,
+            server=server,
+            **kwargs)
 
 
 class PETPVC(_BaseInterface):
@@ -312,12 +338,12 @@ class SPM12(_BaseInterface):
 
         matlabmcr_version = self.binaries_url[-9:-4]
         self.matlabmcr_obj = MatlabMCR(matlabmcr_version, self.pkg_manager)
-        self.mcr_path = posixpath.join(
-            self.matlabmcr_obj.install_path, self.matlabmcr_obj.mcr_version)
+        self.mcr_path = posixpath.join(self.matlabmcr_obj.install_path,
+                                       self.matlabmcr_obj.mcr_version)
 
     def render_run(self):
-        return "\n".join(
-            (self.matlabmcr_obj.render_run(), super().render_run()))
+        return "\n".join((self.matlabmcr_obj.render_run(),
+                          super().render_run()))
 
     def render_env(self):
         """Return dictionary with rendered keys and values."""

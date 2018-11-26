@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class _SingularityRecipeImplementations:
-
     def __init__(self, singularity_recipe_object):
         self._singobj = singularity_recipe_object
 
@@ -72,7 +71,6 @@ class _SingularityRecipeImplementations:
 
 
 class SingularityRecipe(ContainerSpecGenerator):
-
     def __init__(self, specs):
         self._specs = copy.deepcopy(specs)
 
@@ -88,21 +86,19 @@ class SingularityRecipe(ContainerSpecGenerator):
 
         self._implementations = {
             **_installation_implementations,
-            **dict(inspect.getmembers(_SingularityRecipeImplementations(self),
-                                      predicate=inspect.ismethod))
+            **dict(
+                inspect.getmembers(
+                    _SingularityRecipeImplementations(self),
+                    predicate=inspect.ismethod))
         }
 
-        self._order = (
-            ('header', self._header),
-            ('help', self._help),
-            ('setup', self._setup),
-            ('post', self._post),
-            ('environment', self._environment),
-            ('files', self._files),
-            ('runscript', self._runscript),
-            ('test', self._test),
-            ('labels', self._labels)
-        )
+        self._order = (('header', self._header), ('help', self._help),
+                       ('setup', self._setup), ('post', self._post),
+                       ('environment', self._environment), ('files',
+                                                            self._files),
+                       ('runscript',
+                        self._runscript), ('test', self._test), ('labels',
+                                                                 self._labels))
         self._parts_filled = False
         _Users.clear_memory()
         self._add_neurodocker_header()
@@ -132,15 +128,12 @@ class SingularityRecipe(ContainerSpecGenerator):
         return "%post\n" + "\n\n".join(self._post)
 
     def _render_environment(self):
-        return (
-            "%environment\n"
-            + "\n".join('export {}="{}"'.format(*kv)
-                        for kv in self._environment))
+        return ("%environment\n" + "\n".join('export {}="{}"'.format(*kv)
+                                             for kv in self._environment))
 
     def _render_files(self):
-        return (
-            "%files\n"
-            + "\n".join("{} {}".format(*f) for f in self._files))
+        return ("%files\n" + "\n".join("{} {}".format(*f)
+                                       for f in self._files))
 
     def _render_runscript(self):
         return "%runscript\n" + self._runscript
@@ -152,10 +145,10 @@ class SingularityRecipe(ContainerSpecGenerator):
         return "%labels\n" + "\n".join(self._labels)
 
     def _add_neurodocker_header(self):
-        kwds = {
-            'version': 'generic',
-            'method': 'custom'}
-        self._specs['instructions'].insert(1, ('_header', kwds))
+        kwds = {'version': 'generic', 'method': 'custom'}
+        # If ndfreeze is requested, put it before the neurodocker header.
+        offset = 1 if self._specs['instructions'][1][0] == 'ndfreeze' else 0
+        self._specs['instructions'].insert(1 + offset, ('_header', kwds))
 
     def _fill_parts(self):
         pkg_man = self._specs['pkg_manager']
@@ -167,8 +160,8 @@ class SingularityRecipe(ContainerSpecGenerator):
                     try:
                         interface = impl(pkg_manager=pkg_man, **params)
                     except Exception as exc:
-                        logger.error(
-                            "Failed to instantiate {}: {}".format(impl, exc))
+                        logger.error("Failed to instantiate {}: {}".format(
+                            impl, exc))
                         raise
                     if interface.env:
                         _this_env = interface.render_env()

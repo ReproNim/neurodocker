@@ -46,6 +46,7 @@ def _namespace_to_specs(namespace):
     from neurodocker.generators.common import _installation_implementations
 
     instructions = [('base', namespace.base)]
+
     try:
         for arg in namespace.ordered_args:
             # TODO: replace try-except with stricter logic.
@@ -66,10 +67,19 @@ def _namespace_to_specs(namespace):
             _string_vals_to_bool(options)
             _string_vals_to_list(options)
 
-    return {
+    specs = {
         'pkg_manager': namespace.pkg_manager,
         'instructions': instructions,
     }
+
+    # Add nd_freeze
+    nd_freeze_idx = _get_index_of_tuple_in_instructions(
+        'nd_freeze', specs['instructions'])
+    if nd_freeze_idx:
+        nd_freeze = specs['instructions'].pop(nd_freeze_idx)
+        specs['instructions'].insert(1, nd_freeze)
+
+    return specs
 
 
 def is_url(string):
@@ -126,11 +136,13 @@ def set_log_level(level):
     level: {'debug', 'info', 'warning', 'error', 'critical}
         The level at which to print messages. Case-insensitive.
     """
-    logging_levels = {'DEBUG': logging.DEBUG,
-                      'INFO': logging.INFO,
-                      'WARNING': logging.WARNING,
-                      'ERROR': logging.ERROR,
-                      'CRITICAL': logging.CRITICAL}
+    logging_levels = {
+        'DEBUG': logging.DEBUG,
+        'INFO': logging.INFO,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+        'CRITICAL': logging.CRITICAL
+    }
     try:
         level = logging_levels[level.upper()]
         logger.setLevel(level)
@@ -153,3 +165,9 @@ def get_singularity_client():
         raise ImportError(
             "the singularity python (spython) package is required for this")
     return spython.main.Client
+
+
+def _get_index_of_tuple_in_instructions(implementation, instructions):
+    for j, instr in enumerate(instructions):
+        if instr[0] == implementation:
+            return j

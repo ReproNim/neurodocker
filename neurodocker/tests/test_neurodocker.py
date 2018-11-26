@@ -9,29 +9,28 @@ from neurodocker.neurodocker import main
 
 
 def test_generate():
-    args = (
-        "generate docker -b ubuntu:17.04 -p apt"
-        " --arg FOO=BAR BAZ"
-        " --afni version=latest method=source"
-        " --ants version=2.2.0 method=source"
-        " --freesurfer version=6.0.0"
-        " --fsl version=5.0.10"
-        " --user=neuro"
-        " --miniconda create_env=neuro conda_install=python=3.6.2"
-        " --user=root"
-        " --mrtrix3 version=3.0_RC3"
-        " --neurodebian os_codename=zesty server=usa-nh"
-        " --spm12 version=r7219 matlab_version=R2017a"
-        " --expose 1234 9000"
-        " --volume /var /usr/bin"
-        " --label FOO=BAR BAZ=CAT"
-        " --copy relpath/to/file.txt /tmp/file.txt"
-        " --add relpath/to/file2.txt /tmp/file2.txt"
-        " --cmd '--arg1' '--arg2'"
-        " --workdir /home"
-        " --install git"
-        " --user=neuro"
-    )
+    args = ("generate docker -b ubuntu:17.04 -p apt"
+            " --arg FOO=BAR BAZ"
+            " --ndfreeze date=20180312"
+            " --afni version=latest method=source"
+            " --ants version=2.2.0 method=source"
+            " --freesurfer version=6.0.0"
+            " --fsl version=5.0.10"
+            " --user=neuro"
+            " --miniconda create_env=neuro conda_install=python=3.6.2"
+            " --user=root"
+            " --mrtrix3 version=3.0_RC3"
+            " --neurodebian os_codename=zesty server=usa-nh"
+            " --spm12 version=r7219 matlab_version=R2017a"
+            " --expose 1234 9000"
+            " --volume /var /usr/bin"
+            " --label FOO=BAR BAZ=CAT"
+            " --copy relpath/to/file.txt /tmp/file.txt"
+            " --add relpath/to/file2.txt /tmp/file2.txt"
+            " --cmd '--arg1' '--arg2'"
+            " --workdir /home"
+            " --install git"
+            " --user=neuro")
     main(args.split())
 
     with pytest.raises(SystemExit):
@@ -62,9 +61,8 @@ def test_generate_opts(capsys):
 
     main(args.format('--env KEY=VAL KEY2=VAL').split())
     out, _ = capsys.readouterr()
-    assert (
-        ('ENV KEY="VAL" \\' in out and 'KEY="VAL"' in out)
-        or ('ENV KEY2="VAL" \\' in out and 'KEY="VAL"'))
+    assert (('ENV KEY="VAL" \\' in out and 'KEY="VAL"' in out)
+            or ('ENV KEY2="VAL" \\' in out and 'KEY="VAL"'))
 
     main(args.format('--expose 1230 1231').split())
     out, _ = capsys.readouterr()
@@ -78,6 +76,11 @@ def test_generate_opts(capsys):
     out, _ = capsys.readouterr()
     assert "vi" in out
 
+    # Test that nd_freeze comes before the header.
+    main(args.format('--ndfreeze date=20180312').split())
+    out, _ = capsys.readouterr()
+    assert out.find("nd_freeze") < out.find("ND_ENTRYPOINT")
+
 
 @pytest.mark.xfail
 def test_generate_from_json(capsys, tmpdir):
@@ -87,11 +90,18 @@ def test_generate_from_json(capsys, tmpdir):
     main(cmd.split())
     true, _ = capsys.readouterr()
 
-    specs = {'generation_timestamp': '2017-08-31 21:49:04',
-             'instructions': [['base', 'debian:stretch'],
-                              ['convert3d', {'version': '1.0.0'}]],
-             'neurodocker_version': '0.2.0-18-g9227b17',
-             'pkg_manager': 'apt'}
+    specs = {
+        'generation_timestamp':
+        '2017-08-31 21:49:04',
+        'instructions': [['base', 'debian:stretch'],
+                         ['convert3d', {
+                             'version': '1.0.0'
+                         }]],
+        'neurodocker_version':
+        '0.2.0-18-g9227b17',
+        'pkg_manager':
+        'apt'
+    }
     str_specs = json.dumps(specs)
     filepath = tmpdir.join("specs.json")
     filepath.write(str_specs)

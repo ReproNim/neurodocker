@@ -23,8 +23,8 @@ def _indent(string, indent=4, add_list_op=False):
     for ii, line in enumerate(lines):
         line = line.rstrip()
         already_cont = line.startswith(('&&', '&', '||', '|', 'fi'))
-        previous_cont = (
-            lines[ii - 1].endswith('\\') or lines[ii - 1].startswith('if'))
+        previous_cont = (lines[ii - 1].endswith('\\')
+                         or lines[ii - 1].startswith('if'))
         if ii:
             if add_list_op and not already_cont and not previous_cont:
                 line = "&& " + line
@@ -56,7 +56,6 @@ def _dockerfile_base_add_copy(list_srcs_dest, cmd):
 
 
 class _DockerfileImplementations:
-
     @staticmethod
     def add(list_srcs_dest):
         """Return Dockerfile ADD instruction to add file or directory to Docker
@@ -180,8 +179,7 @@ class _DockerfileImplementations:
     @staticmethod
     def install(pkgs, pkg_manager):
         """Return Dockerfile RUN instruction to install system packages."""
-        return _indent(
-            "RUN " + _install(pkgs, pkg_manager), add_list_op=True)
+        return _indent("RUN " + _install(pkgs, pkg_manager), add_list_op=True)
 
     @staticmethod
     def label(labels):
@@ -251,7 +249,6 @@ class _DockerfileImplementations:
 
 
 class _DockerfileInterfaceFormatter:
-
     def __init__(self, interface):
         self.run = interface.render_run()
         self.env = interface.render_env()
@@ -280,8 +277,9 @@ class Dockerfile(ContainerSpecGenerator):
 
     _implementations = {
         **_installation_implementations,
-        **dict(inspect.getmembers(_DockerfileImplementations,
-               predicate=inspect.isfunction))
+        **dict(
+            inspect.getmembers(
+                _DockerfileImplementations, predicate=inspect.isfunction))
     }
 
     def __init__(self, specs):
@@ -299,14 +297,17 @@ class Dockerfile(ContainerSpecGenerator):
         self._add_header()
 
     def _add_header(self):
+        # If ndfreeze is requested, the order of instructions should be:
+        # base, arg noninteractive frontend, ndfreeze, header, entrypoint.
+        offset = 1 if self._specs['instructions'][1][0] == 'ndfreeze' else 0
         self._specs['instructions'].insert(
-            1, ('arg', {'DEBIAN_FRONTEND': 'noninteractive'}))
-        kwds = {
-            'version': 'generic',
-            'method': 'custom'}
-        self._specs['instructions'].insert(2, ('_header', kwds))
+            1, ('arg', {
+                'DEBIAN_FRONTEND': 'noninteractive'
+            }))
+        kwds = {'version': 'generic', 'method': 'custom'}
+        self._specs['instructions'].insert(2 + offset, ('_header', kwds))
         self._specs['instructions'].insert(
-            3, ('entrypoint', "/neurodocker/startup.sh"))
+            3 + offset, ('entrypoint', "/neurodocker/startup.sh"))
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
@@ -318,8 +319,8 @@ class Dockerfile(ContainerSpecGenerator):
                     try:
                         interface = impl(pkg_manager=pkg_man, **params)
                     except Exception as exc:
-                        logger.error(
-                            "Failed to instantiate {}: {}".format(impl, exc))
+                        logger.error("Failed to instantiate {}: {}".format(
+                            impl, exc))
                         raise
                     yield _DockerfileInterfaceFormatter(interface).render()
                 else:
