@@ -2,43 +2,41 @@
 
 All of the examples below use `debian:stretch` as the base image, but any Docker image can be used as a base. Common base images (and their packages managers) are `ubuntu:16.04` (`apt`), `centos:7` (`yum`), `neurodebian:nd16.04` (`apt`), and `neurodebian:stretch` (`apt`).
 
-
-Table of contents
------------------
+## Table of contents
 
 - [Docker and Singularity options](#docker-and-singularity-options)
-  * [`--add-to-entrypoint`](#--add-to-entrypoint)
-  * [`--copy`](#--copy)
-  * [`--install`](#--install)
-  * [`--entrypoint`](#--entrypoint)
-  * [`-e / --env`](#-e----env)
-  * [`-r / --run`](#-r----run)
-  * [`--run-bash`](#--run-bash)
-  * [`-u / --user`](#-u----user)
-  * [`-w / --workdir`](#-w----workdir)
+  - [`--add-to-entrypoint`](#--add-to-entrypoint)
+  - [`--copy`](#--copy)
+  - [`--install`](#--install)
+  - [`--entrypoint`](#--entrypoint)
+  - [`-e / --env`](#-e----env)
+  - [`-r / --run`](#-r----run)
+  - [`--run-bash`](#--run-bash)
+  - [`-u / --user`](#-u----user)
+  - [`-w / --workdir`](#-w----workdir)
 - [Docker-only options](#docker-only-options)
-  * [`--arg`](#--arg)
-  * [`--cmd`](#--cmd)
-  * [`--expose`](#--expose)
-  * [`--label`](#--label)
-  * [`--volume`](#--volume)
+  - [`--arg`](#--arg)
+  - [`--cmd`](#--cmd)
+  - [`--expose`](#--expose)
+  - [`--label`](#--label)
+  - [`--volume`](#--volume)
 - [Neuroimaging software examples](#neuroimaging-software-examples)
-  * [AFNI](#afni)
-  * [ANTs](#ants)
-  * [Convert3D](#convert3d)
-  * [dcm2niix](#dcm2niix)
-  * [FreeSurfer](#freesurfer)
-  * [FSL](#fsl)
-  * [Matlab Compiler Runtime (MCR)](#matlab-compiler-runtime-mcr)
-  * [MINC](#minc)
-  * [Miniconda](#miniconda)
-  * [MRtrix3](#mrtrix3)
-  * [NeuroDebian](#neurodebian)
-  * [PETPVC](#petpvc)
-  * [SPM12](#spm12)
-  * [VNC](#vnc)
+  - [AFNI](#afni)
+  - [ANTs](#ants)
+  - [Convert3D](#convert3d)
+  - [dcm2niix](#dcm2niix)
+  - [FreeSurfer](#freesurfer)
+  - [FSL](#fsl)
+  - [Matlab Compiler Runtime (MCR)](#matlab-compiler-runtime-mcr)
+  - [MINC](#minc)
+  - [Miniconda](#miniconda)
+  - [MRtrix3](#mrtrix3)
+  - [NeuroDebian](#neurodebian)
+  - [PETPVC](#petpvc)
+  - [SPM12](#spm12)
+  - [VNC](#vnc)
 - [JSON](#json)
-
+- [NeuroDebian Freeze](#neurodebian-freeze)
 
 # Docker and Singularity options
 
@@ -81,14 +79,12 @@ neurodocker generate [docker|singularity] --base=centos:7 --pkg-manager=yum \
   --install yum_opts='--debug' git vim
 ```
 
-
 By default --install apt_opts uses --no-install-recommends to minimize container sizes. In few cases this can lead to unexpected behaviours and one can try to build a container without this option.
 
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
   --install apt_opts='--quiet' git vim
-  ```
-
+```
 
 ## `--entrypoint`
 
@@ -214,8 +210,6 @@ This option adds a Docker `VOLUME` layer and does not apply to Singularity.
 neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
   --volume /data
 ```
-
-
 
 # Neuroimaging software examples
 
@@ -349,7 +343,6 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
   --spm12 version=r7219 method=binaries
 ```
 
-
 ## VNC
 
 ```shell
@@ -366,26 +359,31 @@ docker run --rm -it -p 5901:5901 vnc_image xterm
 
 In a VNC client, connect to 127.0.0.1:5901, and enter the password used when configuring the container. `xterm` is a graphical terminal. It is used only as an example. Any GUI program can be used (e.g., Firefox).
 
-
 # JSON
 
 Neurodocker can generate Dockerfiles and Singularity files from JSON. For example, the file `example_specs.json` (contents below) can be used to with `neurodocker generate` as follows:
 
 ```json
 {
-	"pkg_manager": "apt",
-	"instructions": [
-		["base", "debian"],
-		["ants", {
-			"version": "2.2.0"
-		}],
-		["install", ["git"]],
-		["miniconda", {
-			"create_env": "neuro",
-			"conda_install": ["numpy", "traits"],
-			"pip_install": ["nipype"]
-		}]
-	]
+  "pkg_manager": "apt",
+  "instructions": [
+    ["base", "debian"],
+    [
+      "ants",
+      {
+        "version": "2.2.0"
+      }
+    ],
+    ["install", ["git"]],
+    [
+      "miniconda",
+      {
+        "create_env": "neuro",
+        "conda_install": ["numpy", "traits"],
+        "pip_install": ["nipype"]
+      }
+    ]
+  ]
 }
 ```
 
@@ -404,3 +402,21 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
               pip_install='nipype' \
   --json
 ```
+
+# NeuroDebian Freeze
+
+Use this with NeuroDebian distributions to pin the `apt` sources to a specific date (and optionally time). This can greatly help to produce a reproducible container specification, because all calls to `apt-get update` will point to the same snapshots of packages. This will only have an effect on Debian and NeuroDebian APT sources. Please see the script [`nd_freeze`](http://neuro.debian.net/pkgs/neurodebian-freeze.html) for more information. The usage is as follows:
+
+```shell
+neurodocker generate [docker|singularity] --base=neurodebian:stretch --pkg-manager=apt \
+  --ndfreeze date=20180312
+```
+
+One can pass command-line options to `nd_freeze` with `opts`:
+
+```shell
+neurodocker generate [docker|singularity] --base=neurodebian:stretch --pkg-manager=apt \
+  --ndfreeze opts='--no-downgrade' date=20180312
+```
+
+The call to `nd_freeze` will occur close to the beginning of the Docker or Singularity specification, regardless of the position of `--ndfreeze` on the command line.

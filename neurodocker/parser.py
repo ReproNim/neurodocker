@@ -34,7 +34,6 @@ class _SpecsParser:
     --------
     >>> specs = {
     ...     'pkg_manager': 'apt',
-    ...     'check_urls': False,
     ...     'instructions': [
     ...         ('base', 'ubuntu:17.04'),
     ...         ('ants', {'version': '2.2.0'}),
@@ -44,8 +43,10 @@ class _SpecsParser:
     ... }
     >>> SpecsParser(specs)
     """
-    VALID_TOP_LEVEL_KEYS = ['check_urls', 'instructions', 'pkg_manager',
-                            'generation_timestamp', 'neurodocker_version']
+    VALID_TOP_LEVEL_KEYS = [
+        'instructions', 'pkg_manager', 'generation_timestamp',
+        'neurodocker_version'
+    ]
 
     VALID_INSTRUCTIONS_KEYS = Dockerfile._implementations.keys()
 
@@ -79,14 +80,12 @@ class _SpecsParser:
             raise KeyError("The first item in specs['instructions'] must be "
                            "a tuple ('base', '<base_image>').")
 
-        _check_for_invalid_keys(self.specs.keys(),
-                                self.VALID_TOP_LEVEL_KEYS,
+        _check_for_invalid_keys(self.specs.keys(), self.VALID_TOP_LEVEL_KEYS,
                                 'top-level')
 
         instructions_keys = [k for k, _ in self.specs['instructions']]
         _check_for_invalid_keys(instructions_keys,
-                                self.VALID_INSTRUCTIONS_KEYS,
-                                'instructions')
+                                self.VALID_INSTRUCTIONS_KEYS, 'instructions')
 
     def _validate_software_options(self):
         """Raise ValueError if a key is present that does not belong in a

@@ -1,0 +1,9 @@
+# Instructions to run `nd_freeze` in NeuroDebian images.
+
+generic:
+  custom:
+    dependencies:
+      apt: neurodebian-freeze
+    instructions: |
+      {{ ndfreeze.install_dependencies() }}
+      nd_freeze {{ ndfreeze.opts | default('') }} {{ ndfreeze.date }}
