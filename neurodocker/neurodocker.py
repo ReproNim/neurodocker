@@ -164,7 +164,8 @@ def _add_generate_common_arguments(parser):
         " method, and install_path",
         "ndfreeze":
         "Use the NeuroDebian command `nd_freeze` to freeze the apt"
-        " sources to a certain date.",
+        " sources to a certain date. This will only have an effect"
+        " on Debian and NeuroDebian APT sources.",
         "neurodebian":
         "Add NeuroDebian repository. Valid keys are "
         "os_codename (e.g., zesty), server (e.g., usa-nh), and"

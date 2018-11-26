@@ -405,11 +405,18 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 # NeuroDebian Freeze
 
-Use this with NeuroDebian distributions to pin the `apt` sources to a specific date (and optionally time). This can greatly help to produce a reproducible container specification, because all calls to `apt-get update` will point to the same snapshots of packages. Please see the script [`nd_freeze`](http://neuro.debian.net/pkgs/neurodebian-freeze.html) for more information. The usage is as follows:
+Use this with NeuroDebian distributions to pin the `apt` sources to a specific date (and optionally time). This can greatly help to produce a reproducible container specification, because all calls to `apt-get update` will point to the same snapshots of packages. This will only have an effect on Debian and NeuroDebian APT sources. Please see the script [`nd_freeze`](http://neuro.debian.net/pkgs/neurodebian-freeze.html) for more information. The usage is as follows:
 
 ```shell
 neurodocker generate [docker|singularity] --base=neurodebian:stretch --pkg-manager=apt \
   --ndfreeze date=20180312
+```
+
+One can pass command-line options to `nd_freeze` with `opts`:
+
+```shell
+neurodocker generate [docker|singularity] --base=neurodebian:stretch --pkg-manager=apt \
+  --ndfreeze opts='--no-downgrade' date=20180312
 ```
 
 The call to `nd_freeze` will occur close to the beginning of the Docker or Singularity specification, regardless of the position of `--ndfreeze` on the command line.
