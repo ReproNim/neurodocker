@@ -178,7 +178,7 @@ class SingularityRecipe(ContainerSpecGenerator):
                 raise ValueError(
                     "instruction not understood: '{}'".format(instruction))
         if not self._runscript:
-            self._runscript.append(NEURODOCKER_ENTRYPOINT)
+            self._runscript = NEURODOCKER_ENTRYPOINT
         self._parts_filled = True
 
     def _add_json(self):
