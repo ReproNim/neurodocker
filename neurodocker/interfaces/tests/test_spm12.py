@@ -9,8 +9,8 @@ class TestSPM(object):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'ubuntu:18.04'),
-                ('spm12', {'version': 'dev'}),
+                ('base', 'ubuntu:16.04'),
+                ('spm12', {'version': 'r7219'}),
                 ('user', 'neuro'),
             ],
         }
