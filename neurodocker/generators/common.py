@@ -69,8 +69,10 @@ class _Users:
         if user not in cls.initialized_users:
             cls.initialized_users.add(user)
             return (
-                "useradd --no-user-group --create-home --shell /bin/bash {0}".
-                format(user))
+                # Test whether the user exists. If not, add user.
+                'test "$(getent passwd {0})" ||'
+                ' useradd --no-user-group --create-home --shell /bin/bash {0}'
+                .format(user))
         else:
             return False
 
