@@ -9,7 +9,7 @@ class TestSPM(object):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'ubuntu:16.04'),
+                ('base', 'debian:stretch'),
                 ('spm12', {'version': 'r7219'}),
                 ('user', 'neuro'),
             ],
@@ -23,7 +23,7 @@ class TestSPM(object):
         specs = {
             'pkg_manager': 'apt',
             'instructions': [
-                ('base', 'docker://ubuntu:16.04'),
+                ('base', 'docker://debian:stretch'),
                 ('spm12', {'version': 'r7219'}),
                 ('user', 'neuro'),
             ],
