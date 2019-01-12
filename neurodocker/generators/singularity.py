@@ -147,7 +147,10 @@ class SingularityRecipe(ContainerSpecGenerator):
     def _add_neurodocker_header(self):
         kwds = {'version': 'generic', 'method': 'custom'}
         # If ndfreeze is requested, put it before the neurodocker header.
-        offset = 1 if self._specs['instructions'][1][0] == 'ndfreeze' else 0
+        offset = 0
+        if len(self._specs['instructions']) > 1:
+            if self._specs['instructions'][1][0] == 'ndfreeze':
+                offset = 1
         self._specs['instructions'].insert(1 + offset, ('_header', kwds))
 
     def _fill_parts(self):
