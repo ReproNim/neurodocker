@@ -2,7 +2,7 @@
 
 set -exu
 
-echo 'fprintf("testing")' > /tmp/test.m
-$SPMMCRCMD /tmp/test.m
+echo "a = 1" > ~/test.m
+$SPMMCRCMD ~/test.m
 
 printf 'passed'
