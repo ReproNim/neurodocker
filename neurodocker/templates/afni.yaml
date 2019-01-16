@@ -48,7 +48,7 @@ generic:
       apt: >
         curl ed g++ gcc git libglib2.0-dev libglu1-mesa-dev libgsl-dev
         libmotif-dev libnetpbm10-dev libxext-dev libxi-dev libxpm-dev libxt-dev
-        m4 make nlibxmu-headers nmesa-common-dev r-base r-base-dev tcsh
+        m4 make libxmu-headers mesa-common-dev r-base r-base-dev tcsh
         zlib1g-dev
       yum: >
         compat-gcc-34 expat-devel gcc gcc-c++ gcc-gfortran git glib2-devel
