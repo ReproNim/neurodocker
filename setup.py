@@ -61,7 +61,8 @@ def main():
         install_requires=requirements,
         entry_points={
             "console_scripts": [
-                "neurodocker=neurodocker.neurodocker:main"
+                "neurodocker=neurodocker.neurodocker:main",
+                "ndminify=neurodocker.reprozip.gentle.trace:main"
             ],
         },
         python_requires='>=3.5',
