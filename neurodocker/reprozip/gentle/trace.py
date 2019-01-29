@@ -66,7 +66,7 @@ def trace_and_prune(container, commands, directories_to_prune):
 
     _, log_gen = container.exec_run(trace_cmd, stream=True)
     for log in log_gen:
-        log = log.decode().strip()
+        log = log.decode('utf-8').strip()
         logger.info(log)
         if (("REPROZIP" in log and "couldn't use ptrace" in log)
                 or "neurodocker (in container): error" in log.lower()
@@ -79,13 +79,13 @@ def trace_and_prune(container, commands, directories_to_prune):
         "/tmp/reprozip-miniconda/bin/python /tmp/_prune.py"
         " --config-file /tmp/neurodocker-reprozip-trace/config.yml"
         " --dirs-to-prune {}".format(" ".join(directories_to_prune)).split())
-    result = result.decode().strip()
+    result = result.decode('utf-8').strip()
     if ret:
         raise RuntimeError("Failed: {}".format(result))
 
     ret, result = container.exec_run(
         ['cat', '/tmp/neurodocker-reprozip-trace/TO_DELETE.list'])
-    result = result.decode().strip()
+    result = result.decode('utf-8').strip()
     if ret:
         raise RuntimeError("Error: {}".format(result))
 
@@ -118,13 +118,13 @@ def trace_and_prune(container, commands, directories_to_prune):
     print("Removing files ...")
     ret, result = container.exec_run(
         'xargs -d "\n" -a /tmp/neurodocker-reprozip-trace/TO_DELETE.list rm -f')
-    result = result.decode().split()
+    result = result.decode'utf-8').split()
     if ret:
         raise RuntimeError("Error: {}".format(result))
 
     ret, result = container.exec_run(
         'rm -rf /tmp/neurodocker-reprozip-trace /tmp/reprozip-miniconda /tmp/_trace.sh /tmp/_prune.py')
-    result = result.decode().split()
+    result = result.decode('utf-8').split()
     if ret:
         raise RuntimeError("Error: {}".format(result))
 
