@@ -56,7 +56,8 @@ def main():
         package_data={
             'neurodocker': [
                 'templates/*.yaml',
-                'reprozip/utils/reprozip_trace_runner.sh']
+                'reprozip/utils/reprozip_trace_runner.sh',
+                'reprozip/gentle/_trace.sh']
         },
         install_requires=requirements,
         entry_points={
