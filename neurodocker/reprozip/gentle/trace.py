@@ -94,7 +94,7 @@ def trace_and_prune(container, commands, directories_to_prune):
         print("No files to remove. Quitting.")
         return
 
-    print("WARNING!!! THE FOLLOWING FILES WILL BE REMOVED:")
+    print("\nWARNING!!! THE FOLLOWING FILES WILL BE REMOVED:")
     print('\n    ', end='')
     print('\n    '.join(sorted(files_to_remove)))
 
@@ -122,6 +122,12 @@ def trace_and_prune(container, commands, directories_to_prune):
     if ret:
         raise RuntimeError("Error: {}".format(result))
 
+    ret, result = container.exec_run(
+        'rm -rf /tmp/neurodocker-reprozip-trace /tmp/reprozip-miniconda /tmp/_trace.sh /tmp/_prune.py')
+    result = result.decode().split()
+    if ret:
+        raise RuntimeError("Error: {}".format(result))
+
     print("Finished removing files.")
     print("Next, create a new Docker image with the minified container:")
     print("\n    docker export {} | docker import - imagename\n".format(container.name))
@@ -132,7 +138,7 @@ def main():
     p = ArgumentParser(description=__doc__)
     p.add_argument("-c", "--container", required=True, help="Running container.")
     p.add_argument("-d", "--dirs-to-prune", required=True, nargs='+', help="Directories to prune. Data will be lost in these directories.")
-    p.add_argument("--commands", nargs='+', help="Commands to minify.")
+    p.add_argument("--commands", required=True, nargs='+', help="Commands to minify.")
     args = p.parse_args()
 
     trace_and_prune(container=args.container, commands=args.commands, directories_to_prune=args.dirs_to_prune)
