@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
 # This script installs a dedicated Miniconda (not added to $PATH), installs
-# ReproZip, runs `reprozip trace ...` on an arbitrary number of commands, and
-# finally runs `reprozip pack`.
+# ReproZip and runs `reprozip trace ...` on an arbitrary number of commands.
 #
 # This script accepts an arbitrary number of arguments, where each argument is
 # a command to be traced. It is recommended to initialize an environment
-# variable with the command string and to pass that environment variable to
-# this script.
+# variable with the command string and to pass that environment variable,
+# wrapped in double quotes, to this script.
 
 set -ex
 
@@ -102,10 +101,3 @@ fi
 # Run reprozip trace.
 echo "${NEURODOCKER_LOG_PREFIX}: running reprozip trace command(s)"
 run_reprozip_trace "$@"
-
-# Run reprozip pack.
-# REPROZIP_PATH_FILENAME=${REPROZIP_TRACE_DIR}/neurodocker-reprozip.rpz
-# echo "${NEURODOCKER_LOG_PREFIX}: packing up reprozip experiment"
-# ${REPROZIP_CONDA}/bin/reprozip pack -d ${REPROZIP_TRACE_DIR} ${REPROZIP_PATH_FILENAME}
-# echo "${NEURODOCKER_LOG_PREFIX}: saved pack file within the container to"
-# echo "${REPROZIP_PATH_FILENAME}"
