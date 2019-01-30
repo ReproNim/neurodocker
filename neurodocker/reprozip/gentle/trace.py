@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 from neurodocker.utils import get_docker_client
 
@@ -45,6 +46,17 @@ def copy_file_to_container(container, src, dest):
             tar.add(src, arcname=filename, recursive=False)
         tar_stream.seek(0)
         return container.put_archive(dest, tar_stream)
+
+
+def _get_mounts(container):
+    client = get_docker_client()
+    # [{'Type': 'bind',
+    # 'Source': '/path/to/source',
+    # 'Destination': '/destination',
+    # 'Mode': 'ro',
+    # 'RW': False,
+    # 'Propagation': 'rprivate'}]
+    return client.api.inspect_container(container)['Mounts']
 
 
 def trace_and_prune(container, commands, directories_to_prune):
@@ -93,6 +105,19 @@ def trace_and_prune(container, commands, directories_to_prune):
     if not len(files_to_remove):
         print("No files to remove. Quitting.")
         return
+
+    # Check if any files to be removed are in mounted directories.
+    mounts = _get_mounts(container.name)
+    if mounts:
+        for m in mounts:
+            for p in files_to_remove:
+                if Path(m['Destination']) in Path(p).parents:
+                    raise ValueError(
+                        "Attempting to remove files in a mounted directory."
+                        " Directory in the container '{}' is host directory"
+                        " '{}'. Remove this mounted directory from the"
+                        " minification command and rerun."
+                        .format(m['Destination'], m['Source']))
 
     print("\nWARNING!!! THE FOLLOWING FILES WILL BE REMOVED:")
     print('\n    ', end='')
