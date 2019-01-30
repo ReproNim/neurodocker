@@ -47,40 +47,8 @@ def main(*, yaml_file, directories_to_prune):
     files_to_remove = all_files - files_to_keep
     files_to_remove = {f for f in files_to_remove if f.is_file()}
 
-    with Path('/tmp/neurodocker-reprozip-trace/TO_DELETE.list').open('w') as f:
+    with open('/tmp/neurodocker-reprozip-trace/TO_DELETE.list', mode='w', encoding='utf-8') as f:
         print('\n'.join(map(str, sorted(files_to_remove))), file=f)
-
-    # if not files_to_remove:
-    #     print("No files to remove. Quitting.")
-    #     return
-    #
-    # print("The following files will be removed:")
-    # print('\n    ', end='')
-    # print('\n    '.join(map(str, sorted(files_to_remove))))
-    #
-    # print(
-    #     '\nWARNING: PROCEEDING MAY RESULT IN IRREVERSIBLE DATA LOSS, FOR EXAMPLE'
-    #     ' IF ATTEMPTING TO REMOVE FILES IN DIRECTORIES MOUNTED FROM THE HOST.'
-    #     ' PROCEED WITH EXTREME CAUTION! NEURODOCKER ASSUMES NO RESPONSIBILITY'
-    #     ' FOR DATA LOSS. ALL OF THE FILES LISTED ABOVE WILL BE REMOVED.')
-    # response = 'placeholder'
-    # try:
-    #     while response.lower() not in {'y', 'n', ''}:
-    #         response = input('Proceed (y/N)? ')
-    # except KeyboardInterrupt:
-    #     print("Quitting.")
-    #     return
-    #
-    # if response.lower() in {'', 'n'}:
-    #     print("Quitting.")
-    #     return
-    #
-    # msg = "\rRemoving files ({:.2f} %)"
-    # n_files_to_remove = len(files_to_remove)
-    # for i, f in enumerate(files_to_remove):
-    #     f.unlink()
-    #     print(msg.format((i+1)/n_files_to_remove*100), end='')
-    # print()
 
 
 if __name__ == '__main__':
