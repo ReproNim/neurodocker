@@ -56,7 +56,7 @@ def main(*, yaml_file, directories_to_prune):
                 n_errored += 1
 
     print("++ skipping {} files due to unicode encoding errors".format(n_errored))
-    print("++ found {} files to remove".format(len(files_to_remove)))
+    print("++ found {} files to remove".format(len(files_to_remove) - n_errored))
 
 
 if __name__ == '__main__':
