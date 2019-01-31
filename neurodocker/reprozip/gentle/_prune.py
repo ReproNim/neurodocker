@@ -48,7 +48,15 @@ def main(*, yaml_file, directories_to_prune):
     files_to_remove = {f for f in files_to_remove if f.is_file()}
 
     with open('/tmp/neurodocker-reprozip-trace/TO_DELETE.list', mode='w', encoding='utf-8') as f:
-        print('\n'.join(map(str, sorted(files_to_remove))), file=f)
+        n_errored = 0
+        for ff in sorted(files_to_remove):
+            try:
+                print(ff, file=f)
+            except UnicodeEncodeError:
+                n_errored += 1
+
+    print("++ skipping {} files due to unicode encoding errors".format(n_errored))
+    print("++ found {} files to remove".format(len(files_to_remove)))
 
 
 if __name__ == '__main__':
