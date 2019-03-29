@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import os
 import posixpath
 
 from neurodocker import __version__
@@ -100,6 +101,14 @@ class ContainerSpecGenerator:
 
     def render(self):
         raise NotImplementedError("not implemented")
+
+    def save(self, filepath):
+        """Save the rendered container specification to a file."""
+        if os.path.exists(filepath):
+            raise FileExistsError("File already exists: {}".format(filepath))
+        rendered = self.render()
+        with open(filepath, mode='w') as fp:
+            fp.write(rendered + '\n')
 
     @property
     def commented_header(self):
