@@ -15,5 +15,7 @@ generic:
     instructions: |
       echo "Downloading Mango ..."
       mkdir -p {{ mango.install_path }}
-      curl {{ mango.curl_opts }} {{ mango.binaries_url }} \
-      | tar -xz -C {{ mango.install_path }} --strip-components 1
+      curl {{ mango.curl_opts }} -o mango.zip {{ mango.binaries_url }}
+      unzip mango.zip
+      rm -f mango.zip
+      mv Mango {{ mango.install_path }}
