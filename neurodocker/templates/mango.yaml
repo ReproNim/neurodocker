@@ -1,0 +1,19 @@
+# Instructions to install Mango.
+#
+# Website: http://rii.uthscsa.edu/mango/mango.html
+
+generic:
+  binaries:
+    urls:
+      "latest": http://rii.uthscsa.edu/mango/downloads/mango_unix.zip
+      "4.0.1": http://rii.uthscsa.edu/mango/downloads/mango_unix401.zip
+      "4.0": http://rii.uthscsa.edu/mango/downloads/mango_unix40.zip
+      "3.8": http://rii.uthscsa.edu/mango/downloads/mango_unix38.zip
+      "3.7": http://rii.uthscsa.edu/mango/downloads/mango_unix37.zip
+    env:
+      PATH: "{{ mango.install_path }}:$PATH"
+    instructions: |
+      echo "Downloading Mango ..."
+      mkdir -p {{ mango.install_path }}
+      curl {{ mango.curl_opts }} {{ mango.binaries_url }} \
+      | tar -xz -C {{ mango.install_path }} --strip-components 1

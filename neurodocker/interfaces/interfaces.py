@@ -136,6 +136,16 @@ class FSL(_BaseInterface):
                 posixpath.join('fsl', path) for path in self.exclude_paths)
 
 
+class Mango(_BaseInterface):
+    """Create instance of Mango object."""
+
+    _name = 'mango'
+    _pretty_name = 'Mango'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
+
+
 class MatlabMCR(_BaseInterface):
     """Create instance of MatlabMCR object."""
 

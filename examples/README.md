@@ -27,6 +27,7 @@ All of the examples below use `debian:stretch` as the base image, but any Docker
   - [dcm2niix](#dcm2niix)
   - [FreeSurfer](#freesurfer)
   - [FSL](#fsl)
+  - [Mango](#mango)
   - [Matlab Compiler Runtime (MCR)](#matlab-compiler-runtime-mcr)
   - [MINC](#minc)
   - [Miniconda](#miniconda)
@@ -273,6 +274,13 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
   --fsl version=5.0.10 method=binaries
+```
+
+## Mango
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --mango version=4.0.1
 ```
 
 ## Matlab Compiler Runtime (MCR)

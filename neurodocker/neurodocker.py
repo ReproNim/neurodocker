@@ -149,6 +149,8 @@ def _add_generate_common_arguments(parser):
         "fsl":
         "Install FSL. Valid keys are version (required), method,"
         " install_path, and exclude_paths.",
+        "mango": "Install Mango viewer. Valid keys are version (required) and"
+        " install_path.",
         "matlabmcr":
         "Install Matlab Compiler Runtime. Valid keys are version,"
         " method, and install_path",

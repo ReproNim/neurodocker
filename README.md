@@ -14,6 +14,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
   - [Minimize existing Docker image](#minimize-existing-docker-image)
   - [Example of minimizing Docker image for FreeSurfer recon-all](https://github.com/freesurfer/freesurfer/issues/70#issuecomment-316361886)
 - [Known issues](#known-issues)
+- [Adding an interface](#adding-an-interface)
 
 # Installation
 
@@ -73,6 +74,9 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
+| **Mango** | version\*        | latest, 4.0.1, 4.0, 3.8, 3.7 |
+|                             | method           | binaries (default)                                                                                                                                  |
+|                             | install_path     | Installation path. Default `/opt/mango-{version}`.                                                                                              |
 | **Matlab Compiler Runtime** | version\*        | 2018a, 2012-17[a-b], 2010a                                                                                                                          |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/matlabmcr-{version}`.                                                                                              |
@@ -281,6 +285,17 @@ $ reprounzip docker setup neurodocker-reprozip.rpz test
   - Solution: do not use the `-t/--tty` flag, unless using the container interactively.
 - Attempting to rebuild into an existing Singularity image may raise an error.
   - Solution: remove the existing image or build a new image file.
-- The default apt --install option "--no-install-recommends" (that aims at minimizing container sizes) can cause a strange behaviour for cython inside the container
-  - Solution: use "--install apt_opts=`--quiet` "
-  - more information: [examples](examples#--install)
+- The default apt `--install` option `--no-install-recommends` (that aims to minimize container sizes) can cause unexpected behavior, such as packages not being found.
+  - Solution: use `--install apt_opts="--quiet"`
+  - More information: [examples](examples#--install)
+
+# Adding an interface
+
+To add support for a new interface, follow these steps.
+
+1. Create a YAML template file `neurodocker/templates/{interface}.yaml`. This file specifies the installation procedure for the software and environment setup. Multiple installation procedures can be specified, including from the system package manager, by downloading pre-compiled binaries, or building from source. You can use the jinja2 template language in this file for dynamic behavior.
+  - Please refer to the existing YAML files for examples (e.g., [neurodocker/templates/ants.yaml](neurodocker/templates/ants.yaml)).
+2. Add a class definition to `neurodocker/interfaces/interfaces.py`. This class can be simple (like `neurodocker.interfaces.interfaces.MRtrix3`), or it can validate input arguments, dynamically change values when the interface is rendered as a Dockerfile or Singularity recipe, keep important class-wide information in memory, etc (like `neurodocker.interfaces.interfaces.Miniconda`). Also import the new interface in `neurodocker/interfaces/__init__.py`. Please take a look at the existing interface class definitions for more information.
+3. Add the interface to the `neurodocker` command line program by adding a help message for the interface to the `pkgs_help` dictionary in `neurodocker/neurodocker.py`.
+4. Add documentation of the interface to this file and at least one example under [examples](examples).
+5. Add tests under [neurodocker/interfaces/tests](neurodocker/interfaces/tests).
