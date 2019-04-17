@@ -20,7 +20,7 @@ apt-get install -y {{ apt_opts|default('-q --no-install-recommends') }} \\\
     {%- endif -%}
 {% endfor %}
 apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+rm -rf /var/lib/apt/lists/*
 """
 apt_install = jinja2.Template(apt_install)
 
@@ -33,7 +33,7 @@ yum_install = """yum install -y {{ yum_opts|default('-q') }} \\\
     {%- endif -%}
 {% endfor %}
 yum clean packages
-rm -rf /var/cache/yum/* /tmp/* /var/tmp/*
+rm -rf /var/cache/yum/*
 """
 yum_install = jinja2.Template(yum_install)
 
@@ -44,7 +44,7 @@ rm /tmp/toinstall.deb
 {% endfor -%}
 apt-get install -f
 apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+rm -rf /var/lib/apt/lists/*
 """
 deb_install = jinja2.Template(deb_install)
 
