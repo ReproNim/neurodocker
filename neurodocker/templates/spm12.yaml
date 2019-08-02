@@ -6,12 +6,12 @@
 generic:
   binaries:
     urls:
-      dev: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2018b.zip
-      r7219: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
-      r6914: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6914_R2010a.zip
-      r6685: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6685_R2010a.zip
-      r6472: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6472_R2010a.zip
-      r6225: http://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6225_R2010a.zip
+      dev: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2010a.zip
+      r7219: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
+      r6914: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6914_R2010a.zip
+      r6685: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6685_R2010a.zip
+      r6472: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6472_R2010a.zip
+      r6225: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6225_R2010a.zip
     env:
       FORCE_SPMMCR: "1"
     instructions: |
