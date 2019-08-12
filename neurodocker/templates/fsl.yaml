@@ -48,4 +48,6 @@ generic:
       {% if fsl.version in ("6.0.1") -%}
       echo "Downgrading deprecation module per https://github.com/kaczmarj/neurodocker/issues/271#issuecomment-514523420"
       {{ fsl.install_path }}/fslpython/bin/conda install -n fslpython -c conda-forge -y deprecation==1.*
+      echo "Removing bundled with FSLeyes libz likely incompatible with the one from OS"
+      rm -f {{ fsl.install_path }}/bin/FSLeyes/libz.so.1
       {% endif -%}
