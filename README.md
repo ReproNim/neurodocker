@@ -68,7 +68,6 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/freesurfer-{version}`.                                                                                             |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
-|                             | license_path     | Relative path to license file. If provided, this file will be copied into the Docker image. Must be within the build context.                       |
 | **FSL\*\***                 | version\*        | 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
@@ -281,6 +280,9 @@ $ reprounzip docker setup neurodocker-reprozip.rpz test
   - Solution: do not use the `-t/--tty` flag, unless using the container interactively.
 - Attempting to rebuild into an existing Singularity image may raise an error.
   - Solution: remove the existing image or build a new image file.
-- The default apt --install option "--no-install-recommends" (that aims at minimizing container sizes) can cause a strange behaviour for cython inside the container
-  - Solution: use "--install apt_opts=`--quiet` "
-  - more information: [examples](examples#--install)
+- The default apt `--install` option `--no-install-recommends` (that aims at minimizing container sizes) can cause unexpected behavior.
+  - Solution: use `--install apt_opts="--quiet"`
+  - Please see the [examples](examples#--install) for more information.
+- FreeSurfer cannot find my license file.
+  - Solution: get a free license from [FreeSurfer's website](https://surfer.nmr.mgh.harvard.edu/registration.html), and copy it into the container. To build the Docker image, please use the form `docker build .` instead of `docker build - < Dockerfile`. The latter form will not copy files into the image.
+  - Please see the [examples](examples#freesurfer) for more information.
