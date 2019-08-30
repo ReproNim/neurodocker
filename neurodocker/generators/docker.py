@@ -288,9 +288,14 @@ class Dockerfile(ContainerSpecGenerator):
         self._prep()
         _Users.clear_memory()
 
+        self._rendered = False
+
     def render(self):
-        return self.commented_header + "\n\n".join(
-            self._ispecs_to_dockerfile_str())
+        # Cache the rendered string.
+        if not self._rendered:
+            self._rendered = self.commented_header + "\n\n".join(
+                self._ispecs_to_dockerfile_str())
+        return self._rendered
 
     def _prep(self):
         self._add_json()

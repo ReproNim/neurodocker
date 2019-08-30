@@ -31,4 +31,4 @@ generic:
       unzip /tmp/mni_90c.zip -d {{ minc.install_path }}/share/icbm152_model_09c
       sed -i 's+MINC_TOOLKIT=/opt/minc+MINC_TOOLKIT={{ minc.install_path }}+g' {{ minc.install_path }}/minc-toolkit-config.sh
       sed -i '$isource {{ minc.install_path }}/minc-toolkit-config.sh' $ND_ENTRYPOINT
-      rm -rf /tmp/*
+      rm -rf /tmp/mni*
