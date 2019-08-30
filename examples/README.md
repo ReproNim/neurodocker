@@ -220,9 +220,9 @@ neurodocker generate docker --base=debian:stretch --pkg-manager=apt \
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
   --afni version=latest method=binaries
 
-# Build from source.
+# Build current master branch from source.
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --afni version=latest method=source
+  --afni version=master method=source
 ```
 
 ## ANTs
@@ -230,7 +230,7 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 ```shell
 # Build current master branch from source.
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --ants version=latest method=source
+  --ants version=master method=source
 
 # Install binaries for version 2.2.0.
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
