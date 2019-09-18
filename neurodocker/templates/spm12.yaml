@@ -21,6 +21,6 @@ generic:
       mkdir -p {{ spm12.install_path }}
       mv /tmp/spm12/* {{ spm12.install_path }}/
       chmod -R 777 {{ spm12.install_path }}
-      rm -rf /tmp/*
+      rm -rf /tmp/spm*
       {{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} quit
       sed -i '$iexport SPMMCRCMD=\"{{ spm12.install_path }}/run_spm12.sh {{ spm12.mcr_path }} script\"' $ND_ENTRYPOINT
