@@ -249,6 +249,16 @@ class Miniconda(_BaseInterface):
             return super().render_env()
 
 
+class MINC(_BaseInterface):
+    """Create instance of MRIcron object."""
+
+    _name = 'mricron'
+    _pretty_name = 'MRIcron'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
+
+
 class MRtrix3(_BaseInterface):
     """Create instance of MRtrix3 object."""
 
