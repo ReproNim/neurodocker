@@ -5,6 +5,7 @@
 generic:
   binaries:
     urls:
+      latest: https://github.com/neurolabusc/MRIcron/releases/latest/download/MRIcron_linux.zip
       "1.0.20190902": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190902/MRIcron_linux.zip
       "1.0.20190410": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190410/mricron_linux.zip
       "1.0.20181114": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20181114/mricron_linux.zip
@@ -15,7 +16,6 @@ generic:
       apt: libgtk2.0-0
       yum: gtk2
     env:
-      ANTSPATH: "{{ mricron.install_path }}"
       PATH: "{{ mricron.install_path }}:$PATH"
     instructions: |
       {{ mricron.install_dependencies() }}
