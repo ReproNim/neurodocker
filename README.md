@@ -85,6 +85,8 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | conda_install    | Packages to install with `conda`. E.g., `conda_install="python=3.6 numpy traits"`                                                                   |
 |                             | pip_install      | Packages to install with `pip`.                                                                                                                     |
 |                             | activate         | If true (default), activate this environment in container entrypoint.                                                                               |
+| **MRIcron** | version\* | latest, 1.0.20190902, 1.0.20190410, 1.0.20181114, 1.0.20180614, 1.0.20180404, 1.0.20171220 |
+| | install_path | Installation path. Default `/opt/mricron-{version}` |
 | **MRtrix3**                 | version\*        | 3.0                                                                                                                                                 |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/mrtrix3-{version}`.                                                                                                |

@@ -161,6 +161,9 @@ def _add_generate_common_arguments(parser):
         " (defaults to latest). The options conda_install and"
         " pip_install accept strings of packages: conda_install="
         '"python=3.6 numpy traits".',
+        "mricron":
+        "Install MRIcron. valid keys are version (required), method, and"
+        " install_path.",
         "mrtrix3":
         "Install MRtrix3. Valid keys are version (required),"
         " method, and install_path",
