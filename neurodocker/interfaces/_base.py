@@ -146,7 +146,7 @@ class _Resolver:
         if self.version_has_method(version_key, 'binaries'):
             try:
                 urls = self._d[version_key]['binaries']['urls'].keys()
-                return version in urls
+                return version in urls or "*" in urls
             except KeyError:
                 raise ValueError(
                     "no binary URLs defined for version '{}'".format(version)
@@ -169,7 +169,10 @@ class _Resolver:
     def binaries_url(self, version):
         self.check_binaries_has_url(version)
         version_key = self.get_version_key(version)
-        return self._d[version_key]['binaries']['urls'][version]
+        urls = self._d[version_key]['binaries']['urls']
+        if version in urls:
+            return urls[version]
+        return urls["*"].format(version)
 
 
 class _BaseInterface:
