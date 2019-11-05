@@ -306,13 +306,16 @@ class Dockerfile(ContainerSpecGenerator):
         # base, arg noninteractive frontend, ndfreeze, header, entrypoint.
         offset = 1 if self._specs['instructions'][1][0] == 'ndfreeze' else 0
         self._specs['instructions'].insert(
-            1, ('arg', {
+            1, ('user', 'root')
+        )
+        self._specs['instructions'].insert(
+            2, ('arg', {
                 'DEBIAN_FRONTEND': 'noninteractive'
             }))
         kwds = {'version': 'generic', 'method': 'custom'}
-        self._specs['instructions'].insert(2 + offset, ('_header', kwds))
+        self._specs['instructions'].insert(3 + offset, ('_header', kwds))
         self._specs['instructions'].insert(
-            3 + offset, ('entrypoint', "/neurodocker/startup.sh"))
+            4 + offset, ('entrypoint', "/neurodocker/startup.sh"))
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
