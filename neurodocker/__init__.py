@@ -1,6 +1,9 @@
 import sys
 
-from neurodocker.version import __version__
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
 from neurodocker.utils import set_log_level
