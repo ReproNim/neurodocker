@@ -157,6 +157,7 @@ class SingularityRecipe(ContainerSpecGenerator):
             if self._specs['instructions'][1][0] == 'ndfreeze':
                 offset = 1
         self._specs['instructions'].insert(1 + offset, ('_header', kwds))
+        self._specs['instructions'].insert(1 + offset, ('user', 'root'))
 
     def _fill_parts(self):
         pkg_man = self._specs['pkg_manager']
