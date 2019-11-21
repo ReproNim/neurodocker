@@ -11,3 +11,7 @@ if sys.version_info[0] < 3:
         " install Python 3.")
 
 set_log_level('info')
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
