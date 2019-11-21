@@ -313,6 +313,7 @@ class Dockerfile(ContainerSpecGenerator):
         self._specs['instructions'].insert(2 + offset, ('_header', kwds))
         self._specs['instructions'].insert(
             3 + offset, ('entrypoint', "/neurodocker/startup.sh"))
+        self._specs['instructions'].insert(1 + offset, ('user', 'root'))
 
     def _ispecs_to_dockerfile_str(self):
         pkg_man = self._specs['pkg_manager']
