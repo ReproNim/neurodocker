@@ -1,0 +1,2 @@
+include versioneer.py
+include neurodocker/_version.py
