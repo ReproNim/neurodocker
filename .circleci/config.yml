@@ -70,7 +70,7 @@ jobs:
             echo "export PATH=/usr/local/singularity/bin:$PATH" >> ~/.bashrc
             source ~/.bashrc
             sudo apt-get install -y squashfs-tools
-            curl -fsSL https://dl.dropbox.com/s/m4fmejdcmoltzh2/singularity.tar.gz | tar xz -C /usr/local
+            curl -fsSL https://dl.dropbox.com/s/m4fmejdcmoltzh2/singularity.tar.gz | sudo tar xz -C /usr/local
             pip install -q --no-cache-dir singularity
       - run:
           name: Test singularity image builds
