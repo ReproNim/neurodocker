@@ -107,6 +107,8 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     img = client.build(
         recipe=filename,
         image=os.path.join(sr_dir, intname + ".sqsh"))
+    if img is None:
+        raise FileNotFoundError("Could not find built singularity image at '{}'".format(image))
 
     bash_test_file = posixpath.join("/testscripts", bash_test_file)
     test_cmd = "bash " + bash_test_file
