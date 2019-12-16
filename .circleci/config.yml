@@ -67,12 +67,10 @@ jobs:
       - run:
           name: Install singularity
           command: |
+            echo "export PATH=/usr/local/singularity/bin:$PATH" >> ~/.bashrc
             source ~/.bashrc
-            curl -fsSL http://neuro.debian.net/lists/trusty.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
-            curl -fsSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
-            (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
-            sudo apt-get -qq update
-            sudo apt-get install -yq singularity-container
+            sudo apt-get install -y squashfs-tools
+            curl https://dl.dropbox.com/s/m4fmejdcmoltzh2/singularity.tar.gz | tar xz -C /usr/local
             pip install -q --no-cache-dir singularity
       - run:
           name: Test singularity image builds
