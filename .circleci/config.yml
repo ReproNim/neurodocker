@@ -1,6 +1,6 @@
 ---
 _machine_kwds: &machine_kwds
-  image: circleci/classic:201711-01
+  image: ubuntu-1604:201903-01
 
 _checkout_kwds: &checkout_kwds
   path: ~/neurodocker
