@@ -16,9 +16,9 @@ _setup_env: &setup_kwds
     conda update -n base -yq conda
     conda update -yq --all
 
-    pip install -q --no-cache-dir -U pip
-    pip install -q --no-cache-dir reprozip codecov
-    pip install -q --no-cache-dir -e ~/neurodocker[dev]
+    pip install --no-cache-dir -U pip
+    pip install --no-cache-dir reprozip codecov
+    pip install --no-cache-dir -e ~/neurodocker[dev]
 
 
 version: 2
@@ -69,8 +69,8 @@ jobs:
           command: |
             echo "export PATH=/usr/local/singularity/bin:$PATH" >> ~/.bashrc
             source ~/.bashrc
-            sudo apt-get install -y squashfs-tools
             curl -fsSL https://dl.dropbox.com/s/m4fmejdcmoltzh2/singularity.tar.gz | sudo tar xz -C /usr/local
+            singularity version
             pip install -q --no-cache-dir singularity
       - run:
           name: Test singularity image builds
