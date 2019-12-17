@@ -17,7 +17,7 @@ _setup_env: &setup_kwds
     conda update -yq --all
 
     pip install --no-cache-dir -U pip
-    pip install --no-cache-dir reprozip codecov
+    pip install --no-cache-dir reprozip codecov pytest-cov
     pip install --no-cache-dir -e ~/neurodocker[dev]
 
 
