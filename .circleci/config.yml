@@ -76,8 +76,12 @@ jobs:
           name: Test singularity image builds
           no_output_timeout: 360m
           command: |
+            echo "++ BEFORE APPENDING"
+            cat ~/.bashrc
+            echo "export PATH=~/conda/bin:$PATH" >> ~/.bashrc
             source ~/.bashrc
-            echo $PATH
+            echo "++ AFTER APPENDING"
+            # echo $PATH
             pytest --cov -k 'test_singularity' neurodocker
             codecov
       # - save_cache:
