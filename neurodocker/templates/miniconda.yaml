@@ -17,7 +17,7 @@ generic:
       curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}
       bash "$conda_installer" -b -p {{ miniconda.install_path }}
       rm -f "$conda_installer"
-      {%- if miniconda.version == "latest" %}
+      {% if miniconda.version == "latest" -%}
       conda update -yq -nbase conda
       {% endif -%}
       conda config --system --prepend channels conda-forge
