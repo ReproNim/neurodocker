@@ -156,8 +156,8 @@ class SingularityRecipe(ContainerSpecGenerator):
         if len(self._specs['instructions']) > 1:
             if self._specs['instructions'][1][0] == 'ndfreeze':
                 offset = 1
-        self._specs['instructions'].insert(1 + offset, ('user', 'root'))
         self._specs['instructions'].insert(1 + offset, ('_header', kwds))
+        self._specs['instructions'].insert(1 + offset, ('user', 'root'))
 
 
     def _fill_parts(self):
