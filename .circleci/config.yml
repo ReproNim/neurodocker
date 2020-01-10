@@ -34,9 +34,9 @@ jobs:
           *setup_kwds
       - restore_cache:
           keys:
-            - dfs-v1-{{ .Branch }}-{{ .Revision }}
-            - dfs-v1-{{ .Branch }}
-            - dfs-v1
+            - dfs-v2-{{ .Branch }}-{{ .Revision }}
+            - dfs-v2-{{ .Branch }}
+            - dfs-v2
       - run:
           name: Test docker image builds
           no_output_timeout: 360m
@@ -45,7 +45,8 @@ jobs:
             pytest --cov -k 'test_docker' neurodocker
             codecov
       - save_cache:
-          key: dfs-v1-{{ .Branch }}-{{ .Revision }}
+          key: dfs-v2-{{ .Branch }}-{{ .Revision }}
+          when: on_success
           paths:
             - /tmp/cache
 
@@ -60,9 +61,9 @@ jobs:
           *setup_kwds
       - restore_cache:
           keys:
-            - srs-v1-{{ .Branch }}-{{ .Revision }}
-            - srs-v1-{{ .Branch }}
-            - srs-v1
+            - srs-v2-{{ .Branch }}-{{ .Revision }}
+            - srs-v2-{{ .Branch }}
+            - srs-v2
       - run:
           name: Install singularity
           command: |
@@ -81,7 +82,8 @@ jobs:
             pytest --cov -k 'test_singularity' neurodocker
             codecov
       - save_cache:
-          key: srs-v1-{{ .Branch }}-{{ .Revision }}
+          key: srs-v2-{{ .Branch }}-{{ .Revision }}
+          when: on_success
           paths:
             - ~/tmp/cache
 
