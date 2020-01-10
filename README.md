@@ -1,6 +1,6 @@
 # Neurodocker
 
-[![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
+[![build status](https://img.shields.io/circleci/project/github/ReproNim/neurodocker/master.svg)](https://circleci.com/gh/ReproNim/neurodocker/tree/master)
 [![docker pulls](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
 [![python versions](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 
