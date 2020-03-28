@@ -68,7 +68,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/freesurfer-{version}`.                                                                                             |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
-| **FSL\*\***                 | version\*        | 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
+| **FSL\*\***                 | version\*        | 6.0.3, 6.0.2, 6.0.1, 6.0.0, 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
