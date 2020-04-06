@@ -11,6 +11,8 @@
 generic:
   binaries:
     urls:
+      "6.0.3": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.3-centos6_64.tar.gz
+      "6.0.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.2-centos6_64.tar.gz
       "6.0.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.1-centos6_64.tar.gz
       "6.0.0": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.0-centos6_64.tar.gz
       "5.0.11": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.11-centos6_64.tar.gz
@@ -23,6 +25,14 @@ generic:
     env:
       FSLDIR: "{{ fsl.install_path }}"
       PATH: "{{ fsl.install_path }}/bin:$PATH"
+      FSLOUTPUTTYPE: "NIFTI_GZ"
+      FSLMULTIFILEQUIT: "TRUE"
+      FSLTCLSH: "{{ fsl.install_path }}/bin/fsltclsh"
+      FSLWISH: "{{ fsl.install_path }}/bin/fslwish"
+      FSLLOCKDIR: ""
+      FSLMACHINELIST: ""
+      FSLREMOTECALL: ""
+      FSLGECUDAQ: "cuda.q"
     instructions: |
       {{ fsl.install_dependencies() }}
       echo "Downloading FSL ..."
@@ -41,7 +51,7 @@ generic:
       sed -i '$iecho If you are considering commercial use of this container, please consult the relevant license:' $ND_ENTRYPOINT
       sed -i '$iecho https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence' $ND_ENTRYPOINT
       sed -i '$isource $FSLDIR/etc/fslconf/fsl.sh' $ND_ENTRYPOINT
-      {% if fsl.version in ("5.0.11", "5.0.10", "6.0.1") -%}
+      {% if fsl.version in ("5.0.11", "5.0.10", "6.0.1", "6.0.2", "6.0.3") -%}
       echo "Installing FSL conda environment ..."
       bash {{ fsl.install_path }}/etc/fslconf/fslpython_install.sh -f {{ fsl.install_path }}
       {% endif -%}
