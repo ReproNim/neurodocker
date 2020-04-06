@@ -23,7 +23,7 @@ generic:
       conda config --system --prepend channels conda-forge
       conda config --system --set auto_update_conda false
       conda config --system --set show_channel_urls true
-      sync && conda clean --all && sync
+      sync && conda clean -y --all && sync
       {% endif -%}
       {% if miniconda.yaml_file -%}
       conda env create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
@@ -40,7 +40,7 @@ generic:
           "{{ pkg }}"
           {%- endif -%}
       {% endfor %}
-      sync && conda clean --all && sync
+      sync && conda clean -y --all && sync
       {% endif -%}
       {% if miniconda.pip_install is not none -%}
       bash -c "source activate {{ miniconda.env_name }}
