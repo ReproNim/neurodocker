@@ -153,7 +153,7 @@ def trace_and_prune(container, commands, directories_to_prune):
     if ret:
         raise RuntimeError("Error: {}".format(result))
 
-    print("Finished removing files.")
+    print("\n\nFinished removing files.")
     print("Next, create a new Docker image with the minified container:")
     print("\n    docker export {} | docker import - imagename\n".format(container.name))
 
