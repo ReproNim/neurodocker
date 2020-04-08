@@ -44,8 +44,7 @@ function install_conda_reprozip() {
   ls /tmp
   bash $TMP_CONDA_INSTALLER -b -f -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
-  ${REPROZIP_CONDA}/bin/conda install -yq --channel='conda-forge' python=3.6 reprozip
-  ${REPROZIP_CONDA}/bin/conda install -yq sqlite
+  ${REPROZIP_CONDA}/bin/python -m pip install --no-cache-dir reprozip
 }
 
 
