@@ -1,6 +1,6 @@
 # Neurodocker
 
-[![build status](https://img.shields.io/circleci/project/github/kaczmarj/neurodocker/master.svg)](https://circleci.com/gh/kaczmarj/neurodocker/tree/master)
+[![build status](https://img.shields.io/circleci/project/github/ReproNim/neurodocker/master.svg)](https://circleci.com/gh/ReproNim/neurodocker/tree/master)
 [![docker pulls](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
 [![python versions](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 
@@ -20,7 +20,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.5.0 --help
+$ docker run --rm kaczmarj/neurodocker:0.6.0 --help
 ```
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
@@ -68,7 +68,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/freesurfer-{version}`.                                                                                             |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
-| **FSL\*\***                 | version\*        | 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
+| **FSL\*\***                 | version\*        | 6.0.3, 6.0.2, 6.0.1, 6.0.0, 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
@@ -85,6 +85,8 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | conda_install    | Packages to install with `conda`. E.g., `conda_install="python=3.6 numpy traits"`                                                                   |
 |                             | pip_install      | Packages to install with `pip`.                                                                                                                     |
 |                             | activate         | If true (default), activate this environment in container entrypoint.                                                                               |
+| **MRIcron** | version\* | latest, 1.0.20190902, 1.0.20190410, 1.0.20181114, 1.0.20180614, 1.0.20180404, 1.0.20171220 |
+| | install_path | Installation path. Default `/opt/mricron-{version}` |
 | **MRtrix3**                 | version\*        | 3.0                                                                                                                                                 |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/mrtrix3-{version}`.                                                                                                |
@@ -233,11 +235,11 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.5.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.5.0 generate docker \
+$ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1 | docker build -
 ```
 
@@ -246,7 +248,7 @@ $ docker run --rm kaczmarj/neurodocker:0.5.0 generate docker \
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.5.0 generate singularity \
+$ docker run --rm kaczmarj/neurodocker:0.6.0 generate singularity \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 ```
 

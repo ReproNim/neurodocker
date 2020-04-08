@@ -4,6 +4,7 @@ import json
 import io
 
 import pytest
+from unittest import mock
 
 from neurodocker.neurodocker import main
 
@@ -80,6 +81,12 @@ def test_generate_opts(capsys):
     main(args.format('--ndfreeze date=20180312').split())
     out, _ = capsys.readouterr()
     assert out.find("nd_freeze") < out.find("ND_ENTRYPOINT")
+
+    with mock.patch("neurodocker.interfaces.Miniconda._installed", False):
+        main(args.format('--miniconda create_env=newenv version=4.7.10 '
+                         'conda_install=python=3.7').split())
+    out, _ = capsys.readouterr()
+    assert "https://repo.continuum.io/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh" in out
 
 
 def test_generate_from_json(capsys, tmpdir):

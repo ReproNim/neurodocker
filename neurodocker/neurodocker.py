@@ -15,6 +15,8 @@ import json
 import logging
 import sys
 
+import etelemetry
+
 from neurodocker import __version__
 from neurodocker import utils
 from neurodocker.generators import Dockerfile
@@ -159,6 +161,9 @@ def _add_generate_common_arguments(parser):
         " (defaults to latest). The options conda_install and"
         " pip_install accept strings of packages: conda_install="
         '"python=3.6 numpy traits".',
+        "mricron":
+        "Install MRIcron. valid keys are version (required), method, and"
+        " install_path.",
         "mrtrix3":
         "Install MRtrix3. Valid keys are version (required),"
         " method, and install_path",
@@ -404,6 +409,15 @@ def main(args=None):
         utils.set_log_level(namespace.verbosity)
 
     logger.debug(vars(namespace))
+
+    try:
+        latest = etelemetry.get_project("kaczmarj/neurodocker")
+    except RuntimeError as e:
+        print("# Could not check for version updates: ", e)
+    else:
+        if latest and 'version' in latest:
+            print("# Your version: {0} Latest version: {1}".format(__version__,
+                                                                 latest["version"]))
 
     subparser_functions = {
         'docker': generate,

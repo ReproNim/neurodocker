@@ -143,6 +143,8 @@ class MatlabMCR(_BaseInterface):
     _pretty_name = "MATLAB MCR"
 
     _mcr_versions = {
+        '2019b': '97',
+        '2019a': '96',
         '2018b': '95',
         '2018a': '94',
         '2017b': '93',
@@ -150,6 +152,7 @@ class MatlabMCR(_BaseInterface):
         '2016b': '91',
         '2016a': '901',
         '2015b': '90',
+        '2015aSP1': '851',
         '2015a': '85',
         '2014b': '84',
         '2014a': '83',
@@ -247,6 +250,16 @@ class Miniconda(_BaseInterface):
         if not Miniconda._env_set:
             Miniconda._env_set = True
             return super().render_env()
+
+
+class MINC(_BaseInterface):
+    """Create instance of MRIcron object."""
+
+    _name = 'mricron'
+    _pretty_name = 'MRIcron'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
 
 
 class MRtrix3(_BaseInterface):

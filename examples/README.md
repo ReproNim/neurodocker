@@ -30,6 +30,7 @@ All of the examples below use `debian:stretch` as the base image, but any Docker
   - [Matlab Compiler Runtime (MCR)](#matlab-compiler-runtime-mcr)
   - [MINC](#minc)
   - [Miniconda](#miniconda)
+  - [MRIcron](#mricron)
   - [MRtrix3](#mrtrix3)
   - [NeuroDebian](#neurodebian)
   - [PETPVC](#petpvc)
@@ -316,6 +317,13 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
   --copy environment.yml /opt/environment.yml \
   --miniconda create_env=neuro \
               yaml_file=/opt/environment.yml
+```
+
+## MRIcron
+
+```shell
+neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
+  --mricron version=latest
 ```
 
 ## MRtrix3
