@@ -254,7 +254,7 @@ docker run --rm kaczmarj/neurodocker:0.6.0 generate singularity \
 
 ## Minimize existing Docker image
 
-_Neurodocker_ must be `pip` installed for container minimization.
+_Neurodocker_ must be `pip` installed for container minimization. The `docker` Python package must also be installed.
 
 In the following example, a Docker image is built with ANTs version 2.3.1 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.97 GB, and the "minified" image is 293 MB. The only directory that is pruned is `/opt`, which includes the ANTs installation. This means that important directories like `/usr` and `/bin` are untouched, and the container can still be used interactively.
 
