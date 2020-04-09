@@ -20,7 +20,7 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.6.0 --help
+docker run --rm kaczmarj/neurodocker:0.6.0 --help
 ```
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
@@ -28,14 +28,14 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 This project can also be installed with `pip`:
 
 ```shell
-$ pip install neurodocker
-$ neurodocker --help
+pip install neurodocker
+neurodocker --help
 ```
 
 If the `pip install` command above gives a permissions error, install as a non-root user:
 
 ```shell
-$ pip install --user neurodocker
+pip install --user neurodocker
 ```
 
 Note: it is not yet possible to minimize Docker containers using the _Neurodocker_ Docker image.
@@ -235,11 +235,11 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
+docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 
 # Build image by piping Dockerfile to `docker build`
-$ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
+docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1 | docker build -
 ```
 
@@ -248,32 +248,39 @@ $ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-$ docker run --rm kaczmarj/neurodocker:0.6.0 generate singularity \
+docker run --rm kaczmarj/neurodocker:0.6.0 generate singularity \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 ```
 
 ## Minimize existing Docker image
 
-_Neurodocker_ must be `pip` installed for container minimization.
+_Neurodocker_ must be `pip` installed for container minimization. The `docker` Python package must also be installed.
 
-In the following example, a Docker image is built with ANTs version 2.3.1 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.85 GB, and the "minified" image is 365 MB.
+In the following example, a Docker image is built with ANTs version 2.3.1 and a functional scan. The image is minified for running `antsMotionCorr`. The original ANTs Docker image is 1.97 GB, and the "minified" image is 293 MB. The only directory that is pruned is `/opt`, which includes the ANTs installation. This means that important directories like `/usr` and `/bin` are untouched, and the container can still be used interactively.
 
 ```shell
 # Create a Docker image with ANTs, and download a functional scan.
-$ download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
-$ neurodocker generate docker -b centos:7 -p yum --ants version=2.3.1 --run="$download_cmd" | docker build -t ants:2.3.1 -
+download_cmd="curl -sSL -o /home/func.nii.gz http://psydata.ovgu.de/studyforrest/phase2/sub-01/ses-movie/func/sub-01_ses-movie_task-movie_run-1_bold.nii.gz"
+neurodocker generate docker -b centos:7 -p yum --ants version=2.3.1 --run="$download_cmd" | docker build -t ants:2.3.1 -
 
-# Run the container in the background.
-# The option --security-opt=seccomp:unconfined is important. Without this,
-# the trace will not be able to run in the container.
-$ docker run --rm -itd --name ants-container --security-opt=seccomp:unconfined ants:2.3.1
+# Run the container in the background. The option --security-opt=seccomp:unconfined is
+# important. Without this, the trace will not be able to run in the container.
+docker run --rm -itd --name ants-container --security-opt=seccomp:unconfined ants:2.3.1
 
-# Output a ReproZip pack file in the current directory with the files
-# necessary to run antsMotionCorr.
-$ cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
-$ neurodocker reprozip trace ants-container "$cmd"
-# Create a Docker container with the contents of ReproZip's trace.
-$ reprounzip docker setup neurodocker-reprozip.rpz test
+# Find all of the files under `/opt` that are not used by the command(s), and queue
+# those files for deletion.
+cmd="antsMotionCorr -d 3 -a /home/func.nii.gz -o /home/func_avg.nii.gz"
+neurodocker-minify --container ants-container --dirs-to-prune /opt --commands "$cmd"
+# Read through the list of files that will be deleted, and respond with the keyboard.
+# Then, create a new Docker image using the pruned container.
+docker export ants-container | docker import - ants:2.3.1-min-motioncorr
+
+# View a summary of the Docker images.
+docker images
+# REPOSITORY          TAG                    IMAGE ID            CREATED              SIZE
+# ants                2.3.1-min-motioncorr   6436f58e965c        About a minute ago   293MB
+# ants                2.3.1                  b56f5e9d1805        17 minutes ago       1.97GB
+# centos              7                      5e35e350aded        4 months ago         203MB
 ```
 
 # Known issues
