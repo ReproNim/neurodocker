@@ -1,7 +1,7 @@
 # Neurodocker
 
 [![build status](https://img.shields.io/circleci/project/github/ReproNim/neurodocker/master.svg)](https://circleci.com/gh/ReproNim/neurodocker/tree/master)
-[![docker pulls](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/kaczmarj/neurodocker/)
+[![docker pulls](https://img.shields.io/docker/pulls/kaczmarj/neurodocker.svg)](https://hub.docker.com/r/repronim/neurodocker/)
 [![python versions](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 
 _Neurodocker_ is a command-line program that generates custom Dockerfiles and Singularity recipes for neuroimaging and minifies existing containers.
@@ -20,8 +20,10 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.6.0 --help
+docker run --rm repronim/neurodocker:0.7.0 --help
 ```
+
+The Docker images were recently moved to [repronim/neurodocker](https://hub.docker.com/r/repronim/neurodocker) from [kaczmarj/neurodocker](https://hub.docker.com/r/kaczmarj/neurodocker).
 
 _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable characters will be a part of the output (see [moby/moby#8513 (comment)](https://github.com/moby/moby/issues/8513#issuecomment-216191236)).
 
@@ -235,11 +237,11 @@ _Note_: Do not use the `-t/--tty` flag with `docker run` or non-printable charac
 ### Docker
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
+docker run --rm repronim/neurodocker:0.7.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 
 # Build image by piping Dockerfile to `docker build`
-docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
+docker run --rm repronim/neurodocker:0.7.0 generate docker \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1 | docker build -
 ```
 
@@ -248,7 +250,7 @@ docker run --rm kaczmarj/neurodocker:0.6.0 generate docker \
 Install ANTs on Debian 9 (Stretch).
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.6.0 generate singularity \
+docker run --rm repronim/neurodocker:0.7.0 generate singularity \
     --base debian:stretch --pkg-manager apt --ants version=2.3.1
 ```
 
