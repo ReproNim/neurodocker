@@ -272,7 +272,9 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 # Copy FreeSurfer license to arbitrary path and set FS_LICENSE.
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
-  --freesurfer version=6.0.0 method=binaries --copy license.txt / --env FS_LICENSE=/license.txt
+  --freesurfer version=6.0.0-min method=binaries \
+  --copy license.txt /license.txt \
+  --env FS_LICENSE=/license.txt
 ```
 
 ## FSL
