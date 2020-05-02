@@ -4,7 +4,7 @@ set -e
 
 # Generate Dockerfile or Singularity recipe.
 generate() {
-  docker run --rm kaczmarj/neurodocker:master generate "$1" \
+  docker run --rm repronim/neurodocker:master generate "$1" \
     --base=neurodebian:stretch-non-free \
     --pkg-manager=apt \
     --install fsl vim emacs-nox \

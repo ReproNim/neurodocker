@@ -4,7 +4,7 @@ set -e
 
 # Generate Dockerfile.
 generate_docker() {
-  docker run --rm kaczmarj/neurodocker:master generate docker \
+  docker run --rm repronim/neurodocker:master generate docker \
     --base=neurodebian:stretch-non-free \
     --pkg-manager=apt \
     --install vim emacs-nox \
@@ -22,7 +22,7 @@ generate_docker() {
 
 # Generate Singularity recipe (does not include last --cmd arg)
 generate_singularity() {
-  docker run --rm kaczmarj/neurodocker:master generate singularity \
+  docker run --rm repronim/neurodocker:master generate singularity \
     --base=neurodebian:stretch-non-free \
     --pkg-manager=apt \
     --install vim emacs-nox \
