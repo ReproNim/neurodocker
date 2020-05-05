@@ -89,7 +89,7 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
 
 ## `--entrypoint`
 
-This option sets the container's default entrypoint and applies to Docker and Singularity. It adds an `ENTRYPOINT` layer for Docker and replaces the `%runscript` section for Singularity.
+This option sets the container's default entrypoint and applies to Docker and Singularity. It adds an `ENTRYPOINT` layer for Docker and replaces the `%runscript` section for Singularity (see note below regarding Singularity).
 
 ```shell
 neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=apt \
@@ -116,6 +116,8 @@ neurodocker generate [docker|singularity] --base=debian:stretch --pkg-manager=ap
               activate=true \
   --entrypoint "python"
 ```
+
+When using `--entrypoint` with Singularity, `"$@"` must be appended to the entrypoint if the entrypoint accepts command-line arguments. `"$@"` is a quoted array of all command-line arguments. For example, `--entrypoint 'python "$@"'` will accept command-line arguments and `--entrypoint python` will not. With Docker, this is not necessary because command-line arguments are always passed to the entrypoint.
 
 ## `-e / --env`
 
