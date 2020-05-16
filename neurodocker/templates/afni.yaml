@@ -17,7 +17,7 @@ generic:
     dependencies:
       apt: >
         ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1
-        libjpeg62 libxm4 netpbm tcsh xfonts-base xvfb
+        libjpeg62 libxm4 multiarch-support netpbm tcsh xfonts-base xvfb
       yum: >
         ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif
         tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
@@ -26,7 +26,9 @@ generic:
         - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
     instructions: |
       {{ afni.install_dependencies() }}
+      {%- if afni.pkg_manager == "apt" %}
       {{ afni.install_debs() }}
+      {% endif -%}
       gsl2_path="$(find / -name 'libgsl.so.19' || printf '')"
       if [ -n "$gsl2_path" ]; then
         ln -sfv "$gsl2_path" "$(dirname $gsl2_path)/libgsl.so.0";
