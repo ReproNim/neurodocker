@@ -76,6 +76,9 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
+| **ITKsnap**                 | version\*        | 3.8.0 |
+|                             | method           | binaries (default)|
+|                             | install_path     | Installation path. Default `/opt/itksnap-{version}`. |
 | **Matlab Compiler Runtime** | version\*        | 2018a, 2012-17[a-b], 2010a                                                                                                                          |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/matlabmcr-{version}`.                                                                                              |

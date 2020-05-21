@@ -135,6 +135,14 @@ class FSL(_BaseInterface):
             self.exclude_paths = tuple(
                 posixpath.join('fsl', path) for path in self.exclude_paths)
 
+class ITKsnap(_BaseInterface):
+    """Create instance of itksnap object."""
+
+    _name = 'itksnap'
+    _pretty_name = 'ITKsnap'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
 
 class MatlabMCR(_BaseInterface):
     """Create instance of MatlabMCR object."""
