@@ -55,7 +55,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | install_r_pkgs   | If true, install R and AFNI's R packages.                                                                                                           |
 |                             | install_python2  | If true, install Python 2.                                                                                                                          |
 |                             | install_python3  | If true, install Python 3.                                                                                                                          |
-| **ANTs**                    | version\*        | 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
+| **ANTs**                    | version\*        | 2.3.4, 2.3.2, 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
 |                             | method           | binaries (default), source.                                                                                                                         |
 |                             | install_path     | Installation path. Default `/opt/ants-{version}`.                                                                                                   |
 |                             | cmake_opts       | If `method=source`, options for `cmake`.                                                                                                            |
