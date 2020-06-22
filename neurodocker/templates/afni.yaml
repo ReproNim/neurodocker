@@ -17,10 +17,10 @@ generic:
     dependencies:
       apt: >
         ed gsl-bin libglu1-mesa-dev libglib2.0-0 libglw1-mesa libgomp1
-        libjpeg62 libxm4 multiarch-support netpbm tcsh xfonts-base xvfb
+        libjpeg62 libxm4 multiarch-support netpbm tcsh xfonts-base xvfb libgl1-mesa-dri
       yum: >
         ed gsl libGLU libgomp libpng12 libXp libXpm netpbm-progs openmotif
-        tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb
+        tcsh xorg-x11-fonts-misc xorg-x11-server-Xvfb R mesa-dri-drivers
       debs:
         - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
         - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
