@@ -84,7 +84,6 @@ class FreeSurfer(_BaseInterface):
     _exclude_paths = (
         'average/mult-comp-cor',
         'lib/cuda',
-        'lib/qt',
         'subjects/V1_average',
         'subjects/bert',
         'subjects/cvs_avg35',

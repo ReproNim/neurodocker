@@ -17,8 +17,10 @@ generic:
       # See https://github.com/freesurfer/freesurfer/issues/70
       "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
     dependencies:
-      apt: bc libgomp1 libxmu6 libxt6 tcsh perl
-      yum: bc libgomp libXmu libXt tcsh perl
+      apt: bc libgomp1 libxmu6 libxt6 tcsh perl libqt5widgets5 libqt5x11extras5 libglu1-mesa qt5-default libqt4-scripttools libqt4-opengl libxss1 libxft2 libjpeg62 libegl1-mesa libqt5dbus5
+      # tested in ubuntu:16.04
+      yum: bc libgomp libXmu libXt tcsh perl qt-x11 qt5-qtdeclarative qt5-qtbase-gui qt5-qtx11extras mesa-libGLU libXScrnSaver libXft libjpeg-turbo mesa-libEGL epel-release
+      # tested in centos:6
     env:
       FREESURFER_HOME: "{{ freesurfer.install_path }}"
       PATH: "{{ freesurfer.install_path }}/bin:$PATH"
