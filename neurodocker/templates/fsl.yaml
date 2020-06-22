@@ -20,8 +20,8 @@ generic:
       "5.0.9": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
       "5.0.8": https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
     dependencies:
-      apt: bc dc file libfontconfig1 libfreetype6 libgl1-mesa-dri libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6 wget sudo
-      yum: bc file libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt wget sudo
+      apt: bc dc file libfontconfig1 libfreetype6 libgl1-mesa-dri libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6 wget sudo libopenblas-base
+      yum: bc file libGL libGLU libgomp libICE libjpeg libmng libpng12 libSM libX11 libXcursor libXext libXft libXinerama libXrandr libXt wget sudo openblas-serial
     env:
       FSLDIR: "{{ fsl.install_path }}"
       PATH: "{{ fsl.install_path }}/bin:$PATH"
