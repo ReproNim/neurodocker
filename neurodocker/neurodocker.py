@@ -151,6 +151,9 @@ def _add_generate_common_arguments(parser):
         "fsl":
         "Install FSL. Valid keys are version (required), method,"
         " install_path, and exclude_paths.",
+        "itksnap":
+        "Install itksnap. Valid keys are version (required), method,"
+        " install_path, and exclude_paths.",
         "matlabmcr":
         "Install Matlab Compiler Runtime. Valid keys are version,"
         " method, and install_path",

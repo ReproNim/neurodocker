@@ -1,0 +1,25 @@
+# Instructions to install ITKsnap.
+#
+# Repository: http://www.itksnap.org/pmwiki/pmwiki.php?n=SourceCode.SourceCode
+# Website: http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3
+
+# package version for apt and yum identified aiming for centos6,7,8, debian 8,9,10 and ubuntu up to 20.04 using https://pkgs.org
+# due to libpng12-0 this recipe only works for centos6,7,8 and debian 8(jessie) and ubuntu 14.04 16.04 
+
+generic:
+  binaries:
+    urls:
+      "3.8.0": https://sourceforge.net/projects/itk-snap/files/itk-snap/3.8.0/itksnap-3.8.0-20190612-Linux-x86_64-qt4.tar.gz/download
+      # Ubuntu 16.04: working
+    dependencies:
+      apt: libglu1-mesa libsm6 libxt6 libfreetype6 libxrender1 libfontconfig1 libpng12-0 libglib2.0-0 libcurl3 
+      yum: mesa-libGLU libSM libXt freetype libXrender fontconfig glib2 libpng libglib2.0-0 libcurl
+    env:
+      PATH: "{{ itksnap.install_path }}/bin:$PATH"
+      LD_LIBRARY_PATH: "{{ itksnap.install_path }}/lib:$LD_LIBRARY_PATH"
+    instructions: |
+      {{ itksnap.install_dependencies() }}
+      echo "Downloading itksnap ..."
+      mkdir -p {{ itksnap.install_path }}
+      curl {{ itksnap.curl_opts }} {{ itksnap.binaries_url }} \
+      | tar -xz -C {{ itksnap.install_path }} --strip-components 1
