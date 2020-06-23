@@ -33,7 +33,7 @@ generic:
       git clone https://github.com/MRtrix3/mrtrix3.git {{ mrtrix3.install_path }}
       cd {{ mrtrix3.install_path }}
       {% if mrtrix3.version != "master" and mrtrix3.version != "latest" -%}
-      git checkout {{ mrtrix3.version }}
+      git checkout tags/{{ mrtrix3.version }} -b {{ mrtrix3.version }}
       {% endif -%}
       [ ! -f /usr/bin/moc ] && ln -s /usr/bin/moc-qt5 /usr/bin/moc
       [ ! -f /usr/bin/qmake ] && ln -s /usr/bin/qmake-qt5 /usr/bin/qmake
