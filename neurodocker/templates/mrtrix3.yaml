@@ -36,8 +36,8 @@ generic:
       git checkout tags/{{ mrtrix3.version }} -b {{ mrtrix3.version }}
       {% endif -%}
       [ ! -f /usr/bin/moc ] && ln -s /usr/bin/moc-qt5 /usr/bin/moc
-      [ ! -f /usr/bin/qmake ] && ln -s /usr/bin/qmake-qt5 /usr/bin/qmake
-      [ ! -f /usr/bin/rcc ] && ln -s /usr/bin/rcc-qt5 /usr/bin/rcc
-      ./configure
-      echo "Compiling MRtrix3 ..."
-      ./build
+      # [ ! -f /usr/bin/qmake ] && ln -s /usr/bin/qmake-qt5 /usr/bin/qmake
+      # [ ! -f /usr/bin/rcc ] && ln -s /usr/bin/rcc-qt5 /usr/bin/rcc
+      # ./configure
+      # echo "Compiling MRtrix3 ..."
+      # ./build
