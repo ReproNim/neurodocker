@@ -2,7 +2,6 @@
 
 from neurodocker.interfaces.interfaces import (
     AFNI,
-    AFNI,
     ANTs,
     Convert3D,
     Dcm2niix,
@@ -11,6 +10,7 @@ from neurodocker.interfaces.interfaces import (
     MatlabMCR,
     MINC,
     Miniconda,
+    MRIcron,
     MRtrix3,
     NeuroDebian,
     PETPVC,
