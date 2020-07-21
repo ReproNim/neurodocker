@@ -8,7 +8,17 @@ import pytest
 from neurodocker.utils import get_docker_client
 from neurodocker.reprozip.gentle.trace import trace_and_prune
 
+try:
+    import reprozip
 
+    have_reprozip = True
+except ImportError:
+    have_reprozip = False
+
+needs_reprozip = unittest.skipUnless(have_reprozip, "These tests need reprozip")
+
+
+@needs_reprozip
 def test_trace_and_prune():
     client = get_docker_client()
     container = client.containers.run(
@@ -40,6 +50,7 @@ def test_trace_and_prune():
         container.remove()
 
 
+@needs_reprozip
 def test_trace_and_prune_with_mounted_volume(tmpdir):
     client = get_docker_client()
 

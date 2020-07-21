@@ -12,6 +12,16 @@ from neurodocker.utils import get_docker_client
 from neurodocker.reprozip.merge import merge_pack_files
 
 
+try:
+    import reprozip
+
+    have_reprozip = True
+except ImportError:
+    have_reprozip = False
+
+needs_reprozip = unittest.skipUnless(have_reprozip, "These tests need reprozip")
+
+
 def _create_packfile(commands, dir):
     """Create packfile from list `commands` in debian:stretch container."""
     client = get_docker_client()
@@ -32,6 +42,7 @@ def _create_packfile(commands, dir):
     return packfile_path
 
 
+@have_reprozip
 def test_merge_pack_files():
     tmpdir = tempfile.mkdtemp()
 
