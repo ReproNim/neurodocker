@@ -10,14 +10,11 @@ from neurodocker.interfaces._base import _BaseInterface
 from neurodocker.interfaces._base import apt_install
 from neurodocker.interfaces._base import yum_install
 
-_installation_implementations = {
-    ii._name: ii
-    for ii in _BaseInterface.__subclasses__()
-}
+_installation_implementations = {ii._name: ii for ii in _BaseInterface.__subclasses__()}
 
-ND_DIRECTORY = posixpath.join(posixpath.sep, 'neurodocker')
-NEURODOCKER_ENTRYPOINT = posixpath.join(ND_DIRECTORY, 'startup.sh')
-SPEC_FILE = posixpath.join(ND_DIRECTORY, 'neurodocker_specs.json')
+ND_DIRECTORY = posixpath.join(posixpath.sep, "neurodocker")
+NEURODOCKER_ENTRYPOINT = posixpath.join(ND_DIRECTORY, "startup.sh")
+SPEC_FILE = posixpath.join(ND_DIRECTORY, "neurodocker_specs.json")
 
 # TODO: add common methods like `--install` here. Reference them in the
 # Dockerfile and SingularityRecipe implementation classes.
@@ -44,23 +41,22 @@ def _yum_install(pkgs, yum_opts=None):
 def _install(pkgs, pkg_manager):
     """Return instructions to install system packages."""
     installers = {
-        'apt': _apt_install,
-        'yum': _yum_install,
+        "apt": _apt_install,
+        "yum": _yum_install,
     }
     if pkg_manager not in installers.keys():
-        raise ValueError(
-            "package manager '{}' not recognized".format(pkg_manager))
+        raise ValueError("package manager '{}' not recognized".format(pkg_manager))
     opts_key = "{}_opts=".format(pkg_manager)
     opts = [jj for jj in pkgs if jj.startswith(opts_key)]
     pkgs = [kk for kk in pkgs if kk not in opts]
-    opts = opts[0].replace(opts_key, '') if opts else None
+    opts = opts[0].replace(opts_key, "") if opts else None
     return installers[pkg_manager](pkgs, opts)
 
 
 class _Users:
     """Object to hold memory of initialized users."""
 
-    initialized_users = {'root'}
+    initialized_users = {"root"}
 
     @classmethod
     def add(cls, user):
@@ -72,23 +68,25 @@ class _Users:
             return (
                 # Test whether the user exists. If not, add user.
                 'test "$(getent passwd {0})" ||'
-                ' useradd --no-user-group --create-home --shell /bin/bash {0}'
-                .format(user))
+                " useradd --no-user-group --create-home --shell /bin/bash {0}".format(
+                    user
+                )
+            )
         else:
             return False
 
     @classmethod
     def clear_memory(cls):
-        cls.initialized_users = {'root'}
+        cls.initialized_users = {"root"}
 
 
 def _get_json_spec_str(specs):
     """Return instruction to write out specs dictionary to JSON file."""
     js = json.dumps(specs, indent=2)
-    js = js.replace('\\n', '__TO_REPLACE_NEWLINE__')
+    js = js.replace("\\n", "__TO_REPLACE_NEWLINE__")
     js = "\n\\n".join(js.split("\n"))
     # Escape newline characters that the user provided.
-    js = js.replace('__TO_REPLACE_NEWLINE__', '\\\\n')
+    js = js.replace("__TO_REPLACE_NEWLINE__", "\\\\n")
     # Workaround to escape single quotes in a single-quoted string.
     # https://stackoverflow.com/a/1250279/5666087
     js = js.replace("'", """'"'"'""")
@@ -107,8 +105,8 @@ class ContainerSpecGenerator:
         if os.path.exists(filepath):
             raise FileExistsError("File already exists: {}".format(filepath))
         rendered = self.render()
-        with open(filepath, mode='w') as fp:
-            fp.write(rendered + '\n')
+        with open(filepath, mode="w") as fp:
+            fp.write(rendered + "\n")
 
     @property
     def commented_header(self):
@@ -119,6 +117,7 @@ class ContainerSpecGenerator:
             "Thank you for using Neurodocker. If you discover any issues"
             "\nor ways to improve this software, please submit an issue or"
             "\npull request on our GitHub repository:"
-            "\n\n    https://github.com/ReproNim/neurodocker")
+            "\n\n    https://github.com/ReproNim/neurodocker"
+        )
         header = header.format(version=__version__, time=t)
         return "# " + header.replace("\n", "\n# ") + "\n\n"

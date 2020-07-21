@@ -22,9 +22,8 @@ def _indent(string, indent=4, add_list_op=False):
 
     for ii, line in enumerate(lines):
         line = line.rstrip()
-        already_cont = line.startswith(('&&', '&', '||', '|', 'fi'))
-        previous_cont = (lines[ii - 1].endswith('\\')
-                         or lines[ii - 1].startswith('if'))
+        already_cont = line.startswith(("&&", "&", "||", "|", "fi"))
+        previous_cont = lines[ii - 1].endswith("\\") or lines[ii - 1].startswith("if")
         if ii:
             if add_list_op and not already_cont and not previous_cont:
                 line = "&& " + line
@@ -33,7 +32,7 @@ def _indent(string, indent=4, add_list_op=False):
             else:
                 line = " " * indent + line
         if ii != len(lines) - 1:
-            if not line.endswith('\\'):
+            if not line.endswith("\\"):
                 line += " \\"
         out.append(line)
     return "\n".join(out)
@@ -49,8 +48,7 @@ def _dockerfile_base_add_copy(list_srcs_dest, cmd):
 
     for src in srcs:
         if os.path.isabs(src):
-            raise ValueError("Path for {} cannot be absolute: {}"
-                             "".format(cmd, src))
+            raise ValueError("Path for {} cannot be absolute: {}" "".format(cmd, src))
     srcs = '", "'.join(srcs)
     return '{} ["{}", "{}"]'.format(cmd, srcs, dest)
 
@@ -160,7 +158,7 @@ class _DockerfileImplementations:
         for k, v in env_vars.items():
             newline = "\n" if out else ""
             v = json.dumps(v)  # Escape double quotes and other things.
-            out += '{}{}={}'.format(newline, k, v)
+            out += "{}{}={}".format(newline, k, v)
         return _indent("ENV " + out)
 
     @staticmethod
@@ -194,7 +192,7 @@ class _DockerfileImplementations:
         for k, v in labels.items():
             newline = "\n" if out else ""
             v = json.dumps(v)  # Escape double quotes and other things.
-            out += '{}{}={}'.format(newline, k, v)
+            out += "{}{}={}".format(newline, k, v)
         return _indent("LABEL " + out, indent=6)
 
     @staticmethod
@@ -259,7 +257,7 @@ class _DockerfileInterfaceFormatter:
         elif self.env and self.run is None:
             return self._render_run()
         elif self.env and self.run:
-            return self._render_env() + '\n' + self._render_run()
+            return self._render_env() + "\n" + self._render_run()
 
     def _render_env(self):
         """Return string of `ENV` instruction given dictionary of environment
@@ -278,8 +276,8 @@ class Dockerfile(ContainerSpecGenerator):
     _implementations = {
         **_installation_implementations,
         **dict(
-            inspect.getmembers(
-                _DockerfileImplementations, predicate=inspect.isfunction))
+            inspect.getmembers(_DockerfileImplementations, predicate=inspect.isfunction)
+        ),
     }
 
     def __init__(self, specs):
@@ -294,7 +292,8 @@ class Dockerfile(ContainerSpecGenerator):
         # Cache the rendered string.
         if not self._rendered:
             self._rendered = self.commented_header + "\n\n".join(
-                self._ispecs_to_dockerfile_str())
+                self._ispecs_to_dockerfile_str()
+            )
         return self._rendered
 
     def _prep(self):
@@ -304,22 +303,20 @@ class Dockerfile(ContainerSpecGenerator):
     def _add_header(self):
         # If ndfreeze is requested, the order of instructions should be:
         # base, arg noninteractive frontend, ndfreeze, header, entrypoint.
-        offset = 1 if self._specs['instructions'][1][0] == 'ndfreeze' else 0
-        self._specs['instructions'].insert(
-            1, ('user', 'root')
+        offset = 1 if self._specs["instructions"][1][0] == "ndfreeze" else 0
+        self._specs["instructions"].insert(1, ("user", "root"))
+        self._specs["instructions"].insert(
+            2, ("arg", {"DEBIAN_FRONTEND": "noninteractive"})
         )
-        self._specs['instructions'].insert(
-            2, ('arg', {
-                'DEBIAN_FRONTEND': 'noninteractive'
-            }))
-        kwds = {'version': 'generic', 'method': 'custom'}
-        self._specs['instructions'].insert(3 + offset, ('_header', kwds))
-        self._specs['instructions'].insert(
-            4 + offset, ('entrypoint', "/neurodocker/startup.sh"))
+        kwds = {"version": "generic", "method": "custom"}
+        self._specs["instructions"].insert(3 + offset, ("_header", kwds))
+        self._specs["instructions"].insert(
+            4 + offset, ("entrypoint", "/neurodocker/startup.sh")
+        )
 
     def _ispecs_to_dockerfile_str(self):
-        pkg_man = self._specs['pkg_manager']
-        for item in self._specs['instructions']:
+        pkg_man = self._specs["pkg_manager"]
+        for item in self._specs["instructions"]:
             instruction, params = item
             if instruction in self._implementations.keys():
                 impl = self._implementations[instruction]
@@ -327,19 +324,17 @@ class Dockerfile(ContainerSpecGenerator):
                     try:
                         interface = impl(pkg_manager=pkg_man, **params)
                     except Exception as exc:
-                        logger.error("Failed to instantiate {}: {}".format(
-                            impl, exc))
+                        logger.error("Failed to instantiate {}: {}".format(impl, exc))
                         raise
                     yield _DockerfileInterfaceFormatter(interface).render()
                 else:
-                    if instruction == 'install':
+                    if instruction == "install":
                         yield impl(params, pkg_manager=pkg_man)
                     else:
                         yield impl(params)
             else:
-                raise ValueError(
-                    "instruction not understood: '{}'".format(instruction))
+                raise ValueError("instruction not understood: '{}'".format(instruction))
 
     def _add_json(self):
         jsonstr = _get_json_spec_str(self._specs)
-        self._specs['instructions'].append(('run', jsonstr))
+        self._specs["instructions"].append(("run", jsonstr))

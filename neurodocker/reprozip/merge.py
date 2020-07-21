@@ -37,12 +37,12 @@ def _check_deps():
 
     msg = "Dependency '{}' not found."
 
-    if shutil.which('rsync') is None:
-        raise RuntimeError(msg.format('rsync'))
+    if shutil.which("rsync") is None:
+        raise RuntimeError(msg.format("rsync"))
     try:
         import reprozip
     except Exception:
-        raise RuntimeError(msg.format('reprozip'))
+        raise RuntimeError(msg.format("reprozip"))
 
 
 def _extract_rpz(rpz_path, out_dir):
@@ -51,11 +51,11 @@ def _extract_rpz(rpz_path, out_dir):
     prefix = "{}-".format(basename)
     path = tempfile.mkdtemp(prefix=prefix, dir=out_dir)
 
-    with tarfile.open(rpz_path, 'r:*') as tar:
+    with tarfile.open(rpz_path, "r:*") as tar:
         tar.extractall(path)
 
-    data_path = os.path.join(path, 'DATA.tar.gz')
-    with tarfile.open(data_path, 'r:*') as tar:
+    data_path = os.path.join(path, "DATA.tar.gz")
+    with tarfile.open(data_path, "r:*") as tar:
         tar.extractall(path)
 
 
@@ -64,13 +64,12 @@ def _merge_data_dirs(data_dirs, merged_dest):
     import subprocess
 
     tmp_dest = tempfile.mkdtemp(prefix="reprozip-data")
-    data_dirs = ' '.join(data_dirs)
-    merge_cmd = ("rsync -rqabuP {srcs} {dest}"
-                 "".format(srcs=data_dirs, dest=tmp_dest))
+    data_dirs = " ".join(data_dirs)
+    merge_cmd = "rsync -rqabuP {srcs} {dest}" "".format(srcs=data_dirs, dest=tmp_dest)
     subprocess.run(merge_cmd, shell=True, check=True)
 
-    data_tar = os.path.join(merged_dest, 'DATA.tar.gz')
-    with tarfile.open(data_tar, 'w:gz') as tar:
+    data_tar = os.path.join(merged_dest, "DATA.tar.gz")
+    with tarfile.open(data_tar, "w:gz") as tar:
         tar.add(tmp_dest, arcname="")
 
 
@@ -78,10 +77,10 @@ def _get_distribution(filepath):
     """Return Linux distribution from the first run of a config.yml file."""
     import yaml
 
-    with open(filepath, 'r') as fp:
+    with open(filepath, "r") as fp:
         config = yaml.load(fp)
 
-    return config['runs'][0]['distribution']
+    return config["runs"][0]["distribution"]
 
 
 def _fix_config_yml(filepath, distribution):
@@ -92,13 +91,13 @@ def _fix_config_yml(filepath, distribution):
         config = fp.readlines()
 
     for ii, line in enumerate(config):
-        if line.startswith('additional_patterns'):
+        if line.startswith("additional_patterns"):
             config[ii] = "# " + line
-        if 'distribution:' in line:
-            pre = line.split(':')[0]
+        if "distribution:" in line:
+            pre = line.split(":")[0]
             config[ii] = "{}: {}\n".format(pre, distribution)
 
-    with open(filepath, 'w') as fp:
+    with open(filepath, "w") as fp:
         for line in config:
             fp.write(line)
 
@@ -120,32 +119,33 @@ def _combine_traces(traces, out_dir):
     """
     from reprozip.main import combine
 
-    args = _Namespace(traces=traces, dir=out_dir, identify_packages=False,
-                      find_inputs_outputs=False)
+    args = _Namespace(
+        traces=traces, dir=out_dir, identify_packages=False, find_inputs_outputs=False
+    )
     combine(args)
 
-    original_config = os.path.join(os.path.dirname(traces[0]), 'config.yml')
+    original_config = os.path.join(os.path.dirname(traces[0]), "config.yml")
     distribution = _get_distribution(original_config)
 
-    config_filepath = os.path.join(out_dir, 'config.yml')
+    config_filepath = os.path.join(out_dir, "config.yml")
     _fix_config_yml(config_filepath, distribution)
 
 
 def _write_version2_file(merged_dest):
-    path = os.path.join(merged_dest, "METADATA", 'version')
-    with open(path, 'w') as fp:
+    path = os.path.join(merged_dest, "METADATA", "version")
+    with open(path, "w") as fp:
         fp.write("REPROZIP VERSION 2\n")
 
 
 def _create_rpz(path, outfile):
     """Create a .rpz file from a `path` that contains METADATA and DATA.tar.gz.
     """
-    data = os.path.join(path, 'DATA.tar.gz')
-    metadata = os.path.join(path, 'METADATA')
+    data = os.path.join(path, "DATA.tar.gz")
+    metadata = os.path.join(path, "METADATA")
 
-    with tarfile.open(outfile, 'w:') as tar:
-        tar.add(data, arcname='DATA.tar.gz')
-        tar.add(metadata, arcname='METADATA')
+    with tarfile.open(outfile, "w:") as tar:
+        tar.add(data, arcname="DATA.tar.gz")
+        tar.add(metadata, arcname="METADATA")
 
 
 def merge_pack_files(outfile, packfiles):
@@ -160,9 +160,9 @@ def merge_pack_files(outfile, packfiles):
 
     _check_deps()
 
-    if not outfile.endswith('.rpz'):
+    if not outfile.endswith(".rpz"):
         logger.info("Adding '.rpz' extension to output file.")
-        outfile += '.rpz'
+        outfile += ".rpz"
 
     for pf in packfiles:
         if not os.path.isfile(pf):
