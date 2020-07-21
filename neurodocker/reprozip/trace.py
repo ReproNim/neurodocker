@@ -124,7 +124,7 @@ def copy_file_from_container(container, src, dest="."):
             with tarfile.TarFile(tmp.name) as tar:
                 tar.extractall(path=dest)
         return os.path.join(dest, tar_info["name"])
-    except Exception as e:
+    except Exception:
         raise
     finally:
         tar_stream.close()

@@ -40,10 +40,7 @@ class AFNI(_BaseInterface):
         if self.install_python3:
             self._dependencies.append("python3")
         if self.install_r or self.install_r_pkgs:
-            r = {
-                "apt": ["r-base", "r-base-dev", "libnlopt-dev"],
-                "yum": ["R-devel"],
-            }
+            r = {"apt": ["r-base", "r-base-dev", "libnlopt-dev"], "yum": ["R-devel"]}
             self._dependencies.extend(r[self._pkg_manager])
 
 
@@ -266,7 +263,7 @@ class Miniconda(_BaseInterface):
             return super().render_env()
 
 
-class MINC(_BaseInterface):
+class MRIcron(_BaseInterface):
     """Create instance of MRIcron object."""
 
     _name = "mricron"

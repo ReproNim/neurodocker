@@ -1,6 +1,5 @@
 """Tests for trace.py."""
 
-import os
 import unittest
 
 import pytest
