@@ -43,7 +43,7 @@ def _create_packfile(commands, dir):
     return packfile_path
 
 
-@have_reprozip
+@needs_reprozip
 def test_merge_pack_files():
     tmpdir = tempfile.mkdtemp()
 
