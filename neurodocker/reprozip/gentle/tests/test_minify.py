@@ -1,7 +1,7 @@
 """Tests for trace.py."""
 
 import os
-from unittest import mock
+import unittest
 
 import pytest
 
@@ -29,7 +29,7 @@ def test_trace_and_prune():
 
     try:
         # Respond yes to delete things.
-        with mock.patch("builtins.input", return_value="y"):
+        with unittest.mock.patch("builtins.input", return_value="y"):
             trace_and_prune(container.name, commands, "/usr/local")
 
         for cmd in commands:
@@ -70,12 +70,12 @@ def test_trace_and_prune_with_mounted_volume(tmpdir):
 
     try:
         # Respond yes to delete things.
-        with mock.patch("builtins.input", return_value="y"):
+        with unittest.mock.patch("builtins.input", return_value="y"):
             with pytest.raises(ValueError):
                 trace_and_prune(container.name, commands, ["/usr/local", "/work"])
 
         # This should work.
-        with mock.patch("builtins.input", return_value="y"):
+        with unittest.mock.patch("builtins.input", return_value="y"):
             trace_and_prune(container.name, commands, ["/usr/local"])
     finally:
         container.stop()

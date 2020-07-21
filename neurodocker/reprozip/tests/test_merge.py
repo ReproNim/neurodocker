@@ -6,6 +6,7 @@ from glob import glob
 import os
 import tarfile
 import tempfile
+import unittest
 
 from neurodocker.reprozip.trace import ReproZipMinimizer
 from neurodocker.utils import get_docker_client
