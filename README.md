@@ -299,3 +299,14 @@ docker images
 - FreeSurfer cannot find my license file.
   - Solution: get a free license from [FreeSurfer's website](https://surfer.nmr.mgh.harvard.edu/registration.html), and copy it into the container. To build the Docker image, please use the form `docker build .` instead of `docker build - < Dockerfile`. The latter form will not copy files into the image.
   - Please see the [examples](examples#freesurfer) for more information.
+
+
+# Developer installation
+
+Clone the repository and install in editable mode.
+
+```
+git clone https://github.com/ReproNim/neurodocker
+cd neurodocker
+python -m pip install --no-cache-dir --editable .[all]
+```
