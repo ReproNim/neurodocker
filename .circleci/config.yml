@@ -107,7 +107,7 @@ jobs:
           name: Test examples in /examples directory
           command: |
             source ~/.bashrc
-            pytest --cov -k examples/
+            pytest --cov -k examples
 
 
 workflows:
