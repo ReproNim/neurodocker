@@ -1,28 +1,32 @@
 """Utilities for `neurodocker.interfaces.tests`."""
 
+from distutils.spawn import find_executable
 import io
 import logging
 import os
 from pathlib import Path
-import posixpath
 import subprocess
+import tempfile
 
 from neurodocker.generators import Dockerfile
 from neurodocker.generators import SingularityRecipe
 from neurodocker.utils import get_docker_client
-from neurodocker.utils import get_singularity_client
 
 logger = logging.getLogger(__name__)
 
-PUSH_IMAGES = os.environ.get("ND_PUSH_IMAGES", False)
-DOCKER_CACHEDIR = os.path.join(os.path.sep, "tmp", "cache")
-# Singularity builds clear the /tmp directory
-SINGULARITY_CACHEDIR = os.path.join(Path.home(), "tmp", "cache")
+# Where to cache Dockerfiles and Singularity recipes.
+CACHE_DIR = os.environ.get("NEURODOCKER_CACHE_DIR", None)
+if CACHE_DIR is None:
+    CACHE_DIR = Path(tempfile.gettempdir()) / "neurodocker-test-cache"
+else:
+    CACHE_DIR = Path(CACHE_DIR)
+
+logger.info("caching to {}".format(CACHE_DIR))
 
 here = os.path.dirname(os.path.realpath(__file__))
 _volumes = {here: {"bind": "/testscripts", "mode": "ro"}}
 
-_container_run_kwds = {"volumes": _volumes}
+_container_run_kwds = {"volumes": _volumes, "stderr": True}
 
 
 def docker_is_running(client):
@@ -53,73 +57,74 @@ def test_docker_container_from_specs(specs, bash_test_file):
     df = Dockerfile(specs).render()
 
     refpath = bash_test_file[5:].split(".")[0]
-    refpath = os.path.join(DOCKER_CACHEDIR, "Dockerfile." + refpath)
+    refpath = CACHE_DIR / ("Dockerfile." + refpath)
 
-    if os.path.exists(refpath):
+    if refpath.exists():
         logger.info("loading cached reference dockerfile")
-        with open(refpath, "r") as fp:
-            reference = fp.read()
+        reference = refpath.read_text()
         if _dockerfiles_equivalent(df, reference):
             logger.info("test equal to reference dockerfile, passing")
             return  # do not build and test because nothing has changed
+    else:
+        logger.info("cached reference dockerfile not found")
 
     logger.info("building docker image")
     image, build_logs = client.images.build(fileobj=io.BytesIO(df.encode()), rm=True)
 
-    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    bash_test_file = "/testscripts/{}".format(bash_test_file)
     test_cmd = "bash " + bash_test_file
-
     res = client.containers.run(image, test_cmd, **_container_run_kwds)
+    print("OUTPUT")
+    print(res.decode().strip())
     passed = res.decode().strip().endswith("passed")
+    print("VALUE OF passed =", passed)
     assert passed
-
     if passed:
-        os.makedirs(os.path.dirname(refpath), exist_ok=True)
-        with open(refpath, "w") as fp:
-            fp.write(df)
+        refpath.parent.mkdir(parents=True, exist_ok=True)
+        refpath.write_text(df)
+        logger.info("saving dockerfile to cache")
 
 
 def test_singularity_container_from_specs(specs, bash_test_file):
     """"""
-    sr_dir = "singularity_cache"
-    os.makedirs(sr_dir, exist_ok=True)
+    sr_dir = Path("singularity_cache")
+    sr_dir.mkdir(exist_ok=True)
 
     intname = bash_test_file[5:].split(".")[0]
-    refpath = os.path.join(SINGULARITY_CACHEDIR, "Singularity." + intname)
+    refpath = CACHE_DIR / ("Singularity." + intname)
 
     sr = SingularityRecipe(specs).render()
 
-    if os.path.exists(refpath):
-        logger.info("loading cached reference singularity spec")
-        with open(refpath, "r") as fp:
-            reference = fp.read()
+    if refpath.exists():
+        logger.info("loading cached reference singularity recipe")
+        reference = refpath.read_text()
         if _dockerfiles_equivalent(sr, reference):
             logger.info("test equal to reference singularity spec, passing")
             return  # do not build and test because nothing has changed
+    else:
+        logger.info("cached reference singularity recipe not found")
 
     logger.info("building singularity image")
-    filename = os.path.join(sr_dir, "Singularity." + intname)
-    with open(filename, "w") as fp:
-        fp.write(sr)
+    filename = sr_dir / ("Singularity." + intname)
+    filename.write_text(sr)
 
-    client = get_singularity_client()
-    img = client.build(recipe=filename, image=os.path.join(sr_dir, intname + ".sqsh"))
+    # Build singularity image.
+    singularity_executable = find_executable("singularity")
+    img = sr_dir / "{}.sif".format(intname)
+    cmd = "sudo {} build {} {}.sif".format(singularity_executable, filename, img)
+    subprocess.check_output(cmd.split())
 
-    bash_test_file = posixpath.join("/testscripts", bash_test_file)
+    bash_test_file = "/testscripts/{}".format(bash_test_file)
     test_cmd = "bash " + bash_test_file
-
-    # TODO(kaczmarj): replace the exec with a singularity python client
-    # command.
     cmd = "singularity run --bind {s}:{d} {img} {args}"
     cmd = cmd.format(s=here, d=_volumes[here]["bind"], img=img, args=test_cmd)
-
-    output = subprocess.check_output(cmd.split())
-    passed = output.decode().endswith("passed")
+    output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
+    passed = output.decode().strip().endswith("passed")
     assert passed
     if passed:
-        os.makedirs(os.path.dirname(refpath), exist_ok=True)
-        with open(refpath, "w") as fp:
-            fp.write(sr)
+        refpath.parent.mkdir(parents=True, exist_ok=True)
+        refpath.write_text(sr)
+        logger.info("saving singularity recipe to cache")
     os.remove(img)
 
 
