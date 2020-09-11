@@ -111,7 +111,7 @@ def test_singularity_container_from_specs(specs, bash_test_file):
     # Build singularity image.
     singularity_executable = find_executable("singularity")
     img = sr_dir / "{}.sif".format(intname)
-    cmd = "sudo {} build {} {}.sif".format(singularity_executable, filename, img)
+    cmd = "sudo {} build {} {}".format(singularity_executable, img, filename)
     subprocess.check_output(cmd.split())
 
     bash_test_file = "/testscripts/{}".format(bash_test_file)
