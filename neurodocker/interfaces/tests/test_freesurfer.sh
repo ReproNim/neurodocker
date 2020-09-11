@@ -6,4 +6,5 @@ set -ex
 mri_coreg --version
 recon-all --version
 
-printf 'passed'
+# Print to stderr because it is unbuffered.
+>&2 printf 'passed'

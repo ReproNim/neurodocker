@@ -5,4 +5,5 @@ set -exu
 echo "a = 1" > ~/test.m
 $SPMMCRCMD ~/test.m
 
-printf 'passed'
+# Print to stderr because it is unbuffered.
+>&2 printf 'passed'

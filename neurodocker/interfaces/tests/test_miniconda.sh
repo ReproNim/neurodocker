@@ -17,4 +17,5 @@ for pkg in nipype pylsl traits; do
   fi
 done
 
-printf 'passed'
+# Print to stderr because it is unbuffered.
+>&2 printf 'passed'

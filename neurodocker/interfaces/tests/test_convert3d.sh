@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 c3d -h
 
-printf 'passed'
+# Print to stderr because it is unbuffered.
+>&2 printf 'passed'

@@ -4,4 +4,5 @@ set -ex
 
 dcm2niix -h
 
-printf 'passed'
+# Print to stderr because it is unbuffered.
+>&2 printf 'passed'
