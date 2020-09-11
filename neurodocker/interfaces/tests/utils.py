@@ -70,7 +70,7 @@ def test_docker_container_from_specs(specs, bash_test_file):
     test_cmd = "bash " + bash_test_file
 
     res = client.containers.run(image, test_cmd, **_container_run_kwds)
-    passed = res.decode().endswith("passed")
+    passed = res.decode().strip().endswith("passed")
     assert passed
 
     if passed:
