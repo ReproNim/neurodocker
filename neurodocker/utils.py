@@ -69,10 +69,7 @@ def _namespace_to_specs(namespace):
             _string_vals_to_bool(options)
             _string_vals_to_list(options)
 
-    specs = {
-        "pkg_manager": namespace.pkg_manager,
-        "instructions": instructions,
-    }
+    specs = {"pkg_manager": namespace.pkg_manager, "instructions": instructions}
 
     # Add nd_freeze
     nd_freeze_idx = _get_index_of_tuple_in_instructions(
@@ -162,16 +159,6 @@ def get_docker_client(version="auto", **kwargs):
     except ImportError:
         raise ImportError("the docker python package is required for this")
     return docker.from_env(version="auto", **kwargs)
-
-
-def get_singularity_client():
-    try:
-        import spython.main
-    except ImportError:
-        raise ImportError(
-            "the singularity python (spython) package is required for this"
-        )
-    return spython.main.Client
 
 
 def _get_index_of_tuple_in_instructions(implementation, instructions):
