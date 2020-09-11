@@ -1,20 +1,4 @@
----
-# Aliases common among jobs.
-_checkout: &checkout
-  uses: actions/checkout@v2
-_setup_python: &setup_python
-  - name: Set up Python
-    uses: actions/setup-python@v2
-    with:
-      python-version: 3.8
-_install_neurodocker: &install_neurodocker
-  - name: Install Neurodocker
-    run: python -m pip install --editable .[dev]
-_codecov: &codecov
-  - name: Upload code coverage
-    run: codecov
-
-name: Continuous Integration
+name: CI
 
 on:
   push:
@@ -25,24 +9,37 @@ on:
 jobs:
   test_no_image_build:
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.7', '3.6']
     steps:
-    - *checkout
-    - *setup_python
-    - *install_neurodocker
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Neurodocker
+      run: python -m pip install --editable .[dev]
     - name: Run tests that do not build images
       run: python -m pytest --cov -k 'not test_docker and not test_singularity' neurodocker
     - name: Test examples
       run: python -m pytest --cov -k examples
-    - *codecov
+    - name: Code coverage
+      run: codecov
   test_docker_image_builds:
     runs-on: ubuntu-18.04
     steps:
-    - *checkout
-    - *setup_python
-    - *install_neurodocker
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Neurodocker
+      run: python -m pip install --editable .[dev]
     - name: Run tests that build Docker images
       run: pytest --cov -k 'test_docker' neurodocker
-    - *codecov
+    - name: Code coverage
+      run: codecov
   test_singularity_image_builds:
     runs-on: ubuntu-18.04
     steps:
@@ -61,9 +58,14 @@ jobs:
           cd builddir
           make -j
           sudo make install
-      - *checkout
-      - *setup_python
-      - *install_neurodocker
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Neurodocker
+        run: python -m pip install --editable .[dev]
       - name: Run tests that build Singularity images
         run: pytest --cov -k 'test_singularity' neurodocker
-      - *codecov
+      - name: Code coverage
+        run: codecov
