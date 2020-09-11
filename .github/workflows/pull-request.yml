@@ -1,0 +1,62 @@
+name: Pull Request CI
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  test_no_image_build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Neurodocker
+      run: python -m pip install --editable .[dev]
+    - name: Run tests that do not build images
+      run: python -m pytest --cov -k 'not test_docker and not test_singularity' neurodocker
+    - name: Test examples
+      run: python -m pytest --cov -k examples
+  test_docker_image_builds:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Neurodocker
+      run: python -m pip install --editable .[dev]
+    - name: Run tests that build Docker images
+      run: pytest --cov -k 'test_docker' neurodocker
+  test_singularity_image_builds:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Singularity
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            libssl-dev \
+            uuid-dev \
+            libgpgme11-dev \
+            squashfs-tools
+          curl -fsSL https://github.com/hpcng/singularity/releases/download/v3.6.2/singularity-3.6.2.tar.gz \
+          | tar xz
+          cd singularity
+          ./mconfig
+          cd builddir
+          make -j
+          sudo make install
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Neurodocker
+        run: python -m pip install --editable .[dev]
+      - name: Run tests that build Singularity images
+        run: pytest --cov -k 'test_singularity' neurodocker
