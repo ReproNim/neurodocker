@@ -8,7 +8,7 @@ import jinja2
 
 from neurodocker.utils import load_yaml
 
-GENERIC_VERSION = 'generic'
+GENERIC_VERSION = "generic"
 
 apt_install = """apt-get update -qq
 apt-get install -y {{ apt_opts|default('-q --no-install-recommends') }} \\\
@@ -50,7 +50,6 @@ deb_install = jinja2.Template(deb_install)
 
 
 def _load_global_specs():
-
     def load_global_specs(glob_pattern):
         import glob
 
@@ -67,7 +66,7 @@ def _load_global_specs():
         return instructions
 
     base_path = os.path.dirname(os.path.realpath(__file__))
-    glob_pattern = os.path.join(base_path, '..', 'templates', '*.yaml')
+    glob_pattern = os.path.join(base_path, "..", "templates", "*.yaml")
     return load_global_specs(glob_pattern)
 
 
@@ -125,14 +124,13 @@ class _Resolver:
     def check_version_has_method(self, version, method):
         if not self.version_has_method(version, method):
             raise ValueError(
-                "version '{}' does not have method '{}'"
-                .format(version, method)
+                "version '{}' does not have method '{}'".format(version, method)
             )
 
     def version_method_has_instructions(self, version, method):
         version_key = self.get_version_key(version)
         self.check_version_has_method(version_key, method)
-        return 'instructions' in self._d[version_key][method].keys()
+        return "instructions" in self._d[version_key][method].keys()
 
     def check_version_method_has_instructions(self, version, method):
         if not self.version_method_has_instructions(version, method):
@@ -143,9 +141,9 @@ class _Resolver:
 
     def binaries_has_url(self, version):
         version_key = self.get_version_key(version)
-        if self.version_has_method(version_key, 'binaries'):
+        if self.version_has_method(version_key, "binaries"):
             try:
-                urls = self._d[version_key]['binaries']['urls'].keys()
+                urls = self._d[version_key]["binaries"]["urls"].keys()
                 return version in urls or "*" in urls
             except KeyError:
                 raise ValueError(
@@ -153,23 +151,23 @@ class _Resolver:
                 )
         else:
             raise ValueError(
-                "no binary installation method defined for version '{}"
-                .format(version)
+                "no binary installation method defined for version '{}".format(version)
             )
 
     def check_binaries_has_url(self, version):
         if not self.binaries_has_url(version):
             version_key = self.get_version_key(version)
-            valid_vers = self._d[version_key]['binaries']['urls']
+            valid_vers = self._d[version_key]["binaries"]["urls"]
             raise ValueError(
-                "URL not found for version '{}'. Valid versions are {}"
-                .format(version, ', '.join(valid_vers))
+                "URL not found for version '{}'. Valid versions are {}".format(
+                    version, ", ".join(valid_vers)
+                )
             )
 
     def binaries_url(self, version):
         self.check_binaries_has_url(version)
         version_key = self.get_version_key(version)
-        urls = self._d[version_key]['binaries']['urls']
+        urls = self._d[version_key]["binaries"]["urls"]
         if version in urls:
             return urls[version]
         return urls["*"].format(version)
@@ -178,8 +176,9 @@ class _Resolver:
 class _BaseInterface:
     """Base class for interface objects."""
 
-    def __init__(self, name, version, pkg_manager, method='binaries',
-                 install_path=None, **kwargs):
+    def __init__(
+        self, name, version, pkg_manager, method="binaries", install_path=None, **kwargs
+    ):
         self._name = name
         self._version = version
         self._pkg_manager = pkg_manager
@@ -188,9 +187,7 @@ class _BaseInterface:
         self.__dict__.update(**kwargs)
 
         if not _interface_exists_in_yaml(self._name):
-            raise ValueError(
-                "No YAML entry for package '{}'".format(self._name)
-            )
+            raise ValueError("No YAML entry for package '{}'".format(self._name))
         self._resolver = _Resolver(_global_specs[self._name])
 
         self._version_key = self._resolver.get_version_key(self._version)
@@ -200,17 +197,17 @@ class _BaseInterface:
             self._version, self._method
         )
 
-        if method == 'binaries':
+        if method == "binaries":
             self.binaries_url = self._resolver.binaries_url(self._version)
 
         self._instance_specs = deepcopy(
             _global_specs[self._name][self._version_key][self._method]
         )
 
-        self._run = self._instance_specs['instructions']
+        self._run = self._instance_specs["instructions"]
         self._dependencies = self._get_dependencies()
 
-        self._env = self._instance_specs.get('env', None)
+        self._env = self._instance_specs.get("env", None)
 
         # Set default curl options for all interfaces.
         self.__dict__.setdefault("curl_opts", "-fsSL --retry 5")
@@ -250,7 +247,7 @@ class _BaseInterface:
     @property
     def install_path(self):
         if self._install_path is None:
-            path = posixpath.join(posixpath.sep, 'opt', '{}-{}')
+            path = posixpath.join(posixpath.sep, "opt", "{}-{}")
             return path.format(self._name, self._version)
         return self._install_path
 
@@ -259,23 +256,23 @@ class _BaseInterface:
         return self._dependencies
 
     def _get_dependencies(self):
-        if 'dependencies' not in self._instance_specs.keys():
+        if "dependencies" not in self._instance_specs.keys():
             return None
-        if self._instance_specs['dependencies'] is None:
+        if self._instance_specs["dependencies"] is None:
             return None
         try:
-            deps = self._instance_specs['dependencies'][self._pkg_manager]
+            deps = self._instance_specs["dependencies"][self._pkg_manager]
             return deps.split() if deps else None
         except KeyError:
             return None
 
     def _get_debs(self):
-        if 'dependencies' not in self._instance_specs.keys():
+        if "dependencies" not in self._instance_specs.keys():
             return None
-        if self._instance_specs['dependencies'] is None:
+        if self._instance_specs["dependencies"] is None:
             return None
         try:
-            debs = self._instance_specs['dependencies']['debs']
+            debs = self._instance_specs["dependencies"]["debs"]
             return debs if debs else None
         except KeyError:
             return None
@@ -288,25 +285,19 @@ class _BaseInterface:
             )
         pkgs = sorted(self.dependencies) if sort else self.dependencies
 
-        if self.pkg_manager == 'apt':
+        if self.pkg_manager == "apt":
             # Do not render with `apt_opts` or `yum_opts` if they are not
             # provided, because otherwise, instructions are misprinted.
-            apt_opts = self.__dict__.get('apt_opts', None)
+            apt_opts = self.__dict__.get("apt_opts", None)
             if apt_opts is not None:
-                out = apt_install.render(
-                    pkgs=pkgs,
-                    apt_opts=apt_opts,
-                    sort=True)
+                out = apt_install.render(pkgs=pkgs, apt_opts=apt_opts, sort=True)
             else:
                 out = apt_install.render(pkgs=pkgs, sort=True)
 
-        elif self.pkg_manager == 'yum':
-            yum_opts = self.__dict__.get('yum_opts', None)
+        elif self.pkg_manager == "yum":
+            yum_opts = self.__dict__.get("yum_opts", None)
             if yum_opts is not None:
-                out = yum_install.render(
-                    pkgs=pkgs,
-                    yum_opts=yum_opts,
-                    sort=True)
+                out = yum_install.render(pkgs=pkgs, yum_opts=yum_opts, sort=True)
             else:
                 out = yum_install.render(pkgs=pkgs, sort=True)
 
@@ -326,8 +317,13 @@ class _BaseInterface:
 
     def render_env(self):
         """Return dictionary with rendered keys and values."""
-        return {
-            jinja2.Template(k).render({self.name: self}):
-            jinja2.Template(v).render({self.name: self})
-            for k, v in self.env.items()
-        } if self.env else self.env
+        return (
+            {
+                jinja2.Template(k)
+                .render({self.name: self}): jinja2.Template(v)
+                .render({self.name: self})
+                for k, v in self.env.items()
+            }
+            if self.env
+            else self.env
+        )

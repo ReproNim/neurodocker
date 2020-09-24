@@ -6,6 +6,7 @@ import logging
 import re
 
 import yaml
+
 try:
     from yaml import CLoader as Loader
 except ImportError:
@@ -20,14 +21,14 @@ def _count_key_occurence_list_of_tuples(list_of_tuples, key):
 def _string_vals_to_bool(dictionary):
     """Convert string values to bool."""
     # TODO: remove unnecessary boolean variables.
-    bool_vars = {'activate', 'full', 'start_at_runtime'}
+    bool_vars = {"activate", "full", "start_at_runtime"}
     if dictionary is None:
         return
     for key in dictionary.keys():
         if key in bool_vars:
-            if re.search('false', dictionary[key], re.IGNORECASE):
+            if re.search("false", dictionary[key], re.IGNORECASE):
                 dictionary[key] = False
-            elif re.search('true', dictionary[key], re.IGNORECASE):
+            elif re.search("true", dictionary[key], re.IGNORECASE):
                 dictionary[key] = True
             else:
                 dictionary[key] = bool(int(dictionary[key]))
@@ -35,7 +36,7 @@ def _string_vals_to_bool(dictionary):
 
 def _string_vals_to_list(dictionary):
     """Convert string values to lists."""
-    list_keys = ['conda_install', 'pip_install']
+    list_keys = ["conda_install", "pip_install"]
 
     for kk in list_keys:
         if kk in dictionary.keys():
@@ -46,12 +47,12 @@ def _namespace_to_specs(namespace):
     """Return dictionary of specifications from namespace."""
     from neurodocker.generators.common import _installation_implementations
 
-    instructions = [('base', namespace.base)]
+    instructions = [("base", namespace.base)]
 
     try:
         for arg in namespace.ordered_args:
             # TODO: replace try-except with stricter logic.
-            if arg[0] == 'install':
+            if arg[0] == "install":
                 instructions.append(arg)
                 continue
             try:
@@ -69,16 +70,17 @@ def _namespace_to_specs(namespace):
             _string_vals_to_list(options)
 
     specs = {
-        'pkg_manager': namespace.pkg_manager,
-        'instructions': instructions,
+        "pkg_manager": namespace.pkg_manager,
+        "instructions": instructions,
     }
 
     # Add nd_freeze
     nd_freeze_idx = _get_index_of_tuple_in_instructions(
-        'nd_freeze', specs['instructions'])
+        "nd_freeze", specs["instructions"]
+    )
     if nd_freeze_idx:
-        nd_freeze = specs['instructions'].pop(nd_freeze_idx)
-        specs['instructions'].insert(1, nd_freeze)
+        nd_freeze = specs["instructions"].pop(nd_freeze_idx)
+        specs["instructions"].insert(1, nd_freeze)
 
     return specs
 
@@ -87,17 +89,17 @@ def is_url(string):
     from urllib.parse import urlparse
 
     result = urlparse(string)
-    return (result.scheme and result.netloc)
+    return result.scheme and result.netloc
 
 
 def load_json(filepath, **kwargs):
     """Load JSON file `filepath` as dictionary. `kwargs` are keyword arguments
     for `json.load()`.
     """
-    if filepath == '-':
+    if filepath == "-":
         return json.load(sys.stdin, **kwargs)
 
-    with open(filepath, 'r') as fp:
+    with open(filepath, "r") as fp:
         return json.load(fp, **kwargs)
 
 
@@ -105,9 +107,9 @@ def save_json(obj, filepath, indent=4, **kwargs):
     """Save `obj` to JSON file `filepath`. `kwargs` are keyword arguments for
     `json.dump()`.
     """
-    with open(filepath, 'w') as fp:
+    with open(filepath, "w") as fp:
         json.dump(obj, fp, indent=indent, **kwargs)
-        fp.write('\n')
+        fp.write("\n")
 
 
 def load_yaml(filepath, **kwargs):
@@ -120,9 +122,9 @@ def create_logger():
     """Return Neurodocker logger."""
     import logging
 
-    logger = logging.getLogger('neurodocker')
+    logger = logging.getLogger("neurodocker")
     ch = logging.StreamHandler()
-    format_ = '[NEURODOCKER %(asctime)s %(levelname)s]: %(message)s'
+    format_ = "[NEURODOCKER %(asctime)s %(levelname)s]: %(message)s"
     formatter = logging.Formatter(format_)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
@@ -141,11 +143,11 @@ def set_log_level(level):
         The level at which to print messages. Case-insensitive.
     """
     logging_levels = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-        'CRITICAL': logging.CRITICAL
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL,
     }
     try:
         level = logging_levels[level.upper()]
@@ -154,12 +156,12 @@ def set_log_level(level):
         raise ValueError("invalid level '{}'".format(level))
 
 
-def get_docker_client(version='auto', **kwargs):
+def get_docker_client(version="auto", **kwargs):
     try:
         import docker
     except ImportError:
         raise ImportError("the docker python package is required for this")
-    return docker.from_env(version='auto', **kwargs)
+    return docker.from_env(version="auto", **kwargs)
 
 
 def get_singularity_client():
@@ -167,7 +169,8 @@ def get_singularity_client():
         import spython.main
     except ImportError:
         raise ImportError(
-            "the singularity python (spython) package is required for this")
+            "the singularity python (spython) package is required for this"
+        )
     return spython.main.Client
 
 
