@@ -24,19 +24,19 @@ class _SingularityRecipeImplementations:
         self._singobj._post.append(_add_to_entrypoint(cmd))
 
     def base(self, base):
-        if base.startswith('docker://'):
-            bootstrap = 'docker'
-            from_ = base.split('docker://', 1)[1]
-        elif base.startswith('shub://'):
-            bootstrap = 'shub'
-            from_ = base.split('shub://', 1)[1]
+        if base.startswith("docker://"):
+            bootstrap = "docker"
+            from_ = base.split("docker://", 1)[1]
+        elif base.startswith("shub://"):
+            bootstrap = "shub"
+            from_ = base.split("shub://", 1)[1]
         # If no prefix given, assume base is a Docker image.
         else:
-            bootstrap = 'docker'
+            bootstrap = "docker"
             from_ = base
 
-        self._singobj._header['Bootstrap'] = bootstrap
-        self._singobj._header['From'] = from_
+        self._singobj._header["Bootstrap"] = bootstrap
+        self._singobj._header["From"] = from_
 
     def copy(self, list_srcs_dest):
         self._singobj._files.append(list_srcs_dest)
@@ -88,17 +88,22 @@ class SingularityRecipe(ContainerSpecGenerator):
             **_installation_implementations,
             **dict(
                 inspect.getmembers(
-                    _SingularityRecipeImplementations(self),
-                    predicate=inspect.ismethod))
+                    _SingularityRecipeImplementations(self), predicate=inspect.ismethod
+                )
+            ),
         }
 
-        self._order = (('header', self._header), ('help', self._help),
-                       ('setup', self._setup), ('post', self._post),
-                       ('environment', self._environment), ('files',
-                                                            self._files),
-                       ('runscript',
-                        self._runscript), ('test', self._test), ('labels',
-                                                                 self._labels))
+        self._order = (
+            ("header", self._header),
+            ("help", self._help),
+            ("setup", self._setup),
+            ("post", self._post),
+            ("environment", self._environment),
+            ("files", self._files),
+            ("runscript", self._runscript),
+            ("test", self._test),
+            ("labels", self._labels),
+        )
         self._parts_filled = False
         _Users.clear_memory()
         self._add_neurodocker_header()
@@ -116,12 +121,12 @@ class SingularityRecipe(ContainerSpecGenerator):
 
         if not self._rendered:
             self._rendered = self.commented_header + "\n\n".join(
-                map(_render_one, (sec for sec, con in self._order if con)))
+                map(_render_one, (sec for sec, con in self._order if con))
+            )
         return self._rendered
 
     def _render_header(self):
-        return "\n".join(
-            "{}: {}".format(k, v) for k, v in self._header.items())
+        return "\n".join("{}: {}".format(k, v) for k, v in self._header.items())
 
     def _render_help(self):
         return "%help\n" + "\n".join(self._help)
@@ -133,12 +138,12 @@ class SingularityRecipe(ContainerSpecGenerator):
         return "%post\n" + "\n\n".join(self._post)
 
     def _render_environment(self):
-        return ("%environment\n" + "\n".join('export {}="{}"'.format(*kv)
-                                             for kv in self._environment))
+        return "%environment\n" + "\n".join(
+            'export {}="{}"'.format(*kv) for kv in self._environment
+        )
 
     def _render_files(self):
-        return ("%files\n" + "\n".join("{} {}".format(*f)
-                                       for f in self._files))
+        return "%files\n" + "\n".join("{} {}".format(*f) for f in self._files)
 
     def _render_runscript(self):
         return "%runscript\n" + self._runscript
@@ -150,19 +155,18 @@ class SingularityRecipe(ContainerSpecGenerator):
         return "%labels\n" + "\n".join(self._labels)
 
     def _add_neurodocker_header(self):
-        kwds = {'version': 'generic', 'method': 'custom'}
+        kwds = {"version": "generic", "method": "custom"}
         # If ndfreeze is requested, put it before the neurodocker header.
         offset = 0
-        if len(self._specs['instructions']) > 1:
-            if self._specs['instructions'][1][0] == 'ndfreeze':
+        if len(self._specs["instructions"]) > 1:
+            if self._specs["instructions"][1][0] == "ndfreeze":
                 offset = 1
-        self._specs['instructions'].insert(1 + offset, ('_header', kwds))
-        self._specs['instructions'].insert(1 + offset, ('user', 'root'))
-
+        self._specs["instructions"].insert(1 + offset, ("_header", kwds))
+        self._specs["instructions"].insert(1 + offset, ("user", "root"))
 
     def _fill_parts(self):
-        pkg_man = self._specs['pkg_manager']
-        for item in self._specs['instructions']:
+        pkg_man = self._specs["pkg_manager"]
+        for item in self._specs["instructions"]:
             instruction, params = item
             if instruction in self._implementations.keys():
                 impl = self._implementations[instruction]
@@ -170,8 +174,7 @@ class SingularityRecipe(ContainerSpecGenerator):
                     try:
                         interface = impl(pkg_manager=pkg_man, **params)
                     except Exception as exc:
-                        logger.error("Failed to instantiate {}: {}".format(
-                            impl, exc))
+                        logger.error("Failed to instantiate {}: {}".format(impl, exc))
                         raise
                     if interface.env:
                         _this_env = interface.render_env()
@@ -180,17 +183,16 @@ class SingularityRecipe(ContainerSpecGenerator):
                     if interface.run:
                         self._post.append(interface.render_run())
                 else:
-                    if instruction == 'install':
+                    if instruction == "install":
                         impl(params, pkg_manager=pkg_man)
                     else:
                         impl(params)
             else:
-                raise ValueError(
-                    "instruction not understood: '{}'".format(instruction))
+                raise ValueError("instruction not understood: '{}'".format(instruction))
         if not self._runscript:
             self._runscript = NEURODOCKER_ENTRYPOINT
         self._parts_filled = True
 
     def _add_json(self):
         jsonstr = _get_json_spec_str(self._specs)
-        self._specs['instructions'].append(("run", jsonstr))
+        self._specs["instructions"].append(("run", jsonstr))
