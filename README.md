@@ -55,7 +55,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | install_r_pkgs   | If true, install R and AFNI's R packages.                                                                                                           |
 |                             | install_python2  | If true, install Python 2.                                                                                                                          |
 |                             | install_python3  | If true, install Python 3.                                                                                                                          |
-| **ANTs**                    | version\*        | 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
+| **ANTs**                    | version\*        | 2.3.4, 2.3.2, 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
 |                             | method           | binaries (default), source.                                                                                                                         |
 |                             | install_path     | Installation path. Default `/opt/ants-{version}`.                                                                                                   |
 |                             | cmake_opts       | If `method=source`, options for `cmake`.                                                                                                            |
@@ -299,3 +299,16 @@ docker images
 - FreeSurfer cannot find my license file.
   - Solution: get a free license from [FreeSurfer's website](https://surfer.nmr.mgh.harvard.edu/registration.html), and copy it into the container. To build the Docker image, please use the form `docker build .` instead of `docker build - < Dockerfile`. The latter form will not copy files into the image.
   - Please see the [examples](examples#freesurfer) for more information.
+
+
+# Developer installation
+
+Clone the repository and install in editable mode.
+
+```
+git clone https://github.com/ReproNim/neurodocker
+cd neurodocker
+python -m pip install --no-cache-dir --editable .[all]
+```
+
+Before committing changes, initialize `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `black` for formatting.

@@ -79,14 +79,14 @@ def copy_file_to_container(container, src, dest):
         container = client.containers.get(container)
 
     with BytesIO() as tar_stream:
-        with tarfile.TarFile(fileobj=tar_stream, mode='w') as tar:
+        with tarfile.TarFile(fileobj=tar_stream, mode="w") as tar:
             filename = os.path.split(src)[-1]
             tar.add(src, arcname=filename, recursive=False)
         tar_stream.seek(0)
         return container.put_archive(dest, tar_stream)
 
 
-def copy_file_from_container(container, src, dest='.'):
+def copy_file_from_container(container, src, dest="."):
     """Copy file `filepath` from a running Docker `container`, and save it on
     the host to `save_path` with the original filename.
 
@@ -123,8 +123,8 @@ def copy_file_from_container(container, src, dest='.'):
             tmp.flush()
             with tarfile.TarFile(tmp.name) as tar:
                 tar.extractall(path=dest)
-        return os.path.join(dest, tar_info['name'])
-    except Exception as e:
+        return os.path.join(dest, tar_info["name"])
+    except Exception:
         raise
     finally:
         tar_stream.close()
@@ -146,7 +146,7 @@ class ReproZipMinimizer(object):
         directory by default.
     """
 
-    def __init__(self, container, commands, packfile_save_dir='.', **kwargs):
+    def __init__(self, container, commands, packfile_save_dir=".", **kwargs):
 
         try:
             container.put_archive
@@ -160,8 +160,9 @@ class ReproZipMinimizer(object):
         self.commands = commands
         self.packfile_save_dir = packfile_save_dir
 
-        self.shell_filepath = os.path.join(BASE_PATH, 'utils',
-                                           'reprozip_trace_runner.sh')
+        self.shell_filepath = os.path.join(
+            BASE_PATH, "utils", "reprozip_trace_runner.sh"
+        )
 
     def run(self):
         """Install ReproZip, run `reprozip trace`, and copy pack file to host.
@@ -177,21 +178,25 @@ class ReproZipMinimizer(object):
         """
         import docker
 
-        copy_file_to_container(self.container, self.shell_filepath, '/tmp/')
+        copy_file_to_container(self.container, self.shell_filepath, "/tmp/")
 
-        cmds = ' '.join('"{}"'.format(c) for c in self.commands)
+        cmds = " ".join('"{}"'.format(c) for c in self.commands)
 
         trace_cmd = "bash /tmp/reprozip_trace_runner.sh " + cmds
-        logger.debug("running command within container {}: {}"
-                     "".format(self.container.id, trace_cmd))
+        logger.debug(
+            "running command within container {}: {}"
+            "".format(self.container.id, trace_cmd)
+        )
 
         _, log_gen = self.container.exec_run(trace_cmd, stream=True)
         for log in log_gen:
             log = log.decode().strip()
             logger.debug(log)
-            if (("REPROZIP" in log and "couldn't use ptrace" in log)
-                    or "neurodocker (in container): error" in log.lower()
-                    or "_pytracer.Error" in log):
+            if (
+                ("REPROZIP" in log and "couldn't use ptrace" in log)
+                or "neurodocker (in container): error" in log.lower()
+                or "_pytracer.Error" in log
+            ):
                 raise RuntimeError("Error: {}".format(log))
 
         self.pack_filepath = log.split()[-1].strip()
@@ -199,10 +204,12 @@ class ReproZipMinimizer(object):
         print(self.pack_filepath)
         try:
             rel_pack_filepath = copy_file_from_container(
-                self.container, self.pack_filepath, self.packfile_save_dir)
+                self.container, self.pack_filepath, self.packfile_save_dir
+            )
         except docker.errors.NotFound:
             raise RuntimeError(
                 "ReproZip pack file was not found in the container. `reprozip"
-                " trace` might have failed.")
+                " trace` might have failed."
+            )
 
         return os.path.abspath(rel_pack_filepath)

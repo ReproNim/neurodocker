@@ -8,9 +8,9 @@ from neurodocker import utils
 
 
 def test_save_load_json(tmpdir):
-    filepath = tmpdir.join('test.json').strpath
+    filepath = tmpdir.join("test.json").strpath
 
-    obj = {'foo': 'bar'}
+    obj = {"foo": "bar"}
     utils.save_json(obj, filepath)
 
     loaded = utils.load_json(filepath)
@@ -18,6 +18,6 @@ def test_save_load_json(tmpdir):
 
 
 def test_set_log_level(tmpdir):
-    utils.set_log_level('info')
+    utils.set_log_level("info")
     with pytest.raises(ValueError):
-        utils.set_log_level('fake_level')
+        utils.set_log_level("fake_level")
