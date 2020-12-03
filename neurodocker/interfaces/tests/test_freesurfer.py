@@ -8,8 +8,8 @@ class TestFreeSurfer(object):
         specs = {
             "pkg_manager": "apt",
             "instructions": [
-                ("base", "ubuntu:16.04"),
-                ("freesurfer", {"version": "6.0.0-min"}),
+                ("base", "ubuntu:20.04"),
+                ("freesurfer", {"version": "7.1.1-min"}),
                 ("user", "neuro"),
             ],
         }
@@ -23,8 +23,8 @@ class TestFreeSurfer(object):
         specs = {
             "pkg_manager": "apt",
             "instructions": [
-                ("base", "docker://ubuntu:16.04"),
-                ("freesurfer", {"version": "6.0.0-min"}),
+                ("base", "docker://ubuntu:20.04"),
+                ("freesurfer", {"version": "7.1.1-min"}),
                 ("user", "neuro"),
             ],
         }
