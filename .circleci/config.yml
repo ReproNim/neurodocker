@@ -1,6 +1,6 @@
 ---
 _machine_kwds: &machine_kwds
-  image: circleci/classic:201711-01
+  image: ubuntu-2004:202010-01
 
 _checkout_kwds: &checkout_kwds
   path: ~/neurodocker
@@ -68,7 +68,7 @@ jobs:
           name: Install singularity
           command: |
             source ~/.bashrc
-            curl -fsSL http://neuro.debian.net/lists/trusty.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+            curl -fsSL http://neuro.debian.net/lists/focal.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
             curl -fsSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
             (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
             sudo apt-get -qq update
