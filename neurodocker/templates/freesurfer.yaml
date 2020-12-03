@@ -9,6 +9,8 @@
 generic:
   binaries:
     urls:
+      "7.1.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.1/freesurfer-linux-centos6_x86_64-7.1.1.tar.gz
+      "7.1.1-min": https://dl.dropbox.com/s/c3earkfhhvdyuo4/freesurfer-7.1.1-min.tgz
       "7.1.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos6_x86_64-7.1.0.tar.gz
       # 7.0.0 not included because it was recalled several days after release due to a bug. Replaced by 7.1.0.
       # From FreeSurfer team: we recommend that people NOT use 7.0.0 and use 7.1.0 instead.
