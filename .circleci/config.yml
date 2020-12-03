@@ -67,12 +67,30 @@ jobs:
       - run:
           name: Install singularity
           command: |
-            source ~/.bashrc
-            curl -fsSL http://neuro.debian.net/lists/focal.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
-            curl -fsSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | sudo apt-key add -
-            (sudo apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
-            sudo apt-get -qq update
-            sudo apt-get install -yq singularity-container
+            sudo apt-get -qq update && sudo apt-get install -yq \
+                build-essential \
+                uuid-dev \
+                libgpgme-dev \
+                squashfs-tools \
+                libseccomp-dev \
+                wget \
+                pkg-config \
+                git \
+                cryptsetup-bin
+            export VERSION=1.15.5 OS=linux ARCH=amd64 && \
+                wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
+                sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+                rm go$VERSION.$OS-$ARCH.tar.gz
+            echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
+                echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+                source ~/.bashrc
+            export VERSION=3.7.0 && # adjust this as necessary \
+                wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
+                tar -xzf singularity-${VERSION}.tar.gz && \
+                cd singularity
+            ./mconfig && \
+                make -C ./builddir && \
+                sudo make -C ./builddir install
             pip install -q --no-cache-dir singularity
       - run:
           name: Test singularity image builds
