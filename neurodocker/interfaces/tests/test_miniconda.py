@@ -20,7 +20,7 @@ class TestMiniconda(object):
                         "activate": True,
                     },
                 ),
-                ("miniconda", {"use_env": "default", "pip_install": ["pylsl"],}),
+                ("miniconda", {"use_env": "default", "pip_install": ["pylsl"]}),
             ],
         }
 

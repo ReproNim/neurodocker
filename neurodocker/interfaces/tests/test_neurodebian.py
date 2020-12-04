@@ -11,7 +11,7 @@ class TestNeuroDebian(object):
                 ("base", "ubuntu:16.04"),
                 (
                     "neurodebian",
-                    {"os_codename": "stretch", "server": "usa-nh", "full": True,},
+                    {"os_codename": "stretch", "server": "usa-nh", "full": True},
                 ),
                 ("install", ["dcm2niix"]),
                 ("user", "neuro"),
@@ -30,7 +30,7 @@ class TestNeuroDebian(object):
                 ("base", "docker://ubuntu:16.04"),
                 (
                     "neurodebian",
-                    {"os_codename": "stretch", "server": "usa-nh", "full": True,},
+                    {"os_codename": "stretch", "server": "usa-nh", "full": True},
                 ),
                 ("install", ["dcm2niix"]),
                 ("user", "neuro"),
