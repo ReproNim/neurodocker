@@ -5,3 +5,4 @@ set -ex
 mincresample -version
 
 printf 'passed'
+echo

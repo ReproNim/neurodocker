@@ -5,3 +5,4 @@ set -ex
 mrthreshold --help
 
 printf 'passed'
+echo

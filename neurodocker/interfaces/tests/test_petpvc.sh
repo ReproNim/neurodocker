@@ -5,3 +5,4 @@ set -ex
 which petpvc
 
 printf 'passed'
+echo

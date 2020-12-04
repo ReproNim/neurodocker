@@ -55,24 +55,24 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 |                             | install_r_pkgs   | If true, install R and AFNI's R packages.                                                                                                           |
 |                             | install_python2  | If true, install Python 2.                                                                                                                          |
 |                             | install_python3  | If true, install Python 3.                                                                                                                          |
-| **ANTs**                    | version\*        | 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
+| **ANTs**                    | version\*        | 2.3.4, 2.3.2, 2.3.1, 2.3.0, 2.2.0, 2.1.0, 2.0.3, or 2.0.0. If `method=source`, version can be a git commit hash or branch.                                        |
 |                             | method           | binaries (default), source.                                                                                                                         |
 |                             | install_path     | Installation path. Default `/opt/ants-{version}`.                                                                                                   |
 |                             | cmake_opts       | If `method=source`, options for `cmake`.                                                                                                            |
 |                             | make_opts        | If `method=source`, options for `make`.                                                                                                             |
-| **Convert3D**               | version\*        | 1.0.0 or nightly.                                                                                                                                   |
+| **Convert3D**               | version\*        | 1.0.0 or nightly.                                                                                                                                    |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/convert3d-{version}`.                                                                                              |
 | **dcm2niix**                | version\*        | latest, git commit hash or branch.                                                                                                                  |
 |                             | method           | source (default)                                                                                                                                    |
-|                             | install_path     | Installation path. Default `/opt/dcm2niix-{version}`.                                                                                               |
+|                             | install_path     | Installation path. Default `/opt/dcm2niix-{version}`.                                                                                                |
 |                             | cmake_opts       | If `method=source`, options for `cmake`.                                                                                                            |
-|                             | make_opts        | If `method=source`, options for `make`.                                                                                                             |
-| **FreeSurfer**              | version\*        | 6.0.0-min                                                                                                                                           |
+|                             | make_opts        | If `method=source`, options for `make`.                                                                                                              |
+| **FreeSurfer**              | version\*        | 7.1.1-min, 7.1.1, 7.1.0, 6.0.1, 6.0.0-min, 6.0.0                                                                                                    |
 |                             | method           | binaries (default)                                                                                                                                  |
-|                             | install_path     | Installation path. Default `/opt/freesurfer-{version}`.                                                                                             |
+|                             | install_path     | Installation path. Default `/opt/freesurfer-{version}`.                                                                                              |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
-| **FSL\*\***                 | version\*        | 6.0.3, 6.0.2, 6.0.1, 6.0.0, 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                                                        |
+| **FSL\*\***                 | version\*        | 6.0.4, 6.0.3, 6.0.2, 6.0.1, 6.0.0, 5.0.11, 5.0.10, 5.0.9, 5.0.8                                                                                      |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/fsl-{version}`.                                                                                                    |
 |                             | exclude_paths    | Sequence of space-separated path(s) to exclude when inflating the tarball.                                                                          |
@@ -100,7 +100,7 @@ Note: it is not yet possible to minimize Docker containers using the _Neurodocke
 | **PETPVC**                  | version\*        | 1.2.2, 1.2.1, 1.2.0-b, 1.2.0-a, 1.1.0, 1.0.0                                                                                                        |
 |                             | method           | binaries (default)                                                                                                                                  |
 |                             | install_path     | Installation path. Default `/opt/petpvc-{version}`.                                                                                                 |
-| **SPM12**                   | version\*        | r7219, r6914, r6685, r6472, r6225                                                                                                                   |
+| **SPM12**                   | version\*        | dev, r7771, r7487, r7219, r6914, r6685, r6472, r6225                                                                                                                   |
 |                             | install_path     | Installation path. Default `/opt/spm12-{version}`.                                                                                                  |
 |                             |                  | _Note: Matlab Compiler Runtime is installed when SPM12 is installed._                                                                               |
 | **VNC**                     | passwd\*         | Choose a password for this VNC server.                                                                                                              |
@@ -299,3 +299,16 @@ docker images
 - FreeSurfer cannot find my license file.
   - Solution: get a free license from [FreeSurfer's website](https://surfer.nmr.mgh.harvard.edu/registration.html), and copy it into the container. To build the Docker image, please use the form `docker build .` instead of `docker build - < Dockerfile`. The latter form will not copy files into the image.
   - Please see the [examples](examples#freesurfer) for more information.
+
+
+# Developer installation
+
+Clone the repository and install in editable mode.
+
+```
+git clone https://github.com/ReproNim/neurodocker
+cd neurodocker
+python -m pip install --no-cache-dir --editable .[all]
+```
+
+Before committing changes, initialize `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `black` for formatting.
