@@ -6,3 +6,4 @@ Atropos --help
 antsRegistration --version
 
 printf 'passed'
+echo

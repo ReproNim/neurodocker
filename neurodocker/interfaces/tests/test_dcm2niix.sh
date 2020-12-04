@@ -5,3 +5,4 @@ set -ex
 dcm2niix -h
 
 printf 'passed'
+echo
