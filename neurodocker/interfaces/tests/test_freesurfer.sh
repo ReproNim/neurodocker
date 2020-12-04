@@ -7,3 +7,4 @@ mri_coreg --version
 recon-all --version
 
 printf 'passed'
+echo

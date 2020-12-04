@@ -5,3 +5,4 @@ set -ex
 3dSkullStrip -help
 
 printf 'passed'
+echo

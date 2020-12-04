@@ -6,3 +6,4 @@ bet2 -h
 flirt -version
 
 printf 'passed'
+echo

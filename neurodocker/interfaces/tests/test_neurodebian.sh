@@ -4,4 +4,5 @@ set -ex
 
 dcm2niix -h
 
-printf 'passed'
+printf "passed"
+echo
