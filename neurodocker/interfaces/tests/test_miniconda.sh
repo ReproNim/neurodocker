@@ -18,3 +18,4 @@ for pkg in nipype pylsl traits; do
 done
 
 printf 'passed'
+echo
