@@ -18,7 +18,7 @@ generic:
       "2.0.3": https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz
       "2.0.0": https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz
     env:
-      ANTSPATH: "{{ ants.install_path }}"
+      ANTSPATH: "{{ ants.install_path }}/"
       PATH: "{{ ants.install_path }}:$PATH"
     instructions: |
       echo "Downloading ANTs ..."
