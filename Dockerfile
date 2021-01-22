@@ -1,9 +1,9 @@
-FROM alpine:3.11.5
+FROM python:3.9-alpine
 
 COPY . /opt/neurodocker
 
-RUN apk add --update --no-cache git python3 \
-    && python3 -m pip install --no-cache-dir --editable /opt/neurodocker \
+RUN apk add --update --no-cache git \
+    && python -m pip install --no-cache-dir --editable /opt/neurodocker \
     && neurodocker --help
 
 LABEL maintainer="Jakub Kaczmarzyk <jakub.kaczmarzyk@gmail.com>"
