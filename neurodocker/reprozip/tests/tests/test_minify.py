@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from neurodocker.reprozip.gentle.trace import trace_and_prune
+from neurodocker.reprozip.trace import trace_and_prune
 
 reprozip = pytest.importorskip("reprozip", reason="reprozip not found")
 docker = pytest.importorskip("docker", reason="docker-py not found")
