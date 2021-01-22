@@ -1,18 +1,23 @@
 """Remove all files under a directory but not caught by `reprozip trace`."""
 
 from pathlib import Path
+import typing as ty
 
 import yaml
 
 
-def _in_docker():
+def _in_docker() -> bool:
     if not Path("/proc/1/cgroup").is_file():
         return False
-    with open("/proc/1/cgroup") as f:
-        return "docker" in f.read() and Path("/.dockerenv").is_file()
+    # TODO: this is not be a long-term solution.
+    return Path("/.dockerenv").is_file()
 
 
-def main(*, yaml_file, directories_to_prune):
+def main(
+    *,
+    yaml_file: ty.Union[str, Path],
+    directories_to_prune: ty.Union[ty.List[str], ty.List[Path]],
+):
 
     if not _in_docker():
         raise RuntimeError(
@@ -39,9 +44,9 @@ def main(*, yaml_file, directories_to_prune):
 
     for d in directories_to_prune:
         if not d.is_dir():
-            raise ValueError("Directory does not exist: {}".format(d))
+            raise ValueError(f"Directory does not exist: {d}")
 
-    all_files = set()
+    all_files: ty.Set[Path] = set()
     for d in directories_to_prune:
         all_files.update(Path(d).rglob("*"))
 
@@ -58,8 +63,8 @@ def main(*, yaml_file, directories_to_prune):
             except UnicodeEncodeError:
                 n_errored += 1
 
-    print("++ skipping {} files due to unicode encoding errors".format(n_errored))
-    print("++ found {} files to remove".format(len(files_to_remove) - n_errored))
+    print(f"++ skipping {n_errored} files due to unicode encoding errors")
+    print(f"++ found {len(files_to_remove) - n_errored} files to remove")
 
 
 if __name__ == "__main__":

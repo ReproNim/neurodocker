@@ -1,25 +1,51 @@
+"""Minify a Docker container.
+
+This program removes all files under specified directories in the container _not_ used
+by the given command(s).
+"""
+
+import collections
+import io
 import logging
-import os
 from pathlib import Path
+import tarfile
+import typing as ty
 
-from neurodocker.utils import get_docker_client
+try:
+    import docker
+except ImportError:
+    raise ImportError(
+        "The `docker` Python package is required for minification functions."
+    )
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
-TRACE_SCRIPT = os.path.join(BASE_PATH, "_trace.sh")
-PRUNE_SCRIPT = os.path.join(BASE_PATH, "_prune.py")
+# Let these methods raise exceptions if they must.
+client = docker.from_env()
+if not client.ping():
+    raise docker.errors.DockerException("Could not communicate with the Docker Engine")
+
 logger = logging.getLogger(__name__)
 
+_trace_script = Path(__file__).parent / "_trace.sh"
+_prune_script = Path(__file__).parent / "_prune.py"
 
-def copy_file_to_container(container, src, dest):
+# Sync with _trace.sh
+_log_prefix = "NEURODOCKER (in container):"
+
+
+def copy_file_to_container(
+    container: ty.Union[str, docker.models.containers.Container],
+    src: ty.Union[str, Path],
+    dest: ty.Union[str, Path],
+) -> bool:
     """Copy `local_filepath` into `container`:`container_path`.
 
     Parameters
     ----------
-    container : str or container object
+    container : str or `docker.models.containers.Container` instance
         Container to which file is copied.
-    src : str
+    src : str or `pathlib.Path` instance
         Filepath on the host.
-    dest : str
+    dest : str or `pathlib.Path` instance
         Directory inside container. Original filename is preserved.
 
     Returns
@@ -27,109 +53,120 @@ def copy_file_to_container(container, src, dest):
     success : bool
         True if copy was a success. False otherwise.
     """
-    # https://gist.github.com/zbyte64/6800eae10ce082bb78f0b7a2cca5cbc2
-
-    from io import BytesIO
-    import tarfile
-
-    client = get_docker_client()
-
-    try:
-        container.put_archive
-        container = container
-    except AttributeError:
+    src = Path(src)
+    dest = Path(dest)
+    if not isinstance(container, docker.models.containers.Container):
         container = client.containers.get(container)
-
-    with BytesIO() as tar_stream:
+    # https://gist.github.com/zbyte64/6800eae10ce082bb78f0b7a2cca5cbc2
+    with io.BytesIO() as tar_stream:
         with tarfile.TarFile(fileobj=tar_stream, mode="w") as tar:
-            filename = os.path.split(src)[-1]
+            filename = src.name
             tar.add(src, arcname=filename, recursive=False)
         tar_stream.seek(0)
-        return container.put_archive(dest, tar_stream)
+        return container.put_archive(str(dest), tar_stream)
 
 
-def _get_mounts(container):
-    client = get_docker_client()
-    # [{'Type': 'bind',
-    # 'Source': '/path/to/source',
-    # 'Destination': '/destination',
-    # 'Mode': 'ro',
-    # 'RW': False,
-    # 'Propagation': 'rprivate'}]
+def _get_mounts(container: docker.models.containers.Container) -> dict:
+    # [
+    #     {
+    #         "Type": "bind",
+    #         "Source": "/path/to/source",
+    #         "Destination": "/destination",
+    #         "Mode": "ro",
+    #         "RW": False,
+    #         "Propagation": "rprivate",
+    #     }
+    # ]
     return client.api.inspect_container(container)["Mounts"]
 
 
-def trace_and_prune(container, commands, directories_to_prune):
-    client = get_docker_client()
-    container = client.containers.get(container)
+def trace_and_prune(
+    container: ty.Union[str, docker.models.containers.Container],
+    commands: ty.List[str],
+    directories_to_prune: ty.Union[ty.List[str], ty.List[Path]],
+) -> None:
+    """Trace commands in the container, and remove all files in `directories_to_prune`
+    that were not used by the commands.
+    """
+    # TODO: add examples to docstring.
 
+    if not isinstance(container, docker.models.containers.Container):
+        container = client.containers.get(container)
     if isinstance(commands, str):
         commands = [commands]
-
-    if isinstance(directories_to_prune, str):
+    if isinstance(directories_to_prune, (str, Path)):
         directories_to_prune = [directories_to_prune]
 
+    directories_to_prune = [Path(p) for p in directories_to_prune]
     cmds = " ".join('"{}"'.format(c) for c in commands)
 
-    copy_file_to_container(container, TRACE_SCRIPT, "/tmp/")
-    trace_cmd = "bash /tmp/_trace.sh " + cmds
-    logger.info(
-        "running command within container {}: {}" "".format(container.id, trace_cmd)
+    # Copy the trace.sh file into the container and run it.
+    copy_file_to_container(container, _trace_script, "/tmp/")
+    trace_cmd = f"bash /tmp/_trace.sh {cmds}"
+    logger.info(f"running command within container {container.id}: {trace_cmd}")
+
+    # Run container. We need to use the lower-level docker-py API to have access to the
+    # exec_id. Using the exec_id, we can test for the exec's exit code with each
+    # iteration.
+    exec_dict: dict = container.client.api.exec_create(container.id, cmd=trace_cmd)
+    exec_id: str = exec_dict["Id"]
+    log_gen: ty.Generator[bytes, None, None] = container.client.api.exec_start(
+        exec_id, stream=True
     )
 
-    _, log_gen = container.exec_run(trace_cmd, stream=True)
+    # Hold N lines of context. If there is an error during container execution, this
+    # context is shown to the user to give them a better idea of what went wrong.
+    context: ty.Deque[str] = collections.deque([], maxlen=10)
+    exit_code: int
     for log in log_gen:
-        log = log.decode().strip()
-        logger.info(log)
-        if (
-            ("REPROZIP" in log and "couldn't use ptrace" in log)
-            or "neurodocker (in container): error" in log.lower()
-            or "_pytracer.Error" in log
-        ):
-            raise RuntimeError("Error: {}".format(log))
+        log_str = log.decode().strip()
+        context.append(log_str)
+        logger.info(log_str)
+    exit_code = client.api.exec_inspect(exec_id)["ExitCode"]
+    if exit_code != 0:
+        # Print the lines of context in reverse order so last line is at the bottom.
+        ctx_msg = "\n".join(list(context)[::-1])
+        raise RuntimeError(f"error in container:\n{ctx_msg}")
 
     # Get files to prune.
-    copy_file_to_container(container, PRUNE_SCRIPT, "/tmp/")
+    copy_file_to_container(container, _prune_script, "/tmp/")
     ret, result = container.exec_run(
         "/tmp/reprozip-miniconda/bin/python /tmp/_prune.py"
         " --config-file /tmp/neurodocker-reprozip-trace/config.yml"
-        " --dirs-to-prune {}".format(" ".join(directories_to_prune)).split()
+        " --dirs-to-prune {}".format(" ".join(map(str, directories_to_prune))).split()
     )
     result = result.decode().strip()
-    if ret:
-        raise RuntimeError("Failed: {}".format(result))
+    if ret != 0:
+        raise RuntimeError(f"Failed: {result}")
 
     ret, result = container.exec_run(
         ["cat", "/tmp/neurodocker-reprozip-trace/TO_DELETE.list"]
     )
     result = result.decode().strip()
-    if ret:
-        raise RuntimeError("Error: {}".format(result))
+    if ret != 0:
+        raise RuntimeError(f"Error: {result}")
 
-    files_to_remove = result.splitlines()
+    files_to_remove = [Path(p) for p in result.splitlines()]
     if not len(files_to_remove):
         print("No files to remove. Quitting.")
         return
 
     # Check if any files to be removed are in mounted directories.
-    mounts = _get_mounts(container.name)
+    mounts = _get_mounts(container.id)
     if mounts:
         for m in mounts:
             for p in files_to_remove:
                 if Path(m["Destination"]) in Path(p).parents:
                     raise ValueError(
-                        "Attempting to remove files in a mounted directory."
-                        " Directory in the container '{}' is host directory"
-                        " '{}'. Remove this mounted directory from the"
-                        " minification command and rerun.".format(
-                            m["Destination"], m["Source"]
-                        )
+                        "Attempting to remove files in a mounted directory.  Directory"
+                        f" in the container '{m['Destination']}' is host directory"
+                        f" '{m['Source']}'. Remove this mounted directory from the"
+                        " minification command and rerun."
                     )
 
     print("\nWARNING!!! THE FOLLOWING FILES WILL BE REMOVED:")
     print("\n    ", end="")
-    print("\n    ".join(sorted(files_to_remove)))
-
+    print("\n    ".join(sorted(map(str, files_to_remove))))
     print(
         "\nWARNING: PROCEEDING MAY RESULT IN IRREVERSIBLE DATA LOSS, FOR EXAMPLE"
         " IF ATTEMPTING TO REMOVE FILES IN DIRECTORIES MOUNTED FROM THE HOST."
@@ -154,18 +191,19 @@ def trace_and_prune(container, commands, directories_to_prune):
     )
     result = result.decode().split()
     if ret:
-        raise RuntimeError("Error: {}".format(result))
+        raise RuntimeError(f"Error: {result}")
 
     ret, result = container.exec_run(
-        "rm -rf /tmp/neurodocker-reprozip-trace /tmp/reprozip-miniconda /tmp/_trace.sh /tmp/_prune.py"
+        "rm -rf /tmp/neurodocker-reprozip-trace /tmp/reprozip-miniconda"
+        " /tmp/_trace.sh /tmp/_prune.py"
     )
     result = result.decode().split()
     if ret:
-        raise RuntimeError("Error: {}".format(result))
+        raise RuntimeError(f"Error: {result}")
 
     print("\n\nFinished removing files.")
     print("Next, create a new Docker image with the minified container:")
-    print("\n    docker export {} | docker import - imagename\n".format(container.name))
+    print(f"\n    docker export {container.name} | docker import - imagename\n")
 
 
 def main():
