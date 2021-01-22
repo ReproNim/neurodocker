@@ -1,13 +1,35 @@
 # Instructions to add NeuroDebian repositories.
 
-generic:
-  custom:
-    dependencies:
-      apt: dirmngr gnupg2
-    instructions: |
-      {{ neurodebian.install_dependencies() }}
-      curl {{ neurodebian.curl_opts }} {{ neurodebian.url }} \
-      > /etc/apt/sources.list.d/neurodebian.sources.list
-      curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | apt-key add -
-      (apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
-      apt-get -qq update
+name: neurodebian
+binaries:
+  urls:
+    australia: "http://neuro.debian.net/lists/{{ self.os_codename }}.au.{{ self.full_or_libre }}"
+    china-tsinghua: "http://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj1.{{ self.full_or_libre }}"
+    china-scitech: "http://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj2.{{ self.full_or_libre }}"
+    china-zhejiang: "http://neuro.debian.net/lists/{{ self.os_codename }}.cn-zj.{{ self.full_or_libre }}"
+    germany-munich: "http://neuro.debian.net/lists/{{ self.os_codename }}.de-m.{{ self.full_or_libre }}"
+    germany-magdeburg: "http://neuro.debian.net/lists/{{ self.os_codename }}.de-md.{{ self.full_or_libre }}"
+    greece: "http://neuro.debian.net/lists/{{ self.os_codename }}.gr.{{ self.full_or_libre }}"
+    japan: "http://neuro.debian.net/lists/{{ self.os_codename }}.jp.{{ self.full_or_libre }}"
+    usa-ca: "http://neuro.debian.net/lists/{{ self.os_codename }}.us-ca.{{ self.full_or_libre }}"
+    usa-nh: "http://neuro.debian.net/lists/{{ self.os_codename }}.us-nh.{{ self.full_or_libre }}"
+    usa-tn: "http://neuro.debian.net/lists/{{ self.os_codename }}.us-tn.{{ self.full_or_libre }}"
+  arguments:
+    required:
+    - version
+    - os_codename
+    optional:
+      full_or_libre: full
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    - dirmngr
+    - gnupg2
+  instructions: |
+    {{ self.install_dependencies() }}
+    curl -fsSL {{ self.urls[self.version] }} \
+    > /etc/apt/sources.list.d/neurodebian.sources.list
+    curl -sSL https://dl.dropbox.com/s/zxs209o955q6vkg/neurodebian.gpg | apt-key add -
+    (apt-key adv --refresh-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 || true)
+    apt-get -qq update
