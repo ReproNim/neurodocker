@@ -20,6 +20,8 @@ from neurodocker.reproenv.state import registered_templates_items
 from neurodocker.reproenv.template import Template
 from neurodocker.reproenv.types import allowed_pkg_managers
 
+_default_template_path = Path(__file__).parent.parent / "templates"
+
 
 class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
     """Subclass of `click.Group` that adds parameters common to `reproenv generate`
@@ -37,6 +39,8 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
                 multiple=True,
                 envvar="REPROENV_TEMPLATE_PATH",
                 show_envvar=True,
+                # The default must be a tuple because multiple=True.
+                default=(str(_default_template_path),),
                 help="Path to directories with templates to register",
                 type=click.Path(exists=True, file_okay=False, dir_okay=True),
             )
