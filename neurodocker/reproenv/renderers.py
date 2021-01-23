@@ -26,6 +26,16 @@ from neurodocker.reproenv.types import pkg_managers_type
 # attribute, an error will be thrown when the jinja template is instantiated.
 _jinja_env = jinja2.Environment(undefined=jinja2.StrictUndefined)
 
+# Add globals to the jinja environment. These functions can be called from within a
+# template.
+
+
+def _raise_helper(msg: str) -> ty.NoReturn:
+    raise RendererError(msg)
+
+
+_jinja_env.globals["raise"] = _raise_helper
+
 # TODO: add a flag that avoids buggy behavior when basing a new container on
 # one created with ReproEnv.
 
@@ -236,6 +246,9 @@ class _Renderer:
             command = _render_string_from_template(
                 template_method.instructions, template_method
             )
+            # TODO: raise exception here or skip the run instruction?
+            if not command.strip():
+                raise RendererError(f"empty rendered instructions in {template.name}")
             self.run(command)
 
         return self
