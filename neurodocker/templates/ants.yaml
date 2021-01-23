@@ -24,7 +24,7 @@ binaries:
     yum:
     - curl
   env:
-    ANTSPATH: "{{ self.install_path }}"
+    ANTSPATH: "{{ self.install_path }}/"
     PATH: "{{ self.install_path }}:$PATH"
   instructions: |
     {{ self.install_dependencies() }}
