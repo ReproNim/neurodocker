@@ -65,7 +65,7 @@ function run_reprozip_trace() {
     reprozip_cmd="${reprozip_base_cmd} ${continue_} ${cmd}"
     printf "${NEURODOCKER_LOG_PREFIX}: executing command: ${reprozip_cmd}\n"
     {
-      $reprozip_cmd
+      eval $reprozip_cmd
     } || {
       # Show relatively specific error message if a particular trace fails.
       printf "${NEURODOCKER_LOG_PREFIX}: ERROR: reprozip trace command exited with non-zero code. Command: $reprozip_cmd"
