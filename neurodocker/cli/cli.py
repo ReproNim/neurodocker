@@ -2,7 +2,6 @@ import click
 
 from neurodocker import __version__
 from neurodocker.cli.generate import generate
-from neurodocker.cli.minify.trace import minify
 
 
 @click.group()
@@ -12,4 +11,11 @@ def cli():
 
 
 cli.add_command(generate)
-cli.add_command(minify)
+
+# `docker-py` is required for minification but is not installed by default.
+try:
+    from neurodocker.cli.minify.trace import minify
+
+    cli.add_command(minify)
+except ImportError:
+    pass
