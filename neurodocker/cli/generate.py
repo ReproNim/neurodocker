@@ -19,8 +19,6 @@ from neurodocker.reproenv.state import registered_templates_items
 from neurodocker.reproenv.template import Template
 from neurodocker.reproenv.types import allowed_pkg_managers
 
-_default_template_path = Path(__file__).parent.parent / "templates"
-
 
 class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
     """Subclass of `click.Group` that adds parameters common to `reproenv generate`
@@ -38,8 +36,6 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
                 multiple=True,
                 envvar="REPROENV_TEMPLATE_PATH",
                 show_envvar=True,
-                # The default must be a tuple because multiple=True.
-                default=(str(_default_template_path),),
                 help="Path to directories with templates to register",
                 type=click.Path(exists=True, file_okay=False, dir_okay=True),
             )
@@ -345,7 +341,7 @@ def _get_instruction_for_param(
             if tmpl.alert:
                 # TODO: add color to this to make it visible, perhaps yellow. But there
                 # is no color option in `click.confirm`.
-                click.confirm(f"{tmpl.alert} Do you understand?", abort=True, err=True)
+                click.confirm(f"{tmpl.alert} Proceed?", abort=True, err=True)
         else:
             # TODO: should we do anything special with unknown options? Probably log it.
             pass
