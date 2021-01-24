@@ -350,7 +350,7 @@ def _get_instruction_for_param(
 
 @click.group(cls=GroupAddCommonParamsAndRegisteredTemplates)
 def generate(*, template_path):
-    """Generate container."""
+    """Generate a container."""
     pass
 
 
