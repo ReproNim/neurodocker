@@ -1,46 +1,71 @@
 from pathlib import Path
-from unittest.mock import patch
 
+from click.testing import CliRunner
 import pytest
 
-from neurodocker.reprozip.trace import trace_and_prune
+from neurodocker.cli.minify.trace import minify
 
-reprozip = pytest.importorskip("reprozip", reason="reprozip not found")
 docker = pytest.importorskip("docker", reason="docker-py not found")
 
 
-def test_trace_and_prune():
+def test_minify():
     client = docker.from_env()
-    container = client.containers.run(
-        "python:3.8-slim", detach=True, tty=True, security_opt=["seccomp:unconfined"]
-    )
-
-    commands = ["python --version", "python -c print()"]
-
+    container = client.containers.run("python:3.9-slim", detach=True, tty=True)
+    commands = ["python --version", """python -c 'print(123)'"""]
     try:
-        # Respond yes to delete things.
-        with patch("builtins.input", return_value="y"):
-            trace_and_prune(container.name, commands, "/usr/local")
+        runner = CliRunner()
+        result = runner.invoke(
+            minify,
+            ["--container", container.id, "--dir", "/usr/local"] + commands,
+            input="y",
+        )
+        print(result.output)
+        assert result.exit_code == 0
 
+        # Test that the commands can still be run.
         for cmd in commands:
             ret, result = container.exec_run(cmd)
             result = result.decode()
-            if ret:
-                assert (
-                    False
-                ), "unexpected non-zero return code when running '{}'".format(cmd)
+            assert ret == 0, f"unexpected non-zero return code when running '{cmd}'"
 
         # This should fail.
         ret, result = container.exec_run("pip --help")
-        if not ret:
-            assert False, "unexpected zero return code when running '{}'".format(cmd)
+        assert ret != 0, f"unexpected zero return code when running '{cmd}'"
 
     finally:
         container.stop()
         container.remove()
 
 
-def test_trace_and_prune_with_mounted_volume(tmp_path: Path):
+def test_minify_abort():
+    client = docker.from_env()
+    container = client.containers.run("python:3.9-slim", detach=True, tty=True)
+    commands = ["python --version", """python -c 'print(123)'"""]
+    try:
+        runner = CliRunner()
+        result = runner.invoke(
+            minify,
+            ["--container", container.id, "--dir", "/usr/local"] + commands,
+            input="n",  # abort
+        )
+        assert result.exit_code != 0
+
+        # Test that the commands can still be run.
+        for cmd in commands:
+            ret, result = container.exec_run(cmd)
+            result = result.decode()
+            assert ret == 0, f"unexpected non-zero return code when running '{cmd}'"
+
+        # This should still succeed.
+        ret, result = container.exec_run("pip --help")
+        assert ret == 0, f"unexpected non-zero return code when running '{cmd}'"
+
+    finally:
+        container.stop()
+        container.remove()
+
+
+def test_minify_with_mounted_volume(tmp_path: Path):
     client = docker.from_env()
 
     # Create a file in a mounted directory.
@@ -50,21 +75,27 @@ def test_trace_and_prune_with_mounted_volume(tmp_path: Path):
         "python:3.8-slim",
         detach=True,
         tty=True,
-        security_opt=["seccomp:unconfined"],
         volumes={str(tmp_path): {"bind": "/work", "mode": "rw"}},
     )
-
-    commands = ["python --version", "python -c print()"]
+    commands = ["python --version", "python -c 'print()'"]
 
     try:
-        # Respond yes to delete things.
-        with patch("builtins.input", return_value="y"):
-            with pytest.raises(ValueError):
-                trace_and_prune(container, commands, ["/usr/local", "/work"])
+        runner = CliRunner()
+        result = runner.invoke(
+            minify,
+            ["--container", container.id, "--dir", "/usr/local", "--dir", "/work"]
+            + commands,
+        )
+        assert result.exit_code != 0
+        assert "Attempting to remove files in a mounted directory" in result.output
 
-        # This should work.
-        with patch("builtins.input", return_value="y"):
-            trace_and_prune(container, commands, ["/usr/local"])
+        runner = CliRunner()
+        result = runner.invoke(
+            minify,
+            ["--container", container.id, "--dir", "/usr/local"] + commands,
+            input="y",
+        )
+        assert result.exit_code == 0
     finally:
         container.stop()
         container.remove()

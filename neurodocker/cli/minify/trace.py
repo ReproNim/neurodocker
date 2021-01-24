@@ -4,12 +4,16 @@ This program removes all files under specified directories in the container _not
 by the given command(s).
 """
 
-import collections
+# TODO: consider implementing custom types for Docker container and paths within a
+# Docker container.
+
 import io
 import logging
 from pathlib import Path
 import tarfile
 import typing as ty
+
+import click
 
 try:
     import docker
@@ -80,25 +84,42 @@ def _get_mounts(container: docker.models.containers.Container) -> dict:
     return client.api.inspect_container(container)["Mounts"]
 
 
-def trace_and_prune(
+@click.command()
+@click.option(
+    "-c", "--container", required=True, help="ID or name of running Docker container"
+)
+@click.option(
+    "-d",
+    "--dir",
+    "directories_to_prune",
+    required=True,
+    multiple=True,
+    help="Directories in container to prune. Data will be lost in these directories",
+)
+@click.argument("command", nargs=-1, required=True)
+def minify(
     container: ty.Union[str, docker.models.containers.Container],
-    commands: ty.List[str],
-    directories_to_prune: ty.Union[ty.List[str], ty.List[Path]],
+    directories_to_prune: ty.Tuple[str],
+    command: ty.Tuple[str],
 ) -> None:
-    """Trace commands in the container, and remove all files in `directories_to_prune`
-    that were not used by the commands.
+    """Minify a container.
+
+    Trace COMMAND... in the container, and remove all files in `--dirs-to-prune` that
+    were not used by the commands.
+
+    \b
+    Examples
+    --------
+    docker run --rm -itd --name to-minify python:3.9-slim bash
+    neurodocker minify \\
+        --container to-minify \\
+        --dir /usr/local \\
+        "python -c 'a = 1 + 1; print(a)'"
     """
-    # TODO: add examples to docstring.
+    container = client.containers.get(container)
+    container = ty.cast(docker.models.containers.Container, container)
 
-    if not isinstance(container, docker.models.containers.Container):
-        container = client.containers.get(container)
-    if isinstance(commands, str):
-        commands = [commands]
-    if isinstance(directories_to_prune, (str, Path)):
-        directories_to_prune = [directories_to_prune]
-
-    directories_to_prune = [Path(p) for p in directories_to_prune]
-    cmds = " ".join('"{}"'.format(c) for c in commands)
+    cmds = " ".join(f'"{c}"' for c in command)
 
     # Copy the trace.sh file into the container and run it.
     copy_file_to_container(container, _trace_script, "/tmp/")
@@ -113,40 +134,32 @@ def trace_and_prune(
     log_gen: ty.Generator[bytes, None, None] = container.client.api.exec_start(
         exec_id, stream=True
     )
-
-    # Hold N lines of context. If there is an error during container execution, this
-    # context is shown to the user to give them a better idea of what went wrong.
-    context: ty.Deque[str] = collections.deque([], maxlen=10)
-    exit_code: int
     for log in log_gen:
         log_str = log.decode().strip()
-        context.append(log_str)
-        logger.info(log_str)
-    exit_code = client.api.exec_inspect(exec_id)["ExitCode"]
+        click.secho(log_str, fg="yellow")
+    exit_code: int = client.api.exec_inspect(exec_id)["ExitCode"]
     if exit_code != 0:
-        # Print the lines of context in reverse order so last line is at the bottom.
-        ctx_msg = "\n".join(list(context)[::-1])
-        raise RuntimeError(f"error in container:\n{ctx_msg}")
+        raise RuntimeError("error in container")
 
     # Get files to prune.
     copy_file_to_container(container, _prune_script, "/tmp/")
+    ret: int
+    result: bytes
     ret, result = container.exec_run(
         "/tmp/reprozip-miniconda/bin/python /tmp/_prune.py"
         " --config-file /tmp/neurodocker-reprozip-trace/config.yml"
         " --dirs-to-prune {}".format(" ".join(map(str, directories_to_prune))).split()
     )
-    result = result.decode().strip()
     if ret != 0:
-        raise RuntimeError(f"Failed: {result}")
+        raise RuntimeError(f"Failed: {result.decode().strip()}")
 
     ret, result = container.exec_run(
         ["cat", "/tmp/neurodocker-reprozip-trace/TO_DELETE.list"]
     )
-    result = result.decode().strip()
     if ret != 0:
-        raise RuntimeError(f"Error: {result}")
+        raise RuntimeError(f"Error: {result.decode().strip()}")
 
-    files_to_remove = [Path(p) for p in result.splitlines()]
+    files_to_remove = [Path(p) for p in result.decode().strip().splitlines()]
     if not len(files_to_remove):
         print("No files to remove. Quitting.")
         return
@@ -157,72 +170,38 @@ def trace_and_prune(
         for m in mounts:
             for p in files_to_remove:
                 if Path(m["Destination"]) in Path(p).parents:
-                    raise ValueError(
+                    click.get_current_context().fail(
                         "Attempting to remove files in a mounted directory.  Directory"
                         f" in the container '{m['Destination']}' is host directory"
                         f" '{m['Source']}'. Remove this mounted directory from the"
                         " minification command and rerun."
                     )
 
-    print("\nWARNING!!! THE FOLLOWING FILES WILL BE REMOVED:")
-    print("\n    ", end="")
-    print("\n    ".join(sorted(map(str, files_to_remove))))
-    print(
+    click.secho("\nWARNING!!! THE FOLLOWING FILES WILL BE REMOVED:", fg="yellow")
+    click.echo()
+    click.echo("    " + "\n    ".join(sorted(map(str, files_to_remove))))
+    click.secho(
         "\nWARNING: PROCEEDING MAY RESULT IN IRREVERSIBLE DATA LOSS, FOR EXAMPLE"
         " IF ATTEMPTING TO REMOVE FILES IN DIRECTORIES MOUNTED FROM THE HOST."
         " PROCEED WITH EXTREME CAUTION! NEURODOCKER ASSUMES NO RESPONSIBILITY"
-        " FOR DATA LOSS. ALL OF THE FILES LISTED ABOVE WILL BE REMOVED."
+        " FOR DATA LOSS. ALL OF THE FILES LISTED ABOVE WILL BE REMOVED.",
+        fg="yellow",
     )
-    response = "placeholder"
-    try:
-        while response.lower() not in {"y", "n", ""}:
-            response = input("Proceed (y/N)? ")
-    except KeyboardInterrupt:
-        print("\nQuitting.")
-        return
-
-    if response.lower() in {"", "n"}:
-        print("Quitting.")
-        return
-
-    print("Removing files ...")
+    click.confirm("Proceed?", abort=True)
+    click.echo("Removing files ...")
     ret, result = container.exec_run(
         'xargs -d "\n" -a /tmp/neurodocker-reprozip-trace/TO_DELETE.list rm -f'
     )
-    result = result.decode().split()
     if ret:
-        raise RuntimeError(f"Error: {result}")
+        raise RuntimeError(f"Error: {result.decode().split()}")
 
     ret, result = container.exec_run(
         "rm -rf /tmp/neurodocker-reprozip-trace /tmp/reprozip-miniconda"
         " /tmp/_trace.sh /tmp/_prune.py"
     )
-    result = result.decode().split()
     if ret:
-        raise RuntimeError(f"Error: {result}")
+        raise RuntimeError(f"Error: {result.decode().split()}")
 
-    print("\n\nFinished removing files.")
-    print("Next, create a new Docker image with the minified container:")
-    print(f"\n    docker export {container.name} | docker import - imagename\n")
-
-
-def main():
-    from argparse import ArgumentParser
-
-    p = ArgumentParser(description=__doc__)
-    p.add_argument("-c", "--container", required=True, help="Running container.")
-    p.add_argument(
-        "-d",
-        "--dirs-to-prune",
-        required=True,
-        nargs="+",
-        help="Directories to prune. Data will be lost in these directories.",
-    )
-    p.add_argument("--commands", required=True, nargs="+", help="Commands to minify.")
-    args = p.parse_args()
-
-    trace_and_prune(
-        container=args.container,
-        commands=args.commands,
-        directories_to_prune=args.dirs_to_prune,
-    )
+    click.secho("\n\nFinished removing files.", fg="green")
+    click.echo("Next, create a new Docker image with the minified container:")
+    click.echo(f"\n    docker export {container.name} | docker import - imagename\n")
