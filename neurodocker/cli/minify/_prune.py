@@ -5,11 +5,14 @@ import typing as ty
 
 import yaml
 
+# TODO: if removing all of the files in a directory, print that directory with a *.
+# pip does this in `pip uninstall`.
+
 
 def _in_docker() -> bool:
     if not Path("/proc/1/cgroup").is_file():
         return False
-    # TODO: this is not be a long-term solution.
+    # TODO: this is not a long-term solution.
     return Path("/.dockerenv").is_file()
 
 
@@ -21,8 +24,8 @@ def main(
 
     if not _in_docker():
         raise RuntimeError(
-            "Not running in a Docker container. This script should only be"
-            " used within a container."
+            "Not running in a Docker container. This script should only be used within"
+            " a container."
         )
 
     yaml_file = Path(yaml_file)
@@ -42,6 +45,8 @@ def main(
 
     directories_to_prune = [Path(d) for d in directories_to_prune]
 
+    # TODO: consider moving this check to the `neurodocker minify` cli. perhaps make a
+    # new click paramtype that checks if the directory exists in the container.
     for d in directories_to_prune:
         if not d.is_dir():
             raise ValueError(f"Directory does not exist: {d}")
