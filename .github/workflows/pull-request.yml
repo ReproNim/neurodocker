@@ -13,16 +13,7 @@ jobs:
       matrix:
         python-version: ['3.9', '3.8', '3.7']
     steps:
-      # - name: Cache Singularity
-      #   id: cache-singularity
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: $HOME/opt/singularity
-      #     key: ${{ runner.os }}-singularity-3.6.4
-      #     restore-keys: |
-      #       ${{ runner.os }}-singularity-3.6.4
       - name: Install Singularity
-        # if: steps.cache-singularity.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install --yes \
@@ -47,12 +38,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install reproenv
+      - name: Install neurodocker
         run: python -m pip install --editable .[dev]
       - name: Check types
-        run: mypy reproenv
+        run: mypy neurodocker
       - name: Check style
-        run: flake8 reproenv
+        run: flake8 neurodocker
       - name: Run python tests
         run: pytest --numprocesses auto
       - name: Get code coverage
