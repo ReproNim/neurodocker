@@ -4,13 +4,42 @@ Quickstart
 Install
 -------
 
-The recommended approach is to install :code:`neurodocker` in a virtual environment.
-Create one with :code:`conda`, :code:`venv`, or another virtual environment provider,
-and then run the following:
+Container
+~~~~~~~~~
+
+It is recommended to use the Neurodocker Docker image. This can be access through
+Docker or Singularity
+
+.. code-block::
+
+    docker run --rm repronim/neurodocker:0.7.0 --help
+
+.. code-block::
+
+    singularity run docker://repronim/neurodocker:0.7.0 --help
+
+pip
+~~~
+
+Neurodocker can also be installed with :code:`pip`. It is recommended to install in a
+virtual environment.
 
 .. code-block::
 
     python -m pip install neurodocker
+    neurodocker --help
+
+conda
+~~~~~
+
+Neurodocker can also be installed in a :code:`conda` environment (using :code:`pip`).
+
+.. code-block::
+
+    conda create -n neurodocker python=3.9 pyyaml
+    conda activate neurodocker
+    python -m pip install neurodocker
+    neurodocker --help
 
 Generate a container
 --------------------
@@ -116,10 +145,60 @@ Feel free to create a new notebook and :code:`import nipype`.
 Minify a Docker container
 -------------------------
 
-.. todo:: fill in instructions
-
 *Neurodocker* enables you to minify Docker containers for a set of commands. This will
 remove files not used by these commands and will dramatically reduce the size of the
 Docker image.
 
 See :code:`neurodocker minify --help` for more information.
+
+.. note::
+
+    Neurodocker must be installed with `pip` to minify containers.
+
+In the example below, we minify one of the official Python Docker images for certain
+commands. This will remove all of the files in :code:`/usr/local/` that are not used by
+these commands.
+
+`ReproZip <https://www.reprozip.org/>`_ is used to determine the files used by the
+commands.
+
+.. code-block::
+
+    docker run --rm -itd --name to-minify python:3.9-slim bash
+    neurodocker minify \
+      --container to-minify \
+      --dir /usr/local \
+      "python -c 'a = 1 + 1; print(a)'" \
+      "python -c 'import os'"
+
+You will be given a list of all of the files that will be deleted. Review this list of
+files before proceeding.
+
+.. code-block::
+
+    docker export to-minify | docker import - minified-python
+
+Now if you run :code:`docker images`, the image :code:`minified-python` will be listed.
+
+.. warning::
+
+    Environment variables are lost when saving the minified image as a new image. If
+    certain environment variables are required in the minified image, users should
+    create a new Dockerfile that uses the minified image as a base image and then sets
+    environment variables.
+
+The commands that were run during minification will (read should) succeed:
+
+.. code-block::
+
+    docker run --rm minified-python python -c "a = 1 + 1; print(a)"
+    docker run --rm minified-python python -c "import os"
+
+But commands not run during minification are *not guaranteed to succeed*. The following
+commands, for example, result in errors.
+
+.. code-block::
+
+    docker run --rm minified-python python -c 'import math'
+    docker run --rm minified-python python -c 'import pathlib'
+    docker run --rm minified-python pip --help
