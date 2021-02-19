@@ -15,9 +15,8 @@ This website is in progress. Is there is something you would like to see here, p
    :maxdepth: 2
    :caption: Contents:
 
-   quickstart
    user_guide
-   examples
+   build_results
    api
 
 
