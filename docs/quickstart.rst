@@ -1,46 +1,6 @@
 Quickstart
 ==========
 
-Install
--------
-
-Container
-~~~~~~~~~
-
-It is recommended to use the Neurodocker Docker image. This can be access through
-Docker or Singularity
-
-.. code-block::
-
-    docker run --rm repronim/neurodocker:0.7.0 --help
-
-.. code-block::
-
-    singularity run docker://repronim/neurodocker:0.7.0 --help
-
-pip
-~~~
-
-Neurodocker can also be installed with :code:`pip`. It is recommended to install in a
-virtual environment.
-
-.. code-block::
-
-    python -m pip install neurodocker
-    neurodocker --help
-
-conda
-~~~~~
-
-Neurodocker can also be installed in a :code:`conda` environment (using :code:`pip`).
-
-.. code-block::
-
-    conda create -n neurodocker python=3.9 pyyaml
-    conda activate neurodocker
-    python -m pip install neurodocker
-    neurodocker --help
-
 Generate a container
 --------------------
 
@@ -58,7 +18,7 @@ This is a file that defines how to build a Docker image.
 
 (This requires having `Docker <https://docs.docker.com/get-docker/>`_ installed)
 
-.. code-block::
+.. code-block:: bash
 
     neurodocker generate docker --pkg-manager apt \
         --base-image neurodebian:buster \
@@ -71,7 +31,7 @@ by *Neurodocker*. Instructions in the Dockerfile are ordered in the same way as 
 arguments in the command-line. To build a Docker image with this, save the output to a
 file in an empty directory, and build with :code:`docker build`:
 
-.. code-block::
+.. code-block:: bash
 
     mkdir docker-example
     cd docker-example
@@ -87,7 +47,7 @@ the current working directory to :code:`work` within the container, so any files
 create in this directory are saved. If we had not mounted this directory, all of the files
 created in :code:`/work` would be gone after the container was stopped.
 
-.. code-block::
+.. code-block:: bash
 
     docker run --rm -it --workdir /work --volume $PWD:/work --publish 8888:8888 \
         nipype-ants jupyter-notebook --ip 0.0.0.0 --port 8888
@@ -105,7 +65,7 @@ This file can be used to create a Singularity container.
 
 (This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed.
 
-.. code-block::
+.. code-block:: bash
 
     neurodocker generate singularity --pkg-manager apt \
         --base-image neurodebian:buster \
@@ -118,7 +78,7 @@ To build the Singularity image, create a new directory, save this output to a fi
 use :code:`sudo singularity build`. Note that this requires superuser privileges. You
 will not be able to run this on a shared computing environment, like a high performance cluster.
 
-.. code-block::
+.. code-block:: bash
 
     mkdir singularity-example
     cd singularity-example
@@ -135,7 +95,7 @@ it with all of your friends.
 
 To run Jupyter Notebook, use the following:
 
-.. code-block::
+.. code-block:: bash
 
     singularity run --bind $PWD:/work --pwd /work nipype-ants.sif jupyter-notebook
 
@@ -162,7 +122,7 @@ these commands.
 `ReproZip <https://www.reprozip.org/>`_ is used to determine the files used by the
 commands.
 
-.. code-block::
+.. code-block:: bash
 
     docker run --rm -itd --name to-minify python:3.9-slim bash
     neurodocker minify \
@@ -174,7 +134,7 @@ commands.
 You will be given a list of all of the files that will be deleted. Review this list of
 files before proceeding.
 
-.. code-block::
+.. code-block:: bash
 
     docker export to-minify | docker import - minified-python
 
@@ -187,9 +147,9 @@ Now if you run :code:`docker images`, the image :code:`minified-python` will be 
     create a new Dockerfile that uses the minified image as a base image and then sets
     environment variables.
 
-The commands that were run during minification will (read should) succeed:
+The commands that were run during minification will (read: should) succeed:
 
-.. code-block::
+.. code-block:: bash
 
     docker run --rm minified-python python -c "a = 1 + 1; print(a)"
     docker run --rm minified-python python -c "import os"
@@ -197,7 +157,7 @@ The commands that were run during minification will (read should) succeed:
 But commands not run during minification are *not guaranteed to succeed*. The following
 commands, for example, result in errors.
 
-.. code-block::
+.. code-block:: bash
 
     docker run --rm minified-python python -c 'import math'
     docker run --rm minified-python python -c 'import pathlib'
