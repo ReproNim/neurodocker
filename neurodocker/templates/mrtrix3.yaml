@@ -7,6 +7,7 @@ binaries:
     - version
     optional:
       install_path: /opt/mrtrix3-{{ self.version }}
+      build_processes: "1"
   dependencies:
     apt:
     - bzip2
@@ -73,5 +74,4 @@ source:
     {% endif -%}
     python3 configure -nogui
     echo "Compiling MRtrix3 ..."
-    {% if self.build_processes -%}NUMBER_OF_PROCESSORS="{{ self.build_processes }}" {% endif -%}
-    python3 build
+    NUMBER_OF_PROCESSORS="{{ self.build_processes }}" python3 build
