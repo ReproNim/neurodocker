@@ -1,11 +1,6 @@
 Common Uses
 ===========
 
-.. todo::
-
-    Complete this page.
-
-
 Create locally and use remotely
 -------------------------------
 
@@ -56,6 +51,36 @@ This example demonstrates how to build and run an image with Jupyter Notebook.
 Multiple Conda Environments
 ---------------------------
 
-.. todo::
+This example demonstrates how to create a Docker image with multiple conda environments.
 
-    Add content.
+.. code-block:: bash
+
+    neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image debian:buster-slim \
+        --miniconda \
+            version=latest \
+            env_name=envA \
+            env_exists=false \
+            conda_install=pandas \
+        --miniconda \
+            version=latest \
+            installed=true \
+            env_name=envB \
+            env_exists=false \
+            conda_install=scipy \
+    > multi-conda-env.Dockerfile
+
+    docker build --tag multi-conda-env --file multi-conda-env.Dockerfile .
+
+One can use the image in the following way:
+
+.. code-block:: bash
+
+    docker run --rm -it conda-multi-env bash
+    # Pandas is installed in envA.
+    conda activate envA
+    python -c "import pandas"
+    # Scipy is installed in envB.
+    conda activate envB
+    python -c "import scipy"
