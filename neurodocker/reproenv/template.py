@@ -151,7 +151,16 @@ class _BaseInstallationTemplate:
             v = self._kwds["version"]
             # Templates for builds from source have versions `{"ANY"}` because they can
             # ideally build any version.
-            if v not in self.versions and self.versions != {"ANY"}:
+            if (
+                v not in self.versions
+                # This indicates a source method.
+                and self.versions != {"ANY"}
+                # The presence of * in the list of binary urls indicates that any
+                # version is allowed. It also suggests that the version passed by
+                # the user is substituted into the URL for the binaries.
+                # TODO: consider changing {"ANY"} to "*" in source methods.
+                and "*" not in self.versions
+            ):
                 raise TemplateKeywordArgumentError(
                     "Unknown version '{}'. Allowed versions are '{}'.".format(
                         v, "', '".join(self.versions)
