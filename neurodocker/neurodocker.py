@@ -167,6 +167,8 @@ def _add_generate_common_arguments(parser):
         "os_codename (e.g., zesty), server (e.g., usa-nh), and"
         " full (if true, use non-free packages). Valid download"
         " servers are {}.".format(_ndeb_servers),
+        "niftyreg": "Install NiftyReg. Valid keys are version (required),"
+        " method (source only?), and install_path",
         "spm12": "Install SPM12 and its dependency, Matlab Compiler Runtime."
         " Valid keys are version and install_path.",
         "minc": "Install MINC. Valid keys is version (required), method, and"

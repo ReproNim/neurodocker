@@ -1,0 +1,28 @@
+# Instructions to install NiftyReg
+#
+# Repository: https://github.com/KCL-BMEIS/niftyreg
+# Website: http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg
+# Documentation:
+#   - http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg_documentation
+
+generic:
+  generic:
+    dependencies:
+      apt: cmake g++ gcc git make
+      yum: cmake gcc-c++ git make
+    env:
+      PATH: "{{ niftyreg.install_path }}/bin:$PATH"
+    instructions: |
+      {{ niftyreg.install_dependencies() }}
+      mkdir -p /tmp/niftyreg/build
+      git clone https://github.com/KCL-BMEIS/niftyreg /tmp/niftyreg/source
+      {% if niftyreg.version != "master" and niftyreg.version != "latest" -%}
+      cd /tmp/niftyreg/source
+      git fetch --tags
+      git checkout {{ niftyreg.version }}
+      {% endif -%}
+      cd /tmp/niftyreg/build
+      cmake {{ niftyreg.cmake_opts|default("-DBUILD_SHARED_LIBS=OFF") }} /tmp/niftyreg/source
+      make {{ niftyreg.make_opts|default("-j1") }}
+      make install
+      rm -rf /tmp/niftyreg

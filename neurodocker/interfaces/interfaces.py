@@ -73,6 +73,14 @@ class Dcm2niix(_BaseInterface):
     def __init__(self, *args, **kwargs):
         super().__init__(self._name, *args, **kwargs)
 
+class NiftyReg(_BaseInterface):
+    """Create instance of Dcm2niix object."""
+
+    _name = "niftyreg"
+    _pretty_name = "NiftyReg"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self._name, *args, **kwargs)
 
 class FreeSurfer(_BaseInterface):
     """Create instance of FreeSurfer object."""
