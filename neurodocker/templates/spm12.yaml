@@ -14,7 +14,8 @@ binaries:
       install_path: /opt/spm12-{{ self.version }}
       matlab_install_path: /opt/matlab-compiler-runtime-2010a
   urls:
-    dev: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2010a.zip
+    # Dev URL uses 2020a matlab compiler runtime, which we do not support yet.
+    # dev: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2010a.zip
     r7771: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7771_R2010a.zip
     r7487: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7487_R2010a.zip
     r7219: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
