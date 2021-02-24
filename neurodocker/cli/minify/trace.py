@@ -22,18 +22,17 @@ except ImportError:
         "The `docker` Python package is required for minification functions."
     )
 
-# Let these methods raise exceptions if they must.
-client = docker.from_env()
-if not client.ping():
-    raise docker.errors.DockerException("Could not communicate with the Docker Engine")
+try:
+    client = docker.from_env()
+    if not client.ping():
+        raise RuntimeError("Could not communicate with the Docker Engine.")
+except docker.errors.DockerException as e:
+    raise RuntimeError("Could not create a Docker client.")
 
 logger = logging.getLogger(__name__)
 
 _trace_script = Path(__file__).parent / "_trace.sh"
 _prune_script = Path(__file__).parent / "_prune.py"
-
-# Sync with _trace.sh
-_log_prefix = "NEURODOCKER (in container):"
 
 
 def copy_file_to_container(
