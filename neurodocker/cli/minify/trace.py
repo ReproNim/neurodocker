@@ -26,7 +26,7 @@ try:
     client = docker.from_env()
     if not client.ping():
         raise RuntimeError("Could not communicate with the Docker Engine.")
-except docker.errors.DockerException as e:
+except docker.errors.DockerException:
     raise RuntimeError("Could not create a Docker client.")
 
 logger = logging.getLogger(__name__)
