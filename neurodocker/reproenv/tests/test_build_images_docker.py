@@ -18,7 +18,7 @@ def test_build_a(tmp_path):
     d.run("echo foobar")
     d.user("nonroot")
     d.workdir("/opt/foobar")
-    d.entrypoint(["printf", "hi there"])
+    d.entrypoint(["echo", "hi there"])
 
     # Create the paths that are copied in the Dockerfile.
     (tmp_path / "tst").mkdir(exist_ok=True)
@@ -34,5 +34,5 @@ def test_build_a(tmp_path):
     stdout = client.containers.run(image=image, entrypoint="ls /opt")
     assert set(stdout.decode().splitlines()) == {"baz.txt", "foo.txt", "foobar"}
 
-    stdout = client.containers.run(image=image)
+    stdout = client.containers.run(image=image, tty=True)
     assert stdout.decode().strip() == "hi there"
