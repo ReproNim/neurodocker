@@ -205,6 +205,11 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
             help="Set persistent environment variables",
         ),
         OptionEatAll(
+            ["--entrypoint"],
+            multiple=True,
+            help="Set entrypoint of the container",
+        ),
+        OptionEatAll(
             ["--install"],
             multiple=True,
             help="Install packages with system package manager",
@@ -301,6 +306,13 @@ def _get_instruction_for_param(
     elif param.name == "env":
         value = dict(value)
         d = {"name": param.name, "kwds": {**value}}
+    # entrypoint
+    elif param.name == "entrypoint":
+        if isinstance(value, str):
+            value = [value]
+        else:
+            value = list(value)
+        d = {"name": param.name, "kwds": {"args": value}}
     # install
     elif param.name == "install":
         opts = None

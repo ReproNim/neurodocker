@@ -54,6 +54,9 @@
             "$ref": "#/definitions/env"
           },
           {
+            "$ref": "#/definitions/entrypoint"
+          },
+          {
             "$ref": "#/definitions/install"
           },
           {
@@ -183,6 +186,37 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "entrypoint": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "entrypoint"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "args"
+          ],
+          "properties": {
+            "args": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "examples": [],

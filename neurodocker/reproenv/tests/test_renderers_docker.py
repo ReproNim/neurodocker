@@ -281,3 +281,13 @@ USER nonroot
 WORKDIR /opt/foobar
 RUN bash -c 'source activate'"""
     )
+
+    d = DockerRenderer("apt")
+    d.from_("debian:buster-slim")
+    d.entrypoint(["echo", "foo bar"])
+    assert (
+        str(d)
+        == """\
+FROM debian:buster-slim
+ENTRYPOINT ["echo", "foo bar"]"""
+    )

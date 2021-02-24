@@ -16,6 +16,7 @@ def test_build_a(tmp_path):
     d.run("echo foobar")
     d.user("nonroot")
     d.workdir("/opt/foobar")
+    d.entrypoint(["echo", "hi there"])
 
     # Create the paths that are copied in the Dockerfile.
     (tmp_path / "tst").mkdir(exist_ok=True)
@@ -29,7 +30,12 @@ def test_build_a(tmp_path):
     sing_path.write_text(str(d))
     _ = singularity_build(image_path=sif_path, build_spec=sing_path, cwd=tmp_path)
     completed = subprocess.run(
-        f"singularity run {sif_path} ls /opt".split(), capture_output=True, check=True
+        f"singularity exec {sif_path} ls /opt".split(), capture_output=True, check=True
     )
     files_found = set(completed.stdout.decode().splitlines())
     assert files_found == {"baz.txt", "foo.txt", "foobar"}
+
+    completed = subprocess.run(
+        f"singularity run {sif_path}".split(), capture_output=True, check=True
+    )
+    assert completed.stdout.decode().strip() == "hi there"

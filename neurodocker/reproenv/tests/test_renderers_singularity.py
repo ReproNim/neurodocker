@@ -295,3 +295,16 @@ bash -c 'source activate'
 %labels
 ORG BAZ"""
     )
+
+    s = SingularityRenderer("apt")
+    s.from_("debian:buster-slim")
+    s.entrypoint(["echo", "foobar baz"])
+    assert (
+        str(s)
+        == """\
+Bootstrap: docker
+From: debian:buster-slim
+
+%runscript
+echo foobar baz"""
+    )

@@ -296,6 +296,9 @@ class _Renderer:
     def env(self, **kwds: ty.Mapping[str, str]) -> _Renderer:
         raise NotImplementedError()
 
+    def entrypoint(self, args: ty.List[str]) -> _Renderer:
+        raise NotImplementedError()
+
     def from_(self, base_image: str) -> _Renderer:
         raise NotImplementedError()
 
@@ -363,6 +366,11 @@ class DockerRenderer(_Renderer):
     def env(self, **kwds: ty.Mapping[str, str]) -> DockerRenderer:
         """Add a Dockerfile `ENV` instruction."""
         s = "ENV " + " \\\n    ".join(f'{k}="{v}"' for k, v in kwds.items())
+        self._parts.append(s)
+        return self
+
+    def entrypoint(self, args: ty.List[str]) -> DockerRenderer:
+        s = 'ENTRYPOINT ["{}"]'.format('", "'.join(args))
         self._parts.append(s)
         return self
 
@@ -495,6 +503,10 @@ class SingularityRenderer(_Renderer):
     def env(self, **kwds: ty.Mapping[str, str]) -> SingularityRenderer:
         # TODO: why does this raise a type error?
         self._environment.extend(kwds.items())  # type: ignore
+        return self
+
+    def entrypoint(self, args: ty.List[str]) -> SingularityRenderer:
+        self._runscript = " ".join(args)
         return self
 
     def from_(self, base_image: str) -> SingularityRenderer:
