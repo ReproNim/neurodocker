@@ -113,7 +113,11 @@ See :code:`neurodocker minify --help` for more information.
 
 .. note::
 
-    Neurodocker must be installed with `pip` to minify containers.
+    Neurodocker must be installed with :code:`pip` to minify containers.
+
+    .. code-block::
+
+        pip install neurodocker[minify]
 
 In the example below, we minify one of the official Python Docker images for certain
 commands. This will remove all of the files in :code:`/usr/local/` that are not used by
