@@ -10,3 +10,4 @@ User Guide
     common_uses
     templates_renderers
     add_template
+    known_issues
