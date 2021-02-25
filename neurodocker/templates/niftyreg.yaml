@@ -1,0 +1,42 @@
+# Template for niftyreg.
+name: niftyreg
+source:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/niftyreg-{{ self.version }}
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
+      make_opts: -j1
+  dependencies:
+    apt:
+    - ca-certificates
+    - cmake
+    - g++
+    - gcc
+    - git
+    - make
+    yum:
+    - ca-certificates
+    - cmake
+    - gcc-c++
+    - git
+    - make
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$LD_LIBRARY_PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    mkdir -p /tmp/niftyreg/build
+    git clone https://github.com/KCL-BMEIS/niftyreg /tmp/niftyreg/source
+    {% if self.version != "master" and self.version != "latest" -%}
+    cd /tmp/niftyreg/source
+    git fetch --tags
+    git checkout {{ self.version }}
+    {% endif -%}
+    cd /tmp/niftyreg/build
+    cmake {{ self.cmake_opts }} /tmp/niftyreg/source
+    make {{ self.make_opts }}
+    make install
+    ldconfig
+    rm -rf /tmp/niftyreg
