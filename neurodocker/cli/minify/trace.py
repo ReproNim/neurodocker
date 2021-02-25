@@ -95,10 +95,12 @@ def _get_mounts(container: docker.models.containers.Container) -> dict:
     multiple=True,
     help="Directories in container to prune. Data will be lost in these directories",
 )
+@click.option("--yes", is_flag=True, help="Reply yes to all prompts.")
 @click.argument("command", nargs=-1, required=True)
 def minify(
     container: ty.Union[str, docker.models.containers.Container],
     directories_to_prune: ty.Tuple[str],
+    yes: bool,
     command: ty.Tuple[str],
 ) -> None:
     """Minify a container.
@@ -186,7 +188,10 @@ def minify(
         " FOR DATA LOSS. ALL OF THE FILES LISTED ABOVE WILL BE REMOVED.",
         fg="yellow",
     )
-    click.confirm("Proceed?", abort=True)
+    if yes:
+        click.secho("Proceeding because --yes was provided", fg="green")
+    else:
+        click.confirm("Proceed?", abort=True)
     click.echo("Removing files ...")
     ret, result = container.exec_run(
         'xargs -d "\n" -a /tmp/neurodocker-reprozip-trace/TO_DELETE.list rm -f'

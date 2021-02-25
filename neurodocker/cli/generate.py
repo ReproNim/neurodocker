@@ -233,6 +233,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
             help="Switch to a different user (create user if it does not exist)",
         ),
         click.Option(["--workdir"], multiple=True, help="Set the working directory"),
+        click.Option(["--yes"], is_flag=True, help="Reply yes to all prompts."),
     ]
     return params
 
@@ -354,9 +355,15 @@ def _get_instruction_for_param(
             # If the template has an alert, prompt the user for confirmation.
             tmpl = Template(get_template(tmpl_name))
             if tmpl.alert:
-                # TODO: add color to this to make it visible, perhaps yellow. But there
-                # is no color option in `click.confirm`.
-                click.confirm(f"{tmpl.alert} Proceed?", abort=True, err=True)
+                # If user provides --yes flag, print message but do not ask for
+                # confirmation.
+                yes = ctx.params.get("yes")
+                if yes:
+                    click.secho(tmpl.alert, fg="yellow", err=True)
+                else:
+                    # TODO: add color to this to make it visible, perhaps yellow. But
+                    # there is no color option in `click.confirm`.
+                    click.confirm(f"{tmpl.alert} Proceed?", abort=True, err=True)
         else:
             # TODO: should we do anything special with unknown options? Probably log it.
             pass
