@@ -38,6 +38,7 @@ source:
     required:
     - version
     optional:
+      fork: https://github.com/ANTsX/ANTs.git
       install_path: /opt/ants-{{ self.version }}
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
       make_opts: -j1
@@ -64,7 +65,7 @@ source:
   instructions: |
     {{ self.install_dependencies() }}
     mkdir -p /tmp/ants/build
-    git clone https://github.com/ANTsX/ANTs.git /tmp/ants/source
+    git clone {{ self.fork }} /tmp/ants/source
     {% if self.version != "master" and self.version != "latest" -%}
     cd /tmp/ants/source
     git fetch --tags

@@ -36,6 +36,7 @@ source:
     required:
     - version
     optional:
+      fork: https://github.com/rordenlab/dcm2niix
       install_path: /opt/dcm2niix-{{ self.version }}
       cmake_opts: ""
       make_opts: -j1
@@ -62,7 +63,7 @@ source:
     PATH: "{{ self.install_path }}/bin:$PATH"
   instructions: |
     {{ self.install_dependencies() }}
-    git clone https://github.com/rordenlab/dcm2niix /tmp/dcm2niix
+    git clone {{ self.fork }} /tmp/dcm2niix
     {% if self.version != "master" and self.version != "latest" -%}
     cd /tmp/dcm2niix
     git fetch --tags

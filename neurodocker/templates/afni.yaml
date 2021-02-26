@@ -78,6 +78,7 @@ source:
     required:
     - version
     optional:
+      fork: https://github.com/afni/afni.git
       install_path: /opt/afni-{{ self.version }}
       install_r_pkgs: "false"
       install_python3: "false"
@@ -139,7 +140,7 @@ source:
     {{ self.install_dependencies() }}
     {%- if self.install_python3.lower() in ["true", "1", "y"] %}
     {{ self.install(["python3"]) }}{% endif %}
-    git clone https://github.com/afni/afni.git {{ self.install_path }}
+    git clone {{ self.fork }} {{ self.install_path }}
     cd {{ self.install_path }}
     {% if self.version != "master" and self.version != "latest" -%}
     git fetch --tags
