@@ -40,6 +40,7 @@ source:
     required:
     - version
     optional:
+      repo: https://github.com/MRtrix3/mrtrix3.git
       install_path: /opt/mrtrix3-{{ self.version }}
       build_processes: ""
   dependencies:
@@ -67,7 +68,7 @@ source:
   instructions: |
     {{ self.install_dependencies() }}
     mkdir -p {{ self.install_path }}
-    git clone https://github.com/MRtrix3/mrtrix3.git {{ self.install_path }}
+    git clone {{ self.repo }} {{ self.install_path }}
     cd {{ self.install_path }}
     {% if self.version != "master" and self.version != "latest" -%}
     git checkout {{ self.version }}
