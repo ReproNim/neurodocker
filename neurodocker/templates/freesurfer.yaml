@@ -86,3 +86,44 @@ binaries:
       {%- endif -%}
     {%- endfor %}
     {%- endif %}
+
+source:
+  arguments:
+    required:
+    - version
+    optional:
+      repo: https://github.com/freesurfer/freesurfer
+      source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
+      pkg_uri: hello
+      pkg_path: /tmp/freesurfer/pkg
+      install_path: /opt/freesurfer-{{ self.version }}
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS=OFF -DMINIMAL=ON -DFS_PACKAGES_DIR={{ self.pkg_path }}
+      make_opts: -j1
+  dependencies:
+    apt:
+    - ca-certificates
+    - cmake
+    - g++
+    - gcc
+    - git
+    - make
+    yum:
+    - ca-certificates
+    - cmake
+    - gcc-c++
+    - git
+    - make
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$LD_LIBRARY_PATH"
+  instructions: |
+    mkdir -p {{ self.install_path }}
+    git clone {{ self.repo }} {{ self.source_path }}
+    {% if self.version != "master" and self.version != "latest" -%}
+    cd {{ self.source_path }}
+    git fetch --tags
+    git checkout {{ self.version }}
+    {% endif -%}
+    cd {{ self.install_path }}
+    cmake {{ self.cmake_opts }} {{ self.source_path }}
+    make {{ self.make_opts }}
