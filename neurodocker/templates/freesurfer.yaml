@@ -114,8 +114,28 @@ source:
     - git
     - make
   env:
-    PATH: "{{ self.install_path }}/bin:$PATH"
-    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$LD_LIBRARY_PATH"
+    # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
+    # freesurfer env
+    OS: "Linux"
+    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    FREESURFER_HOME: "{{ self.install_path }}"
+    FREESURFER: "{{ self.install_path }}"
+    SUBJECTS_DIR: "{{ self.install_path }}/subjects"
+    LOCAL_DIR: "{{ self.install_path }}/local"
+    FSFAST_HOME: "{{ self.install_path }}/fsfast"
+    FMRI_ANALYSIS_DIR: "{{ self.install_path }}/fsfast"
+    FUNCTIONALS_DIR: "{{ self.install_path }}/sessions"
+    # default freesurfer options
+    FS_OVERRIDE: "0"
+    FIX_VERTEX_AREA: ""
+    FSF_OUTPUT_FORMAT: "nii.gz# mni env requirements"
+    # mni environment requirements
+    MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
+    MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
+    MNI_DIR: "{{ self.install_path }}/mni"
+    MNI_DATAPATH: "{{ self.install_path }}/mni/data"
+    MNI_PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
+    PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
   instructions: |
     mkdir -p {{ self.install_path }}
     git clone {{ self.repo }} {{ self.source_path }}
