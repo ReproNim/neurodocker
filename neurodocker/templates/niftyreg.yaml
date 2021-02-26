@@ -5,6 +5,7 @@ source:
     required:
     - version
     optional:
+      repo: https://github.com/KCL-BMEIS/niftyreg
       install_path: /opt/niftyreg-{{ self.version }}
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
       make_opts: -j1
@@ -28,7 +29,7 @@ source:
   instructions: |
     {{ self.install_dependencies() }}
     mkdir -p /tmp/niftyreg/build
-    git clone https://github.com/KCL-BMEIS/niftyreg /tmp/niftyreg/source
+    git clone {{ self.repo }} /tmp/niftyreg/source
     {% if self.version != "master" and self.version != "latest" -%}
     cd /tmp/niftyreg/source
     git fetch --tags
