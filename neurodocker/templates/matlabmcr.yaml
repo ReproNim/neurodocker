@@ -9,7 +9,7 @@ binaries:
     required:
     - version
     optional:
-      curl_opts: -v
+      curl_opts: ""
       install_path: /opt/MCR-{{ self.version }}
   urls:
     "2019b": http://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/1/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019b_Update_1_glnxa64.zip
@@ -24,6 +24,7 @@ binaries:
     "2015aSP1": https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015aSP1/installers/glnxa64/MCR_R2015aSP1_glnxa64_installer.zip
     "2015a": https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015a/installers/glnxa64/MCR_R2015a_glnxa64_installer.zip
     "2014a": https://ssd.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip
+    "2014b": https://ssd.mathworks.com/supportfiles/downloads/R2014b/deployment_files/R2014b/installers/glnxa64/MCR_R2014b_glnxa64_installer.zip
     "2013b": https://ssd.mathworks.com/supportfiles/downloads/R2013b/deployment_files/R2013b/installers/glnxa64/MCR_R2013b_glnxa64_installer.zip
     "2013a": https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2013a/MCR_R2013a_glnxa64_installer.zip
     "2012b": https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012b/MCR_R2012b_glnxa64_installer.zip

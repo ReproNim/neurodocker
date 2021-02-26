@@ -64,7 +64,7 @@ binaries:
     # default freesurfer options
     FS_OVERRIDE: "0"
     FIX_VERTEX_AREA: ""
-    FSF_OUTPUT_FORMAT: "nii.gz# mni env requirements"
+    FSF_OUTPUT_FORMAT: "nii.gz"
     # mni environment requirements
     MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
     MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
@@ -128,7 +128,7 @@ source:
     # default freesurfer options
     FS_OVERRIDE: "0"
     FIX_VERTEX_AREA: ""
-    FSF_OUTPUT_FORMAT: "nii.gz# mni env requirements"
+    FSF_OUTPUT_FORMAT: "nii.gz"
     # mni environment requirements
     MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
     MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
@@ -138,12 +138,7 @@ source:
     PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
   instructions: |
     mkdir -p {{ self.install_path }}
-    git clone {{ self.repo }} {{ self.source_path }}
-    {% if self.version != "master" and self.version != "latest" -%}
-    cd {{ self.source_path }}
-    git fetch --tags
-    git checkout {{ self.version }}
-    {% endif -%}
+    git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
     cd {{ self.install_path }}
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
