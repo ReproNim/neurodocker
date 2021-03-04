@@ -222,6 +222,7 @@ source:
     git fetch datasrc
     # PW 2021/03/04: Werid.. this returns an error code, but things still work?
     #                So hardwire the exit code to zero so `docker build` doesn't error out
+    #                THis is because surfer.nmr now runs git-annex 8. todo: upgrade
     git annex enableremote datasrc || true
     git annex get -q .
     # Compile and install
