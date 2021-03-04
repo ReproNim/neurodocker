@@ -100,10 +100,14 @@ def _log_instruction(func: ty.Callable):
         # We remove key-value pairs where value is None, because the schema does not
         # allow for None values.
         # TODO: consider this further...
-        arguments = inspect.getcallargs(func, self, *args, **kwds)
-        arguments.pop("self", None)  # Remove self
-        arguments = {k: v for k, v in arguments.items() if v is not None}
-        d = {"name": func.__name__, "kwds": arguments}
+        sig = inspect.signature(func)
+        bargs = sig.bind(self, *args, **kwds)
+        # self is not an argument in the spec, but it is present because these are
+        # instance methods.
+        del bargs.arguments["self"]
+        # We could apply defaults with `bargs.apply_defaults()` but we do not because
+        # many defaults are None and the renderer schema does not support null values.
+        d = {"name": func.__name__, "kwds": dict(bargs.arguments)}
         self._instructions["instructions"].append(d)
         return func(self, *args, **kwds)
 
