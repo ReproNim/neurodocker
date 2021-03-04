@@ -98,7 +98,7 @@ source:
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS=OFF -DMINIMAL=ON -DFS_PACKAGES_DIR={{ self.pkg_path }}
-      make_opts: -j1
+      make_opts: -j4
   env:
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
     # freesurfer env
@@ -127,6 +127,7 @@ source:
     - ca-certificates
     - cmake
     - git
+    - git-annex
     - make
     - bc
     - binutils
@@ -171,24 +172,62 @@ source:
   instructions: |
     {{ self.install_dependencies() }}
     # Compile with gcc 4.8
+    # --------------------
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
     update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.8 100
-    # FreeSurfer needs CMake 3.9 or higher
-    mkdir -p /tmp/cmake
-    cd /tmp/cmake
-    curl -sSL --retry 5 https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz | tar -xz
-    cd cmake-3.12.3 
+    # FreeSurfer needs python > 3.6 (? todo: verify)
+    # From: https://github.com/pwighton/fs-docker/blob/09cc6b0b6c0538cbb182b04435daf85c123a63d5/build/Dockerfile#L66
+    # Alternative is https://github.com/ReproNim/neurodocker/blob/master/neurodocker/templates/afni.yaml
+    # But it installs python 3.5
+    # -------------------------------------------------------------------------
+    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tgz | tar -xz -C /tmp
+    cd /tmp/Python-3.6.5
     ./configure
     make
-    make install
-    ###
+    make install 
+    cd /
+    rm -rf /tmp/Python-3.6.5
+    pip3 install -q --no-cache-dir -U pip
+    pip3 install -q --no-cache-dir wheel
+    sync
+    # FreeSurfer needs CMake 3.9 or higher
+    # Taken from: https://github.com/Rikorose/gcc-cmake/blob/master/gcc-4/Dockerfile
+    # ------------------------------------------------------------------------------
+    wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /tmp/cmake-install.sh
+    chmod u+x /tmp/cmake-install.sh
+    mkdir -p /usr/share/cmake-3.19.0
+    /tmp/cmake-install.sh --skip-license --prefix=/usr/share/cmake-3.19.0
+    CMAKE_BINPATH=`which cmake`
+    rm -rf $CMAKE_BINPATH
+    ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
+    rm /tmp/cmake-install.sh
+    # FreeSurfer needs a modern (>6.0? todo verify) version of git annex
+    # ----------------------------------------------------------------   
+    curl -sSL --retry 5 https://downloads.kitenet.net/git-annex/linux/current/git-annex-standalone-amd64.tar.gz | tar -xz -C /usr/share
+    GITANNEX_BINPATH=`which git-annex`
+    rm -rf $GITANNEX_BINPATH
+    ln -s /usr/share/git-annex.linux/git-annex $GITANNEX_BINPATH
+    # Compile FreeSurfer
+    # https://github.com/pwighton/fs-docker (todo: maybe a newer way?)
+    # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
     wget -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
-    cd {{ self.install_path }}
-    cmake {{ self.cmake_opts }} {{ self.source_path }}
-    make {{ self.make_opts }}
+    # Files needed to be downloaded from the annex before we can run `make install`
+    # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
+    # -------------------------------------------------
+    cd {{ self.source_path }}
+    # git remote add datasrc https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
+    # git fetch datasrc
+    # git annex enableremote datasrc
+    # git annex get .
+    # Compile and install
+    # -------------------------------------------------
+    # cd {{ self.install_path }}
+    # cmake {{ self.cmake_opts }} {{ self.source_path }}
+    # make {{ self.make_opts }}
+    # make install
