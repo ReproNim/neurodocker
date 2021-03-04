@@ -92,14 +92,24 @@ source:
     required:
     - version
     optional:
+      license_base64: ""
       repo: https://github.com/freesurfer/freesurfer
-      source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_url: http://surfer.nmr.mgh.harvard.edu/pub/data/fspackages/prebuilt/centos7-packages.tar.gz
+      annex: https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
+      minimal: "ON"
+      build_guis: "OFF"
+      infant_module: "OFF"
+      install_python_deps: "OFF"
+      distribute_fspython: "OFF"
+      fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
+      source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
-      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS=OFF -DMINIMAL=ON -DFS_PACKAGES_DIR={{ self.pkg_path }}
+      license_path: /opt/freesurfer/license.txt
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }}
       make_opts: -j4
   env:
+    FS_LICENSE: "{{ self.license_path }}"
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
     # freesurfer env
     OS: "Linux"
@@ -218,11 +228,11 @@ source:
     # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
     # -------------------------------------------------
     cd {{ self.source_path }}
-    git remote add datasrc https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
+    git remote add datasrc {{ self.annex }}
     git fetch datasrc
     # PW 2021/03/04: Werid.. this returns an error code, but things still work?
     #                So hardwire the exit code to zero so `docker build` doesn't error out
-    #                THis is because surfer.nmr now runs git-annex 8. todo: upgrade
+    #                This is because surfer.nmr now runs git-annex 8(?) todo: upgrade
     git annex enableremote datasrc || true
     git annex get -q .
     # Compile and install
@@ -231,3 +241,9 @@ source:
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
     make install
+    # If self.license_base64 populated, decode from base64 and write to self.license_path
+    # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
+    # -------------------------------------------------
+    if [ -n "{{ self.license_base64 }}" ]; then \
+      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}; \
+    fi
