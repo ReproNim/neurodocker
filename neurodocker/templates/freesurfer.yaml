@@ -105,7 +105,8 @@ source:
       source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
-      license_path: /opt/freesurfer/license.txt
+      # This one has to be quoted with \"s for some reason
+      license_path: "{{ self.install_path }}/license.txt"
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }}
       make_opts: -j4
   env:
