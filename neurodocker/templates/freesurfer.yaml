@@ -171,6 +171,9 @@ source:
     - make
   instructions: |
     {{ self.install_dependencies() }}
+    # git config
+    git config --global user.email "CI@example.com"
+    git config --global user.name "CI"
     # Compile with gcc 4.8
     # --------------------
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
@@ -207,7 +210,7 @@ source:
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
-    wget -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
+    wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
