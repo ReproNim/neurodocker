@@ -202,12 +202,6 @@ source:
     rm -rf $CMAKE_BINPATH
     ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
     rm /tmp/cmake-install.sh
-    # FreeSurfer needs a modern (>6.0? todo verify) version of git annex
-    # ----------------------------------------------------------------   
-    curl -sSL --retry 5 https://downloads.kitenet.net/git-annex/linux/current/git-annex-standalone-amd64.tar.gz | tar -xz -C /usr/share
-    GITANNEX_BINPATH=`which git-annex`
-    rm -rf $GITANNEX_BINPATH
-    ln -s /usr/share/git-annex.linux/git-annex $GITANNEX_BINPATH
     # Compile FreeSurfer
     # https://github.com/pwighton/fs-docker (todo: maybe a newer way?)
     # ----------------------------------------------------------------
@@ -221,13 +215,15 @@ source:
     # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
     # -------------------------------------------------
     cd {{ self.source_path }}
-    # git remote add datasrc https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
-    # git fetch datasrc
-    # git annex enableremote datasrc
-    # git annex get .
+    git remote add datasrc https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
+    git fetch datasrc
+    # PW 2021/03/04: Werid.. this returns an error code, but things still work?
+    #                So hardwire the exit code to zero so `docker build` doesn't error out
+    git annex enableremote datasrc || true
+    git annex get -q .
     # Compile and install
     # -------------------------------------------------
-    # cd {{ self.install_path }}
-    # cmake {{ self.cmake_opts }} {{ self.source_path }}
-    # make {{ self.make_opts }}
-    # make install
+    cd {{ self.install_path }}
+    cmake {{ self.cmake_opts }} {{ self.source_path }}
+    make {{ self.make_opts }}
+    make install
