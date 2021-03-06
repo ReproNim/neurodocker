@@ -377,12 +377,20 @@ class _Renderer:
     def workdir(self, path: os.PathLike) -> _Renderer:
         raise NotImplementedError()
 
+    def to_json(self, **json_kwds) -> str:
+        """Return instructions used in this renderer in JSON format.
+
+        json_kwds are keyword arguments passed to `json.dumps`.
+        """
+        return json.dumps(self._instructions, **json_kwds)
+
     def _get_instructions(self) -> str:
         """Return string representation of a printf command that writes the renderer
         instructions to a JSON file in the container.
         """
-        j = json.dumps(self._instructions, indent=2)
-        # Double-escape escaped sequences.
+        j = self.to_json(indent=2)
+        # Double-escape escaped sequences so that when printf is done with them, they
+        # are escaped with a single slash.
         j = j.replace("\\", "\\\\")
         cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
