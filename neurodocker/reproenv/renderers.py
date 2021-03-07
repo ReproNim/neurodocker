@@ -101,13 +101,26 @@ def _log_instruction(func: ty.Callable):
         # allow for None values.
         # TODO: consider this further...
         sig = inspect.signature(func)
+
+        # We could apply defaults with `bargs.apply_defaults()` but we do not because
+        # many defaults are None and the renderer schema does not support null values.
         bargs = sig.bind(self, *args, **kwds)
         # self is not an argument in the spec, but it is present because these are
         # instance methods.
         del bargs.arguments["self"]
-        # We could apply defaults with `bargs.apply_defaults()` but we do not because
-        # many defaults are None and the renderer schema does not support null values.
+
+        # If a function takes **kwds, save those without wrapping them in another dict.
+        # Assume that **kwds arguments are _always_ kwds (eg, not kwargs).
+        # TODO: generalize this to work on any VAR_KEYWORD parameter.
+        kwds_param = sig.parameters.get("kwds")
+        if kwds_param is not None:
+            if kwds_param.kind == kwds_param.VAR_KEYWORD:
+                bargs_kwds = bargs.arguments.pop("kwds")
+                if bargs_kwds is not None:
+                    bargs.arguments.update(bargs_kwds)
+
         d = {"name": func.__name__, "kwds": dict(bargs.arguments)}
+
         self._instructions["instructions"].append(d)
         return func(self, *args, **kwds)
 
