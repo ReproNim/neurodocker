@@ -5,7 +5,9 @@
 
 # TODO: add a dedicated class for key=value in the eat-all class.
 
+import json as json_lib
 from pathlib import Path
+import sys
 import typing as ty
 
 import click
@@ -438,3 +440,32 @@ def singularity(ctx: click.Context, pkg_manager: str, **kwds):
         pkg_manager=pkg_manager,
         **kwds,
     )
+
+
+@click.command()
+@click.argument(
+    "container_type",
+    required=True,
+    type=click.Choice(["docker", "singularity"], case_sensitive=False),
+)
+@click.argument(
+    "input",
+    type=click.File("r"),
+    default=sys.stdin,
+)
+def genfromjson(*, container_type: str, input: ty.IO):
+    """Generate a container from a ReproEnv JSON file.
+
+    INPUT is standard input by default or a path to a JSON file.
+    """
+    d = json_lib.load(input)
+
+    renderer: ty.Type[_Renderer]
+    if container_type.lower() == "docker":
+        renderer = DockerRenderer
+    elif container_type.lower() == "singularity":
+        renderer = SingularityRenderer
+
+    r = renderer.from_dict(d)
+    spec = str(r)
+    click.echo(spec)
