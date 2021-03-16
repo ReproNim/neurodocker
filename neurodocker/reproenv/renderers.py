@@ -405,6 +405,8 @@ class _Renderer:
         # Double-escape escaped sequences so that when printf is done with them, they
         # are escaped with a single slash.
         j = j.replace("\\", "\\\\")
+        # Add slash to the end of each line, except the last.
+        j = " \\\n".join(j.splitlines())
         cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
