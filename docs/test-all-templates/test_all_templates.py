@@ -83,7 +83,7 @@ def get_template_params() -> list:
                 id=name_kwds_to_id(name, kwds),
             )
             params.append(p)
-    return params[10:11]
+    return params
 
 
 @pytest.mark.parametrize("template,template_kwds", get_template_params())
