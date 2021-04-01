@@ -139,11 +139,22 @@ class _Renderer:
 
         self.pkg_manager = pkg_manager
         self._users = {"root"} if users is None else users
+        # This keeps track of the current user. This is useful when saving the JSON
+        # specification to JSON, because if we are not root, we can change to root,
+        # write the file, and return to whichever user we were.
+        self._current_user = "root"
         self._instructions: ty.Mapping = {
             "pkg_manager": self.pkg_manager,
             "existing_users": list(self._users),
             "instructions": [],
         }
+
+        # Strings (comments) that indicate the beginning and end of saving the JSON
+        # spec to a file. This helps us in testing because sometimes we don't care
+        # about the JSON but we do care about everything else. We can remove the
+        # content between these two strings.
+        self._json_save_start = "# Save specification to JSON."
+        self._json_save_end = "# End saving to specification to JSON."
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (_Renderer, str)):
@@ -421,7 +432,15 @@ class DockerRenderer(_Renderer):
     def render(self) -> str:
         """Return the rendered Dockerfile."""
         s = "\n".join(self._parts)
-        s += f"\n\n# Save specification to file.\nRUN {self._get_instructions()}"
+
+        # Save specification to JSON.
+        s += f"\n\n{self._json_save_start}"
+        if self._current_user != "root":
+            s += "\nUSER root"
+        s += f"\nRUN {self._get_instructions()}"
+        if self._current_user != "root":
+            s += f"\nUSER {self._current_user}"
+        s += f"\n{self._json_save_end}"
         s = s.strip()  # Prune whitespace from beginning and end.
         return s
 
@@ -519,6 +538,7 @@ class DockerRenderer(_Renderer):
             self._parts.append(s)
             self._users.add(user)
         self._parts.append(f"USER {user}")
+        self._current_user = user
         return self
 
     @_log_instruction
@@ -563,10 +583,18 @@ class SingularityRenderer(_Renderer):
                 s += f'\nexport {k}="{v}"'
 
         # Add post.
-        if self._post:
-            s += "\n\n%post\n"
-            s += "\n\n".join(self._post)
-            s += f"\n\n# Save specification to file.\n{self._get_instructions()}"
+        # There will always be a post section, because we always want to add the
+        # reproenv specification.
+        s += "\n\n%post\n"
+        # This section might be empty, but that is OK.
+        s += "\n\n".join(self._post)
+        s += f"\n\n{self._json_save_start}"
+        if self._current_user != "root":
+            s += "\nsu - root"
+        s += f"\n{self._get_instructions()}"
+        if self._current_user != "root":
+            s += f"\nsu - {self._current_user}"
+        s += f"\n{self._json_save_end}"
 
         # Add runscript.
         if self._runscript:
@@ -659,6 +687,7 @@ class SingularityRenderer(_Renderer):
             self._users.add(user)
             self._post.append(post)
         self._post.append(f"su - {user}")
+        self._current_user = user
         return self
 
     @_log_instruction
