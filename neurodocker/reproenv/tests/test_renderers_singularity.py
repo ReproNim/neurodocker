@@ -3,6 +3,7 @@ import pytest
 from neurodocker.reproenv.exceptions import RendererError
 from neurodocker.reproenv.renderers import SingularityRenderer
 from neurodocker.reproenv.template import Template
+from neurodocker.reproenv.tests.utils import prune_rendered
 
 
 def test_singularity_renderer_add_template():
@@ -39,11 +40,11 @@ def test_singularity_renderer_add_template():
     # Test apt.
     s = SingularityRenderer("apt")
     s.add_template(Template(d, binaries_kwds=dict(myname="Bjork")), method="binaries")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
-
-
 %environment
 export foo="bar"
 
@@ -71,11 +72,11 @@ echo hello Bjork"""
 
     s = SingularityRenderer("apt")
     s.add_template(Template(d), method="binaries")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
-
-
 %environment
 export foo="bar"
 
@@ -92,23 +93,10 @@ def test_singularity_render_from_instance_methods():
     s = SingularityRenderer("apt")
     s.from_("alpine")
     s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
-        == """\
-Bootstrap: docker
-From: alpine
-
-%files
-foo/bar/baz.txt /opt/
-foo/baz/cat.txt /opt/"""
-    )
-
-    s = SingularityRenderer("apt")
-    s.from_("alpine")
-    s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
-    s.env(FOO="BAR")
-    assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -117,18 +105,17 @@ From: alpine
 foo/bar/baz.txt /opt/
 foo/baz/cat.txt /opt/
 
-%environment
-export FOO="BAR\""""
+%post"""
     )
 
-    # Label
     s = SingularityRenderer("apt")
     s.from_("alpine")
     s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
     s.env(FOO="BAR")
-    s.label(ORG="BAZ")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -139,6 +126,33 @@ foo/baz/cat.txt /opt/
 
 %environment
 export FOO="BAR"
+
+%post"""
+    )
+
+    # Label
+    s = SingularityRenderer("apt")
+    s.from_("alpine")
+    s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
+    s.env(FOO="BAR")
+    s.label(ORG="BAZ")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
+    assert (
+        rendered
+        == """\
+Bootstrap: docker
+From: alpine
+
+%files
+foo/bar/baz.txt /opt/
+foo/baz/cat.txt /opt/
+
+%environment
+export FOO="BAR"
+
+%post
+
 
 %labels
 ORG BAZ"""
@@ -151,8 +165,10 @@ ORG BAZ"""
     s.env(FOO="BAR")
     s.label(ORG="BAZ")
     s.run("echo foobar")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -179,8 +195,10 @@ ORG BAZ"""
     s.label(ORG="BAZ")
     s.run("echo foobar")
     s.user("nonroot")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -216,8 +234,10 @@ ORG BAZ"""
     s.workdir("/opt/foo")
     s.user("root")
     s.user("nonroot")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -261,8 +281,10 @@ ORG BAZ"""
     s.user("root")
     s.user("nonroot")
     s.run_bash("source activate")
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: alpine
@@ -299,11 +321,16 @@ ORG BAZ"""
     s = SingularityRenderer("apt")
     s.from_("debian:buster-slim")
     s.entrypoint(["echo", "foobar baz"])
+    rendered = str(s)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(s)
+        rendered
         == """\
 Bootstrap: docker
 From: debian:buster-slim
+
+%post
+
 
 %runscript
 echo foobar baz"""

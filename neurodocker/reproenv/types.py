@@ -5,6 +5,14 @@ import typing as ty
 from mypy_extensions import TypedDict
 from typing_extensions import Literal
 
+# The path to the JSON file within the container, which contains the information of
+# how the container was generated. The contents of the JSON file conform to the
+# renderer schema, and the dictionary can be used to instantiate a new renderer object,
+# which will reproduce the Dockerfile or Singularity recipe.
+# Note that at the time of writing (04 March 2021), there is no version checking on the
+# renderer dictionary, so compatibility is not guaranteed.
+REPROENV_SPEC_FILE_IN_CONTAINER = "/.reproenv.json"
+
 allowed_installation_methods = {"binaries", "source"}
 installation_methods_type = Literal["binaries", "source"]
 

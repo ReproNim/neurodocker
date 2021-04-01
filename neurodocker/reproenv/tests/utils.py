@@ -69,3 +69,21 @@ def singularity_build(
         str(build_spec),
     ]
     return subprocess.run(cmds, check=True, cwd=cwd)
+
+
+def prune_rendered(r: str) -> str:
+    # Remove portion that saves JSON to file.
+    lines = r.splitlines()
+    start_bad = lines.index("# Save specification to JSON.")
+    end_bad = lines.index("# End saving to specification to JSON.")
+    new_lines = lines[: start_bad - 1] + lines[end_bad + 1 :]
+    r = "\n".join(new_lines)
+
+    # Remove comments.
+    # This part has to happen _after_ removing the JSON, because
+    # JSON is removed based on a certain comment.
+    r = "\n".join(line for line in r.splitlines() if not line.startswith("#"))
+
+    # TODO: should we remove empty lines?
+
+    return r

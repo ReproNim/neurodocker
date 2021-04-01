@@ -2,6 +2,7 @@ import click
 
 from neurodocker import __version__
 from neurodocker.cli.generate import generate
+from neurodocker.cli.generate import genfromjson
 
 
 @click.group()
@@ -14,6 +15,7 @@ def cli():
 
 
 cli.add_command(generate)
+cli.add_command(genfromjson)
 
 # `docker-py` is required for minification but is not installed by default.
 # We also pass if there is an error retrieving the Docker client.

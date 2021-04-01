@@ -3,6 +3,7 @@ import pytest
 from neurodocker.reproenv.exceptions import RendererError
 from neurodocker.reproenv.renderers import DockerRenderer
 from neurodocker.reproenv.template import Template
+from neurodocker.reproenv.tests.utils import prune_rendered
 
 
 def test_docker_renderer_add_template():
@@ -75,8 +76,10 @@ def test_docker_renderer_add_template():
     }
     r = DockerRenderer("apt")
     r.add_template(Template(d, binaries_kwds=dict(name="Bjork")), method="binaries")
+    rendered = str(r)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(r)
+        rendered
         == """ENV foo="bar"
 RUN apt-get update -qq \\
     && apt-get install -y -q --no-install-recommends \\
@@ -100,8 +103,10 @@ RUN apt-get update -qq \\
 
     r = DockerRenderer("apt")
     r.add_template(Template(d), method="binaries")
+    rendered = str(r)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(r)
+        rendered
         == """ENV foo="bar"
 RUN apt-get update -qq \\
     && apt-get install -y -q --no-install-recommends \\
@@ -115,16 +120,16 @@ def test_docker_render_from_instance_methods():
     d = DockerRenderer("apt")
 
     d.from_("alpine")
-    assert str(d) == "FROM alpine"
+    assert prune_rendered(str(d)).strip() == "FROM alpine"
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
-    assert str(d) == "FROM alpine AS builder"
+    assert prune_rendered(str(d)).strip() == "FROM alpine AS builder"
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
     d.arg("FOO")
-    assert str(d) == "FROM alpine AS builder\nARG FOO"
+    assert prune_rendered(str(d)).strip() == "FROM alpine AS builder\nARG FOO"
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
@@ -132,8 +137,10 @@ def test_docker_render_from_instance_methods():
     d.copy(
         ["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/", from_="builder", chown="neuro"
     )
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -149,8 +156,10 @@ COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
         ["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/", from_="builder", chown="neuro"
     )
     d.env(PATH="$PATH:/opt/foo/bin")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -168,8 +177,10 @@ ENV PATH="$PATH:/opt/foo/bin\""""
     )
     d.env(PATH="$PATH:/opt/foo/bin")
     d.label(ORG="myorg")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -189,8 +200,10 @@ LABEL ORG="myorg\""""
     d.env(PATH="$PATH:/opt/foo/bin")
     d.label(ORG="myorg")
     d.run("echo foobar")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -212,8 +225,10 @@ RUN echo foobar"""
     d.label(ORG="myorg")
     d.run("echo foobar")
     d.user("nonroot")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -239,8 +254,10 @@ USER nonroot"""
     d.run("echo foobar")
     d.user("nonroot")
     d.workdir("/opt/foobar")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -266,8 +283,10 @@ WORKDIR /opt/foobar"""
     d.user("nonroot")
     d.workdir("/opt/foobar")
     d.run_bash("source activate")
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM alpine AS builder
 ARG FOO
@@ -285,8 +304,10 @@ RUN bash -c 'source activate'"""
     d = DockerRenderer("apt")
     d.from_("debian:buster-slim")
     d.entrypoint(["echo", "foo bar"])
+    rendered = str(d)
+    rendered = prune_rendered(rendered).strip()
     assert (
-        str(d)
+        rendered
         == """\
 FROM debian:buster-slim
 ENTRYPOINT ["echo", "foo bar"]"""
