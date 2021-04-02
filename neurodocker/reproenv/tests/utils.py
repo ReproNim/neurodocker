@@ -114,7 +114,10 @@ def build_singularity_image(
         yield str(sif)
     finally:
         if remove:
-            sif.unlink(missing_ok=True)
+            try:
+                sif.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def run_docker_image(
