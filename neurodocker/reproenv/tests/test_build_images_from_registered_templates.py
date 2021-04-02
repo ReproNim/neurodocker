@@ -1,7 +1,6 @@
 # TODO: add more tests for `from_dict` method.
 
 from pathlib import Path
-import subprocess
 import typing as ty
 
 import pytest
@@ -9,7 +8,7 @@ import pytest
 from neurodocker.reproenv.renderers import DockerRenderer
 from neurodocker.reproenv.renderers import SingularityRenderer
 from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.tests.utils import singularity_build
+from neurodocker.reproenv.tests.utils import get_build_and_run_fns
 from neurodocker.reproenv.tests.utils import skip_if_no_docker
 from neurodocker.reproenv.tests.utils import skip_if_no_singularity
 from neurodocker.reproenv.types import installation_methods_type
@@ -57,60 +56,21 @@ def test_build_using_renderer_from_dict(
 
     fd_exe = "fdfind" if pkg_manager == "apt" else "fd"
 
-    if cmd == "docker":
-        import docker
+    rcls = DockerRenderer if cmd == "docker" else SingularityRenderer
+    specf = "Dockerfile" if cmd == "docker" else "Singularity"
 
-        client = docker.from_env()
-        r = DockerRenderer.from_dict(d)
-        # Write Dockerfile.
-        (tmp_path / "Dockerfile").write_text(str(r))
-        image = client.images.build(path=str(tmp_path), tag="jq", rm=True)
-        # This is a tuple...
-        image = image[0]
-        stdout = client.containers.run(image=image, command="jq --help")
-        assert stdout.decode().strip().startswith("jq - commandline JSON processor")
-        stdout = client.containers.run(image=image, command="jq --version")
-        assert stdout.decode().strip() == jq_version_output
+    r = rcls.from_dict(d)
+    (tmp_path / specf).write_text(str(r))
+
+    build_fn, run_fn = get_build_and_run_fns(cmd)
+    with build_fn(tmp_path) as img:
+        stdout, _ = run_fn(img, args=["jq", "--help"])
+        assert stdout.startswith("jq - commandline JSON processor")
+        stdout, _ = run_fn(img, args=["jq", "--version"])
+        assert stdout == jq_version_output
         # Test that deb was installed
-        stdout = client.containers.run(image=image, command=f"{fd_exe} --version")
-        assert stdout.decode().strip().startswith(fd_version_startswith)
-
-    elif cmd == "singularity":
-        # Create a Singularity recipe
-        r = SingularityRenderer.from_dict(d)
-        # Write Singularity recipe
-        sing_path = tmp_path / "Singularity"
-        sif_path = tmp_path / "jq-test.sif"
-        sing_path.write_text(str(r))
-        # Build
-        _ = singularity_build(image_path=sif_path, build_spec=sing_path, cwd=tmp_path)
-        # Test
-        completed = subprocess.run(
-            f"singularity run {sif_path} jq --help".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert (
-            completed.stdout.decode()
-            .strip()
-            .startswith("jq - commandline JSON processor")
-        )
-        completed = subprocess.run(
-            f"singularity run {sif_path} jq --version".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert completed.stdout.decode().strip() == jq_version_output
-        # Test that deb was installed
-        completed = subprocess.run(
-            f"singularity run {sif_path} {fd_exe} --version".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert completed.stdout.decode().strip().startswith(fd_version_startswith)
-
-    else:
-        raise ValueError("unknown container type")
+        stdout, _ = run_fn(img, args=[fd_exe, "--version"])
+        assert stdout.startswith(fd_version_startswith)
 
 
 @pytest.mark.verylong
@@ -147,71 +107,23 @@ def test_build_using_renderer_instance_methods(
 
     fd_exe = "fdfind" if pkg_manager == "apt" else "fd"
 
-    if cmd == "docker":
-        import docker
+    rcls = DockerRenderer if cmd == "docker" else SingularityRenderer
+    r = rcls(pkg_manager=pkg_manager)
+    r.from_(base_image)
+    r.add_registered_template("jq", method=method, version=jq_version)
+    specf = "Dockerfile" if cmd == "docker" else "Singularity"
+    (tmp_path / specf).write_text(str(r))
 
-        client = docker.from_env()
-
-        r = DockerRenderer(pkg_manager=pkg_manager)
-        r.from_(base_image)
-        r.add_registered_template("jq", method=method, version=jq_version)
-
-        # Write Dockerfile.
-        (tmp_path / "Dockerfile").write_text(str(r))
-        image = client.images.build(path=str(tmp_path), tag="jq", rm=True)
-        # This is a tuple...
-        image = image[0]
-        stdout = client.containers.run(image=image, command="jq --help")
-        assert stdout.decode().strip().startswith("jq - commandline JSON processor")
-        stdout = client.containers.run(image=image, command="jq --version")
+    build_fn, run_fn = get_build_and_run_fns(cmd)
+    with build_fn(tmp_path) as img:
+        stdout, _ = run_fn(img, args=["jq", "--help"])
+        assert stdout.startswith("jq - commandline JSON processor")
+        stdout, _ = run_fn(img, args=["jq", "--version"])
         if method == "source" and jq_version == "1.5":
-            assert stdout.decode().strip() == "jq-"
+            assert stdout == "jq-"
         else:
-            assert stdout.decode().strip() == jq_version_output
+            assert stdout == jq_version_output
         # Test that deb was installed
         if method == "binaries":
-            stdout = client.containers.run(image=image, command=f"{fd_exe} --version")
-            assert stdout.decode().strip().startswith(fd_version_startswith)
-
-    elif cmd == "singularity":
-        # Create a Singularity recipe.
-        sr = SingularityRenderer(pkg_manager=pkg_manager)
-        sr.from_(base_image)
-        sr.add_registered_template("jq", method=method, version=jq_version)
-
-        # Write Singularity recipe.
-        sing_path = tmp_path / "Singularity"
-        sif_path = tmp_path / "jq-test.sif"
-        sing_path.write_text(str(sr))
-        _ = singularity_build(image_path=sif_path, build_spec=sing_path, cwd=tmp_path)
-        completed = subprocess.run(
-            f"singularity run {sif_path} jq --help".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert (
-            completed.stdout.decode()
-            .strip()
-            .startswith("jq - commandline JSON processor")
-        )
-        completed = subprocess.run(
-            f"singularity run {sif_path} jq --version".split(),
-            capture_output=True,
-            check=True,
-        )
-        if method == "source" and jq_version == "1.5":
-            assert completed.stdout.decode().strip() == "jq-"
-        else:
-            assert completed.stdout.decode().strip() == jq_version_output
-
-        # Test that deb was installed
-        if pkg_manager == "apt" and method == "binaries":
-            completed = subprocess.run(
-                f"singularity run {sif_path} {fd_exe} --version".split(),
-                capture_output=True,
-                check=True,
-            )
-            assert completed.stdout.decode().strip().startswith(fd_version_startswith)
-
-    else:
-        raise ValueError("unknown container type")
+            stdout, _ = run_fn(img, args=[fd_exe, "--version"])
+            assert stdout.startswith(fd_version_startswith)

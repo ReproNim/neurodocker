@@ -1,5 +1,4 @@
 from pathlib import Path
-import subprocess
 
 from click.testing import CliRunner
 import pytest
@@ -7,7 +6,7 @@ import pytest
 from neurodocker.cli.cli import generate
 from neurodocker.cli.cli import genfromjson
 from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.tests.utils import singularity_build
+from neurodocker.reproenv.tests.utils import get_build_and_run_fns
 from neurodocker.reproenv.tests.utils import skip_if_no_docker
 from neurodocker.reproenv.tests.utils import skip_if_no_singularity
 
@@ -31,8 +30,6 @@ from neurodocker.reproenv.tests.utils import skip_if_no_singularity
 def test_build_image_from_registered(
     tmp_path: Path, cmd: str, pkg_manager: str, base_image: str
 ):
-    import docker
-
     # Templates are in this directory.
     template_path = Path(__file__).parent
     runner = CliRunner(env={"REPROENV_TEMPLATE_PATH": str(template_path)})
@@ -54,30 +51,13 @@ def test_build_image_from_registered(
     assert result.exit_code == 0, result.output
     assert "jq-1.5/jq-linux64" in result.output
 
-    if cmd == "docker":
-        # build docker image
-        (tmp_path / "Dockerfile").write_text(result.output)
-        client = docker.from_env()
-        image = client.images.build(path=str(tmp_path), tag="reproenvtest", rm=True)
-        image = image[0]  # This is a tuple...
-        stdout = client.containers.run(image=image, command="jq --help")
-        assert "jq is a tool for processing JSON" in stdout.decode().strip()
+    spec = "Dockerfile" if cmd == "docker" else "Singularity"
+    (tmp_path / spec).write_text(result.output)
 
-    elif cmd == "singularity":
-        # build singularity image
-        sing_path = tmp_path / "Singularity"
-        sif_path = tmp_path / "test.sif"
-        sing_path.write_text(result.output)
-        _ = singularity_build(image_path=sif_path, build_spec=sing_path, cwd=tmp_path)
-        completed = subprocess.run(
-            f"singularity run {sif_path} jq --help".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert "jq is a tool for processing JSON" in completed.stdout.decode()
-
-    else:
-        raise ValueError(f"unknown command: {cmd}")
+    build_fn, run_fn = get_build_and_run_fns(cmd)
+    with build_fn(tmp_path) as img:
+        stdout, _ = run_fn(img, args=["jq", "--help"])
+        assert "jq is a tool for processing JSON" in stdout
 
 
 @pytest.mark.long
@@ -88,23 +68,22 @@ def test_build_image_from_registered(
         pytest.param("singularity", marks=skip_if_no_singularity),
     ],
 )
-def test_json_roundtrip(cmd: str, tmp_path: Path):
+@pytest.mark.parametrize("inputs", ["file", "stdin"])
+def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
     """Test that we can generate a JSON representation of a container and build an
     identical container with it.
     """
-    import docker
-
     _TemplateRegistry._reset()
     runner = CliRunner()
     result = runner.invoke(
         generate,
         [
             cmd,
+            "--json",
             "--base-image",
             "debian:buster-slim",
             "--pkg-manager",
             "apt",
-            "--json",
             "--install",
             "git",
             "--env",
@@ -115,45 +94,21 @@ def test_json_roundtrip(cmd: str, tmp_path: Path):
     assert result.exit_code == 0, result.output
     (tmp_path / "specs.json").write_text(result.output)
 
-    # TODO: also test stdin
-    result = runner.invoke(genfromjson, [cmd, str(tmp_path / "specs.json")])
-
-    if cmd == "docker":
-        (tmp_path / "Dockerfile").write_text(result.output)
-        client = docker.from_env()
-        image = client.images.build(path=str(tmp_path), rm=True)
-        image = image[0]  # This is a tuple...
-        try:
-            # build docker image
-            stdout = client.containers.run(
-                image=image, command="git --help", remove=True
-            )
-            assert "commit" in stdout.decode()
-            stdout = client.containers.run(image=image, command="env", remove=True)
-            assert "CAT=FOO" in stdout.decode()
-            assert "DOG=BAR" in stdout.decode()
-        finally:
-            client.images.remove(image.id)
-
-    elif cmd == "singularity":
-        # build singularity image
-        sing_path = tmp_path / "Singularity"
-        sif_path = tmp_path / "test.sif"
-        sing_path.write_text(result.output)
-        _ = singularity_build(image_path=sif_path, build_spec=sing_path, cwd=tmp_path)
-        completed = subprocess.run(
-            f"singularity run {sif_path} git --help".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert "commit" in completed.stdout.decode()
-        completed = subprocess.run(
-            f"singularity run {sif_path} env".split(),
-            capture_output=True,
-            check=True,
-        )
-        assert "CAT=FOO" in completed.stdout.decode()
-        assert "DOG=BAR" in completed.stdout.decode()
-
+    if inputs == "file":
+        result = runner.invoke(genfromjson, [cmd, str(tmp_path / "specs.json")])
+    elif inputs == "stdin":
+        json_input = (tmp_path / "specs.json").read_text()
+        result = runner.invoke(genfromjson, [cmd, "-"], input=json_input)
     else:
-        raise ValueError(f"unknown command: {cmd}")
+        raise ValueError(f"unknown inputs: {inputs}")
+
+    spec = "Dockerfile" if cmd == "docker" else "Singularity"
+    (tmp_path / spec).write_text(result.output)
+
+    build_fn, run_fn = get_build_and_run_fns(cmd)
+    with build_fn(tmp_path) as img:
+        stdout, _ = run_fn(img, args=["git", "--help"])
+        assert "commit" in stdout
+        stdout, _ = run_fn(img, args=["env"])
+        assert "CAT=FOO" in stdout
+        assert "DOG=BAR" in stdout
