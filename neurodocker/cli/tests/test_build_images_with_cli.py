@@ -68,7 +68,8 @@ def test_build_image_from_registered(
         pytest.param("singularity", marks=skip_if_no_singularity),
     ],
 )
-def test_json_roundtrip(cmd: str, tmp_path: Path):
+@pytest.mark.parametrize("inputs", ["file", "stdin"])
+def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
     """Test that we can generate a JSON representation of a container and build an
     identical container with it.
     """
@@ -93,8 +94,13 @@ def test_json_roundtrip(cmd: str, tmp_path: Path):
     assert result.exit_code == 0, result.output
     (tmp_path / "specs.json").write_text(result.output)
 
-    # TODO: also test stdin
-    result = runner.invoke(genfromjson, [cmd, str(tmp_path / "specs.json")])
+    if inputs == "file":
+        result = runner.invoke(genfromjson, [cmd, str(tmp_path / "specs.json")])
+    elif inputs == "stdin":
+        json_input = (tmp_path / "specs.json").read_text()
+        result = runner.invoke(genfromjson, [cmd, "-"], input=json_input)
+    else:
+        raise ValueError(f"unknown inputs: {inputs}")
 
     spec = "Dockerfile" if cmd == "docker" else "Singularity"
     (tmp_path / spec).write_text(result.output)
