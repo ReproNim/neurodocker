@@ -49,8 +49,11 @@ skip_if_no_singularity = pytest.mark.skipif(
 
 
 @contextlib.contextmanager
-def build_docker_image(context: Path, remove=True) -> ty.Generator[str, None, None]:
+def build_docker_image(context: Path, remove=False) -> ty.Generator[str, None, None]:
     """Context manager that builds a Docker image and removes it on exit.
+
+    The argument `remove` is `False` by default because we clean up all images at the
+    end of each pytest session.
 
     Yields
     ------
@@ -60,7 +63,7 @@ def build_docker_image(context: Path, remove=True) -> ty.Generator[str, None, No
     df = context / "Dockerfile"
     if not df.exists():
         raise FileNotFoundError(f"Dockerfile not found: {df}")
-    tag = uuid.uuid4().hex
+    tag = "reproenv-pytest-" + uuid.uuid4().hex
     cmd: ty.List[str] = ["docker", "build", "--tag", tag, str(context)]
     try:
         _ = subprocess.check_output(cmd, cwd=context)
@@ -93,7 +96,7 @@ def build_singularity_image(
     recipe = context / "Singularity"
     if not recipe.exists():
         raise FileNotFoundError(f"Singularity recipe not found: {recipe}")
-    sif = context / f"{uuid.uuid4().hex}.sif"
+    sif = context / f"reproenv-pytest-{uuid.uuid4().hex}.sif"
     # Set singularity cache to /dev/shm
     user = getpass.getuser()
     cachedir = Path("/") / "dev" / "shm" / user / "singularity"
@@ -158,6 +161,16 @@ def run_singularity_image(
     stdout = process.stdout.decode().strip()
     stderr = process.stderr.decode().strip()
     return stdout, stderr
+
+
+def get_build_and_run_fns(cmd: str):
+    cmd = cmd.lower()
+    if cmd == "docker":
+        return build_docker_image, run_docker_image
+    elif cmd == "singularity":
+        return build_singularity_image, run_singularity_image
+    else:
+        raise KeyError(f"unknown cmd: {cmd}")
 
 
 def prune_rendered(r: str) -> str:
