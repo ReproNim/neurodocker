@@ -6,6 +6,7 @@ import functools
 import inspect
 import json
 import os
+import pathlib
 import types
 import typing as ty
 
@@ -42,6 +43,8 @@ _jinja_env.globals["raise"] = _raise_helper
 
 # TODO: add a flag that avoids buggy behavior when basing a new container on
 # one created with ReproEnv.
+
+PathType = ty.Union[str, pathlib.Path, os.PathLike]
 
 
 def _render_string_from_template(
@@ -368,12 +371,12 @@ class _Renderer:
 
     def copy(
         self,
-        source: ty.Union[ty.List[os.PathLike], os.PathLike],
-        destination: os.PathLike,
+        source: ty.Union[PathType, ty.List[PathType]],
+        destination: ty.Union[PathType, ty.List[PathType]],
     ) -> _Renderer:
         raise NotImplementedError()
 
-    def env(self, **kwds: ty.Mapping[str, str]) -> _Renderer:
+    def env(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
 
     def entrypoint(self, args: ty.List[str]) -> _Renderer:
@@ -385,7 +388,7 @@ class _Renderer:
     def install(self, pkgs: ty.List[str], opts: str = None) -> _Renderer:
         raise NotImplementedError()
 
-    def label(self, **kwds: ty.Mapping[str, str]) -> _Renderer:
+    def label(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
 
     def run(self, command: str) -> _Renderer:
@@ -398,7 +401,7 @@ class _Renderer:
     def user(self, user: str) -> _Renderer:
         raise NotImplementedError()
 
-    def workdir(self, path: os.PathLike) -> _Renderer:
+    def workdir(self, path: PathType) -> _Renderer:
         raise NotImplementedError()
 
     def to_json(self, **json_kwds) -> str:
@@ -454,8 +457,8 @@ class DockerRenderer(_Renderer):
     @_log_instruction
     def copy(
         self,
-        source: ty.Union[ty.List[os.PathLike], os.PathLike],
-        destination: os.PathLike,
+        source: ty.Union[PathType, ty.List[PathType]],
+        destination: PathType,
         from_: str = None,
         chown: str = None,
     ) -> DockerRenderer:
@@ -474,7 +477,7 @@ class DockerRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def env(self, **kwds: ty.Mapping[str, str]) -> DockerRenderer:
+    def env(self, **kwds: str) -> DockerRenderer:
         """Add a Dockerfile `ENV` instruction."""
         s = "ENV " + " \\\n    ".join(f'{k}="{v}"' for k, v in kwds.items())
         self._parts.append(s)
@@ -505,7 +508,7 @@ class DockerRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def label(self, **kwds: ty.Mapping[str, str]) -> DockerRenderer:
+    def label(self, **kwds: str) -> DockerRenderer:
         """Add a Dockerfile `LABEL` instruction."""
         s = "LABEL " + " \\\n      ".join(f'{k}="{v}"' for k, v in kwds.items())
         self._parts.append(s)
@@ -542,7 +545,7 @@ class DockerRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def workdir(self, path: os.PathLike) -> DockerRenderer:
+    def workdir(self, path: PathType) -> DockerRenderer:
         """Add a Dockerfile `WORKDIR` instruction."""
         self._parts.append("WORKDIR " + str(path))
         return self
@@ -613,15 +616,15 @@ class SingularityRenderer(_Renderer):
     def arg(self, key: str, value: str = None) -> SingularityRenderer:
         # TODO: look into whether singularity has something like ARG, like passing in
         # environment variables.
-        s = f"{key}" if value is None else f"{key}={value}"
+        s = f"{key}=" if value is None else f"{key}={value}"
         self._post.append(s)
         return self
 
     @_log_instruction
     def copy(
         self,
-        source: ty.Union[ty.List[os.PathLike], os.PathLike],
-        destination: os.PathLike,
+        source: ty.Union[PathType, ty.List[PathType]],
+        destination: PathType,
     ) -> SingularityRenderer:
         if not isinstance(source, (list, tuple)):
             source = [source]
@@ -630,7 +633,7 @@ class SingularityRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def env(self, **kwds: ty.Mapping[str, str]) -> SingularityRenderer:
+    def env(self, **kwds: str) -> SingularityRenderer:
         # TODO: why does this raise a type error?
         self._environment.extend(kwds.items())  # type: ignore
         return self
@@ -665,7 +668,7 @@ class SingularityRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def label(self, **kwds: ty.Mapping[str, str]) -> SingularityRenderer:
+    def label(self, **kwds: str) -> SingularityRenderer:
         # TODO: why are we getting this error?
         # Argument 1 to "update" of "dict" has incompatible type
         # "Dict[str, Mapping[str, str]]"; expected "Mapping[str, str]"
@@ -691,7 +694,7 @@ class SingularityRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def workdir(self, path: os.PathLike) -> SingularityRenderer:
+    def workdir(self, path: PathType) -> SingularityRenderer:
         self._post.append(f"mkdir -p {path}\ncd {path}")
         return self
 
