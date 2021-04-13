@@ -1,4 +1,4 @@
-# Common use-case examples
+# Examples of common use-cases
 
 This directory includes some examples of common use-cases for Docker containers generated with _Neurodocker_ from different stages of the analysis life cycle.
 
