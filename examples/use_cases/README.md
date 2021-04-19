@@ -7,7 +7,13 @@ Each example:
 - Generates a `Dockerfile` with _Neurodocker_ (using _Neurodocker_ Docker image and `debian:stretch` base image) that includes specific versions of FSL and ANTs
 - Builds the Docker image
 - Runs a short processing script (both Bash and Python examples included here). For these examples, we simply skull strip a T1-weighted image with BET and warp it into MNI space with ANTs.
-- Note that these example Docker images include FSL and ANTs to provide realistic examples, however downloading FSL can take some time and the images will be quite large (~12GB).
+
+### Important notes
+
+- These example Docker images include FSL and ANTs in order to provide somewhat realistic examples. However, downloading FSL can take some time and the images will be quite large (~12GB).
+- The commands in the example scripts likely will not produce good results and should not be used in any real analysis.
+
+### Running examples
 
 To run these examples, you will need Docker installed as we will use the _Neurodocker_ docker image. The _Neurodocker_ commands are explained in more detail at the end of this document.
 

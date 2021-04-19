@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # This example assumes data located in directory
-# called 'data' that has been mounted to '/home'
-# (i.e. '/home/data')
+# called 'input' that has been mounted to '/home'
+# (i.e. '/home/input')
 
 input="/home/input"
 output="/home/output"
@@ -29,6 +29,7 @@ for subj in sub-*; do
     mkdir -p ${output}/${subj}
     antsRegistrationSyNQuick.sh \
         -d 3 \
+        -t r \
         -f ${FSLDIR}/data/standard/MNI152_T1_1mm_brain.nii.gz \
         -m ${output}/${subj}/${subj}_T1w_bet.nii.gz \
         -o ${output}/${subj}/${subj}_T1w_bet2mni
