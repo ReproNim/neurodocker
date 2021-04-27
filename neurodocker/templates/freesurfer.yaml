@@ -242,6 +242,7 @@ source:
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
     make install
+    pip3 install -r {{ self.source_path }}/python/requirements.txt;
     # If self.license_base64 populated, decode from base64 and write to self.license_path
     # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
     # -------------------------------------------------
