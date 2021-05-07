@@ -101,14 +101,14 @@ source:
       infant_module: "OFF"
       install_python_deps: "OFF"
       distribute_fspython: "OFF"
-      install_niftireg_martinos: "OFF"
+      martinos_build: "OFF"
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
       source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
       license_path: "{{ self.install_path }}/license.txt"
-      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DINSTALL_NIFTIREG_MARTINOS={{ self.install_niftireg_martinos }}
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }}
       make_opts: -j4
   env:
     FS_LICENSE: "{{ self.license_path }}"
