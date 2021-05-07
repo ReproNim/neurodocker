@@ -172,6 +172,7 @@ source:
     - sudo
     - tar
     - tcsh
+    - unzip
     - uuid-dev
     - vim-common
     - wget
