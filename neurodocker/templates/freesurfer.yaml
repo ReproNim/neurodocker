@@ -101,13 +101,14 @@ source:
       infant_module: "OFF"
       install_python_deps: "OFF"
       distribute_fspython: "OFF"
+      install_niftireg_martinos: "OFF"
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
       source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
       license_path: "{{ self.install_path }}/license.txt"
-      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }}
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DINSTALL_NIFTIREG_MARTINOS={{ self.install_niftireg_martinos }}
       make_opts: -j4
   env:
     FS_LICENSE: "{{ self.license_path }}"
@@ -225,6 +226,11 @@ source:
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
+    # Compile
+    # -------------------------------------------------
+    cd {{ self.install_path }}
+    cmake {{ self.cmake_opts }} {{ self.source_path }}
+    make {{ self.make_opts }}
     # Files needed to be downloaded from the annex before we can run `make install`
     # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
     # -------------------------------------------------
@@ -236,11 +242,9 @@ source:
     #                This is because surfer.nmr now runs git-annex 8(?) todo: upgrade
     git annex enableremote datasrc || true
     git annex get -q .
-    # Compile and install
-    # -------------------------------------------------
+    # Install
+    # -------------------------------------------------    
     cd {{ self.install_path }}
-    cmake {{ self.cmake_opts }} {{ self.source_path }}
-    make {{ self.make_opts }}
     make install
     pip3 install -r {{ self.source_path }}/python/requirements.txt
     # If self.license_base64 populated, decode from base64 and write to self.license_path
