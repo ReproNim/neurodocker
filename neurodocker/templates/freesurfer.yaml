@@ -192,18 +192,18 @@ source:
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
     update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.8 100
-    # FreeSurfer needs python > 3.6 (? todo: verify)
+    # FreeSurfer needs python  v3.6.8
     # From: https://github.com/pwighton/fs-docker/blob/09cc6b0b6c0538cbb182b04435daf85c123a63d5/build/Dockerfile#L66
     # Alternative is https://github.com/ReproNim/neurodocker/blob/master/neurodocker/templates/afni.yaml
     # But it installs python 3.5
     # -------------------------------------------------------------------------
-    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tgz | tar -xz -C /tmp
-    cd /tmp/Python-3.6.5
+    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /tmp
+    cd /tmp/Python-3.6.8
     ./configure
     make
     make install 
     cd /
-    rm -rf /tmp/Python-3.6.5
+    rm -rf /tmp/Python-3.6.8
     pip3 install -q --no-cache-dir -U pip
     pip3 install -q --no-cache-dir wheel
     sync
