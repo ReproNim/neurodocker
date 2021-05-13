@@ -93,9 +93,16 @@ source:
     - version
     optional:
       license_base64: ""
+      # The subject dir is not in /opt, like everything else FreeSurfer-related
+      # Because if we want to run `neurodocker minify` we want to operate over the `/opt`
+      # dir and have the subjects dir excluded
+      subjects_dir: "/ext/fs-subjects"
+      infant_model_dir: "/opt/fs-infant-model"
       repo: https://github.com/freesurfer/freesurfer
       pkg_url: http://surfer.nmr.mgh.harvard.edu/pub/data/fspackages/prebuilt/centos7-packages.tar.gz
       annex: https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
+      # set to niftyreg.yaml default
+      niftyreg_path: /opt/niftyreg-master
       minimal: "ON"
       build_guis: "OFF"
       infant_module: "OFF"
@@ -103,6 +110,7 @@ source:
       distribute_fspython: "OFF"
       martinos_build: "OFF"
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
+      # --- Probably don't have to change args below here (?) ---
       source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
       pkg_path: /tmp/freesurfer/pkg
       install_path: /opt/freesurfer-{{ self.version }}
@@ -112,21 +120,26 @@ source:
       make_opts: -j4
   env:
     FS_LICENSE: "{{ self.license_path }}"
+    SUBJECTS_DIR: "{{ self.subjects_dir }}"
+    FS_INFANT_MODEL: "{{ self.infant_model_dir }}"
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
-    # freesurfer env
     OS: "Linux"
-    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    PATH: "{{ self.niftyreg_path }}/bin:{{ self.pkg_path }}/mni/current/bin:{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     FREESURFER_HOME: "{{ self.install_path }}"
     FREESURFER: "{{ self.install_path }}"
-    SUBJECTS_DIR: "{{ self.install_path }}/subjects"
+    PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
     LOCAL_DIR: "{{ self.install_path }}/local"
     FSFAST_HOME: "{{ self.install_path }}/fsfast"
     FMRI_ANALYSIS_DIR: "{{ self.install_path }}/fsfast"
+    FSF_OUTPUT_FORMAT: "nii.gz"
     FUNCTIONALS_DIR: "{{ self.install_path }}/sessions"
     # default freesurfer options
     FS_OVERRIDE: "0"
     FIX_VERTEX_AREA: ""
-    FSF_OUTPUT_FORMAT: "nii.gz"
+    # To supress a `Could not set locale` error when `mri_convert` is run in recon-all
+    FS_DISABLE_LANG: "1"
+    # Just in case: https://github.com/freesurfer/freesurfer/issues/776
+    FS_TIME_ALLOW: "0"
     # mni environment requirements
     MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
     MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
@@ -134,6 +147,23 @@ source:
     MNI_DATAPATH: "{{ self.install_path }}/mni/data"
     MNI_PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
     PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
+    # infant model setup, see:
+    #   - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/dockerfile#L85
+    #   - https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/infant/freesurfer-linux-centos7_x86_64-infant.tar.gz
+    # This temporary and should migrate somewhere else
+    CNYBCH_TEMPLATE_SUBJECTS_DIR: "{{ self.infant_model_dir }}/CNYBCH"
+    CNYBCH_SUBJECTS: "Template1 Template2 Template3 Template4 Template5 Template6 Template7 Template8 Template9 Template10 Template11 Template12 Template13 Template14 Template15 Template16 Template17 Template18 Template19 Template20 Template21 Template22 Template23 Template24 Template25 Template26"
+    # age at MRI scan (mo)
+    CNYBCH_AGES: "9 7 6 5 18 12 0 0 3 8 10 10 18 4 2 14 3 16 0 12 0 15 5 17 16 0"
+    CNYBCH_GMWM_SUBJECTS: "Template5 Template6 Template8 Template10 Template13 Template18 Template20 Template22"
+    # mo
+    CNYBCH_GMWM_AGES: "18 12 0 8 18 16 12 15"
+    CNYBCH_NEONATES: "Template7 Template8 Template19 Template21 Template26"
+    # days (first two computed from weeks)
+    CNYBCH_NEONATEAGES: "3 4 1 2 4"
+    CNYBCH_AROUNDONE: "Template11 Template12 Template6 Template20 Template16"
+    #mo
+    CNYBCH_AROUNDONEAGES: "10 10 12 12 14"
   dependencies:
     apt:
     - ca-certificates
@@ -144,6 +174,7 @@ source:
     - bc
     - binutils
     - bzip2
+    - coreutils
     - curl
     - g++-4.8
     - gcc-4.8-base
@@ -187,6 +218,8 @@ source:
     # git config
     git config --global user.email "CI@example.com"
     git config --global user.name "CI"
+    # Following along with:
+    #  - https://travis-ci.com/github/freesurfer/freesurfer/builds/219074161
     # Compile with gcc 4.8
     # --------------------
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
@@ -195,7 +228,6 @@ source:
     # FreeSurfer needs python  v3.6.8
     # From: https://github.com/pwighton/fs-docker/blob/09cc6b0b6c0538cbb182b04435daf85c123a63d5/build/Dockerfile#L66
     # Alternative is https://github.com/ReproNim/neurodocker/blob/master/neurodocker/templates/afni.yaml
-    # But it installs python 3.5
     # -------------------------------------------------------------------------
     curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /tmp
     cd /tmp/Python-3.6.8
@@ -208,7 +240,7 @@ source:
     pip3 install -q --no-cache-dir wheel
     sync
     # FreeSurfer needs CMake 3.9 or higher
-    # Taken from: https://github.com/Rikorose/gcc-cmake/blob/master/gcc-4/Dockerfile
+    # From: https://github.com/Rikorose/gcc-cmake/blob/master/gcc-4/Dockerfile
     # ------------------------------------------------------------------------------
     wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /tmp/cmake-install.sh
     chmod u+x /tmp/cmake-install.sh
@@ -219,7 +251,7 @@ source:
     ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
     rm /tmp/cmake-install.sh
     # Compile FreeSurfer
-    # https://github.com/pwighton/fs-docker (todo: maybe a newer way?)
+    # https://github.com/pwighton/fs-docker
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
@@ -240,7 +272,7 @@ source:
     git fetch datasrc
     # PW 2021/03/04: Werid.. this returns an error code, but things still work?
     #                So hardwire the exit code to zero so `docker build` doesn't error out
-    #                This is because surfer.nmr now runs git-annex 8(?) todo: upgrade
+    #                This is because surfer.nmr now runs git-annex 8 todo: upgrade
     git annex enableremote datasrc || true
     git annex get -q .
     # Install
@@ -254,3 +286,18 @@ source:
     if [ -n "{{ self.license_base64 }}" ]; then \
       echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}; \
     fi
+    # Setup mount points
+    # -------------------------------------------------
+    mkdir -p {{ self.subjects_dir }}
+    mkdir -p {{ self.infant_model_dir }}
+    # Install python reqs for infant module
+    # - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
+    # - infant entrypoint is make executable here, but needs to be activates with `--entrypoint` 
+    # -------------------------------------------------
+    if [ "{{ self.infant_module }}" = "ON" ]; then \
+      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
+      mkdir -p {{ self.install_path }}/average/sscnn_skullstripping; \
+      chmod +x {{ self.source_path }}/infant/docker/entrypoint.bash; \
+    fi
+    # Todo:
+    #   - delete the /tmp dir, but first ensure that it's not needed
