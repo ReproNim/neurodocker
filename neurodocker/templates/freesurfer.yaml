@@ -264,6 +264,19 @@ source:
     cd {{ self.install_path }}
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
+    # Install python reqs
+    # -------------------------------------------------
+    #   For infant:
+    #     - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
+    #     - infant entrypoint is made executable here, but needs to be activates with `--entrypoint` 
+    if [ "{{ self.infant_module }}" = ON ] | [ "{{ self.infant_module }}" = on ]; then \
+      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
+      mkdir -p {{ self.install_path }}/average/sscnn_skullstripping; \
+      chmod +x {{ self.source_path }}/infant/docker/entrypoint.bash; \
+    else \
+      pip3 install -r {{ self.source_path }}/python/requirements.txt; \
+      pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
+    fi            
     # Files needed to be downloaded from the annex before we can run `make install`
     # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
     # -------------------------------------------------
@@ -279,18 +292,6 @@ source:
     # -------------------------------------------------    
     cd {{ self.install_path }}
     make install
-    # Install python reqs
-    #   For infant:
-    #     - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
-    #     - infant entrypoint is made executable here, but needs to be activates with `--entrypoint` 
-    if [ "{{ self.infant_module }}" = ON ] | [ "{{ self.infant_module }}" = on ]; then \
-      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
-      mkdir -p {{ self.install_path }}/average/sscnn_skullstripping; \
-      chmod +x {{ self.source_path }}/infant/docker/entrypoint.bash; \
-    else \
-      pip3 install -r {{ self.source_path }}/python/requirements.txt; \
-      pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
-    fi        
     # If self.license_base64 populated, decode from base64 and write to self.license_path
     # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
     # -------------------------------------------------
