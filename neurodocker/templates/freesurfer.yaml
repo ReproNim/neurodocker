@@ -258,6 +258,10 @@ source:
     wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
+    echo "Cloning..."
+    echo "   remote:      "{{ self.repo }}
+    echo "   branch:      "{{ self.repo }}
+    echo "   destination: "{{ self.source_path }}
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
     # Compile
     # -------------------------------------------------
