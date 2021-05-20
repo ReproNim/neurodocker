@@ -273,7 +273,7 @@ source:
     #   For infant:
     #     - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
     #     - infant entrypoint is made executable here, but needs to be activates with `--entrypoint` 
-    if [ "{{ self.infant_module }}" = ON ] | [ "{{ self.infant_module }}" = on ]; then \
+    if [ "{{ self.infant_module }}" = ON ] || [ "{{ self.infant_module }}" = on ]; then \
       pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
       mkdir -p {{ self.install_path }}/average/sscnn_skullstripping; \
       chmod +x {{ self.source_path }}/infant/docker/entrypoint.bash; \
