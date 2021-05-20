@@ -275,8 +275,7 @@ source:
     #     - infant entrypoint is made executable here, but needs to be activates with `--entrypoint` 
     if [ "{{ self.infant_module }}" = ON ] || [ "{{ self.infant_module }}" = on ]; then \
       pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
-      mkdir -p {{ self.install_path }}/average/sscnn_skullstripping; \
-      chmod +x {{ self.source_path }}/infant/docker/entrypoint.bash; \
+      ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
     else \
       pip3 install -r {{ self.source_path }}/python/requirements.txt; \
       pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
