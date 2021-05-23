@@ -64,7 +64,7 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
         params: ty.List[click.Parameter] = [
             click.Option(
                 ["-p", "--pkg-manager"],
-                type=click.Choice(allowed_pkg_managers, case_sensitive=False),
+                type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
                 required=True,
                 multiple=False,
                 help="System package manager",
@@ -89,6 +89,9 @@ class OrderedParamsCommand(click.Command):
         param_order: ty.List[click.Parameter]
         opts, _, param_order = parser.parse_args(args=list(args))
         for param in param_order:
+            # We need the parameter name... so if it's None, let's panic.
+            if param.name is None:
+                raise ValueError(f"parameter name is None: {param}")
             value = opts[param.name]
             # If we have multiple values, take the first one. We do this before type
             # casting, because type casting for some reason brings all of the given
@@ -179,7 +182,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
     params: ty.List[click.Parameter] = [
         click.Option(
             ["-p", "--pkg-manager"],
-            type=click.Choice(allowed_pkg_managers, case_sensitive=False),
+            type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
             required=True,
             multiple=False,
             help="System package manager",
@@ -364,6 +367,9 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {"path": value}}
     # probably a registered template?
     else:
+        # We need the parameter name... so if it's None, let's panic.
+        if param.name is None:
+            raise ValueError(f"parameter name is None: {param}")
         if param.name.lower() in registered_templates():
             tmpl_name = param.name.lower()
             value = dict(value)
