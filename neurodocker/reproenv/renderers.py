@@ -421,7 +421,7 @@ class _Renderer:
         j = j.replace("\\", "\\\\")
         # Add slash to the end of each line, except the last.
         j = " \\\n".join(j.splitlines())
-        cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
+        cmd = f"echo '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
 
