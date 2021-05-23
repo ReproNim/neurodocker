@@ -419,9 +419,13 @@ class _Renderer:
         # Double-escape escaped sequences so that when printf is done with them, they
         # are escaped with a single slash.
         j = j.replace("\\", "\\\\")
+        # Same with parentheses.
+        j = j.replace("(", "\\(").replace(")", "\\)")
         # Add slash to the end of each line, except the last.
         j = " \\\n".join(j.splitlines())
-        cmd = f"echo '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
+        # Escape the % characters so printf does not interpret them as delimiters.
+        j = j.replace("%", "%%")
+        cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
 
