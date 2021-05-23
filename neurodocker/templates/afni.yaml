@@ -54,10 +54,10 @@ binaries:
     {{ self.install_dependencies() }}
     {%- if self.install_python3.lower() in ["true", "1", "y"] %}
     {{ self.install(["python3"]) }}
-    {% endif -%}
-    gsl2_path="$(find / -name 'libgsl.so.19' || printf '')"
-    if [ -n "$gsl2_path" ]; then \
-      ln -sfv "$gsl2_path" "$(dirname $gsl2_path)/libgsl.so.0"; \
+    {% endif %}
+    gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
+    if [ -n "$gsl_path" ]; then \
+      ln -sfv "$gsl_path" "$(dirname $gsl_path)/libgsl.so.0"; \
     fi
     ldconfig
     mkdir -p {{ self.install_path }}
