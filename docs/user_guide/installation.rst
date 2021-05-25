@@ -33,7 +33,7 @@ Neurodocker can also be installed in a :code:`conda` environment (using :code:`p
 
 .. code-block:: bash
 
-    conda create -n neurodocker python pyyaml
+    conda create -n neurodocker python=3.9
     conda activate neurodocker
     python -m pip install neurodocker
     neurodocker --help
