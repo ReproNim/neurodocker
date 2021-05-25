@@ -33,13 +33,16 @@ file in an empty directory, and build with :code:`docker build`:
 
 .. code-block:: bash
 
+    # creating a new empty directory
     mkdir docker-example
     cd docker-example
+    # saving the output of neurodocker command in a file: Dockerfile
     neurodocker generate docker --pkg-manager apt \
         --base-image neurodebian:buster \
         --ants version=2.3.4 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Dockerfile
+    # building a new image using the Dockerfile (use --file <dockerfile_name> option if other name is used)
     docker build --tag nipype-ants .
 
 Then, you can start a Jupyter Notebook with the following command. This will mount
@@ -80,13 +83,16 @@ will not be able to run this on a shared computing environment, like a high perf
 
 .. code-block:: bash
 
+    # creating a new empty directory
     mkdir singularity-example
     cd singularity-example
+    # saving the output of the Neurodocker command in the Singularity file
     neurodocker generate singularity --pkg-manager apt \
         --base-image neurodebian:buster \
         --ants version=2.3.4 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Singularity
+    # building a new image using the Singularity file
     sudo singularity build nipype-ants.sif Singularity
 
 This will create a new file :code:`nipype-ants.sif` in this directory. This is the
@@ -128,7 +134,9 @@ commands.
 
 .. code-block:: bash
 
+    # running a container in the background and assigning `to-minify` name to the container
     docker run --rm -itd --name to-minify python:3.9-slim bash
+    # running minify command for a specific set of python commands
     neurodocker minify \
       --container to-minify \
       --dir /usr/local \
