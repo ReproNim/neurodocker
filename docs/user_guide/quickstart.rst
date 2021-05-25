@@ -45,10 +45,12 @@ file in an empty directory, and build with :code:`docker build`:
     # building a new image using the Dockerfile (use --file <dockerfile_name> option if other name is used)
     docker build --tag nipype-ants .
 
-Then, you can start a Jupyter Notebook with the following command. This will mount
+The image :code: `nipype-ants` contains :code: `ANTs` and a Python environment with :code: `Nipype` and :code: `Jupyter Notebook`.
+You can start a Jupyter Notebook with the following command. This will mount
 the current working directory to :code:`work` within the container, so any files you
 create in this directory are saved. If we had not mounted this directory, all of the files
 created in :code:`/work` would be gone after the container was stopped.
+:code: `--publish 8888:8888` and :code: `--ip 0.0.0.0 --port 8888` is required in order to use Jupyter Notebook from a Docker container.
 
 .. code-block:: bash
 
