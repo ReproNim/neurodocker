@@ -68,7 +68,7 @@ majority of containers. The code block below generates a
 `Singularity definition file <https://sylabs.io/guides/3.7/user-guide/definition_files.html>`_.
 This file can be used to create a Singularity container.
 
-(This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed.
+**This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed first.**
 
 .. code-block:: bash
 
