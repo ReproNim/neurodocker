@@ -19,7 +19,7 @@ pip
 ---
 
 Neurodocker can also be installed with :code:`pip`. This is useful if you want to use
-the Neurodocker Python API. We recommend to installing in a virtual environment.
+the Neurodocker Python API. Python 3.7 or newer is required.
 
 .. code-block:: bash
 
