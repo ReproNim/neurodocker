@@ -77,7 +77,7 @@ One can use the image in the following way:
 
 .. code-block:: bash
 
-    docker run --rm -it conda-multi-env bash
+    docker run --rm -it multi-conda-env bash
     # Pandas is installed in envA.
     conda activate envA
     python -c "import pandas"
