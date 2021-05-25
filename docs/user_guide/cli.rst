@@ -40,6 +40,7 @@ neurodocker generate
     docker       Generate a Dockerfile.
     singularity  Generate a Singularity recipe.
 
+The :code: `neurodocker generate` command has two subcommands: `docker` and `singularity`. Most of the arguments for these subcommands are identical, but please check the details below.
 
 neurodocker generate docker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
