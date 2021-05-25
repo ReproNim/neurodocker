@@ -16,7 +16,7 @@ Docker
 Run the following code snippet to generate a `Dockerfile <https://docs.docker.com/engine/reference/builder/>`_.
 This is a file that defines how to build a Docker image.
 
-(This requires having `Docker <https://docs.docker.com/get-docker/>`_ installed)
+**This requires having `Docker <https://docs.docker.com/get-docker/>`_ installed first**
 
 .. code-block:: bash
 
