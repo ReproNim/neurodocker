@@ -430,7 +430,7 @@ neurodocker minify
 
 .. note::
 
-    Minifying images requires additional dependencies. Please install neurodocker with
+    Minifying images requires additional dependencies installed with :code: `pip`. Please install neurodocker with
 
     .. code-block::
 
