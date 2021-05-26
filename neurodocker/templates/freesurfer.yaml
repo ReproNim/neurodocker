@@ -183,6 +183,7 @@ source:
     - libbz2-dev
     - libfreetype6-dev
     - libgfortran-4.8-dev
+    - libglib2.0-0
     - libglu1-mesa-dev
     - libgomp1
     - libjpeg62-dev
@@ -260,7 +261,7 @@ source:
     rm -rf {{ self.pkg_path }}/packages
     echo "Cloning..."
     echo "   remote:      "{{ self.repo }}
-    echo "   branch:      "{{ self.repo }}
+    echo "   branch:      "{{ self.version }}
     echo "   destination: "{{ self.source_path }}
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
     # Compile
@@ -272,7 +273,6 @@ source:
     # -------------------------------------------------
     #   For infant:
     #     - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
-    #     - infant entrypoint is made executable here, but needs to be activates with `--entrypoint` 
     if [ "{{ self.infant_module }}" = ON ] || [ "{{ self.infant_module }}" = on ]; then \
       pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
       ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash; \
