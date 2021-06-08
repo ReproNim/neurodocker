@@ -281,15 +281,6 @@ source:
       pip3 install -r {{ self.source_path }}/python/requirements.txt; \
       pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
     fi
-    # Compile some utils to support samseg atlas creation, if enabled (see `fs_build_GEMS2`)
-    # ----------------------------------------------------
-    if [ "{{ self.samseg_atlas_build }}" = ON ] || [ "{{ self.samseg_atlas_build }}" = on ]; then \
-      ln -s /usr/local/bin/python3 /usr/local/bin/python; \
-      {{ self.source_path }}/packages/build_packages.py --only-itk {{ self.install_path }}/packages; \
-      cd {{ self.source_path }}/gems; \
-      cmake . -G "Unix Makefiles" -DBUILD_CUDA=OFF -DBUILD_EXECUTABLES=OFF -DBUILD_GUI=OFF -DBUILD_MATLAB=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DITK_DIR=/opt/freesurfer-20210513-fs-infant-dev-merge/packages/itk/4.13.0/src/build -DGFORTRAN_LIBRARIES=/usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=.; \
-      make {{ self.make_opts }}; \
-    fi             
     # Files needed to be downloaded from the annex before we can run `make install`
     # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
     # -------------------------------------------------
@@ -305,6 +296,16 @@ source:
     # -------------------------------------------------    
     cd {{ self.install_path }}
     make install
+    # Compile some utils to support samseg atlas creation, if enabled (see `fs_build_GEMS2`)
+    # (needs to be run after git annex get because it depends on `packages/source/itk-4.13.0.tar.gz`
+    # ----------------------------------------------------
+    if [ "{{ self.samseg_atlas_build }}" = ON ] || [ "{{ self.samseg_atlas_build }}" = on ]; then \
+      ln -s /usr/local/bin/python3 /usr/local/bin/python; \
+      {{ self.source_path }}/packages/build_packages.py --only-itk {{ self.install_path }}/packages; \
+      cd {{ self.source_path }}/gems; \
+      cmake . -G "Unix Makefiles" -DBUILD_CUDA=OFF -DBUILD_EXECUTABLES=OFF -DBUILD_GUI=OFF -DBUILD_MATLAB=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DITK_DIR={{ self.install_path }}/packages/itk/4.13.0/src/build -DGFORTRAN_LIBRARIES=/usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=.; \
+      make {{ self.make_opts }}; \
+    fi
     # If self.license_base64 populated, decode from base64 and write to self.license_path
     # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
     # -------------------------------------------------
