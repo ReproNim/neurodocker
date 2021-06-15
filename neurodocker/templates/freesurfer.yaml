@@ -292,6 +292,7 @@ source:
     #                This is because surfer.nmr now runs git-annex 8 todo: upgrade
     git annex enableremote datasrc || true
     git annex get -q .
+    git annex unlock
     # Install
     # -------------------------------------------------    
     cd {{ self.install_path }}
