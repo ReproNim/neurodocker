@@ -117,7 +117,7 @@ source:
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
       license_path: "{{ self.install_path }}/license.txt"
-      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }}
+      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }} -DGEMS_BUILD_EXECUTABLES={{ self.samseg_atlas_build }}
       make_opts: -j4
   env:
     FS_LICENSE: "{{ self.license_path }}"
@@ -297,16 +297,6 @@ source:
     # -------------------------------------------------    
     cd {{ self.install_path }}
     make install
-    # Compile some utils to support samseg atlas creation, if enabled (see `fs_build_GEMS2`)
-    # (needs to be run after git annex get because it depends on `packages/source/itk-4.13.0.tar.gz`
-    # ----------------------------------------------------
-    if [ "{{ self.samseg_atlas_build }}" = ON ] || [ "{{ self.samseg_atlas_build }}" = on ]; then \
-      ln -s /usr/local/bin/python3 /usr/local/bin/python; \
-      {{ self.source_path }}/packages/build_packages.py --only-itk {{ self.install_path }}/packages; \
-      cd {{ self.source_path }}/gems; \
-      cmake . -G "Unix Makefiles" -DBUILD_CUDA=OFF -DBUILD_EXECUTABLES=OFF -DBUILD_GUI=OFF -DBUILD_MATLAB=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DITK_DIR={{ self.install_path }}/packages/itk/4.13.0/src/build -DGFORTRAN_LIBRARIES=/usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="-msse2 -mfpmath=sse -fPIC -fpermissive" -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=.; \
-      make {{ self.make_opts }}; \
-    fi
     # If self.license_base64 populated, decode from base64 and write to self.license_path
     # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
     # -------------------------------------------------
