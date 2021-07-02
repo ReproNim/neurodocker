@@ -113,7 +113,7 @@ source:
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
       # --- Probably don't have to change args below here (?) ---
       source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
-      pkg_path: /tmp/freesurfer/pkg
+      pkg_path: /opt/freesurfer-pkg
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
       license_path: "{{ self.install_path }}/license.txt"
