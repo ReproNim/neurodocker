@@ -134,6 +134,7 @@ source:
     FMRI_ANALYSIS_DIR: "{{ self.install_path }}/fsfast"
     FSF_OUTPUT_FORMAT: "nii.gz"
     FUNCTIONALS_DIR: "{{ self.install_path }}/sessions"
+    PYTHONPATH: "{{ self.install_path }}/python/packages"
     # default freesurfer options
     FS_OVERRIDE: "0"
     FIX_VERTEX_AREA: ""
