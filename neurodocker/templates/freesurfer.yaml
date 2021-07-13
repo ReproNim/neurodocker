@@ -125,7 +125,7 @@ source:
     FS_INFANT_MODEL: "{{ self.infant_model_dir }}"
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
     OS: "Linux"
-    PATH: "{{ self.niftyreg_path }}/bin:{{ self.pkg_path }}/mni/current/bin:{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    PATH: "{{ self.niftyreg_path }}/bin:{{ self.pkg_path }}/mni/current/bin:{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:$PATH"
     FREESURFER_HOME: "{{ self.install_path }}"
     FREESURFER: "{{ self.install_path }}"
     PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
