@@ -1,18 +1,27 @@
 # Instructions to configure VNC.
-
-generic:
-  system:
-    dependencies:
-      apt: tightvncserver xfonts-base xvfb xterm openbox
-      yum: tightvnc-server xorg-x11-fonts xorg-x11-server-Xvfb xterm openbox
-    instructions: |
-      {{ vnc.install_dependencies() }}
-      echo 'Configuring VNC password ...'
-      mkdir -p ~/.vnc
-      echo {{ vnc.passwd }} | vncpasswd -f > ~/.vnc/passwd
-      chmod 0600 ~/.vnc/passwd
-      sed -i '$iexport USER=$(whoami)' $ND_ENTRYPOINT
-      sed -i '$iexport DISPLAY=$HOSTNAME:1' $ND_ENTRYPOINT
-      {% if vnc.start_at_runtime -%}
-      sed -i '$ivncserver -geometry {{ vnc.geometry|default('1600x1200') }}' $ND_ENTRYPOINT
-      {% endif -%}
+#
+# Run:
+#   vncserver -geometry 1600x1200
+name: vnc
+# Not actually source, but we do not want to provide binaries.
+source:
+  arguments:
+    required:
+    - passwd
+  dependencies:
+    apt:
+    - openbox
+    - tightvncserver
+    - xfonts-base
+    - xvfb
+    yum:
+    - openbox
+    - tightvnc-server
+    - xorg-x11-fonts
+    - xorg-x11-server-Xvfb
+  instructions: |
+    {{ self.install_dependencies() }}
+    echo 'Configuring VNC password ...'
+    mkdir -p ~/.vnc
+    echo {{ self.passwd }} | vncpasswd -f > ~/.vnc/passwd
+    chmod 0600 ~/.vnc/passwd

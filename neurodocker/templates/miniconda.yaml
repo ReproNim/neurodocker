@@ -1,60 +1,88 @@
 # Instructions to install Miniconda.
-#
-# Website: https://conda.io/miniconda.html
 
-generic:
-  binaries:
-    urls:
-      "*": https://repo.continuum.io/miniconda/Miniconda3-{}-Linux-x86_64.sh
-    env:
-      CONDA_DIR: '{{ miniconda.install_path }}'
-      PATH: '{{ miniconda.install_path }}/bin:$PATH'
-    instructions: |
-      {% if not miniconda._installed -%}
-      export PATH="{{ miniconda.install_path }}/bin:$PATH"
-      echo "Downloading Miniconda installer ..."
-      conda_installer="/tmp/miniconda.sh"
-      curl {{ miniconda.curl_opts }} -o "$conda_installer" {{ miniconda.binaries_url }}
-      bash "$conda_installer" -b -p {{ miniconda.install_path }}
-      rm -f "$conda_installer"
-      {% if miniconda.version == "latest" -%}
-      conda update -yq -nbase conda
-      {% endif -%}
-      conda config --system --prepend channels conda-forge
-      conda config --system --set auto_update_conda false
-      conda config --system --set show_channel_urls true
-      sync && conda clean -y --all && sync
-      {% endif -%}
-      {% if miniconda.yaml_file -%}
-      conda env create {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} --file {{ miniconda.yaml_file }}
-      rm -rf ~/.cache/pip/*
-      {% elif miniconda.env_name not in miniconda._environments -%}
-      conda create -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }}
-      {% endif -%}
-      {% if miniconda.conda_install is not none -%}
-      conda install -y {{ miniconda.conda_opts|default("-q") }} --name {{ miniconda.env_name }} \
-      {%- for pkg in miniconda.conda_install %}
+name: miniconda
+binaries:
+  urls:
+    latest: https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-x86_64.sh
+    "*": https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-x86_64.sh
+  env:
+    CONDA_DIR: '{{ self.install_path }}'
+    PATH: '{{ self.install_path }}/bin:$PATH'
+  dependencies:
+    apt:
+    - bzip2
+    - ca-certificates
+    - curl
+    yum:
+    - bzip2
+    - curl
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/miniconda-{{ self.version }}
+      # We do not use a boolean type here because all keywords to the templates are
+      # expected to be strings.
+      installed: "false"
+      env_name: base
+      env_exists: "true"
+      conda_install: ""
+      pip_install: ""
+      conda_opts: ""
+      pip_opts: ""
+      yaml_file: ""
+  instructions: |
+    {% if not self.installed.lower() in ["true", "y", "1"] -%}
+    {{ self.install_dependencies() }}
+    # Install dependencies.
+    export PATH="{{ self.install_path }}/bin:$PATH"
+    echo "Downloading Miniconda installer ..."
+    conda_installer="/tmp/miniconda.sh"
+    curl -fsSL -o "$conda_installer" {{ self.urls["*"] }}
+    bash "$conda_installer" -b -p {{ self.install_path }}
+    rm -f "$conda_installer"
+    {% if self.version == "latest" -%}
+    conda update -yq -nbase conda
+    {% endif -%}
+    # Prefer packages in conda-forge
+    conda config --system --prepend channels conda-forge
+    # Packages in lower-priority channels not considered if a package with the same
+    # name exists in a higher priority channel. Can dramatically speed up installations.
+    # Conda recommends this as a default
+    # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html
+    conda config --set channel_priority strict
+    conda config --system --set auto_update_conda false
+    conda config --system --set show_channel_urls true
+    # Enable `conda activate`
+    conda init bash
+    {% endif -%}
+    {% if self.yaml_file -%}
+    {% if self.env_name == "base" %}{{ raise("Environment name cannot be 'base' if creating an environment from a YAML file.") }}{% endif -%}
+    conda env create {{ self.conda_opts|default("-q") }} --name {{ self.env_name }} --file {{ self.yaml_file }}
+    {% elif self.env_exists.lower() not in ["true", "y", "1"] -%}
+    conda create -y {{ self.conda_opts|default("-q") }} --name {{ self.env_name }}
+    {% endif -%}
+    {% if self.conda_install -%}
+    conda install -y {{ self.conda_opts|default("-q") }} --name {{ self.env_name }} \
+    {%- for pkg in self.conda_install.split() %}
+        {% if not loop.last -%}
+        "{{ pkg }}" \
+        {%- else -%}
+        "{{ pkg }}"
+        {%- endif -%}
+    {% endfor %}
+    {% endif -%}
+    {% if self.pip_install -%}
+    bash -c "source activate {{ self.env_name }}
+      python -m pip install --no-cache-dir {{ self.pip_opts }} \
+      {%- for pkg in self.pip_install.split() %}
           {% if not loop.last -%}
           "{{ pkg }}" \
           {%- else -%}
           "{{ pkg }}"
           {%- endif -%}
-      {% endfor %}
-      sync && conda clean -y --all && sync
-      {% endif -%}
-      {% if miniconda.pip_install is not none -%}
-      bash -c "source activate {{ miniconda.env_name }}
-        pip install --no-cache-dir {{ miniconda.pip_opts }} \
-        {%- for pkg in miniconda.pip_install %}
-            {% if not loop.last -%}
-            "{{ pkg }}" \
-            {%- else -%}
-            "{{ pkg }}"
-            {%- endif -%}
-        {% endfor %}"
-      rm -rf ~/.cache/pip/*
-      sync
-      {% endif -%}
-      {% if miniconda.activate -%}
-      sed -i '$isource activate {{ miniconda.env_name }}' $ND_ENTRYPOINT
-      {% endif -%}
+      {% endfor %}"
+    {% endif -%}
+    # Clean up
+    sync && conda clean --all --yes && sync
+    rm -rf ~/.cache/pip/*

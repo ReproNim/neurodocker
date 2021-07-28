@@ -1,39 +1,78 @@
 # Instructions to install MRtrix3.
-#
-# Repository: https://github.com/MRtrix3/mrtrix3
-# Website: http://www.mrtrix.org/
-# Documentation: http://mrtrix.readthedocs.io/en/latest/
 
-generic:
-  binaries:
-    depndencies:
-      apt: python python-numpy
-      yum: numpy python
-    urls:
-      "3.0_RC3": https://dl.dropbox.com/s/2oh339ehcxcf8xf/mrtrix3-3.0_RC3-Linux-centos6.9-x86_64.tar.gz
-      "3.0_RC2": https://dl.dropbox.com/s/f6y0l472wuio70x/mrtrix3-3.0_RC2-Linux-centos6.9-x86_64.tar.gz
-    env:
-      PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
-    instructions: |
-      echo "Downloading MRtrix3 ..."
-      mkdir -p {{ mrtrix3.install_path }}
-      curl {{ mrtrix3.curl_opts }} {{ mrtrix3.binaries_url }} \
-      | tar -xz -C {{ mrtrix3.install_path }} --strip-components 1
+name: mrtrix3
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/mrtrix3-{{ self.version }}
+      build_processes: "1"
+  dependencies:
+    apt:
+    - bzip2
+    - ca-certificates
+    - curl
+    - libpng16-16
+    - libtiff5
+    yum:
+    - bzip2
+    - curl
+    - fftw3
+    - libpng
+    - libtiff
+  urls:
+    "3.0.2": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.2/conda-linux-mrtrix3-3.0.2-h6bb024c_0.tar.bz2
+    "3.0.1": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.1/conda-linux-mrtrix3-3.0.1-h6bb024c_0.tar.bz2
+    "3.0.0": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.0/conda-linux-mrtrix3-3.0.0-h6bb024c_0.tar.bz2
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    echo "Downloading MRtrix3 ..."
+    mkdir -p {{ self.install_path }}
+    curl -fsSL {{ self.urls[self.version] }} \
+    | tar -xj -C {{ self.install_path }}
 
-  source:
-    dependencies:
-      apt: g++ gcc git libeigen3-dev make python python-numpy zlib1g-dev
-      yum: eigen3-devel gcc-c++ git make numpy python zlib-devel
-    env:
-      PATH: "{{ mrtrix3.install_path }}/bin:$PATH"
-    instructions: |
-      {{ mrtrix3.install_dependencies() }}
-      mkdir -p {{ mrtrix3.install_path }}
-      git clone https://github.com/MRtrix3/mrtrix3.git {{ mrtrix3.install_path }}
-      cd {{ mrtrix3.install_path }}
-      {% if mrtrix3.version != "master" and mrtrix3.version != "latest" -%}
-      git checkout {{ mrtrix3.version }}
-      {% endif -%}
-      ./configure -nogui
-      echo "Compiling MRtrix3 ..."
-      ./build
+source:
+  arguments:
+    required:
+    - version
+    optional:
+      repo: https://github.com/MRtrix3/mrtrix3.git
+      install_path: /opt/mrtrix3-{{ self.version }}
+      build_processes: ""
+  dependencies:
+    apt:
+    - ca-certificates
+    - g++
+    - gcc
+    - git
+    - libeigen3-dev
+    - make
+    - python3
+    - python3-numpy
+    - zlib1g-dev
+    yum:
+    - eigen3-devel
+    - gcc-c++
+    - git
+    - make
+    - numpy
+    - python3
+    - zlib-devel
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    mkdir -p {{ self.install_path }}
+    git clone {{ self.repo }} {{ self.install_path }}
+    cd {{ self.install_path }}
+    {% if self.version != "master" and self.version != "latest" -%}
+    git checkout {{ self.version }}
+    {% endif -%}
+    python3 configure -nogui
+    echo "Compiling MRtrix3 ..."
+    NUMBER_OF_PROCESSORS="{{ self.build_processes }}" python3 build

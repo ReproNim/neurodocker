@@ -2,19 +2,32 @@
 #
 # Repository: https://github.com/UCL/PETPVC
 
-generic:
-  binaries:
-    urls:
-      "1.2.2": https://github.com/UCL/PETPVC/releases/download/v1.2.2/PETPVC-1.2.2-Linux.tar.gz
-      "1.2.1": https://github.com/UCL/PETPVC/releases/download/v1.2.1/PETPVC-1.2.1-Linux.tar.gz
-      "1.2.0-b": https://github.com/UCL/PETPVC/releases/download/v1.2.0-b/PETPVC-1.2.0-b-Linux.tar.gz
-      "1.2.0-a": https://github.com/UCL/PETPVC/releases/download/v1.2.0-a/PETPVC-1.2.0-a-Linux.tar.gz
-      "1.1.0": https://github.com/UCL/PETPVC/releases/download/v1.1.0/PETPVC-1.1.0-Linux.tar.gz
-      "1.0.0": https://github.com/UCL/PETPVC/releases/download/v1.0.0/PETPVC-1.0.0-Linux.tar.gz
-    env:
-      PATH: "{{ petpvc.install_path }}/bin:$PATH"
-    instructions: |
-      echo "Downloading PETPVC ..."
-      mkdir -p {{ petpvc.install_path }}
-      curl {{ petpvc.curl_opts }} {{ petpvc.binaries_url }} \
-      | tar -xz -C {{ petpvc.install_path }} --strip-components 1
+name: petpvc
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/petpvc-{{ self.version }}
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    yum:
+    - curl
+  urls:
+    "1.2.4": https://github.com/UCL/PETPVC/releases/download/v1.2.4/PETPVC-1.2.4-Linux.tar.gz
+    "1.2.2": https://github.com/UCL/PETPVC/releases/download/v1.2.2/PETPVC-1.2.2-Linux.tar.gz
+    "1.2.1": https://github.com/UCL/PETPVC/releases/download/v1.2.1/PETPVC-1.2.1-Linux.tar.gz
+    "1.2.0-b": https://github.com/UCL/PETPVC/releases/download/v1.2.0-b/PETPVC-1.2.0-b-Linux.tar.gz
+    "1.2.0-a": https://github.com/UCL/PETPVC/releases/download/v1.2.0-a/PETPVC-1.2.0-a-Linux.tar.gz
+    "1.1.0": https://github.com/UCL/PETPVC/releases/download/v1.1.0/PETPVC-1.1.0-Linux.tar.gz
+    "1.0.0": https://github.com/UCL/PETPVC/releases/download/v1.0.0/PETPVC-1.0.0-Linux.tar.gz
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    echo "Downloading PETPVC ..."
+    mkdir -p {{ self.install_path }}
+    curl -fL {{ self.urls[self.version] }} \
+    | tar -xz -C {{ self.install_path }} --strip-components 1

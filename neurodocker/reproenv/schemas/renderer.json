@@ -1,0 +1,397 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Renderer Schema",
+  "type": "object",
+  "required": [
+    "instructions",
+    "pkg_manager"
+  ],
+  "properties": {
+    "pkg_manager": {
+      "type": "string",
+      "enum": [
+        "apt",
+        "yum"
+      ],
+      "examples": [
+        "apt",
+        "yum"
+      ]
+    },
+    "existing_users": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "default": [
+        "root"
+      ],
+      "examples": [
+        [
+          "root"
+        ],
+        [
+          "root",
+          "nonroot"
+        ]
+      ]
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/from_"
+          },
+          {
+            "$ref": "#/definitions/arg"
+          },
+          {
+            "$ref": "#/definitions/copy"
+          },
+          {
+            "$ref": "#/definitions/env"
+          },
+          {
+            "$ref": "#/definitions/entrypoint"
+          },
+          {
+            "$ref": "#/definitions/install"
+          },
+          {
+            "$ref": "#/definitions/label"
+          },
+          {
+            "$ref": "#/definitions/run"
+          },
+          {
+            "$ref": "#/definitions/run_bash"
+          },
+          {
+            "$ref": "#/definitions/user"
+          },
+          {
+            "$ref": "#/definitions/workdir"
+          }
+        ]
+      },
+      "minItems": 1,
+      "additionalItems": false,
+      "examples": []
+    }
+  },
+  "definitions": {
+    "from_": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "from_"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "base_image"
+          ],
+          "properties": {
+            "base_image": {
+              "type": "string"
+            },
+            "as_": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "arg": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "arg"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "copy": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "copy"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "source",
+            "destination"
+          ],
+          "properties": {
+            "source": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "destination": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "env": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "env"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "entrypoint": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "entrypoint"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "args"
+          ],
+          "properties": {
+            "args": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "install": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "install"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "pkgs"
+          ],
+          "properties": {
+            "pkgs": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "opts": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "label": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "label"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "run": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "run"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "command"
+          ],
+          "properties": {
+            "command": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "run_bash": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "run_bash"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "command"
+          ],
+          "properties": {
+            "command": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "user": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "user"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "user"
+          ],
+          "properties": {
+            "user": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "workdir": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "workdir"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,26 +1,77 @@
 # Instructions to install dcm2niix.
-#
-# Repository: https://github.com/rordenlab/dcm2niix
-# Documentation: https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
 
-generic:
-  source:
-    dependencies:
-      apt: cmake g++ gcc git make pigz zlib1g-dev
-      yum: cmake gcc-c++ git libstdc++-static make pigz zlib-devel
-    env:
-      PATH: "{{ dcm2niix.install_path }}/bin:$PATH"
-    instructions: |
-      {{ dcm2niix.install_dependencies() }}
-      git clone https://github.com/rordenlab/dcm2niix /tmp/dcm2niix
-      {% if dcm2niix.version != "master" and dcm2niix.version != "latest" -%}
-      cd /tmp/dcm2niix
-      git fetch --tags
-      git checkout {{ dcm2niix.version }}
-      {% endif -%}
-      mkdir /tmp/dcm2niix/build
-      cd /tmp/dcm2niix/build
-      cmake {{ dcm2niix.cmake_opts }} -DCMAKE_INSTALL_PREFIX:PATH={{ dcm2niix.install_path }} ..
-      make {{ dcm2niix.make_opts }}
-      make install
-      rm -rf /tmp/dcm2niix
+name: dcm2niix
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/dcm2niix-{{ self.version }}
+  urls:
+    latest: https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip
+    v1.0.20201102: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20201102/dcm2niix_lnx.zip
+    v1.0.20200331: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20200331/dcm2niix_lnx.zip
+    v1.0.20190902: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20190902/dcm2niix_lnx.zip
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    - unzip
+    yum:
+    - curl
+    - unzip
+  env:
+    PATH: "{{ self.install_path }}:$PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    mkdir -p {{ self.install_path }}
+    cd {{ self.install_path }}
+    curl -fsSL -o dcm2niix.zip {{ self.urls[self.version] }}
+    unzip dcm2niix.zip
+    rm dcm2niix.zip
+    chmod +x dcm2niix
+
+source:
+  arguments:
+    required:
+    - version
+    optional:
+      repo: https://github.com/rordenlab/dcm2niix
+      install_path: /opt/dcm2niix-{{ self.version }}
+      cmake_opts: ""
+      make_opts: -j1
+  dependencies:
+    apt:
+    - ca-certificates
+    - cmake
+    - g++
+    - gcc
+    - git
+    - make
+    - pigz
+    - zlib1g-dev
+    yum:
+    - ca-certificates
+    - cmake
+    - gcc-c++
+    - git
+    - libstdc++-static
+    - make
+    - pigz
+    - zlib-devel
+  env:
+    PATH: "{{ self.install_path }}/bin:$PATH"
+  instructions: |
+    {{ self.install_dependencies() }}
+    git clone {{ self.repo }} /tmp/dcm2niix
+    {% if self.version != "master" and self.version != "latest" -%}
+    cd /tmp/dcm2niix
+    git fetch --tags
+    git checkout {{ self.version }}
+    {% endif -%}
+    mkdir /tmp/dcm2niix/build
+    cd /tmp/dcm2niix/build
+    cmake {{ self.cmake_opts }} -DCMAKE_INSTALL_PREFIX:PATH={{ self.install_path }} ..
+    make {{ self.make_opts }}
+    make install
+    rm -rf /tmp/dcm2niix

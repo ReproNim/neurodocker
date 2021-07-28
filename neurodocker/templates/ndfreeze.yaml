@@ -1,12 +1,18 @@
 # Instructions to run `nd_freeze` in NeuroDebian images.
 
-generic:
-  custom:
-    dependencies:
-      apt: neurodebian-freeze
-    instructions: |
-      apt-get update -qq
-      apt-get install -y -q --no-install-recommends neurodebian-freeze
-      nd_freeze {{ ndfreeze.opts | default('') }} {{ ndfreeze.date }}
-      apt-get clean
-      rm -rf /var/lib/apt/lists/*
+name: ndfreeze
+# not actually source, but we have a choice between binaries and source. Using binaries
+# requires the urls property.
+source:
+  arguments:
+    required:
+    - date
+    optional:
+      opts: ""
+  # No dependencies because we explicitly install in the instructions.
+  instructions: |
+    apt-get update -qq
+    apt-get install -y -q --no-install-recommends neurodebian-freeze
+    nd_freeze {{ self.opts }} {{ self.date }}
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
