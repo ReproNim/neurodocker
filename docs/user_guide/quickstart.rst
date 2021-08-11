@@ -16,7 +16,7 @@ Docker
 Run the following code snippet to generate a `Dockerfile <https://docs.docker.com/engine/reference/builder/>`_.
 This is a file that defines how to build a Docker image.
 
-(This requires having `Docker <https://docs.docker.com/get-docker/>`_ installed)
+**This requires having `Docker <https://docs.docker.com/get-docker/>`_ installed first**
 
 .. code-block:: bash
 
@@ -33,19 +33,24 @@ file in an empty directory, and build with :code:`docker build`:
 
 .. code-block:: bash
 
+    # creating a new empty directory
     mkdir docker-example
     cd docker-example
+    # saving the output of neurodocker command in a file: Dockerfile
     neurodocker generate docker --pkg-manager apt \
         --base-image neurodebian:buster \
         --ants version=2.3.4 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Dockerfile
+    # building a new image using the Dockerfile (use --file <dockerfile_name> option if other name is used)
     docker build --tag nipype-ants .
 
-Then, you can start a Jupyter Notebook with the following command. This will mount
+The image :code: `nipype-ants` contains :code: `ANTs` and a Python environment with :code: `Nipype` and :code: `Jupyter Notebook`.
+You can start a Jupyter Notebook with the following command. This will mount
 the current working directory to :code:`work` within the container, so any files you
 create in this directory are saved. If we had not mounted this directory, all of the files
 created in :code:`/work` would be gone after the container was stopped.
+:code: `--publish 8888:8888` and :code: `--ip 0.0.0.0 --port 8888` is required in order to use Jupyter Notebook from a Docker container.
 
 .. code-block:: bash
 
@@ -57,13 +62,11 @@ Feel free to create a new notebook and :code:`import nipype`.
 Singularity
 ~~~~~~~~~~~
 
-The only difference between this command and the one above is :code:`neurodocker generate singularity`
-versus :code:`neurodocker generate docker`. This will be the case when generating the
-majority of containers. The code block below generates a
-`Singularity definition file <https://sylabs.io/guides/3.7/user-guide/definition_files.html>`_.
-This file can be used to create a Singularity container.
+In most cases the only difference between generating Dockerfile and 
+`Singularity definition file <https://sylabs.io/guides/3.7/user-guide/definition_files.html>`_ (the file that is used to create a Singularity container) is in  
+a form of :code:`neurodocker generate` command,  `neurodocker generate singularity` has to be used instead of :code:`neurodocker generate docker`.
 
-(This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed.
+**This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed first.**
 
 .. code-block:: bash
 
@@ -80,13 +83,16 @@ will not be able to run this on a shared computing environment, like a high perf
 
 .. code-block:: bash
 
+    # creating a new empty directory
     mkdir singularity-example
     cd singularity-example
+    # saving the output of the Neurodocker command in the Singularity file
     neurodocker generate singularity --pkg-manager apt \
         --base-image neurodebian:buster \
         --ants version=2.3.4 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Singularity
+    # building a new image using the Singularity file
     sudo singularity build nipype-ants.sif Singularity
 
 This will create a new file :code:`nipype-ants.sif` in this directory. This is the
@@ -128,7 +134,9 @@ commands.
 
 .. code-block:: bash
 
+    # running a container in the background and assigning `to-minify` name to the container
     docker run --rm -itd --name to-minify python:3.9-slim bash
+    # running minify command for a specific set of python commands
     neurodocker minify \
       --container to-minify \
       --dir /usr/local \

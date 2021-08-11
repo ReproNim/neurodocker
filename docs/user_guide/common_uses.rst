@@ -32,7 +32,7 @@ This example demonstrates how to build and run an image with Jupyter Notebook.
     neurodocker generate docker \
         --pkg-manager apt \
         --base-image debian:buster-slim \
-        --miniconda
+        --miniconda \
             version=latest \
             conda_install="matplotlib notebook numpy pandas seaborn" \
         --user nonroot \
@@ -77,7 +77,7 @@ One can use the image in the following way:
 
 .. code-block:: bash
 
-    docker run --rm -it conda-multi-env bash
+    docker run --rm -it multi-conda-env bash
     # Pandas is installed in envA.
     conda activate envA
     python -c "import pandas"

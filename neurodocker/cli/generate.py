@@ -5,11 +5,14 @@
 
 # TODO: add a dedicated class for key=value in the eat-all class.
 
+import json as json_lib
 from pathlib import Path
+import sys
 import typing as ty
 
 import click
 
+from neurodocker.reproenv.renderers import _Renderer
 from neurodocker.reproenv.renderers import DockerRenderer
 from neurodocker.reproenv.renderers import SingularityRenderer
 from neurodocker.reproenv.state import get_template
@@ -61,7 +64,7 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
         params: ty.List[click.Parameter] = [
             click.Option(
                 ["-p", "--pkg-manager"],
-                type=click.Choice(allowed_pkg_managers, case_sensitive=False),
+                type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
                 required=True,
                 multiple=False,
                 help="System package manager",
@@ -86,6 +89,9 @@ class OrderedParamsCommand(click.Command):
         param_order: ty.List[click.Parameter]
         opts, _, param_order = parser.parse_args(args=list(args))
         for param in param_order:
+            # We need the parameter name... so if it's None, let's panic.
+            if param.name is None:
+                raise ValueError(f"parameter name is None: {param}")
             value = opts[param.name]
             # If we have multiple values, take the first one. We do this before type
             # casting, because type casting for some reason brings all of the given
@@ -176,7 +182,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
     params: ty.List[click.Parameter] = [
         click.Option(
             ["-p", "--pkg-manager"],
-            type=click.Choice(allowed_pkg_managers, case_sensitive=False),
+            type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
             required=True,
             multiple=False,
             help="System package manager",
@@ -234,11 +240,24 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         ),
         click.Option(["--workdir"], multiple=True, help="Set the working directory"),
         click.Option(["--yes"], is_flag=True, help="Reply yes to all prompts."),
+        click.Option(
+            ["--json"],
+            is_flag=True,
+            help=(
+                "Output instructions as JSON. This can be used to generate Dockerfiles"
+                " or Singularity recipes with Neurodocker."
+            ),
+        ),
     ]
     return params
 
 
-def _create_help_for_template(template: Template):
+def _create_help_for_template(template: Template) -> str:
+    """Return a string help message for a template.
+
+    This help message lists available installation methods and required and optional
+    parameters for each method.
+    """
     methods = []
     if template.binaries is not None:
         methods.append("binaries")
@@ -348,6 +367,9 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {"path": value}}
     # probably a registered template?
     else:
+        # We need the parameter name... so if it's None, let's panic.
+        if param.name is None:
+            raise ValueError(f"parameter name is None: {param}")
         if param.name.lower() in registered_templates():
             tmpl_name = param.name.lower()
             value = dict(value)
@@ -376,21 +398,80 @@ def generate(*, template_path):
     pass
 
 
+def _base_generate(
+    ctx: click.Context, renderer: ty.Type[_Renderer], pkg_manager: str, **kwds
+):
+    """Function that does all of the work of `generate docker` and
+    `generate singularity`. The difference between those two is the renderer used.
+    """
+    renderer_dict = _params_to_renderer_dict(ctx=ctx, pkg_manager=pkg_manager)
+    r = renderer.from_dict(renderer_dict)
+
+    # Print the instructions in JSON if that's what the user wants.
+    # We get the JSON instructions from the renderer itself -- rather than the
+    # `renderer_dict` -- because the renderer instructions containers (mostly)
+    # reproducible commands. A user might pass `--fsl version=6.0.4`, and the JSON will
+    # include the commands associated with that version of FSL. If we had printed the
+    # `renderer_dict`, then the dictionary would include `fsl` and version 6.0.4, but
+    # the behavior of that installation could change if there is a change in the
+    # template for FSL in neurodocker.
+    json = kwds.get("json", False)
+    if json:
+        click.echo(r.to_json())
+        ctx.exit(0)
+
+    output = str(r)
+    click.echo(output)
+
+
 @generate.command(cls=OrderedParamsCommand)
 @click.pass_context
-def docker(ctx: click.Context, pkg_manager, **kwds):
+def docker(ctx: click.Context, pkg_manager: str, **kwds):
     """Generate a Dockerfile."""
-    renderer_dict = _params_to_renderer_dict(ctx=ctx, pkg_manager=pkg_manager)
-    renderer = DockerRenderer.from_dict(renderer_dict)
-    output = str(renderer)
-    click.echo(output)
+    _base_generate(
+        ctx=ctx,
+        renderer=DockerRenderer,
+        pkg_manager=pkg_manager,
+        **kwds,
+    )
 
 
 @generate.command(cls=OrderedParamsCommand)
 @click.pass_context
-def singularity(ctx: click.Context, pkg_manager, **kwds):
+def singularity(ctx: click.Context, pkg_manager: str, **kwds):
     """Generate a Singularity recipe."""
-    renderer_dict = _params_to_renderer_dict(ctx=ctx, pkg_manager=pkg_manager)
-    renderer = SingularityRenderer.from_dict(renderer_dict)
-    output = str(renderer)
-    click.echo(output)
+    _base_generate(
+        ctx=ctx,
+        renderer=SingularityRenderer,
+        pkg_manager=pkg_manager,
+        **kwds,
+    )
+
+
+@click.command()
+@click.argument(
+    "container_type",
+    required=True,
+    type=click.Choice(["docker", "singularity"], case_sensitive=False),
+)
+@click.argument(
+    "input",
+    type=click.File("r"),
+    default=sys.stdin,
+)
+def genfromjson(*, container_type: str, input: ty.IO):
+    """Generate a container from a ReproEnv JSON file.
+
+    INPUT is standard input by default or a path to a JSON file.
+    """
+    d = json_lib.load(input)
+
+    renderer: ty.Type[_Renderer]
+    if container_type.lower() == "docker":
+        renderer = DockerRenderer
+    elif container_type.lower() == "singularity":
+        renderer = SingularityRenderer
+
+    r = renderer.from_dict(d)
+    spec = str(r)
+    click.echo(spec)

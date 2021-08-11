@@ -161,9 +161,23 @@ SPM
 Miniconda
 ---------
 
-.. todo::
+Docker with new :code:`conda` environment, python packages installed with :code:`conda` and :code:`pip`.
 
-    Add an example of building a Miniconda image.
+.. code-block:: bash
+
+    neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image debian:buster-slim \
+        --miniconda \
+            version=latest \
+            env_name=env_scipy \
+            env_exists=false \
+            conda_install=pandas \
+            pip_install=scipy \
+    > conda-env.Dockerfile
+
+    docker build --tag conda-env --file conda-env.Dockerfile .
+
 
 Nipype tutorial
 ---------------
