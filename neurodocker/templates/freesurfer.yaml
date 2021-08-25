@@ -120,7 +120,7 @@ source:
       # This one has to be quoted with \"s for some reason
       license_path: "{{ self.install_path }}/license.txt"
       cxx_flags: "-msse2 -mfpmath=sse -fPIC -fpermissive"
-      c_flags: "-msse2 -mfpmath=sse -fPIC -fpermissive"
+      c_flags: "-msse2 -mfpmath=sse -fPIC"
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }} -DGEMS_BUILD_EXECUTABLES={{ self.samseg_atlas_build }} -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="{{ self.cxx_flags }}" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="{{ self.c_flags }}"
       make_opts: -j4
   env:
@@ -224,18 +224,15 @@ source:
   instructions: |
     {{ self.install_dependencies() }}
     # git config
+    # -------------------------------------------------------------------------
     git config --global user.email "CI@example.com"
     git config --global user.name "CI"
-    # Following along with:
-    #  - https://travis-ci.com/github/freesurfer/freesurfer/builds/219074161
-    # Compile with gcc 4.8
-    # --------------------
+    # Switch to gcc 4.8
+    # -------------------------------------------------------------------------
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
     update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.8 100
-    # FreeSurfer needs python  v3.6.8
-    # From: https://github.com/pwighton/fs-docker/blob/09cc6b0b6c0538cbb182b04435daf85c123a63d5/build/Dockerfile#L66
-    # Alternative is https://github.com/ReproNim/neurodocker/blob/master/neurodocker/templates/afni.yaml
+    # Python  v3.6.8
     # -------------------------------------------------------------------------
     curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /tmp
     cd /tmp/Python-3.6.8
@@ -247,9 +244,8 @@ source:
     pip3 install -q --no-cache-dir -U pip
     pip3 install -q --no-cache-dir wheel
     sync
-    # FreeSurfer needs CMake 3.9 or higher
-    # From: https://github.com/Rikorose/gcc-cmake/blob/master/gcc-4/Dockerfile
-    # ------------------------------------------------------------------------------
+    # Cmake v3.19.0 (must be > v3.6.8)
+    # -------------------------------------------------------------------------
     wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /tmp/cmake-install.sh
     chmod u+x /tmp/cmake-install.sh
     mkdir -p /usr/share/cmake-3.19.0
@@ -257,9 +253,8 @@ source:
     CMAKE_BINPATH=`which cmake`
     rm -rf $CMAKE_BINPATH
     ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
-    rm /tmp/cmake-install.sh
+    rm /tmp/cmake-install.sh    
     # Compile FreeSurfer
-    # https://github.com/pwighton/fs-docker
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
@@ -271,61 +266,56 @@ source:
     echo "   branch:      "{{ self.version }}
     echo "   destination: "{{ self.source_path }}
     git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
-    # Compile
-    # -------------------------------------------------
     cd {{ self.install_path }}
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
     # Install python reqs
-    # -------------------------------------------------
-    #   For infant:
-    #     - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/entrypoint.freesurfer-run.bash#L9
-    if [ "{{ self.infant_module }}" = ON ] || [ "{{ self.infant_module }}" = on ]; then \
-      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt; \
-      ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash; \
-    else \
-      pip3 install -r {{ self.source_path }}/python/requirements.txt; \
-    fi
-    # PW 2021/08/13: moving comments outside of `git_annex_get` if block
-    # PW 2021/03/04: Weird.. this (`git annex enableremote datasrc`) returns an 
-    #                error code, but things still work?
-    #                So hardwire the exit code to zero so `docker build` doesn't error out
-    #                This is because surfer.nmr now runs git-annex 8? todo: upgrade
-    # Files needed to be downloaded from the annex before we can run `make install`
-    # todo: tag files in annex so we can run `git annex get --metadata fstags=makeinstall` (faster)
-    # -------------------------------------------------
-    if [ "{{ self.git_annex_get }}" = ON ] || [ "{{ self.git_annex_get }}" = on ]; then \
-      cd {{ self.source_path }}; \
-      git remote add datasrc {{ self.annex }}; \
-      git fetch datasrc; \
-      git annex enableremote datasrc || true; \
-      git annex get -q .; \
-      git annex unlock; \
-      cd {{ self.install_path }}; \
-      make install; \
-    fi
-    # Since the gems subdir doesn't rely on the annex remote to execute `make install`,
+    # ----------------------------------------------------------------
+    {%- if self.infant_module.lower() in ["on", "true", "1", "y"] %}
+      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
+      ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
+    {% else %}
+      pip3 install -r {{ self.source_path }}/python/requirements.txt
+    {% endif -%}
+    # Setup annex remote
+    # ----------------------------------------------------------------
+    cd {{ self.source_path }}
+    git remote add datasrc {{ self.annex }}
+    git fetch datasrc
+    git annex enableremote datasrc || true      
+    # Pull from annex and install 
+    # (`make install` will fail if `git annex get` isn't run)
+    # ----------------------------------------------------------------
+    {%- if self.git_annex_get.lower() in ["on", "true", "1", "y"] %}
+      git annex get -q .
+      git annex unlock
+      cd {{ self.install_path }}
+      make install
+    {% endif -%}
     # If were building for samseg atlases, run make install in the gems subdir
+    # Since the gems subdir doesn't rely on the annex remote to execute `make install`,
     # This lets us build the container with git_annex_get=off, and still have gems binaries installed
-    if [ "{{ self.samseg_atlas_build }}" = ON ] || [ "{{ self.samseg_atlas_build }}" = on ]; then \
-      cd {{ self.source_path }}/gems; \
-      make install; \
-    fi
-    # If self.license_base64 populated, decode from base64 and write to self.license_path
-    # https://github.com/pwighton/fs-docker/blob/master/run/entrypoint.freesurfer-run.bash
-    # -------------------------------------------------
-    if [ -n "{{ self.license_base64 }}" ]; then \
-      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}; \
-    fi
-    ## *** Dev tools **
-    ## Note jupyter relies on `libsqlite3-dev` being present before python is compiled
-    if [ "{{ self.dev_tools }}" = ON ] || [ "{{ self.dev_tools }}" = on ]; then \
-      pip3 install jupyter; \
-      pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
-    fi
+    # ----------------------------------------------------------------
+    {%- if self.samseg_atlas_build.lower() in ["on", "true", "1", "y"] %}
+      cd {{ self.source_path }}/gems
+      make install
+    {% endif -%}
     # Setup mount points
-    # -------------------------------------------------
+    # ----------------------------------------------------------------
     mkdir -p {{ self.subjects_dir }}
     mkdir -p {{ self.infant_model_dir }}
-    # Todo:
-    #   - delete the /tmp dir, but first ensure that it's not needed
+    # If self.license_base64 is populated, decode from base64 and write to self.license_path
+    # -------------------------------------------------
+    {%- if self.license_base64 is defined and self.license_base64|length %}
+      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
+    {% endif -%}
+    # Dev tools
+    #   - jupyter relies on `libsqlite3-dev` being present before python is compiled
+    #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
+    # -------------------------------------------------
+    {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
+      pip3 install jupyter; \
+      pip3 install -r {{ self.source_path }}/python/requirements-extra.txt; \
+    {% else %}
+      rm -rf /tmp/*
+    {% endif -%}
