@@ -296,11 +296,6 @@ source:
     # ----------------------------------------------------------------
     mkdir -p {{ self.subjects_dir }}
     mkdir -p {{ self.infant_model_dir }}
-    # If self.license_base64 is populated, decode from base64 and write to self.license_path
-    # ----------------------------------------------------------------
-    {%- if self.license_base64 is defined and self.license_base64|length %}
-      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
-    {% endif -%}
     # Dev tools
     #   - jupyter relies on `libsqlite3-dev` being present before python is compiled
     #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
