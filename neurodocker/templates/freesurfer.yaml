@@ -292,14 +292,6 @@ source:
       cd {{ self.install_path }}
       make install
     {% endif -%}
-    # If were building for samseg atlases, run make install in the gems subdir
-    # Since the gems subdir doesn't rely on the annex remote to execute `make install`,
-    # This lets us build the container with git_annex_get=off, and still have gems binaries installed
-    # ----------------------------------------------------------------
-    {%- if self.samseg_atlas_build.lower() in ["on", "true", "1", "y"] %}
-      cd {{ self.source_path }}/gems
-      make install
-    {% endif -%}
     # Setup mount points
     # ----------------------------------------------------------------
     mkdir -p {{ self.subjects_dir }}
