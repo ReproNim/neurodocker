@@ -223,6 +223,12 @@ source:
     - make
   instructions: |
     {{ self.install_dependencies() }}
+    # If self.license_base64 is populated, decode from base64 and write to self.license_path
+    # ----------------------------------------------------------------
+    {%- if self.license_base64 is defined and self.license_base64|length %}
+      echo "   fs license (base64):      "{{ self.license_base64 }}
+      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
+    {% endif -%}
     # git config
     # -------------------------------------------------------------------------
     git config --global user.email "CI@example.com"
@@ -287,6 +293,7 @@ source:
     # (`make install` will fail if `git annex get` isn't run)
     # ----------------------------------------------------------------
     {%- if self.git_annex_get.lower() in ["on", "true", "1", "y"] %}
+      cd {{ self.source_path }}
       git annex get -q .
       git annex unlock
       cd {{ self.install_path }}
