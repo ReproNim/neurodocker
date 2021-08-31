@@ -223,12 +223,6 @@ source:
     - make
   instructions: |
     {{ self.install_dependencies() }}
-    # If self.license_base64 is populated, decode from base64 and write to self.license_path
-    # ----------------------------------------------------------------
-    {%- if self.license_base64 is defined and self.license_base64|length %}
-      echo "   fs license (base64):      "{{ self.license_base64 }}
-      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
-    {% endif -%}
     # git config
     # -------------------------------------------------------------------------
     git config --global user.email "CI@example.com"
@@ -264,6 +258,11 @@ source:
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
+    {%- if self.license_base64 is defined and self.license_base64|length %}
+      echo "   fs license (base64):      "{{ self.license_base64 }}
+      mkdir -p `dirname {{ self.license_path }}`
+      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
+    {% endif -%}
     wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
