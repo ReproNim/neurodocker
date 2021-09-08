@@ -259,9 +259,9 @@ source:
     mkdir -p {{ self.pkg_path }}
     mkdir -p {{ self.install_path }}
     {%- if self.license_base64 is defined and self.license_base64|length %}
-      echo "   fs license (base64):      "{{ self.license_base64 }}
-      mkdir -p `dirname {{ self.license_path }}`
-      echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
+    echo "   fs license (base64):      "{{ self.license_base64 }}
+    mkdir -p `dirname {{ self.license_path }}`
+    echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
     {% endif -%}
     wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
@@ -277,10 +277,10 @@ source:
     # Install python reqs
     # ----------------------------------------------------------------
     {%- if self.infant_module.lower() in ["on", "true", "1", "y"] %}
-      pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
-      ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
+    pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
+    ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
     {% else %}
-      pip3 install -r {{ self.source_path }}/python/requirements.txt
+    pip3 install -r {{ self.source_path }}/python/requirements.txt
     {% endif -%}
     # Setup annex remote
     # ----------------------------------------------------------------
@@ -292,11 +292,11 @@ source:
     # (`make install` will fail if `git annex get` isn't run)
     # ----------------------------------------------------------------
     {%- if self.git_annex_get.lower() in ["on", "true", "1", "y"] %}
-      cd {{ self.source_path }}
-      git annex get -q .
-      git annex unlock
-      cd {{ self.install_path }}
-      make install
+    cd {{ self.source_path }}
+    git annex get -q .
+    git annex unlock
+    cd {{ self.install_path }}
+    make install
     {% endif -%}
     # Setup mount points
     # ----------------------------------------------------------------
@@ -307,8 +307,8 @@ source:
     #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
     # ----------------------------------------------------------------
     {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
-      pip3 install jupyter
-      pip3 install -r {{ self.source_path }}/python/requirements-extra.txt
+    pip3 install jupyter
+    pip3 install -r {{ self.source_path }}/python/requirements-extra.txt
     {% else %}
-      rm -rf /tmp/*
+    rm -rf /tmp/*
     {% endif -%}
