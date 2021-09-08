@@ -118,7 +118,7 @@ source:
       pkg_path: /opt/freesurfer-pkg
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
-      license_path: "{{ self.install_path }}/license.txt"
+      license_path: {{ self.install_path }}/license.txt
       cxx_flags: "-msse2 -mfpmath=sse -fPIC -fpermissive"
       c_flags: "-msse2 -mfpmath=sse -fPIC"
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }} -DGEMS_BUILD_EXECUTABLES={{ self.samseg_atlas_build }} -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="{{ self.cxx_flags }}" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="{{ self.c_flags }}"
