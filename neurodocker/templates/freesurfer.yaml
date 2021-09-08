@@ -263,7 +263,7 @@ source:
     mkdir -p `dirname {{ self.license_path }}`
     echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}
     {% endif -%}
-    wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }} 
+    wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }}
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
     echo "Cloning..."
