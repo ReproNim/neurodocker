@@ -118,14 +118,14 @@ source:
       pkg_path: /opt/freesurfer-pkg
       install_path: /opt/freesurfer-{{ self.version }}
       # This one has to be quoted with \"s for some reason
-      license_path: "{{ self.install_path }}"
+      license_path: "/opt"
       license_file: license.txt
       cxx_flags: "-msse2 -mfpmath=sse -fPIC -fpermissive"
       c_flags: "-msse2 -mfpmath=sse -fPIC"
       cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_GUIS={{ self.build_guis }} -DMINIMAL={{ self.minimal }} -DINFANT_MODULE={{ self.infant_module }} -DFS_PACKAGES_DIR={{ self.pkg_path }} -DGFORTRAN_LIBRARIES={{ self.fortran_libs }} -DINSTALL_PYTHON_DEPENDENCIES={{ self.install_python_deps }} -DDISTRIBUTE_FSPYTHON={{ self.distribute_fspython }} -DMARTINOS_BUILD={{ self.martinos_build }} -DGEMS_BUILD_EXECUTABLES={{ self.samseg_atlas_build }} -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_CXX_COMPILER_AR=/usr/bin/ar -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_CXX_FLAGS="{{ self.cxx_flags }}" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_C_COMPILER_AR=/usr/bin/ar -DCMAKE_C_COMPILER_RANLIB=/usr/bin/ranlib -DCMAKE_C_FLAGS="{{ self.c_flags }}"
       make_opts: -j4
   env:
-    FS_LICENSE: "{{ self.license_path }}"
+    FS_LICENSE: "{{ self.license_path }}/{{ license_file }}"
     SUBJECTS_DIR: "{{ self.subjects_dir }}"
     FS_INFANT_MODEL: "{{ self.infant_model_dir }}"
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
@@ -261,7 +261,7 @@ source:
     mkdir -p {{ self.install_path }}
     {%- if self.license_base64 is defined and self.license_base64|length %}
     echo "   fs license (base64):      "{{ self.license_base64 }}
-    mkdir -p {{ self.license_path }})
+    mkdir -p {{ self.license_path }}
     echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}/{{ self.license_file }}
     {% endif -%}
     wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }}
