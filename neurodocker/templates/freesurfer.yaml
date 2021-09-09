@@ -306,10 +306,15 @@ source:
     # Dev tools
     #   - jupyter relies on `libsqlite3-dev` being present before python is compiled
     #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
+    #   - awscli is installed (todo, best place for this?)
     # ----------------------------------------------------------------
     {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
     pip3 install jupyter
     pip3 install -r {{ self.source_path }}/python/requirements-extra.txt
+    cd /tmp
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
     {% else %}
     rm -rf /tmp/*
     {% endif -%}
