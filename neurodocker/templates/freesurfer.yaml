@@ -148,12 +148,12 @@ source:
     # Just in case: https://github.com/freesurfer/freesurfer/issues/776
     FS_TIME_ALLOW: "0"
     # mni environment requirements
-    MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
-    MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
-    MNI_DIR: "{{ self.install_path }}/mni"
-    MNI_DATAPATH: "{{ self.install_path }}/mni/data"
-    MNI_PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
-    PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
+    MINC_BIN_DIR: "{{ self.pkg_path }}/mni/current/bin"
+    MINC_LIB_DIR: "{{ self.pkg_path }}/mni/current/lib"
+    MNI_DIR: "{{ self.pkg_path }}/mni"
+    MNI_DATAPATH: "{{ self.pkg_path }}/mni/current/data"
+    MNI_PERL5LIB: "{{ self.pkg_path }}/mni/current/share/perl5"
+    PERL5LIB: "{{ self.pkg_path }}/mni/current/share/perl5"
     # infant model setup, see:
     #   - https://github.com/pwighton/fs-docker/blob/f691232312e97f2ea87b8ae45bfd5c365e2bc91c/baby/dockerfile#L85
     #   - https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/infant/freesurfer-linux-centos7_x86_64-infant.tar.gz
