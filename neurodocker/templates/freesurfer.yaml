@@ -272,7 +272,7 @@ source:
     echo "   remote:      "{{ self.repo }}
     echo "   branch:      "{{ self.branch }}
     echo "   destination: "{{ self.source_path }}
-    git clone --single-branch --branch {{ self.branch }} {{ self.repo }} {{ self.source_path }}
+    git clone --branch {{ self.branch }} {{ self.repo }} {{ self.source_path }}
     {%- if self.commit is defined and self.commit|length %}
     cd {{ self.source_path }}
     git checkout {{ self.commit }}
