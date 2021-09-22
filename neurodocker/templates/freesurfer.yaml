@@ -90,8 +90,9 @@ binaries:
 source:
   arguments:
     required:
-    - version
+    - branch
     optional:
+      commit: ""
       license_base64: ""
       # The subject dir is not in /opt, like everything else FreeSurfer-related
       # Because if we want to run `neurodocker minify` we want to operate over the `/opt`
@@ -114,9 +115,9 @@ source:
       dev_tools: "OFF"
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
       # --- Probably don't have to change args below here (?) ---
-      source_path: /tmp/freesurfer/freesurfer-{{ self.version }}
+      source_path: /tmp/freesurfer/freesurfer-{{ self.branch }}
       pkg_path: /opt/freesurfer-pkg
-      install_path: /opt/freesurfer-{{ self.version }}
+      install_path: /opt/freesurfer-{{ self.branch }}
       # This one has to be quoted with \"s for some reason
       license_path: "/opt"
       license_file: license.txt
@@ -269,9 +270,13 @@ source:
     rm -rf {{ self.pkg_path }}/packages
     echo "Cloning..."
     echo "   remote:      "{{ self.repo }}
-    echo "   branch:      "{{ self.version }}
+    echo "   branch:      "{{ self.branch }}
     echo "   destination: "{{ self.source_path }}
-    git clone --single-branch --branch {{ self.version }} {{ self.repo }} {{ self.source_path }}
+    git clone --single-branch --branch {{ self.branch }} {{ self.repo }} {{ self.source_path }}
+    {%- if self.commit is defined and self.commit|length %}
+    cd {{ self.source_path }}
+    git checkout {{ self.commit }}
+    {% endif -%}    
     cd {{ self.install_path }}
     cmake {{ self.cmake_opts }} {{ self.source_path }}
     make {{ self.make_opts }}
