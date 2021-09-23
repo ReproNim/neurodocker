@@ -229,6 +229,33 @@ source:
     # -------------------------------------------------------------------------
     git config --global user.email "CI@example.com"
     git config --global user.name "CI"
+    # Switch to gcc 4.8
+    # -------------------------------------------------------------------------
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
+    update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.8 100
+    # Python  v3.6.8
+    # -------------------------------------------------------------------------
+    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /tmp
+    cd /tmp/Python-3.6.8
+    ./configure
+    make
+    make install 
+    cd /
+    rm -rf /tmp/Python-3.6.8
+    pip3 install -q --no-cache-dir -U pip
+    pip3 install -q --no-cache-dir wheel
+    sync
+    # Cmake v3.19.0 (must be > v3.6.8)
+    # -------------------------------------------------------------------------
+    wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /tmp/cmake-install.sh
+    chmod u+x /tmp/cmake-install.sh
+    mkdir -p /usr/share/cmake-3.19.0
+    /tmp/cmake-install.sh --skip-license --prefix=/usr/share/cmake-3.19.0
+    CMAKE_BINPATH=`which cmake`
+    rm -rf $CMAKE_BINPATH
+    ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
+    rm /tmp/cmake-install.sh    
     # Compile FreeSurfer
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
@@ -238,6 +265,9 @@ source:
     mkdir -p {{ self.license_path }}
     echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}/{{ self.license_file }}
     {% endif -%}
+    wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }}
+    mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
+    rm -rf {{ self.pkg_path }}/packages
     echo "Cloning..."
     echo "   remote:      "{{ self.repo }}
     echo "   branch:      "{{ self.branch }}
@@ -248,3 +278,49 @@ source:
     cd {{ self.source_path }}
     git checkout {{ self.commit }}
     {% endif -%}    
+    cd {{ self.install_path }}
+    cmake {{ self.cmake_opts }} {{ self.source_path }}
+    make {{ self.make_opts }}
+    # Install python reqs
+    # ----------------------------------------------------------------
+    {%- if self.infant_module.lower() in ["on", "true", "1", "y"] %}
+    pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
+    ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
+    {% else %}
+    pip3 install -r {{ self.source_path }}/python/requirements.txt
+    {% endif -%}
+    # Setup annex remote
+    # ----------------------------------------------------------------
+    cd {{ self.source_path }}
+    git remote add datasrc {{ self.annex }}
+    git fetch datasrc
+    git annex enableremote datasrc || true      
+    # Pull from annex and install 
+    # (`make install` will fail if `git annex get` isn't run)
+    # ----------------------------------------------------------------
+    {%- if self.git_annex_get.lower() in ["on", "true", "1", "y"] %}
+    cd {{ self.source_path }}
+    git annex get -q .
+    git annex unlock
+    cd {{ self.install_path }}
+    make install
+    {% endif -%}
+    # Setup mount points
+    # ----------------------------------------------------------------
+    mkdir -p {{ self.subjects_dir }}
+    mkdir -p {{ self.infant_model_dir }}
+    # Dev tools
+    #   - jupyter relies on `libsqlite3-dev` being present before python is compiled
+    #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
+    #   - awscli is installed (todo, best place for this?)
+    # ----------------------------------------------------------------
+    {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
+    pip3 install jupyter
+    pip3 install -r {{ self.source_path }}/python/requirements-extra.txt
+    cd /tmp
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+    {% else %}
+    rm -rf /tmp/*
+    {% endif -%}
