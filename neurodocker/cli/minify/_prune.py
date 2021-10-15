@@ -32,7 +32,7 @@ def main(
     if yaml_file.name != "config.yml":
         raise ValueError("File should be named `config.yml`")
     with yaml_file.open(mode="r") as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     # Paths caught by `reprozip trace`. These can be directories or files.
     # There could potentially be other information (e.g., input/output,
