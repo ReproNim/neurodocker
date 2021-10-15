@@ -18,6 +18,7 @@ source:
     - bzip2
     - ca-certificates
     - curl
+    - epel-release
     - localedef
     - unzip
   env:
