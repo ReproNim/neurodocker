@@ -21,6 +21,7 @@ binaries:
     - curl
     - ed
     - gsl-bin
+    - libgl1-mesa-dri
     - libglu1-mesa-dev
     - libglib2.0-0
     - libglw1-mesa
@@ -41,8 +42,10 @@ binaries:
     - libpng12
     - libXp
     - libXpm
+    - mesa-dri-drivers
     - netpbm-progs
     - openmotif
+    - R
     - tcsh
     - which
     - xorg-x11-fonts-misc
@@ -93,6 +96,7 @@ source:
     - g++
     - gcc
     - git
+    - libgl1-mesa-dri
     - libglib2.0-dev
     - libglu1-mesa-dev
     - libgsl-dev
@@ -126,10 +130,12 @@ source:
     - libXt-devel
     - m4
     - make
+    - mesa-dri-drivers
     - mesa-libGL-devel
     - mesa-libGLU-devel
     - netpbm-devel
     - openmotif-devel
+    - R
     - tcsh
     - which
     - zlib-devel
