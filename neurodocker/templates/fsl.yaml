@@ -69,6 +69,7 @@ binaries:
     - libjpeg
     - libmng
     - libpng12
+    - openblas-serial
     - sudo
     - wget
   env:
