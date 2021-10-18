@@ -316,10 +316,6 @@ source:
     # ----------------------------------------------------------------
     {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
     pip3 install jupyter
-    # Don't insall extra python packages with infant model due to tensorflow version mismatch
-    {%- if not self.infant_module.lower() in ["on", "true", "1", "y"] %}
-    pip3 install -r {{ self.source_path }}/python/requirements-extra.txt
-    {% endif -%}
     cd /tmp
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
