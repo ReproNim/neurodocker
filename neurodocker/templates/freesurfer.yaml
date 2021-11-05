@@ -320,6 +320,12 @@ source:
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     ./aws/install
+    rm -rf /tmp/aws
+    rm -rf /tmp/awscliv2.zip
     {% else %}
-    rm -rf /tmp/*
+    # Note: don't run `rm -rf /tmp/*` since singularity bind-mounts /tmp by default
+    # See: https://github.com/ReproNim/neurodocker/issues/246
+    rm -rf /tmp/freesurfer
+    rm -rf /tmp/aws
+    rm -rf /tmp/awscliv2.zip
     {% endif -%}
