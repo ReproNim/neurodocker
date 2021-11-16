@@ -234,28 +234,32 @@ source:
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
     update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.8 100
+    # Make a staging directory, we don't want to use /tmp since it doesn't play nice with singularity
+    # See: https://github.com/ReproNim/neurodocker/issues/246
+    # -------------------------------------------------------------------------    
+    mkdir -p /stage
     # Python  v3.6.8
     # -------------------------------------------------------------------------
-    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /tmp
-    cd /tmp/Python-3.6.8
+    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /stage
+    cd /stage/Python-3.6.8
     ./configure
     make
     make install 
     cd /
-    rm -rf /tmp/Python-3.6.8
+    rm -rf /stage/Python-3.6.8
     pip3 install -q --no-cache-dir -U pip
     pip3 install -q --no-cache-dir wheel
     sync
     # Cmake v3.19.0 (must be > v3.6.8)
     # -------------------------------------------------------------------------
-    wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /tmp/cmake-install.sh
-    chmod u+x /tmp/cmake-install.sh
+    wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh -q -O /stage/cmake-install.sh
+    chmod u+x /stage/cmake-install.sh
     mkdir -p /usr/share/cmake-3.19.0
-    /tmp/cmake-install.sh --skip-license --prefix=/usr/share/cmake-3.19.0
+    /stage/cmake-install.sh --skip-license --prefix=/usr/share/cmake-3.19.0
     CMAKE_BINPATH=`which cmake`
     rm -rf $CMAKE_BINPATH
     ln -s /usr/share/cmake-3.19.0/bin/cmake $CMAKE_BINPATH
-    rm /tmp/cmake-install.sh    
+    rm /stage/cmake-install.sh
     # Compile FreeSurfer
     # ----------------------------------------------------------------
     mkdir -p {{ self.pkg_path }}
@@ -286,6 +290,7 @@ source:
     {%- if self.infant_module.lower() in ["on", "true", "1", "y"] %}
     pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
     ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
+    # todo, edit freesurfer so infant-container-entrypoint-aws.bash gets installed to /opt
     {% else %}
     pip3 install -r {{ self.source_path }}/python/requirements.txt
     {% endif -%}
@@ -311,21 +316,17 @@ source:
     mkdir -p {{ self.infant_model_dir }}
     # Dev tools
     #   - jupyter relies on `libsqlite3-dev` being present before python is compiled
-    #   - the /tmp dir isn't deleted (to facilitate recompile/install/test)
+    #   - the /stage dir isn't deleted (to facilitate recompile/install/test)
     #   - awscli is installed (todo, best place for this?)
     # ----------------------------------------------------------------
     {%- if self.dev_tools.lower() in ["on", "true", "1", "y"] %}
     pip3 install jupyter
-    cd /tmp
+    cd /stage
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     ./aws/install
-    rm -rf /tmp/aws
-    rm -rf /tmp/awscliv2.zip
+    rm -rf /stage/aws
+    rm -rf /stage/awscliv2.zip
     {% else %}
-    # Note: don't run `rm -rf /tmp/*` since singularity bind-mounts /tmp by default
-    # See: https://github.com/ReproNim/neurodocker/issues/246
-    rm -rf /tmp/freesurfer
-    rm -rf /tmp/aws
-    rm -rf /tmp/awscliv2.zip
+    rm -rf /stage
     {% endif -%}
