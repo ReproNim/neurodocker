@@ -114,8 +114,11 @@ source:
       git_annex_get: "ON"
       dev_tools: "OFF"
       fortran_libs: /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.so
-      # --- Probably don't have to change args below here (?) ---
-      source_path: /tmp/freesurfer/freesurfer-{{ self.branch }}
+      # --- Probably don't have to change args below here ---
+      # Were using a source path of `/stage` instead of `/temp` in case we want to 
+      # keep the source dir around for debugging (dev_tools=ON) with singularity containers
+      # (which bind mount the `/tmp` dir by default)   
+      source_path: /stage/freesurfer/freesurfer-{{ self.branch }}
       pkg_path: /opt/freesurfer-pkg
       install_path: /opt/freesurfer-{{ self.branch }}
       # This one has to be quoted with \"s for some reason
@@ -290,7 +293,7 @@ source:
     {%- if self.infant_module.lower() in ["on", "true", "1", "y"] %}
     pip3 install -r {{ self.source_path }}/infant/docker/requirements.txt
     ln -s {{ self.install_path }}/bin/infant-container-entrypoint.bash /bin/infant-container-entrypoint.bash
-    # todo, edit freesurfer so infant-container-entrypoint-aws.bash gets installed to /opt
+    ln -s {{ self.install_path }}/bin/infant-container-entrypoint-aws.bash /bin/infant-container-entrypoint-aws.bash
     {% else %}
     pip3 install -r {{ self.source_path }}/python/requirements.txt
     {% endif -%}
