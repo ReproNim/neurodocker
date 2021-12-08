@@ -83,4 +83,4 @@ source:
       mv bin lib {{ self.install_path }}/ \
       mv ../Scripts/* {{ self.install_path }} ; \
     fi
-    rm -rf /tmp/ants
+    # rm -rf /tmp/ants
