@@ -69,7 +69,7 @@ source:
     {% if self.version != "master" and self.version != "latest" -%}
     cd /tmp/ants/source
     git fetch --tags
-    git checkout {{ self.version }}
+    git -c advice.detachedHead=false checkout v{{ self.version }}
     {% endif -%}
     cd /tmp/ants/build
     cmake {{ self.cmake_opts }} /tmp/ants/source
@@ -78,9 +78,11 @@ source:
     # Recent versions of ants create ANTS-build.
     if [ -d ANTS-build ]; then \
       cd ANTS-build \
-      && make ; \
+      && make install; \
     else \
       mv bin lib {{ self.install_path }}/ \
       mv ../Scripts/* {{ self.install_path }} ; \
     fi
     rm -rf /tmp/ants
+
+    
