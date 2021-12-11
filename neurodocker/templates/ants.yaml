@@ -60,7 +60,7 @@ source:
     - zlib-devel
   env:
     ANTSPATH: "{{ self.install_path }}/bin"
-    PATH: "{{ self.install_path }}/bin:$PATH"
+    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/Scripts:$PATH"
     LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$LD_LIBRARY_PATH"
   instructions: |
     {{ self.install_dependencies() }}
@@ -78,7 +78,8 @@ source:
     # Recent versions of ants create ANTS-build.
     if [ -d ANTS-build ]; then \
       cd ANTS-build \
-      && make install; \
+      && make install \
+      && mv ../../source/Scripts/ {{ self.install_path }}; \
     else \
       mv bin lib {{ self.install_path }}/ \
       mv ../Scripts/* {{ self.install_path }} ; \
