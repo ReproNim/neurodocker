@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Template Schema",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "binaries"
+      ]
+    },
+    {
+      "required": [
+        "source"
+      ]
+    }
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "alert": {
+      "type": "string",
+      "examples": [
+        "This software includes non-free licenses. Please refer to the respective licenses for more information."
+      ]
+    },
+    "binaries": {
+      "type": "object",
+      "required": [
+        "instructions",
+        "urls"
+      ],
+      "properties": {
+        "instructions": {
+          "$ref": "#/definitions/instructions"
+        },
+        "env": {
+          "$ref": "#/definitions/env"
+        },
+        "arguments": {
+          "$ref": "#/definitions/arguments"
+        },
+        "dependencies": {
+          "$ref": "#/definitions/dependencies"
+        },
+        "urls": {
+          "$ref": "#/definitions/urls"
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "instructions"
+      ],
+      "properties": {
+        "instructions": {
+          "$ref": "#/definitions/instructions"
+        },
+        "env": {
+          "$ref": "#/definitions/env"
+        },
+        "arguments": {
+          "$ref": "#/definitions/arguments"
+        },
+        "dependencies": {
+          "$ref": "#/definitions/dependencies"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "minProperties": 1,
+  "additionalProperties": false,
+  "definitions": {
+    "arguments": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optional": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "optional_kwd": "default value",
+              "another_optional": "another default value"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "instructions": {
+      "type": "string",
+      "examples": [
+        "echo foobar && ls /usr/"
+      ]
+    },
+    "env": {
+      "type": "object",
+      "examples": [
+        {
+          "MYVAR": "VALUE",
+          "PATH": "$PATH:$HOME/bin"
+        }
+      ],
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "properties": {
+        "apt": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "debs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "yum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "examples": [
+        {
+          "apt": [
+            "curl",
+            "python3-dev"
+          ],
+          "debs": [
+            "http://ftp.us.debian.org/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb"
+          ],
+          "yum": [
+            "curl",
+            "python3-dev"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "urls": {
+      "type": "object",
+      "examples": [
+        {
+          "1.0.0": "https://127.0.0.1/path/to/binaries-v1.0.0.tar.gz",
+          "2.0.0": "https://127.0.0.1/another/path/to/binaries-v2.0.0.tar.gz"
+        }
+      ],
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -3,48 +3,76 @@
 #
 # Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
 
-generic:
-  binaries:
-    urls:
-      2019b: http://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/1/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019b_Update_1_glnxa64.zip
-      2019a: https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019a_Update_6_glnxa64.zip
-      2018b: https://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/glnxa64/MCR_R2018b_glnxa64_installer.zip
-      2018a: https://ssd.mathworks.com/supportfiles/downloads/R2018a/deployment_files/R2018a/installers/glnxa64/MCR_R2018a_glnxa64_installer.zip
-      2017b: https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip
-      2017a: https://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
-      2016b: https://ssd.mathworks.com/supportfiles/downloads/R2016b/deployment_files/R2016b/installers/glnxa64/MCR_R2016b_glnxa64_installer.zip
-      2016a: https://ssd.mathworks.com/supportfiles/downloads/R2016a/deployment_files/R2016a/installers/glnxa64/MCR_R2016a_glnxa64_installer.zip
-      2015b: https://ssd.mathworks.com/supportfiles/downloads/R2015b/deployment_files/R2015b/installers/glnxa64/MCR_R2015b_glnxa64_installer.zip
-      2015aSP1: https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015aSP1/installers/glnxa64/MCR_R2015aSP1_glnxa64_installer.zip
-      2015a: https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015a/installers/glnxa64/MCR_R2015a_glnxa64_installer.zip
-      2014b: https://ssd.mathworks.com/supportfiles/downloads/R2014b/deployment_files/R2014b/installers/glnxa64/MCR_R2014b_glnxa64_installer.zip
-      2014a: https://ssd.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip
-      2013b: https://ssd.mathworks.com/supportfiles/downloads/R2013b/deployment_files/R2013b/installers/glnxa64/MCR_R2013b_glnxa64_installer.zip
-      2013a: https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2013a/MCR_R2013a_glnxa64_installer.zip
-      2012b: https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012b/MCR_R2012b_glnxa64_installer.zip
-      2012a: https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
-      2010a: https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
-    dependencies:
-      apt: bc libncurses5 libxext6 libxmu6 libxpm-dev libxt6
-      yum: bc libXext.x86_64 libXmu libXpm libXt.x86_64
-      debs:
-        - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-    env:
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/runtime/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/bin/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/sys/os/glnxa64:{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/extern/bin/glnxa64"
-      MATLABCMD: "{{ matlabmcr.install_path }}/{{ matlabmcr.mcr_version }}/toolbox/matlab"
-    instructions: |
-      export TMPDIR="$(mktemp -d)"
-      {{ matlabmcr.install_dependencies() }}
-      echo "Downloading MATLAB Compiler Runtime ..."
-      {% if matlabmcr.version == "2010a" -%}
-      {{ matlabmcr.install_debs() }}
-      curl {{ matlabmcr.curl_opts }} -o "$TMPDIR/MCRInstaller.bin" {{ matlabmcr.binaries_url }}
-      chmod +x "$TMPDIR/MCRInstaller.bin"
-      "$TMPDIR/MCRInstaller.bin" -silent -P installLocation="{{ matlabmcr.install_path }}"
-      {% else -%}
-      curl {{ matlabmcr.curl_opts }} -o "$TMPDIR/mcr.zip" {{ matlabmcr.binaries_url }}
-      unzip -q "$TMPDIR/mcr.zip" -d "$TMPDIR/mcrtmp"
-      "$TMPDIR/mcrtmp/install" -destinationFolder {{ matlabmcr.install_path }} -mode silent -agreeToLicense yes
-      {% endif -%}
-      rm -rf "$TMPDIR"
-      unset TMPDIR
+name: matlabmcr
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      curl_opts: ""
+      install_path: /opt/MCR-{{ self.version }}
+  urls:
+    "2021b": https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_glnxa64.zip
+    "2021a": https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_5_glnxa64.zip
+    "2020b": https://ssd.mathworks.com/supportfiles/downloads/R2020b/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020b_Update_6_glnxa64.zip
+    "2020a": https://ssd.mathworks.com/supportfiles/downloads/R2020a/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020a_Update_7_glnxa64.zip
+    "2019b": https://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/9/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019b_Update_9_glnxa64.zip
+    "2019a": https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/9/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019a_Update_9_glnxa64.zip
+    "2018b": https://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/glnxa64/MCR_R2018b_glnxa64_installer.zip
+    "2018a": https://ssd.mathworks.com/supportfiles/downloads/R2018a/deployment_files/R2018a/installers/glnxa64/MCR_R2018a_glnxa64_installer.zip
+    "2017b": https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip
+    "2017a": https://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
+    "2016b": https://ssd.mathworks.com/supportfiles/downloads/R2016b/deployment_files/R2016b/installers/glnxa64/MCR_R2016b_glnxa64_installer.zip
+    "2016a": https://ssd.mathworks.com/supportfiles/downloads/R2016a/deployment_files/R2016a/installers/glnxa64/MCR_R2016a_glnxa64_installer.zip
+    "2015b": https://ssd.mathworks.com/supportfiles/downloads/R2015b/deployment_files/R2015b/installers/glnxa64/MCR_R2015b_glnxa64_installer.zip
+    "2015aSP1": https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015aSP1/installers/glnxa64/MCR_R2015aSP1_glnxa64_installer.zip
+    "2015a": https://ssd.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015a/installers/glnxa64/MCR_R2015a_glnxa64_installer.zip
+    "2014a": https://ssd.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip
+    "2014b": https://ssd.mathworks.com/supportfiles/downloads/R2014b/deployment_files/R2014b/installers/glnxa64/MCR_R2014b_glnxa64_installer.zip
+    "2013b": https://ssd.mathworks.com/supportfiles/downloads/R2013b/deployment_files/R2013b/installers/glnxa64/MCR_R2013b_glnxa64_installer.zip
+    "2013a": https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2013a/MCR_R2013a_glnxa64_installer.zip
+    "2012b": https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012b/MCR_R2012b_glnxa64_installer.zip
+    "2012a": https://ssd.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
+    "2010a": https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
+  dependencies:
+    apt:
+    - bc
+    - curl
+    - libncurses5
+    - libxext6
+    - libxmu6
+    - libxpm-dev
+    - libxt6
+    - multiarch-support
+    - unzip
+    yum:
+    - bc
+    - curl
+    - libXext.x86_64
+    - libXmu
+    - libXpm
+    - libXt.x86_64
+    - unzip
+    debs:
+    - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+  env:
+    LD_LIBRARY_PATH: |
+      {% set versionTovXX = {"2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
+      $LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ self.install_path }}/{{ versionTovXX[self.version] }}/runtime/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/bin/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/sys/os/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/extern/bin/glnxa64
+    MATLABCMD: "{{ self.install_path }}/{{ self.version }}/toolbox/matlab"
+  instructions: |
+    export TMPDIR="$(mktemp -d)"
+    {{ self.install_dependencies() }}
+    echo "Downloading MATLAB Compiler Runtime ..."
+    {% if self.version == "2010a" -%}
+    {{ self.install_debs() }}
+    curl {{ self.curl_opts }} -o "$TMPDIR/MCRInstaller.bin" {{ self.urls[self.version] }}
+    chmod +x "$TMPDIR/MCRInstaller.bin"
+    "$TMPDIR/MCRInstaller.bin" -silent -P installLocation="{{ self.install_path }}"
+    {% else -%}
+    curl {{ self.curl_opts }} -o "$TMPDIR/mcr.zip" {{ self.urls[self.version] }}
+    unzip -q "$TMPDIR/mcr.zip" -d "$TMPDIR/mcrtmp"
+    "$TMPDIR/mcrtmp/install" -destinationFolder {{ self.install_path }} -mode silent -agreeToLicense yes
+    {% endif -%}
+    rm -rf "$TMPDIR"
+    unset TMPDIR

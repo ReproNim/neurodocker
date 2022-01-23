@@ -1,0 +1,58 @@
+# Sample template. Installs `jq` from binaries or from source.
+
+name: jq
+binaries:
+  arguments:
+    required:
+    - version
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    yum:
+    - curl
+  env:
+    ND_BAZ: '1234'
+    ND_FOO: BAR
+  instructions: |
+    {{ self.install_dependencies() }}
+    curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
+    chmod +x /usr/local/bin/jq
+  urls:
+    '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+source:
+  arguments:
+    required:
+    - version
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    - automake
+    - gcc
+    - git
+    - libtool
+    - make
+    yum:
+    - ca-certificates
+    - curl
+    - automake
+    - gcc
+    - git
+    - libtool
+    - make
+  env:
+    ND_BAZ: '1234'
+    ND_FOO: BAR
+  instructions: |
+    {{ self.install_dependencies() }}
+    mkdir jq
+    cd jq
+    curl -fsSL https://github.com/stedolan/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
+    | tar xz --strip-components 1
+    # Only required in version 1.6
+    autoreconf -fi
+    ./configure --disable-maintainer-mode
+    make
+    make install

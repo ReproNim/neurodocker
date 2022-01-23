@@ -1,41 +1,89 @@
----
 # Instructions to install FreeSurfer.
-#
-# Repository: https://github.com/freesurfer/freesurfer
-# Website: https://surfer.nmr.mgh.harvard.edu/
-# Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki
 
-
-generic:
-  binaries:
-    urls:
-      "7.1.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.1/freesurfer-linux-centos6_x86_64-7.1.1.tar.gz
-      "7.1.1-min": https://dl.dropbox.com/s/c3earkfhhvdyuo4/freesurfer-7.1.1-min.tgz
-      "7.1.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos6_x86_64-7.1.0.tar.gz
-      # 7.0.0 not included because it was recalled several days after release due to a bug. Replaced by 7.1.0.
-      # From FreeSurfer team: we recommend that people NOT use 7.0.0 and use 7.1.0 instead.
-      "6.0.1": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz
-      "6.0.0": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
-      # See https://github.com/freesurfer/freesurfer/issues/70
-      "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
-    dependencies:
-      apt: bc libgomp1 libxmu6 libxt6 tcsh perl
-      yum: bc libgomp libXmu libXt tcsh perl
-    env:
-      FREESURFER_HOME: "{{ freesurfer.install_path }}"
-      PATH: "{{ freesurfer.install_path }}/bin:$PATH"
-    instructions: |
-      {{ freesurfer.install_dependencies() }}
-      echo "Downloading FreeSurfer ..."
-      mkdir -p {{ freesurfer.install_path }}
-      curl {{ freesurfer.curl_opts }} {{ freesurfer.binaries_url }} \
-      | tar -xz -C {{ freesurfer.install_path }} --strip-components 1 {% if freesurfer.exclude_paths -%}\
-      {%- for exclude_path in freesurfer.exclude_paths %}
-        {% if not loop.last -%}
-        --exclude='{{ exclude_path }}' \
-        {%- else -%}
-        --exclude='{{ exclude_path }}'
-        {%- endif -%}
-      {%- endfor %}
-      {%- endif %}
-      sed -i '$isource "{{ freesurfer.install_path }}/SetUpFreeSurfer.sh"' "$ND_ENTRYPOINT"
+name: freesurfer
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/freesurfer-{{ self.version }}
+      exclude_paths: |
+        average/mult-comp-cor
+        lib/cuda
+        lib/qt
+        subjects/V1_average
+        subjects/bert
+        subjects/cvs_avg35
+        subjects/cvs_avg35_inMNI152
+        subjects/fsaverage3
+        subjects/fsaverage4
+        subjects/fsaverage5
+        subjects/fsaverage6
+        subjects/fsaverage_sym
+        trctrain
+  urls:
+    "7.2.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz
+    "7.1.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.1/freesurfer-linux-centos6_x86_64-7.1.1.tar.gz
+    "7.1.1-min": https://dl.dropbox.com/s/c3earkfhhvdyuo4/freesurfer-7.1.1-min.tgz
+    "7.1.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos6_x86_64-7.1.0.tar.gz
+    # 7.0.0 not included because it was recalled several days after release due to a bug. Replaced by 7.1.0.
+    # From FreeSurfer team: we recommend that people NOT use 7.0.0 and use 7.1.0 instead.
+    "6.0.1": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz
+    "6.0.0": ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    # See https://github.com/freesurfer/freesurfer/issues/70
+    "6.0.0-min": https://dl.dropbox.com/s/nnzcfttc41qvt31/recon-all-freesurfer6-3.min.tgz
+  dependencies:
+    apt:
+    - bc
+    - ca-certificates
+    - curl
+    - libgomp1
+    - libxmu6
+    - libxt6
+    - tcsh
+    - perl
+    yum:
+    - bc
+    - curl
+    - libgomp
+    - libXmu
+    - libXt
+    - tcsh
+    - perl
+  env:
+    # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
+    # freesurfer env
+    OS: "Linux"
+    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    FREESURFER_HOME: "{{ self.install_path }}"
+    FREESURFER: "{{ self.install_path }}"
+    SUBJECTS_DIR: "{{ self.install_path }}/subjects"
+    LOCAL_DIR: "{{ self.install_path }}/local"
+    FSFAST_HOME: "{{ self.install_path }}/fsfast"
+    FMRI_ANALYSIS_DIR: "{{ self.install_path }}/fsfast"
+    FUNCTIONALS_DIR: "{{ self.install_path }}/sessions"
+    # default freesurfer options
+    FS_OVERRIDE: "0"
+    FIX_VERTEX_AREA: ""
+    FSF_OUTPUT_FORMAT: "nii.gz# mni env requirements"
+    # mni environment requirements
+    MINC_BIN_DIR: "{{ self.install_path }}/mni/bin"
+    MINC_LIB_DIR: "{{ self.install_path }}/mni/lib"
+    MNI_DIR: "{{ self.install_path }}/mni"
+    MNI_DATAPATH: "{{ self.install_path }}/mni/data"
+    MNI_PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
+    PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
+  instructions: |
+    {{ self.install_dependencies() }}
+    echo "Downloading FreeSurfer ..."
+    mkdir -p {{ self.install_path }}
+    curl -fL {{ self.urls[self.version] }} \
+    | tar -xz -C {{ self.install_path }} --owner root --group root --no-same-owner --strip-components 1 {% if self.exclude_paths -%}\
+    {%- for exclude_path in self.exclude_paths.split() %}
+      {% if not loop.last -%}
+      --exclude='{{ exclude_path }}' \
+      {%- else -%}
+      --exclude='{{ exclude_path }}'
+      {%- endif -%}
+    {%- endfor %}
+    {%- endif %}
