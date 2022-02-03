@@ -66,6 +66,8 @@ binaries:
     MATLABCMD: "{{ self.install_path }}/{{ self.version }}/toolbox/matlab"
     XAPPLRESDIR: |
       /opt/{{ self.install_path }}/{{ versionTovXX[self.version] }}/x11/app-defaults
+    MCRROOT: "{{ self.install_path }}/{{ self.version }}"
+
   instructions: |
     export TMPDIR="$(mktemp -d)"
     {{ self.install_dependencies() }}
