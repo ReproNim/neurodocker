@@ -24,10 +24,10 @@ binaries:
   env:
     FORCE_SPMMCR: "1"
     SPM_HTML_BROWSER: "0"
-    MCR_INHIBIT_CTF_LOCK: 1
-    SPM_HTML_BROWSER: 0
+    MCR_INHIBIT_CTF_LOCK: "1"
+    SPM_HTML_BROWSER: "0"
     SPMROOT: "{{ self.install_path }}"
-    MCR_INHIBIT_CTF_LOCK: 1
+    MCR_INHIBIT_CTF_LOCK: "1"
     PATH: "{{ self.install_path }}:$PATH"
 
   instructions: |
