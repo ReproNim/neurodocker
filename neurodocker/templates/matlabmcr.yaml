@@ -45,6 +45,8 @@ binaries:
     - libxt6
     - multiarch-support
     - unzip
+    - openjdk-8-jre
+    - dbus-x11
     yum:
     - bc
     - curl
@@ -53,6 +55,8 @@ binaries:
     - libXpm
     - libXt.x86_64
     - unzip
+    - java-1.8.0-openjdk
+    - dbus-x11
     debs:
     - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
   env:
