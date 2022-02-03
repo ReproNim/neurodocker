@@ -1,0 +1,46 @@
+# Instructions to install CAT12 toolbox with SPM.
+#
+# Website: http://141.35.69.218/cat/
+# Documentation: http://www.neuro.uni-jena.de/cat12-html/cat_versions.html
+
+
+name: cat12
+binaries:
+  arguments:
+    required:
+    - version
+    optional:
+      install_path: /opt/CAT12-{{ self.version }}
+  urls:
+    r1933_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8_r1933_R2017b_MCR_Linux.zip
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    - unzip
+    yum:
+    - curl
+    - unzip
+  env:
+    FORCE_SPMMCR: "1"
+    SPM_HTML_BROWSER: "0"
+    MCR_INHIBIT_CTF_LOCK: 1
+    SPM_HTML_BROWSER: 0
+    SPMROOT: /opt/cat12_link
+    MCRROOT: /opt/mcr_link
+    MCR_INHIBIT_CTF_LOCK: 1v
+
+
+  instructions: |
+    {{ self.install_dependencies() }}
+    # Install cat12
+    echo "Downloading standalone CAT12 ..."
+    curl -fL -o /tmp/cat12.zip {{ self.urls[self.version] }}
+    unzip -q /tmp/cat12.zip -d /tmp
+    rm -rf /tmp/cat12.zip
+    mkdir -p {{ self.install_path }}
+    mv /tmp/spm12/* {{ self.install_path }}/
+    chmod -R 777 {{ self.install_path }}
+    rm -rf /tmp/spm*
+    # Test
+    {{ self.install_path }}/spm12 function exit

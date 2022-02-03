@@ -99,6 +99,13 @@ neurodocker generate docker
                                     - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]
                                     - make_opts [default: -j1]
 
+    --cat12 KEY=VALUE            Add cat12
+                                    method=[binaries]
+                                    options for method=binaries
+                                    - version [required]
+                                        version=[r1933_R2017b]
+                                    - install_path [default: /opt/CAT12-{{ self.version }}]
+
     --convert3d KEY=VALUE        Add convert3d
                                     method=[binaries]
                                     options for method=binaries

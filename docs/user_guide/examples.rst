@@ -139,6 +139,21 @@ ANTS
     docker build --tag ants:2.3.4 --file ants-234.Dockerfile .
 
 
+
+CAT12
+---
+
+.. code-block:: bash
+
+    neurodocker generate docker \
+        --base-image ubuntu:16.04 \
+        --pkg-manager apt \
+        --mcr 2017b \
+        --cat12 version=r1933_R2017b \
+    > cat12-r1933_R2017b.Dockerfile
+
+    docker build --tag cat12:r1933_R2017b --file cat12-r1933_R2017b.Dockerfile .
+
 SPM
 ---
 
