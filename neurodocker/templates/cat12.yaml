@@ -38,7 +38,7 @@ binaries:
     unzip -q /tmp/cat12.zip -d /tmp
     rm -rf /tmp/cat12.zip
     mkdir -p {{ self.install_path }}
-    mv /tmp/*{{ self.urls[self.version] }}*/* {{ self.install_path }}/
+    mv /tmp/*{{ self.version }}*/* {{ self.install_path }}/
     chmod -R 777 {{ self.install_path }}
     # Test
     {{ self.install_path }}/spm12 function exit
