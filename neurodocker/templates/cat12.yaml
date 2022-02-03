@@ -40,6 +40,5 @@ binaries:
     mkdir -p {{ self.install_path }}
     mv /tmp/spm12/* {{ self.install_path }}/
     chmod -R 777 {{ self.install_path }}
-    rm -rf /tmp/spm*
     # Test
     {{ self.install_path }}/spm12 function exit
