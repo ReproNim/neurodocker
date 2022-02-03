@@ -143,6 +143,8 @@ ANTS
 CAT12
 ---
 
+CAT12 requires the MCR in the correction version. Miniconda and nipype is optional but recommended to use CAT12 from NiPype.
+
 .. code-block:: bash
 
     neurodocker generate docker \
@@ -150,6 +152,9 @@ CAT12
         --pkg-manager apt \
         --mcr 2017b \
         --cat12 version=r1933_R2017b \
+        --miniconda \
+         version=latest \
+         conda_install='python=3.8 traits nipype numpy scipy h5py scikit-image' \
     > cat12-r1933_R2017b.Dockerfile
 
     docker build --tag cat12:r1933_R2017b --file cat12-r1933_R2017b.Dockerfile .
