@@ -22,6 +22,10 @@ binaries:
         subjects/fsaverage_sym
         trctrain
   urls:
+    "7.2.0-centos6": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-CentOS6-7.2.0-1.x86_64.rpm
+    "7.2.0-centos7": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-CentOS7-7.2.0-1.x86_64.rpm
+    "7.2.0-centos8": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-CentOS8-7.2.0-1.x86_64.rpm
+    "7.2.0-deb": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer_7.2.0_amd64.deb 
     "7.2.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz
     "7.1.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.1/freesurfer-linux-centos6_x86_64-7.1.1.tar.gz
     "7.1.1-min": https://dl.dropbox.com/s/c3earkfhhvdyuo4/freesurfer-7.1.1-min.tgz
@@ -75,18 +79,43 @@ binaries:
     PERL5LIB: "{{ self.install_path }}/mni/share/perl5"
   instructions: |
     {{ self.install_dependencies() }}
-    echo "Downloading FreeSurfer ..."
-    mkdir -p {{ self.install_path }}
-    curl -fL {{ self.urls[self.version] }} \
-    | tar -xz -C {{ self.install_path }} --owner root --group root --no-same-owner --strip-components 1 {% if self.exclude_paths -%}\
-    {%- for exclude_path in self.exclude_paths.split() %}
-      {% if not loop.last -%}
-      --exclude='{{ exclude_path }}' \
+    {%- if self.version in ["6.0.0-min", "6.0.0", "6.0.1", "7.1.0", "7.1.1-min", "7.1.1", "7.2.0"] %}
+      # Install the old way (.tar.gz)
+      echo "Downloading FreeSurfer ..."
+      mkdir -p {{ self.install_path }}
+      curl -fL {{ self.urls[self.version] }} \
+      | tar -xz -C {{ self.install_path }} --owner root --group root --no-same-owner --strip-components 1 {% if self.exclude_paths -%}\
+      {%- for exclude_path in self.exclude_paths.split() %}
+        {% if not loop.last -%}
+        --exclude='{{ exclude_path }}' \
+        {%- else -%}
+        --exclude='{{ exclude_path }}'
+        {%- endif -%}
+      {%- endfor %}
+      {%- endif %}    
+    {%- else -%}
+      # Install the new way (.deb or .rpm package)
+      {%- if self.version in ["apt"] %}
+        apt-get update -qq
+        apt-get install --fix-missing -y \
+          apt-file apt-utils apt-transport-https dpkg-dev debhelper devscripts librpm-dev rpm
+        curl -o /stage/freesurfer_amd64.deb {{ self.urls[self.version] }}
+        dpkg -i /stage/freesurfer_amd64.deb
+        # To supress interactive keyboard-configuration
+        DEBIAN_FRONTEND=noninteractive apt-get -f -y install
+        # todo: find install dir and set env vars accordingly
+        apt-get clean
+        rm -rf /var/lib/apt/lists/*
+        sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'
       {%- else -%}
-      --exclude='{{ exclude_path }}'
+        # todo: wip
+        yum -y update --exclude=filesystem*
+        yum -y install dnf-plugins-core epel-release
+        yum -y config-manager --set-enabled powertools
+        yum -y update --exclude=filesystem* 
       {%- endif -%}
-    {%- endfor %}
-    {%- endif %}
+      echo "{{ self.pkg_manager }}"
+    {%- endif -%}
 
 source:
   arguments:
