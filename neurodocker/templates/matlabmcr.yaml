@@ -45,6 +45,8 @@ binaries:
     - libxt6
     - multiarch-support
     - unzip
+    - openjdk-8-jre
+    - dbus-x11
     yum:
     - bc
     - curl
@@ -53,6 +55,8 @@ binaries:
     - libXpm
     - libXt.x86_64
     - unzip
+    - java-1.8.0-openjdk
+    - dbus-x11
     debs:
     - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
   env:
@@ -60,6 +64,11 @@ binaries:
       {% set versionTovXX = {"2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
       $LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ self.install_path }}/{{ versionTovXX[self.version] }}/runtime/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/bin/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/sys/os/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/extern/bin/glnxa64
     MATLABCMD: "{{ self.install_path }}/{{ self.version }}/toolbox/matlab"
+    XAPPLRESDIR: |
+      {% set versionTovXX = {"2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
+      /opt/{{ self.install_path }}/{{ versionTovXX[self.version] }}/x11/app-defaults
+    MCRROOT: "{{ self.install_path }}/{{ self.version }}"
+
   instructions: |
     export TMPDIR="$(mktemp -d)"
     {{ self.install_dependencies() }}
