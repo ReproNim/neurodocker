@@ -12,7 +12,7 @@ binaries:
       curl_opts: ""
       install_path: /opt/MCR-{{ self.version }}
   urls:
-    "2021b": https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_glnxa64.zip
+    "2021b": https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/2/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_Update_2_glnxa64.zip
     "2021a": https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_5_glnxa64.zip
     "2020b": https://ssd.mathworks.com/supportfiles/downloads/R2020b/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020b_Update_6_glnxa64.zip
     "2020a": https://ssd.mathworks.com/supportfiles/downloads/R2020a/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020a_Update_7_glnxa64.zip
