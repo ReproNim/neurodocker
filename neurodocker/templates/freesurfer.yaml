@@ -344,7 +344,7 @@ source:
     git annex unlock
     cd {{ self.install_path }}
     make install
-    {% endif %}
+    {% endif -%}
     # Setup mount points
     # ----------------------------------------------------------------
     mkdir -p {{ self.subjects_dir }}
