@@ -303,7 +303,7 @@ source:
     echo "   fs license (base64):      "{{ self.license_base64 }}
     mkdir -p {{ self.license_path }}
     echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}/{{ self.license_file }}
-    {% endif -%}
+    {% endif %}
     wget -q -c {{ self.pkg_url }} -O - | tar -xz -C {{ self.pkg_path }}
     mv {{ self.pkg_path }}/packages/* {{ self.pkg_path }}
     rm -rf {{ self.pkg_path }}/packages
@@ -328,7 +328,7 @@ source:
     ln -s {{ self.install_path }}/bin/infant-container-entrypoint-aws.bash /bin/infant-container-entrypoint-aws.bash
     {% else %}
     pip3 install -r {{ self.source_path }}/python/requirements.txt
-    {% endif -%}
+    {% endif %}
     # Setup annex remote
     # ----------------------------------------------------------------
     cd {{ self.source_path }}
@@ -344,7 +344,7 @@ source:
     git annex unlock
     cd {{ self.install_path }}
     make install
-    {% endif -%}
+    {% endif %}
     # Setup mount points
     # ----------------------------------------------------------------
     mkdir -p {{ self.subjects_dir }}
@@ -364,7 +364,7 @@ source:
     rm -rf /stage/awscliv2.zip
     {%- if self.infant_model_s3 is defined and self.infant_model_s3|length and self.infant_model_s3_region is defined and self.infant_model_s3_region|length %}
     aws s3 cp --no-sign-request --region={{ self.infant_model_s3_region }} --recursive --include '*' {{ self.infant_model_s3 }} {{ self.infant_model_dir }}/
-    {% endif -%}
+    {% endif %}
     {% else %}
     rm -rf /stage
-    {% endif -%}
+    {% endif %}
