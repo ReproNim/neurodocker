@@ -328,7 +328,7 @@ source:
     ln -s {{ self.install_path }}/bin/infant-container-entrypoint-aws.bash /bin/infant-container-entrypoint-aws.bash
     {% else %}
     pip3 install -r {{ self.source_path }}/python/requirements.txt
-    {% endif %}
+    {% endif -%}
     # Setup annex remote
     # ----------------------------------------------------------------
     cd {{ self.source_path }}
@@ -367,4 +367,4 @@ source:
     {% endif %}
     {% else %}
     rm -rf /stage
-    {% endif %}
+    {% endif -%}
