@@ -80,7 +80,6 @@ binaries:
   instructions: |
     {{ self.install_dependencies() }}
     {%- if self.version in ["6.0.0-min", "6.0.0", "6.0.1", "7.1.0", "7.1.1-min", "7.1.1", "7.2.0"] %}
-      # Install the old way (.tar.gz)
       echo "Downloading FreeSurfer ..."
       mkdir -p {{ self.install_path }}
       curl -fL {{ self.urls[self.version] }} \
@@ -94,16 +93,13 @@ binaries:
       {%- endfor %}
       {%- endif %}    
     {%- else -%}
-      # Install the new way (.deb or .rpm package)
-      {%- if self.version in ["apt"] %}
+      {%- if self.version in ["deb"] %}
         apt-get update -qq
         apt-get install --fix-missing -y \
           apt-file apt-utils apt-transport-https dpkg-dev debhelper devscripts librpm-dev rpm
         curl -o /stage/freesurfer_amd64.deb {{ self.urls[self.version] }}
         dpkg -i /stage/freesurfer_amd64.deb
-        # To supress interactive keyboard-configuration
         DEBIAN_FRONTEND=noninteractive apt-get -f -y install
-        # todo: find install dir (/usr/local/freesurfer/7.2.0/) and set env vars accordingly
         apt-get clean
         rm -rf /var/lib/apt/lists/*
         sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'
