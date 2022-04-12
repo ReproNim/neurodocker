@@ -256,11 +256,11 @@ source:
     - make
   instructions: |
     {{ self.install_dependencies() }}
-    {% if self.license_base64 is defined and self.license_base64|length %}
+    {%- if self.license_base64 is defined and self.license_base64|length %}
     echo "   fs license (base64):      "{{ self.license_base64 }}
     mkdir -p {{ self.license_path }}
     echo {{ self.license_base64 }} | base64 -d > {{ self.license_path }}/{{ self.license_file }}
-    {% endif %}
+    {% endif -%}
     # git config
     # -------------------------------------------------------------------------
     git config --global user.email "CI@example.com"
