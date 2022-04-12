@@ -425,6 +425,8 @@ class _Renderer:
         j = " \\\n".join(j.splitlines())
         # Escape the % characters so printf does not interpret them as delimiters.
         j = j.replace("%", "%%")
+        # Escape single quotes with '"'"'
+        j = j.replace("'", "'\"'\"'")
         cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
