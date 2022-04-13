@@ -162,7 +162,7 @@ source:
     FS_LICENSE: "{{ self.license_path }}/{{ self.license_file }}"
     SUBJECTS_DIR: "{{ self.subjects_dir }}"
     FS_INFANT_MODEL: "{{ self.infant_model_dir }}"
-    SSCNN_MODEL_DIR: "{{ self.infant_model_dir }}"/sscnn_skullstrip
+    SSCNN_MODEL_DIR: "{{ self.infant_model_dir }}/sscnn_skullstrip"
     # From https://github.com/freesurfer/freesurfer/blob/54018f7d6f620d6288b28f50e14a0a4ba421757c/Dockerfile#L20-L42
     OS: "Linux"
     PATH: "{{ self.niftyreg_path }}/bin:{{ self.pkg_path }}/mni/current/bin:{{ self.install_path }}/bin:{{ self.install_path }}/fsfast/bin:{{ self.install_path }}/tktools:{{ self.install_path }}/mni/bin:$PATH"
