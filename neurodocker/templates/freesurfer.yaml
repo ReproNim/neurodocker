@@ -118,9 +118,9 @@ binaries:
 
 source:
   arguments:
-    required:
-    - branch
     optional:
+      repo: https://github.com/freesurfer/freesurfer
+      branch: "dev"
       commit: ""
       license_base64: ""
       license_path: "/opt"
@@ -132,7 +132,6 @@ source:
       infant_model_dir: "/opt/fs-infant-model"
       infant_model_s3: ""
       infant_model_s3_region: ""
-      repo: https://github.com/freesurfer/freesurfer
       pkg_url: http://surfer.nmr.mgh.harvard.edu/pub/data/fspackages/prebuilt/centos7-packages.tar.gz
       annex: https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/repo/annex.git
       # set to niftyreg.yaml default
