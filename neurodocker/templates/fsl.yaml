@@ -7,6 +7,7 @@
 #
 # Website: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
 # License: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+# Available Versions: https://fsl.fmrib.ox.ac.uk/fsldownloads/manifest.json
 
 name: fsl
 alert: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
@@ -18,6 +19,8 @@ binaries:
       install_path: /opt/fsl-{{ self.version }}
       exclude_paths: ""
   urls:
+    "6.0.5.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.1-centos7_64.tar.gz
+    "6.0.5": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5-centos7_64.tar.gz
     "6.0.4": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.4-centos6_64.tar.gz
     "6.0.3": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.3-centos6_64.tar.gz
     "6.0.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.2-centos6_64.tar.gz
@@ -48,6 +51,7 @@ binaries:
     - libxrandr2
     - libxrender1
     - libxt6
+    - nano
     - sudo
     - wget
     yum:
@@ -69,6 +73,7 @@ binaries:
     - libjpeg
     - libmng
     - libpng12
+    - nano
     - openblas-serial
     - sudo
     - wget
