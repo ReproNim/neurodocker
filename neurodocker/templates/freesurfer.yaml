@@ -276,15 +276,15 @@ source:
     # See: https://github.com/ReproNim/neurodocker/issues/246
     # -------------------------------------------------------------------------    
     mkdir -p /stage
-    # Python  v3.6.8
+    # Python  v3.8.9
     # -------------------------------------------------------------------------
-    curl -sSL --retry 5 https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz | tar -xz -C /stage
-    cd /stage/Python-3.6.8
+    curl -sSL --retry 5 https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tgz | tar -xz -C /stage
+    cd /stage/Python-3.8.9
     ./configure
     make
     make install
     cd /
-    rm -rf /stage/Python-3.6.8
+    rm -rf /stage/Python-3.8.9
     pip3 install -q --no-cache-dir -U pip
     pip3 install -q --no-cache-dir wheel
     sync
