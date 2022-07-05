@@ -391,6 +391,12 @@ class _Renderer:
     def label(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
 
+    def labels(self, labels_dict: dict) -> _Renderer:
+        """Adds a set of labels to the dockerfile from a dict. This permits
+        labels that can include special chars (e.g. '.')."""
+        self.label(**labels_dict)
+        return self
+
     def run(self, command: str) -> _Renderer:
         raise NotImplementedError()
 
