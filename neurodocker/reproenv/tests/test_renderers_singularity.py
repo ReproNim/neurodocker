@@ -164,6 +164,7 @@ ORG BAZ"""
     s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
     s.env(FOO="BAR")
     s.label(ORG="BAZ")
+    s.labels({'org.test.label': 'BAX'})
     s.run("echo foobar")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
@@ -184,7 +185,8 @@ export FOO="BAR"
 echo foobar
 
 %labels
-ORG BAZ"""
+ORG BAZ
+org.test.label BAX"""
     )
 
     # User

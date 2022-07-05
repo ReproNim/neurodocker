@@ -618,9 +618,9 @@ class SingularityRenderer(_Renderer):
 
         # Add labels.
         if self._labels:
-            s += "\n\n%labels\n"
+            s += "\n\n%labels"
             for kv in self._labels.items():
-                s += " ".join(kv)
+                s += "\n" + " ".join(kv)
 
         return s
 
