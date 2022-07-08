@@ -18,15 +18,20 @@ binaries:
   dependencies:
     apt:
     - ca-certificates
+    - cmake
     - curl
     - ed
     - gsl-bin
+    - libcurl4-openssl-dev
     - libgl1-mesa-dri
+    - libjpeg-turbo8-dev
     - libglu1-mesa-dev
     - libglib2.0-0
     - libglw1-mesa
     - libgomp1
     - libjpeg62
+    - libssl-dev
+    - libudunits2-dev
     - libxm4
     - multiarch-support
     - netpbm
@@ -34,19 +39,24 @@ binaries:
     - xfonts-base
     - xvfb
     yum:
+    - cmake
     - curl
     - ed
     - gsl
+    - libcurl-devel
     - libGLU
     - libgomp
+    - libjpeg-turbo-devel
     - libpng12
     - libXp
     - libXpm
     - mesa-dri-drivers
     - netpbm-progs
     - openmotif
+    - openssl-devel
     - R
     - tcsh
+    - udunits2-devel
     - which
     - xorg-x11-fonts-misc
     - xorg-x11-server-Xvfb
@@ -55,9 +65,9 @@ binaries:
       - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
-    {%- if self.install_python3.lower() in ["true", "1", "y"] %}
+    {% if self.install_python3.lower() in ["true", "1", "y"] -%}
     {{ self.install(["python3"]) }}
-    {% endif %}
+    {%- endif %}
     gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
     if [ -n "$gsl_path" ]; then \
       ln -sfv "$gsl_path" "$(dirname $gsl_path)/libgsl.so.0"; \
