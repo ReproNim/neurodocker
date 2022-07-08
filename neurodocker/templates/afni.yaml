@@ -55,9 +55,9 @@ binaries:
       - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
-    {%- if self.install_python3.lower() in ["true", "1", "y"] -%}
+    {% if self.install_python3.lower() in ["true", "1", "y"] -%}
     {{ self.install(["python3"]) }}
-    {% endif %}
+    {%- endif %}
     gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
     if [ -n "$gsl_path" ]; then \
       ln -sfv "$gsl_path" "$(dirname $gsl_path)/libgsl.so.0"; \
