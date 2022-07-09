@@ -46,7 +46,6 @@ binaries:
     - netpbm-progs
     - openmotif
     - R
-    - epel-release
     - tcsh
     - which
     - xorg-x11-fonts-misc
