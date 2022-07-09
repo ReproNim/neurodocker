@@ -1,6 +1,6 @@
 # Instructions to install AFNI.
 
-# rPkgsInstall -pkgs ALL
+# 
 # TODO: consider updating the source instructions to use cmake.  
 
 name: afni
@@ -75,6 +75,7 @@ binaries:
       {{ self.install(["R-devel"]) }}
       {% endif -%}
     {% endif -%}
+    rPkgsInstall -pkgs ALL
 
 source:
   arguments:
