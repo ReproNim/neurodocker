@@ -73,7 +73,7 @@ binaries:
       {% elif self.pkg_manager == "yum" %}
       {{ self.install(["R-devel"]) }}
       {% endif -%}
-    rPkgsInstall -pkgs ALL
+    # rPkgsInstall -pkgs ALL
     {% endif -%}
 
 source:
