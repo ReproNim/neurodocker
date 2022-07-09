@@ -1,7 +1,6 @@
 # Instructions to install AFNI.
 
-# 
-# TODO: consider updating the source instructions to use cmake.  
+# TODO: consider updating the source instructions to use cmake.
 
 name: afni
 binaries:
@@ -74,8 +73,8 @@ binaries:
       {% elif self.pkg_manager == "yum" %}
       {{ self.install(["R-devel"]) }}
       {% endif -%}
+    echo "rPkgsInstall -pkgs ALL"
     {% endif -%}
-    rPkgsInstall -pkgs ALL
 
 source:
   arguments:
