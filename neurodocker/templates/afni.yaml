@@ -35,6 +35,8 @@ binaries:
     - libxm4
     - multiarch-support
     - netpbm
+    - python-is-python3
+    - python3-pip
     - tcsh
     - xfonts-base
     - xvfb
@@ -54,6 +56,8 @@ binaries:
     - netpbm-progs
     - openmotif
     - openssl-devel
+    - python-is-python3
+    - python3-pip
     - R
     - tcsh
     - udunits2-devel
@@ -67,6 +71,7 @@ binaries:
     {{ self.install_dependencies() }}
     {% if self.install_python3.lower() in ["true", "1", "y"] -%}
     {{ self.install(["python3"]) }}
+    pip3 install matplotlib
     {%- endif %}
     gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
     if [ -n "$gsl_path" ]; then \
