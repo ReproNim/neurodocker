@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.viewcode",
     # "sphinx.ext.linkcode",
     "sphinxcontrib.apidoc",
+    'sphinx_click',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

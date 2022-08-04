@@ -6,6 +6,7 @@ User Guide
     installation
     quickstart
     cli
+    cli_auto
     examples
     common_uses
     minify
