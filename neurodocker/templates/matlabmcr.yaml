@@ -43,7 +43,6 @@ binaries:
     - libxmu6
     - libxpm-dev
     - libxt6
-    - multiarch-support
     - unzip
     - openjdk-8-jre
     - dbus-x11
