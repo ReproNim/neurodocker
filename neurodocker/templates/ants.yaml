@@ -36,7 +36,7 @@ binaries:
     {% if self.version == "2.4.1" -%}
     curl -fsSL -o ants.zip {{ self.urls[self.version] }}
     unzip ants.zip -d /opt
-    mv /opt/{{ self.install_path }}/bin/* /opt/{{ self.install_path }}
+    mv {{ self.install_path }}/bin/* {{ self.install_path }}
     rm ants.zip
     {% elif self.version != "2.4.1" -%}
     mkdir -p {{ self.install_path }}
@@ -96,5 +96,3 @@ source:
       mv ../Scripts/* {{ self.install_path }} ; \
     fi
     rm -rf /tmp/ants
-
-    
