@@ -17,4 +17,3 @@ repos:
     rev: "6.0.0"
     hooks:
         - id: flake8
-          exclude: tests_.*.py|version.*.py|setup.py # ignore tests and versioneer related code
