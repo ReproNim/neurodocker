@@ -52,6 +52,7 @@ jobs:
             generate docker \
             --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
             --pkg-manager=${pkg_manager} \
+            --yes \
             --{{ wf.software }} \
             {% if wf.add_version %}
             version=${{ '{{' }} matrix.version {{ '}}' }} \
