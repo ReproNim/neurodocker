@@ -14,7 +14,11 @@ apt_based = [
 yum_based = ["fedora:36", "centos:7"]
 
 softwares: dict[str, dict[str, list[str]]] = {
-    "afni": {"versions": [], "methods": ["binaries", "source"]},
+    "afni": {
+        "versions": [],
+        "methods": ["binaries", "source"],
+        "afni_python": ["true", "false"],
+    },
     "freesurfer": {"versions": ["7.3.1", "7.2.0", "7.1.0", "6.0.0"], "methods": []},
     "ants": {
         "versions": ["2.3.4", "2.2.0", "2.0.0"],
@@ -64,13 +68,17 @@ def main():
             "software": software,
         }
 
-        if spec["versions"] and len(spec["versions"]) > 0:
-            wf["add_version"] = "yup"
+        if spec.get("versions") is not None and len(spec["versions"]) > 0:
+            wf["add_version"] = True
             wf["versions"] = stringify(spec["versions"])
 
-        if spec["methods"] and len(spec["methods"]) > 0:
-            wf["add_method"] = "yup"
+        if spec.get("methods") is not None and len(spec["methods"]) > 0:
+            wf["add_method"] = True
             wf["methods"] = stringify(spec["methods"])
+
+        if spec.get("afni_python") is not None and len(spec["afni_python"]) > 0:
+            wf["add_afni_python"] = True
+            wf["afni_python"] = stringify(spec["afni_python"])
 
         print(wf)
 

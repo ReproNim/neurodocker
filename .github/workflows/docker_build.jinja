@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: ["*"]
 
+concurrency:
+  group: ${{ '{{' }} github.workflow {{ '}}' }}-${{ '{{' }} github.ref {{ '}}' }}
+  cancel-in-progress: true
+
 jobs:
 
   {{ wf.software }}:
@@ -23,6 +27,9 @@ jobs:
         {% if wf.add_method %}
         method: [{{ wf.methods }}]
         {% endif %}
+        {% if wf.add_afni_python %}
+        afni_python: [{{ wf.afni_python }}]
+        {% endif %}        
 
     steps:
       - uses: actions/checkout@v3
@@ -53,17 +60,19 @@ jobs:
             --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
             --pkg-manager=${pkg_manager} \
             --yes \
-            {% if wf.software == 'cat12' %}
+{% if wf.software == 'cat12' %}
             --matlabmcr method='binaries' version='2021b' \
-            {% endif %}
+{% endif %}
             --{{ wf.software }} \
-            {% if wf.add_version %}
+{% if wf.add_version %}
             version=${{ '{{' }} matrix.version {{ '}}' }} \
-            {% endif %}
-            {% if wf.add_method %}
+{% endif %}
+{% if wf.add_method %}
             method=${{ '{{' }} matrix.method {{ '}}' }} \
-            {% endif %}
-            > Dockerfile_tmp
+{% endif %}
+{% if wf.add_afni_python %}
+            install_python3=${{ '{{' }} matrix.afni_python {{ '}}' }} \
+{% endif %}            > Dockerfile_tmp
 
           cat Dockerfile_tmp
 
