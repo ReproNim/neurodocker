@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:8', 'fedora:36']
+        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'fedora:36']
         version: ['2.3.4', '2.0.0']
         method: ['binaries', 'source']
 
@@ -39,11 +39,11 @@ jobs:
             pkg_manager="apt"
           fi
 
-          yum_based=('centos:8', 'fedora:36')
+          yum_based=('fedora:36')
           if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
             pkg_manager="yum"
           fi
-          
+
           neurodocker \
             generate docker \
             --base-image=${{ matrix.base_image }} \
@@ -52,6 +52,8 @@ jobs:
             version=${{ matrix.version }} \
             method=${{ matrix.method }} \
             > Dockerfile_tmp
+
+          cat Dockerfile_tmp
 
       - name: Build the Docker image
         run: docker build -f Dockerfile_tmp .
