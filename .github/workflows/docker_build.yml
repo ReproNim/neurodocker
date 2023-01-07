@@ -2,50 +2,59 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "*" ]
+    branches: ["*"]
   pull_request:
-    branches: [ "*" ]
+    branches: ["*"]
 
 # fedora:36, ubuntu:22.04, ubuntu:18.04, ubuntu:16.04, centos:8
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        base_image: ["fedora:36", "centos:8", "ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"]
+        base_image:
+          [
+            "fedora:36",
+            "centos:8",
+            "ubuntu:22.04",
+            "ubuntu:18.04",
+            "ubuntu:16.04",
+          ]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.10"
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
 
-    - name: Install neurodocker
-      run: python -m pip install --editable .[dev]
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
 
-    - name: Generate Dockerfile apt
-      if: contains( ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"], ${{ matrix.base_image }} )
-      run: |
-        neurodocker \
-          generate docker \
-          --base-image=${{ matrix.base_image }} \
-          --pkg-manager=apt \
-          --freesurfer version=7.3.1 > Dockerfile_tmp
+      - name: Generate Dockerfile apt
+        if:
+          contains( ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"], ${{
+          matrix.base_image }} )
+        run: |
 
-    - name: Generate Dockerfile yum
-      if: contains( ["fedora:36", "centos:8"], ${{ matrix.base_image }} )
-      run: |
-        neurodocker \
-          generate docker \
-          --base-image=${{ matrix.base_image }} \
-          --pkg-manager=yum \
-          --freesurfer version=7.3.1 > Dockerfile_tmp
 
-    - name: Build the Docker image
-      run: docker build -f Dockerfile_tmp .
+          yum_based=("fedora:36", "centos:8")
+
+          pkg_manager="apt"
+          if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          : echo "pkg_manager=${pkg_manager}"
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ matrix.base_image }} \
+            --pkg-manager=${pkg_manager} \
+            --freesurfer version=7.3.1 > Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .
