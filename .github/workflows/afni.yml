@@ -1,3 +1,4 @@
+# This is file is automatically generated. Do not edit.
 name: afni
 
 on:
@@ -16,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:8', 'fedora:36']
-
+        
 
     steps:
       - uses: actions/checkout@v3

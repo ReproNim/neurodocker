@@ -31,7 +31,7 @@ def main():
 
         if versions and len(versions) > 0:
             wf = {
-                "os": os,
+                            "os": os,
                 "software": software,
                 "add_version": 'yup',
                 "versions": stringify_list(versions),
@@ -41,6 +41,8 @@ def main():
                 "os": os,
                 "software": software
             }
+
+        wf["header"] = "# This is file is automatically generated. Do not edit."
 
         print(wf)
 
