@@ -47,7 +47,7 @@ jobs:
           if [[ " ${yum_based[*]} " =~ ${{ '{{' }} matrix.base_image {{ '}}' }} ]]; then
             pkg_manager="yum"
           fi
-          
+
           neurodocker \
             generate docker \
             --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
@@ -60,6 +60,8 @@ jobs:
             method=${{ '{{' }} matrix.method {{ '}}' }} \
             {% endif %}
             > Dockerfile_tmp
+
+          cat Dockerfile_tmp
 
       - name: Build the Docker image
         run: docker build -f Dockerfile_tmp .

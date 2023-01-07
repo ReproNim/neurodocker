@@ -3,7 +3,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 apt_based = ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"]
-yum_based = ["centos:8", "fedora:36"]
+yum_based = ["fedora:36"]
 
 softwares: dict[str, list[str]] = {
     "afni": {"versions": [], "methods": ["binaries", "source"]},
@@ -12,6 +12,7 @@ softwares: dict[str, list[str]] = {
     "fsl": {"versions": ["6.0.5.1", "5.0.10"], "methods": ["binaries"]},
     "mrtrix3": {"versions": ["3.0.2", "3.0.0"], "methods": ["binaries", "source"]},
     "spm12": {"versions": ["r7771", "r6225"], "methods": ["binaries"]},
+    "matlabmcr": {"versions": ["2021b", "2010a"], "methods": ["binaries"]},
 }
 
 output_dir = Path(__file__).parent
