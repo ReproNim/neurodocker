@@ -15,12 +15,18 @@ yum_based = ["fedora:36", "centos:8", "centos:7"]
 
 softwares: dict[str, dict[str, list[str]]] = {
     "afni": {"versions": [], "methods": ["binaries", "source"]},
-    "freesurfer": {"versions": ["7.3.1", "6.0.0"], "methods": []},
-    "ants": {"versions": ["2.3.4", "2.0.0"], "methods": ["binaries", "source"]},
-    "fsl": {"versions": ["6.0.5.1", "5.0.10"], "methods": ["binaries"]},
-    "mrtrix3": {"versions": ["3.0.2", "3.0.0"], "methods": ["binaries", "source"]},
-    "matlabmcr": {"versions": ["2021b", "2010a"], "methods": ["binaries"]},
-    "spm12": {"versions": ["r7771", "r6225"], "methods": ["binaries"]},
+    "freesurfer": {"versions": ["7.3.1", "7.2.0", "7.1.0", "6.0.0"], "methods": []},
+    "ants": {
+        "versions": ["2.3.4", "2.2.0", "2.0.0"],
+        "methods": ["binaries", "source"],
+    },
+    "fsl": {"versions": ["6.0.5.1", "6.0.0", "5.0.10"], "methods": ["binaries"]},
+    "mrtrix3": {
+        "versions": ["3.0.2", "3.0.1", "3.0.0"],
+        "methods": ["binaries", "source"],
+    },
+    "matlabmcr": {"versions": ["2021b", "2015a", "2010a"], "methods": ["binaries"]},
+    "spm12": {"versions": ["r7771", "r6914", "r6225"], "methods": ["binaries"]},
     "cat12": {"versions": ["r1933_R2017b"], "methods": ["binaries"]},
 }
 
