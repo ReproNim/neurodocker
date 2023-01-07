@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: freesurfer
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
   pull_request:
     branches: ["*"]
 
-# fedora:36, ubuntu:22.04, ubuntu:18.04, ubuntu:16.04, centos:8
-
 jobs:
-  build:
+
+  freesurfer:
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,6 +23,7 @@ jobs:
             "ubuntu:18.04",
             "ubuntu:16.04",
           ]
+        version: ["7.3.1", "6.0.0"]
 
     steps:
       - uses: actions/checkout@v3
@@ -54,7 +55,7 @@ jobs:
             generate docker \
             --base-image=${{ matrix.base_image }} \
             --pkg-manager=${pkg_manager} \
-            --freesurfer version=7.3.1 > Dockerfile_tmp
+            --freesurfer version=${{ matrix.version }} > Dockerfile_tmp
 
       - name: Build the Docker image
         run: docker build -f Dockerfile_tmp .
