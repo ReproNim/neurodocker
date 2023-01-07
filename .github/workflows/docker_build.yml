@@ -23,8 +23,13 @@ jobs:
     - name: Install neurodocker
       run: python -m pip install --editable .[dev]
 
-    - name: version
-      run: neurodocker --version
+    - name: Generate Dockerfile
+      run: |
+        neurodocker \
+         generate docker \
+          --base-image=ubuntu:20.04 \
+          --pkg-manager=apt \
+          --freesurfer version=7.3.1 > Dockerfile_u2004_fs73
 
     - name: Build the Docker image
-      run: docker build .
+      run: docker build -f Dockerfile_u2004_fs73
