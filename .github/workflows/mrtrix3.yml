@@ -1,5 +1,5 @@
 # This is file is automatically generated. Do not edit.
-name: afni
+name: mrtrix3
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  afni:
+  mrtrix3:
 
     runs-on: ubuntu-latest
 
@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:8', 'fedora:36']
+        version: ['3.0.2', '3.0.0']
         method: ['binaries', 'source']
 
     steps:
@@ -47,7 +48,8 @@ jobs:
             generate docker \
             --base-image=${{ matrix.base_image }} \
             --pkg-manager=${pkg_manager} \
-            --afni \
+            --mrtrix3 \
+            version=${{ matrix.version }} \
             method=${{ matrix.method }} \
             > Dockerfile_tmp
 
