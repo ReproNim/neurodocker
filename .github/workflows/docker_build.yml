@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         base_image:
           [
@@ -34,21 +35,20 @@ jobs:
       - name: Install neurodocker
         run: python -m pip install --editable .[dev]
 
-      - name: Generate Dockerfile apt
-        if:
-          contains( ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"], ${{
-          matrix.base_image }} )
+      - name: Generate Dockerfile
         run: |
 
+          apt_based=("ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04")
+          if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="apt"
+          fi
 
           yum_based=("fedora:36", "centos:8")
-
-          pkg_manager="apt"
           if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
             pkg_manager="yum"
           fi
 
-          : echo "pkg_manager=${pkg_manager}"
+          echo "pkg_manager will b:  ${pkg_manager}"
 
           neurodocker \
             generate docker \
