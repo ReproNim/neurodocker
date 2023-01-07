@@ -1,5 +1,5 @@
 # This is file is automatically generated. Do not edit.
-name: freesurfer
+name: cat12
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  freesurfer:
+  cat12:
 
     runs-on: ubuntu-latest
 
@@ -17,7 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'bullseye-20221219-slim', 'buster-20221219-slim', 'stretch-slim', 'fedora:36', 'centos:8', 'centos:7']
-        version: ['7.3.1', '6.0.0']
+        version: ['r1933_R2017b']
+        method: ['binaries']
 
     steps:
       - uses: actions/checkout@v3
@@ -47,8 +48,9 @@ jobs:
             generate docker \
             --base-image=${{ matrix.base_image }} \
             --pkg-manager=${pkg_manager} \
-            --freesurfer \
+            --cat12 \
             version=${{ matrix.version }} \
+            method=${{ matrix.method }} \
             > Dockerfile_tmp
 
           cat Dockerfile_tmp

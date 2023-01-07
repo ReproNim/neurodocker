@@ -2,17 +2,26 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-apt_based = ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"]
-yum_based = ["fedora:36"]
 
-softwares: dict[str, list[str]] = {
+apt_based = [
+    "ubuntu:22.04",
+    "ubuntu:18.04",
+    "ubuntu:16.04",
+    "bullseye-20221219-slim",
+    "buster-20221219-slim",
+    "stretch-slim",
+]
+yum_based = ["fedora:36", "centos:8", "centos:7"]
+
+softwares: dict[str, dict[str, list[str]]] = {
     "afni": {"versions": [], "methods": ["binaries", "source"]},
     "freesurfer": {"versions": ["7.3.1", "6.0.0"], "methods": []},
     "ants": {"versions": ["2.3.4", "2.0.0"], "methods": ["binaries", "source"]},
     "fsl": {"versions": ["6.0.5.1", "5.0.10"], "methods": ["binaries"]},
     "mrtrix3": {"versions": ["3.0.2", "3.0.0"], "methods": ["binaries", "source"]},
-    "spm12": {"versions": ["r7771", "r6225"], "methods": ["binaries"]},
     "matlabmcr": {"versions": ["2021b", "2010a"], "methods": ["binaries"]},
+    "spm12": {"versions": ["r7771", "r6225"], "methods": ["binaries"]},
+    "cat12": {"versions": ["r1933_R2017b"], "methods": ["binaries"]},
 }
 
 output_dir = Path(__file__).parent

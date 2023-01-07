@@ -18,6 +18,7 @@ Please see our website https://www.repronim.org/neurodocker for more information
 [![fsl](https://github.com/Remi-Gau/neurodocker/actions/workflows/fsl.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/fsl.yml)
 [![mrtrix3](https://github.com/Remi-Gau/neurodocker/actions/workflows/mrtrix3.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/mrtrix3.yml)
 [![spm12](https://github.com/Remi-Gau/neurodocker/actions/workflows/spm12.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/spm12.yml)
+[![matlabmcr](https://github.com/Remi-Gau/neurodocker/actions/workflows/matlabmcr.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/matlabmcr.yml)
 
 # Installation
 
