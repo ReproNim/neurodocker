@@ -1,5 +1,5 @@
 # This is file is automatically generated. Do not edit.
-name: afni
+name: 'afni'
 
 on:
   push:

@@ -33,7 +33,7 @@ softwares: dict[str, dict[str, list[str]]] = {
 output_dir = Path(__file__).parent
 
 
-def stringify_list(some_list: list[str]) -> str:
+def stringify(some_list: list[str]) -> str:
     if len(some_list) == 1:
         return f"'{some_list[0]}'"
     return "'" + "', '".join(some_list) + "'"
@@ -44,16 +44,16 @@ def main():
     env = Environment(
         loader=FileSystemLoader(Path(__file__).parent),
         autoescape=select_autoescape(),
-        trim_blocks=True,
         lstrip_blocks=True,
+        trim_blocks=True,
     )
 
     template = env.get_template("docker_build.jinja")
 
     os = {
-        "apt_based": stringify_list(apt_based),
-        "yum_based": stringify_list(yum_based),
-        "all": stringify_list(apt_based + yum_based),
+        "apt_based": stringify(apt_based),
+        "yum_based": stringify(yum_based),
+        "all": stringify(apt_based + yum_based),
     }
 
     for software, spec in softwares.items():
@@ -66,11 +66,11 @@ def main():
 
         if spec["versions"] and len(spec["versions"]) > 0:
             wf["add_version"] = "yup"
-            wf["versions"] = stringify_list(spec["versions"])
+            wf["versions"] = stringify(spec["versions"])
 
         if spec["methods"] and len(spec["methods"]) > 0:
             wf["add_method"] = "yup"
-            wf["methods"] = stringify_list(spec["methods"])
+            wf["methods"] = stringify(spec["methods"])
 
         print(wf)
 

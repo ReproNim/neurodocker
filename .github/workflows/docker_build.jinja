@@ -1,5 +1,5 @@
 {{ wf.header }}
-name: {{ wf.software }}
+name: '{{ wf.software }}'
 
 on:
   push:
@@ -53,6 +53,9 @@ jobs:
             --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
             --pkg-manager=${pkg_manager} \
             --yes \
+            {% if wf.software == 'cat12' %}
+            --matlabmcr method='binaries' version='2021b' \
+            {% endif %}
             --{{ wf.software }} \
             {% if wf.add_version %}
             version=${{ '{{' }} matrix.version {{ '}}' }} \

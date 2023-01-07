@@ -1,5 +1,5 @@
 # This is file is automatically generated. Do not edit.
-name: cat12
+name: 'cat12'
 
 on:
   push:
@@ -49,6 +49,7 @@ jobs:
             --base-image=${{ matrix.base_image }} \
             --pkg-manager=${pkg_manager} \
             --yes \
+            --matlabmcr method='binaries' version='2021b' \
             --cat12 \
             version=${{ matrix.version }} \
             method=${{ matrix.method }} \
