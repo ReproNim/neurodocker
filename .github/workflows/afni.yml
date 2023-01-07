@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-20221219-slim', 'debian:buster-20221219-slim', 'stretch-slim', 'fedora:36', 'centos:8', 'centos:7']
+        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:8', 'centos:7']
         method: ['binaries', 'source']
 
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: Generate Dockerfile
         run: |
 
-          apt_based=('ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-20221219-slim', 'debian:buster-20221219-slim', 'stretch-slim')
+          apt_based=('ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim')
           if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
             pkg_manager="apt"
           fi
@@ -47,6 +47,7 @@ jobs:
             generate docker \
             --base-image=${{ matrix.base_image }} \
             --pkg-manager=${pkg_manager} \
+            --yes \
             --afni \
             method=${{ matrix.method }} \
             > Dockerfile_tmp
