@@ -7,8 +7,8 @@ apt_based = [
     "ubuntu:22.04",
     "ubuntu:18.04",
     "ubuntu:16.04",
-    "bullseye-20221219-slim",
-    "buster-20221219-slim",
+    "debian:bullseye-20221219-slim",
+    "debian:buster-20221219-slim",
     "stretch-slim",
 ]
 yum_based = ["fedora:36", "centos:8", "centos:7"]
