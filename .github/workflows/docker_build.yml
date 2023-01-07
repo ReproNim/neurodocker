@@ -6,11 +6,17 @@ on:
   pull_request:
     branches: [ "*" ]
 
+# fedora:36, ubuntu:22.04, ubuntu:18.04, ubuntu:16.04, centos:8
+
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        base_image: ["fedora:36", "ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04", "centos:8"]
 
     steps:
     - uses: actions/checkout@v3
@@ -26,10 +32,10 @@ jobs:
     - name: Generate Dockerfile
       run: |
         neurodocker \
-         generate docker \
-          --base-image=ubuntu:20.04 \
+          generate docker \
+          --base-image=${{ matrix.base_image }} \
           --pkg-manager=apt \
-          --freesurfer version=7.3.1 > Dockerfile_u2004_fs73 .
+          --freesurfer version=7.3.1 > Dockerfile_tmp
 
     - name: Build the Docker image
-      run: docker build -f Dockerfile_u2004_fs73
+      run: docker build -f Dockerfile_tmp .
