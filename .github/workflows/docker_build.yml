@@ -29,7 +29,7 @@ jobs:
          generate docker \
           --base-image=ubuntu:20.04 \
           --pkg-manager=apt \
-          --freesurfer version=7.3.1 > Dockerfile_u2004_fs73
+          --freesurfer version=7.3.1 > Dockerfile_u2004_fs73 .
 
     - name: Build the Docker image
       run: docker build -f Dockerfile_u2004_fs73
