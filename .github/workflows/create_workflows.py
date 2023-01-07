@@ -5,18 +5,23 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 apt_based = ["ubuntu:22.04", "ubuntu:18.04", "ubuntu:16.04"]
 yum_based = ["centos:8", "fedora:36"]
 
-softwares: dict[str, list[str]] = {"afni": []}
+softwares: dict[str, list[str]] = {"afni": {"versions": [], "methods": ["binaries"] }}
 
 output_dir = Path(__file__).parent
 
 def stringify_list(some_list: list[str]) -> str:
+    if len(some_list) == 1:
+        return f"'{some_list[0]}'"
     return "'" + "', '".join(some_list) + "'"
 
 
 def main():
 
     env = Environment(
-        loader=FileSystemLoader(Path(__file__).parent), autoescape=select_autoescape()
+        loader=FileSystemLoader(Path(__file__).parent), 
+        autoescape=select_autoescape(), 
+        trim_blocks=True, 
+        lstrip_blocks=True
     )
 
     template = env.get_template("docker_build.jinja")
@@ -27,22 +32,21 @@ def main():
         "all": stringify_list(apt_based + yum_based),
     }
 
-    for software, versions in softwares.items():
+    for software, spec in softwares.items():
 
-        if versions and len(versions) > 0:
-            wf = {
-                            "os": os,
-                "software": software,
-                "add_version": 'yup',
-                "versions": stringify_list(versions),
-            }
-        else:
-            wf = {
+        wf = {
+                "header": "# This is file is automatically generated. Do not edit.",
                 "os": os,
                 "software": software
             }
 
-        wf["header"] = "# This is file is automatically generated. Do not edit."
+        if spec["versions"] and len(spec["versions"]) > 0:
+            wf["add_version"] = 'yup'
+            wf["versions"] = stringify_list(spec["versions"])
+
+        if spec["methods"] and len(spec["methods"]) > 0:
+            wf["add_method"] = 'yup'
+            wf["methods"] = stringify_list(spec["methods"])
 
         print(wf)
 

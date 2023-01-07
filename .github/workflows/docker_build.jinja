@@ -17,7 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         base_image: [{{ wf.os.all }}]
-        {% if wf.add_version %}version: [{{ wf.versions }}]{% endif %}
+        {% if wf.add_version %}
+        version: [{{ wf.versions }}]
+        {% endif %}
+        {% if wf.add_method %}
+        method: [{{ wf.methods }}]
+        {% endif %}
 
     steps:
       - uses: actions/checkout@v3
@@ -42,14 +47,19 @@ jobs:
           if [[ " ${yum_based[*]} " =~ ${{ '{{' }} matrix.base_image {{ '}}' }} ]]; then
             pkg_manager="yum"
           fi
-
-          echo "pkg_manager will be:  ${pkg_manager}"
-
+          
           neurodocker \
             generate docker \
             --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
             --pkg-manager=${pkg_manager} \
-            --{{ wf.software }} {% if wf.add_version %}version=${{ '{{' }} matrix.version {{ '}}' }}{% endif %}  > Dockerfile_tmp
+            --{{ wf.software }} \
+            {% if wf.add_version %}
+            version=${{ '{{' }} matrix.version {{ '}}' }} \
+            {% endif %}
+            {% if wf.add_method %}
+            method=${{ '{{' }} matrix.method {{ '}}' }} \
+            {% endif %}
+            > Dockerfile_tmp
 
       - name: Build the Docker image
         run: docker build -f Dockerfile_tmp .
