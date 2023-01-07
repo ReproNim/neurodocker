@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:8', 'centos:7']
+        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
         version: ['r1933_R2017b']
         method: ['binaries']
 
@@ -39,7 +39,7 @@ jobs:
             pkg_manager="apt"
           fi
 
-          yum_based=('fedora:36', 'centos:8', 'centos:7')
+          yum_based=('fedora:36', 'centos:7')
           if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
             pkg_manager="yum"
           fi

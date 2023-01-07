@@ -11,7 +11,7 @@ apt_based = [
     "debian:buster-slim",
     "debian:stretch-slim",
 ]
-yum_based = ["fedora:36", "centos:8", "centos:7"]
+yum_based = ["fedora:36", "centos:7"]
 
 softwares: dict[str, dict[str, list[str]]] = {
     "afni": {"versions": [], "methods": ["binaries", "source"]},
