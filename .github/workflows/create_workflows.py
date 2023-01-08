@@ -29,7 +29,7 @@ softwares: dict[str, dict[str, list[str]]] = {
         "versions": ["3.0.2", "3.0.1", "3.0.0"],
         "methods": ["binaries", "source"],
     },
-    "matlabmcr": {"versions": ["2021b", "2015a", "2010a"], "methods": ["binaries"]},
+    "matlabmcr": {"versions": ["2021b", "2015a", "2012a", "2010a"], "methods": ["binaries"]},
     "spm12": {"versions": ["r7771", "r6914", "r6225"], "methods": ["binaries"]},
     "cat12": {"versions": ["r1933_R2017b"], "methods": ["binaries"]},
 }

@@ -61,7 +61,7 @@ jobs:
             --pkg-manager=${pkg_manager} \
             --yes \
 {% if wf.software == 'cat12' %}
-            --matlabmcr method='binaries' version='2021b' \
+            --matlabmcr method='binaries' version='2017b' \
 {% endif %}
             --{{ wf.software }} \
 {% if wf.add_version %}
