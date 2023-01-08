@@ -24,15 +24,22 @@ softwares: dict[str, dict[str, list[str]]] = {
         "versions": ["2.3.4", "2.2.0", "2.0.0"],
         "methods": ["binaries", "source"],
     },
-    "fsl": {"versions": ["6.0.5.1", "6.0.0", "5.0.10"], "methods": ["binaries"]},
+    "fsl": {
+        "versions": ["6.0.5.1", "6.0.4", "6.0.3", "6.0.2", "6.0.1", "6.0.0", "5.0.10"],
+        "methods": ["binaries"],
+    },
     "mrtrix3": {
         "versions": ["3.0.2", "3.0.1", "3.0.0"],
         "methods": ["binaries", "source"],
     },
-    "matlabmcr": {"versions": ["2021b", "2015a", "2012a", "2010a"], "methods": ["binaries"]},
+    "matlabmcr": {
+        "versions": ["2021b", "2015a", "2012a", "2010a"],
+        "methods": ["binaries"],
+    },
     "spm12": {"versions": ["r7771", "r6914", "r6225"], "methods": ["binaries"]},
     "cat12": {"versions": ["r1933_R2017b"], "methods": ["binaries"]},
 }
+
 
 output_dir = Path(__file__).parent
 
