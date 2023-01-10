@@ -29,7 +29,7 @@ jobs:
         {% endif %}
         {% if wf.add_afni_python %}
         afni_python: [{{ wf.afni_python }}]
-        {% endif %}        
+        {% endif %}
 
     steps:
       - uses: actions/checkout@v3

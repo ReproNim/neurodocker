@@ -23,7 +23,7 @@ jobs:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
         version: ['2021b', '2015a', '2012a', '2010a']
         method: ['binaries']
-        
+
 
     steps:
       - uses: actions/checkout@v3

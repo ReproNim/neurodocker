@@ -29,7 +29,7 @@ the Neurodocker Python API. Python 3.7 or newer is required.
 conda
 -----
 
-We recommend using a virtual environment or a :code:`conda` environment. 
+We recommend using a virtual environment or a :code:`conda` environment.
 In order to create a new :code:`conda` environment and install Neurodocker:
 
 .. code-block:: bash
