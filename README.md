@@ -10,17 +10,6 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 
 Please see our website https://www.repronim.org/neurodocker for more information.
 
-# image build status
-
-[![afni](https://github.com/Remi-Gau/neurodocker/actions/workflows/afni.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/afni.yml)
-[![ants](https://github.com/Remi-Gau/neurodocker/actions/workflows/ants.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/ants.yml)
-[![freesurfer](https://github.com/Remi-Gau/neurodocker/actions/workflows/freesurfer.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/freesurfer.yml)
-[![fsl](https://github.com/Remi-Gau/neurodocker/actions/workflows/fsl.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/fsl.yml)
-[![mrtrix3](https://github.com/Remi-Gau/neurodocker/actions/workflows/mrtrix3.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/mrtrix3.yml)
-[![spm12](https://github.com/Remi-Gau/neurodocker/actions/workflows/spm12.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/spm12.yml)
-[![matlabmcr](https://github.com/Remi-Gau/neurodocker/actions/workflows/matlabmcr.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/matlabmcr.yml)
-[![cat12](https://github.com/Remi-Gau/neurodocker/actions/workflows/cat12.yml/badge.svg)](https://github.com/Remi-Gau/neurodocker/actions/workflows/cat12.yml)
-
 # Installation
 
 Use the _Neurodocker_ Docker image (recommended):
@@ -59,3 +48,8 @@ python -m pip install --no-cache-dir --editable .[all]
 ```
 
 Before committing changes, initialize `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `black` for formatting.
+
+
+## Build status
+
+[![](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg)](https://github.com/Remi-Gau/neurodocker?branch=test_build)
