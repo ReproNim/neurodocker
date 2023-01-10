@@ -52,4 +52,10 @@ Before committing changes, initialize `pre-commit` with `pre-commit install`. Th
 
 ## Build status
 
-[![](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg)](https://github.com/Remi-Gau/neurodocker?branch=test_build)
+http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build
+
+[![](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build)](https://github.com/Remi-Gau/neurodocker?branch=test_build)
+
+http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=spm12
+
+[![](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=spm12)](https://github.com/Remi-Gau/neurodocker?branch=test_build)
