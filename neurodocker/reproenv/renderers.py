@@ -717,6 +717,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
     lines = string.splitlines()
     for ii, line in enumerate(lines):
         line = line.rstrip()
+        if not line:
+            continue
         is_last_line = ii == len(lines) - 1
         already_cont = line.startswith(("&&", "&", "||", "|", "fi"))
         is_comment = line.startswith("#")
