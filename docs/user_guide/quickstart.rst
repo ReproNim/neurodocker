@@ -62,8 +62,8 @@ Feel free to create a new notebook and :code:`import nipype`.
 Singularity
 ~~~~~~~~~~~
 
-In most cases the only difference between generating Dockerfile and 
-`Singularity definition file <https://sylabs.io/guides/3.7/user-guide/definition_files.html>`_ (the file that is used to create a Singularity container) is in  
+In most cases the only difference between generating Dockerfile and
+`Singularity definition file <https://sylabs.io/guides/3.7/user-guide/definition_files.html>`_ (the file that is used to create a Singularity container) is in
 a form of :code:`neurodocker generate` command,  `neurodocker generate singularity` has to be used instead of :code:`neurodocker generate docker`.
 
 **This requires having `Singularity <https://sylabs.io/guides/3.7/user-guide/quick_start.html>`_ installed first.**

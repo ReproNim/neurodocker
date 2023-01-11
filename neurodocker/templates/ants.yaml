@@ -85,5 +85,3 @@ source:
       mv ../Scripts/* {{ self.install_path }} ; \
     fi
     rm -rf /tmp/ants
-
-    
