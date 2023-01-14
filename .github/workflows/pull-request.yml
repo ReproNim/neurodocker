@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Install Apptainer
         env:
-          VERSION=1.1.5
+          VERSION: 1.1.5
         run: |
           sudo apt-get update
           sudo apt-get install -y wget
