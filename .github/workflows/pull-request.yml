@@ -18,29 +18,14 @@ jobs:
           VERSION=1.1.5
         run: |
           sudo apt-get update
-          sudo apt-get update && apt-get install -y \
-              build-essential \
-              libseccomp-dev \
-              pkg-config \
-              uidmap \
-              squashfs-tools \
-              squashfuse \
-              fuse2fs \
-              fuse-overlayfs \
-              fakeroot \
-              cryptsetup \
-              curl wget git
-          wget -q https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
-          tar -xzf apptainer-${VERSION}.tar.gz && \
-          cd apptainer-${VERSION} && \
-          ./mconfig --prefix=$HOME/opt/apptainer --without-suid && \
-          make -C ./builddir && \
-          sudo make -C ./builddir install
+          sudo apt-get install -y wget
+          wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer_${VERSION}_amd64.deb
+          wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-suid_${VERSION}_amd64.deb
+          sudo apt-get install --yes ./apptainer*
       - name: Set Apptainer/Singularity environment variables
         run: |
-          echo $HOME/opt/singularity/bin >> $GITHUB_PATH
           # Give reproenv the full path to apptainer, so it still works with `sudo`.
-          echo REPROENV_APPTAINER_PROGRAM=$HOME/opt/apptainer/bin/apptainer >> $GITHUB_ENV
+          echo REPROENV_APPTAINER_PROGRAM=apptainer >> $GITHUB_ENV
           echo APPTAINER_CACHEDIR=/dev/shm/$(whoami)/singularity >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up Python
