@@ -1,3 +1,23 @@
+"""
+This scripts uses a jinja template to create CI workflows to test:
+
+    - different linux distributions (split by the package manager they use)
+    - different softwares that neurodocker supports
+    - different install method for a given software
+
+All of those are defined in a python dictionary.
+
+Versions to install are read from the neurodocker template for a given software.
+It is possible to skip a version by adding a "skip_versions" key to the software.
+
+Each workflow:
+
+    - installs the latest version of neurodocker
+    - builds a dockerfile for a combination of OS / software / version / install method
+    - cat the dockerfile
+    - attempts to build the corresponding image
+
+"""
 from pathlib import Path
 
 import yaml  # type: ignore
@@ -52,9 +72,49 @@ softwares: dict[str, dict[str, list[str]]] = {
     "spm12": {"methods": ["binaries"]},
 }
 
-
 output_dir = Path(__file__).parent
 template_folder = Path(__file__).parents[2].joinpath("neurodocker", "templates")
+
+build_dashboard_file = Path(__file__).parents[2].joinpath("build_dashboard.md")
+branch = "test_build"  # "master"
+repo = "Remi-Gau/neurodocker"  # "ReproNim/neurodocker"
+
+
+def create_dashboard_file():
+    """Create a build dashboard file."""
+
+    print("creating build dashboard file...")
+    print(build_dashboard_file)
+
+    gh_actions_url = "http://github-actions.40ants.com/"
+
+    with open(build_dashboard_file, "w") as f:
+
+        image_base_url = f"{gh_actions_url}{repo}/matrix.svg?branch={branch}"
+        print(
+            """<!-- This page is generated automatically. Do not edit manually. -->
+# Build dashboard)
+
+
+""",
+            file=f,
+        )
+
+        for software, _ in softwares.items():
+
+            image_url = f"{image_base_url}&only={software}"
+            print(
+                f"""
+## {software}
+
+[github actions workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
+
+[![{software} build status]({image_url})]
+
+
+""",
+                file=f,
+            )
 
 
 def get_versions_from_neurodocker_template(software: str) -> list[str]:
@@ -112,12 +172,13 @@ def main():
             wf["add_afni_python"] = True
             wf["afni_python"] = stringify(spec["afni_python"])
 
-        print(wf)
-
-        print(template.render(wf=wf))
-
-        with open(output_dir.joinpath(software).with_suffix(".yml"), "w") as f:
+        output_file = output_dir.joinpath(software).with_suffix(".yml")
+        print("creating workflow")
+        print(f"{output_file}")
+        with open(output_file, "w") as f:
             print(template.render(wf=wf), file=f)
+
+    create_dashboard_file()
 
 
 if __name__ == "__main__":

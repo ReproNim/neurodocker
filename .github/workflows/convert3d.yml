@@ -1,0 +1,64 @@
+# This is file is automatically generated. Do not edit.
+name: 'convert3d'
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  convert3d:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
+        version: ['nightly', '1.0.0']
+        method: ['binaries']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
+
+      - name: Generate Dockerfile
+        run: |
+
+          apt_based=('ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim')
+          if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="apt"
+          fi
+
+          yum_based=('fedora:36', 'centos:7')
+          if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ matrix.base_image }} \
+            --pkg-manager=${pkg_manager} \
+            --yes \
+            --convert3d \
+            version=${{ matrix.version }} \
+            method=${{ matrix.method }} \
+            > Dockerfile_tmp
+
+          cat Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .
