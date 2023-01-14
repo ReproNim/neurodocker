@@ -21,9 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
-        version: ['2021b', '2015a', '2012a', '2010a']
+        version: ['2021b', '2021a', '2020b', '2020a', '2019b', '2019a', '2018b', '2018a', '2017b', '2017a', '2016b', '2016a', '2015b', '2015aSP1', '2015a', '2014a', '2014b', '2013b', '2013a', '2012b', '2012a', '2010a']
         method: ['binaries']
-
 
     steps:
       - uses: actions/checkout@v3

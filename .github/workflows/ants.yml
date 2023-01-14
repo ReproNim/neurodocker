@@ -21,9 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
-        version: ['2.3.4', '2.2.0', '2.0.0']
+        version: ['2.3.4', '2.3.2', '2.3.1', '2.3.0', '2.2.0', '2.1.0', '2.0.3', '2.0.0']
         method: ['binaries', 'source']
-
 
     steps:
       - uses: actions/checkout@v3

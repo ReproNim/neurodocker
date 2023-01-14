@@ -1,7 +1,7 @@
 from pathlib import Path
 
+import yaml  # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-
 
 apt_based = [
     "ubuntu:22.04",
@@ -13,35 +13,51 @@ apt_based = [
 ]
 yum_based = ["fedora:36", "centos:7"]
 
+"""
+Add a "skip_versions" key to the software dictionary if you want to skip
+testing a specific version. For example, if you want to skip testing
+version 1.0.0 of afni, add the following to the software dictionary:
+
+    "afni": {
+            "skip_versions": ["1.0.0"],
+            "methods": ["binaries", "source"],
+            "afni_python": ["true", "false"],
+        },
+
+"""
 softwares: dict[str, dict[str, list[str]]] = {
     "afni": {
-        "versions": [],
         "methods": ["binaries", "source"],
         "afni_python": ["true", "false"],
     },
-    "freesurfer": {"versions": ["7.3.1", "7.2.0", "7.1.0", "6.0.0"], "methods": []},
+    "freesurfer": {"methods": []},
     "ants": {
-        "versions": ["2.3.4", "2.2.0", "2.0.0"],
         "methods": ["binaries", "source"],
     },
     "fsl": {
-        "versions": ["6.0.5.1", "6.0.4", "6.0.3", "6.0.2", "6.0.1", "6.0.0", "5.0.10"],
         "methods": ["binaries"],
     },
     "mrtrix3": {
-        "versions": ["3.0.2", "3.0.1", "3.0.0"],
         "methods": ["binaries", "source"],
     },
     "matlabmcr": {
-        "versions": ["2021b", "2015a", "2012a", "2010a"],
         "methods": ["binaries"],
     },
-    "spm12": {"versions": ["r7771", "r6914", "r6225"], "methods": ["binaries"]},
-    "cat12": {"versions": ["r1933_R2017b"], "methods": ["binaries"]},
+    "spm12": {"methods": ["binaries"]},
+    "cat12": {"methods": ["binaries"]},
 }
 
 
 output_dir = Path(__file__).parent
+template_folder = Path(__file__).parents[2].joinpath("neurodocker", "templates")
+
+
+def get_versions_from_neurodocker_template(software: str) -> list[str]:
+    """Load the list of versions to test from the software template."""
+    template = template_folder.joinpath(software).with_suffix(".yaml")
+    with open(template, "r") as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+    return list(data["binaries"]["urls"].keys())
 
 
 def stringify(some_list: list[str]) -> str:
@@ -75,9 +91,13 @@ def main():
             "software": software,
         }
 
-        if spec.get("versions") is not None and len(spec["versions"]) > 0:
+        versions = get_versions_from_neurodocker_template(software)
+        for i in spec.get("skip_versions", []):
+            versions.remove(i)
+
+        if versions is not None and len(versions) > 0:
             wf["add_version"] = True
-            wf["versions"] = stringify(spec["versions"])
+            wf["versions"] = stringify(versions)
 
         if spec.get("methods") is not None and len(spec["methods"]) > 0:
             wf["add_method"] = True

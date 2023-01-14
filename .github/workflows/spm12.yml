@@ -21,9 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         base_image: ['ubuntu:22.04', 'ubuntu:18.04', 'ubuntu:16.04', 'debian:bullseye-slim', 'debian:buster-slim', 'debian:stretch-slim', 'fedora:36', 'centos:7']
-        version: ['r7771', 'r6914', 'r6225']
+        version: ['r7771', 'r7487', 'r7219', 'r6914', 'r6685', 'r6472', 'r6225']
         method: ['binaries']
-
 
     steps:
       - uses: actions/checkout@v3
