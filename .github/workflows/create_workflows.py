@@ -93,7 +93,7 @@ def create_dashboard_file():
         image_base_url = f"{gh_actions_url}{repo}/matrix.svg?branch={branch}"
         print(
             """<!-- This page is generated automatically. Do not edit manually. -->
-# Build dashboard)
+# Build dashboard
 """,
             file=f)
 
