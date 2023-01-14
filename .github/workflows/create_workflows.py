@@ -94,23 +94,25 @@ def create_dashboard_file():
         print(
             """<!-- This page is generated automatically. Do not edit manually. -->
 # Build dashboard)
-
-
 """,
-            file=f,
-        )
+            file=f)
 
+        # table of content 
+        for software, _ in softwares.items():
+            print(f"""- [{software}](#{software})""", file=f)
+
+        print("", file=f)
+
+        # link to the github actions workflow and image of the build status
         for software, _ in softwares.items():
 
             image_url = f"{image_base_url}&only={software}"
             print(
-                f"""
-## {software}
+                f"""## {software}
 
-[github actions workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
+[{software} github actions workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
 
-[![{software} build status]({image_url})]
-
+![{software} build status]({image_url})
 """,
                 file=f,
             )
