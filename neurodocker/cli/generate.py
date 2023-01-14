@@ -138,7 +138,6 @@ class OptionEatAll(click.Option):
                 if not done:
                     value.append(state.rargs.pop(0))
             value = tuple(value)
-
             # call the actual process
             self._previous_parser_process(value, state)
 
@@ -221,6 +220,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--install"],
             multiple=True,
+            type=tuple,
             help="Install packages with system package manager",
         ),
         OptionEatAll(

@@ -50,7 +50,7 @@ PathType = ty.Union[str, pathlib.Path, os.PathLike]
 def _render_string_from_template(
     source: str, template: _BaseInstallationTemplate
 ) -> str:
-    """Take a string from a template and render """
+    """Take a string from a template and render"""
     # TODO: we could use a while loop or recursive function to render the template until
     # there are no jinja-specific things. At this point, we support one level of
     # nesting.
@@ -717,6 +717,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
     lines = string.splitlines()
     for ii, line in enumerate(lines):
         line = line.rstrip()
+        if not line:
+            continue
         is_last_line = ii == len(lines) - 1
         already_cont = line.startswith(("&&", "&", "||", "|", "fi"))
         is_comment = line.startswith("#")
