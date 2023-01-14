@@ -83,10 +83,10 @@ def build_docker_image(context: Path, remove=False) -> ty.Generator[str, None, N
 def build_singularity_image(
     context: Path, remove=True
 ) -> ty.Generator[str, None, None]:
-    """Context manager that builds a Singularity image and removes it on exit.
+    """Context manager that builds a Apptainer image and removes it on exit.
 
-    If `sudo singularity` is not available, the full path to `singularity` can be set
-    with the environment variable `REPROENV_SINGULARITY_PROGRAM`.
+    If `sudo singularity` is not available, the full path to `apptainer` can be set
+    with the environment variable `REPROENV_APPTAINER_PROGRAM`.
 
     Yields
     ------
@@ -95,15 +95,15 @@ def build_singularity_image(
     """
     recipe = context / "Singularity"
     if not recipe.exists():
-        raise FileNotFoundError(f"Singularity recipe not found: {recipe}")
+        raise FileNotFoundError(f"Apptainer recipe not found: {recipe}")
     sif = context / f"reproenv-pytest-{uuid.uuid4().hex}.sif"
-    # Set singularity cache to /dev/shm
+    # Set apptainer cache to /dev/shm
     user = getpass.getuser()
-    cachedir = Path("/") / "dev" / "shm" / user / "singularity"
-    singularity = os.environ.get("REPROENV_SINGULARITY_PROGRAM", "singularity")
+    cachedir = Path("/") / "dev" / "shm" / user / "apptainer"
+    singularity = os.environ.get("REPROENV_APPTAINER_PROGRAM", "apptainer")
     cmd: ty.List[str] = [
         "sudo",
-        f"SINGULARITY_CACHEDIR={cachedir}",
+        f"APPTAINER_CACHEDIR={cachedir}",
         singularity,
         "build",
         str(sif),
