@@ -67,6 +67,7 @@ def test_minify_abort():
         container.stop()
         container.remove()
 
+
 @pytest.mark.skip(reason="ptrace no longer supported under docker")
 def test_minify_with_mounted_volume(tmp_path: Path):
     client = docker.from_env()
