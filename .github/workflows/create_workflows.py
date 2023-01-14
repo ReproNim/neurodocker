@@ -30,21 +30,26 @@ softwares: dict[str, dict[str, list[str]]] = {
         "methods": ["binaries", "source"],
         "afni_python": ["true", "false"],
     },
-    "freesurfer": {"methods": []},
     "ants": {
         "methods": ["binaries", "source"],
     },
+    "cat12": {"methods": ["binaries"]},
+    "convert3d": {"methods": ["binaries"]},
+    "dcm2niix": {
+        "methods": ["binaries", "source"],
+    },
+    "freesurfer": {"methods": []},
     "fsl": {
         "methods": ["binaries"],
-    },
-    "mrtrix3": {
-        "methods": ["binaries", "source"],
     },
     "matlabmcr": {
         "methods": ["binaries"],
     },
+    "mricron": {"methods": ["binaries"]},
+    "mrtrix3": {
+        "methods": ["binaries", "source"],
+    },
     "spm12": {"methods": ["binaries"]},
-    "cat12": {"methods": ["binaries"]},
 }
 
 
