@@ -12,13 +12,11 @@
 
 
 
-
 ## ants
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/ants.yml)
 
 [![ants build status](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=ants)]
-
 
 
 
@@ -30,13 +28,11 @@
 
 
 
-
 ## convert3d
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/convert3d.yml)
 
 [![convert3d build status](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=convert3d)]
-
 
 
 
@@ -48,13 +44,11 @@
 
 
 
-
 ## freesurfer
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/freesurfer.yml)
 
 [![freesurfer build status](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=freesurfer)]
-
 
 
 
@@ -66,13 +60,11 @@
 
 
 
-
 ## matlabmcr
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/matlabmcr.yml)
 
 [![matlabmcr build status](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=matlabmcr)]
-
 
 
 
@@ -84,7 +76,6 @@
 
 
 
-
 ## mrtrix3
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/mrtrix3.yml)
@@ -93,12 +84,10 @@
 
 
 
-
 ## spm12
 
 [github actions workflow](https://github.com/Remi-Gau/neurodocker/actions/workflows/spm12.yml)
 
 [![spm12 build status](http://github-actions.40ants.com/Remi-Gau/neurodocker/matrix.svg?branch=test_build&only=spm12)]
-
 
 

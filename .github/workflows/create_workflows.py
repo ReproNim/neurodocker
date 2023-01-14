@@ -111,7 +111,6 @@ def create_dashboard_file():
 
 [![{software} build status]({image_url})]
 
-
 """,
                 file=f,
             )
