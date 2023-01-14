@@ -1,11 +1,32 @@
 # This is file is automatically generated. Do not edit.
 name: 'spm12'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: ["*"]
   pull_request:
     branches: ["*"]
+
+# Uses the cron schedule for github actions
+#
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+#
+#         ┌───────────── minute (0 - 59)
+#         │ ┌───────────── hour (0 - 23)
+#         │ │   ┌───────────── day of the month (1 - 31)
+#         │ │   │    ┌───────────── month (1 - 12 or JAN-DEC)
+#         │ │   │    │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         * *   *    * *
+
+  schedule:
+  - cron: 0 0 1,15 * *
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
