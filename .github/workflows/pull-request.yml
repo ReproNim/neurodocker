@@ -41,7 +41,7 @@ jobs:
       - name: Install neurodocker
         run: python -m pip install --editable .[dev]
       - name: Check types
-        run: mypy neurodocker
+        run: mypy --install-types --non-interactive neurodocker
       - name: Check style
         run: flake8 neurodocker
       - name: Run python tests
