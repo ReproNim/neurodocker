@@ -13,7 +13,7 @@ def test_validate_template_invalid_templates():
         _validate_template({})
 
     with pytest.raises(
-        exceptions.TemplateError, match="'binaries' is a required property"
+        exceptions.TemplateError, match="{'name': 'bar'} is not valid"
     ):
         _validate_template({"name": "bar"})
 
