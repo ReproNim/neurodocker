@@ -15,7 +15,7 @@ Please see our website https://www.repronim.org/neurodocker for more information
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-docker run --rm kaczmarj/neurodocker:0.9.1 --help
+docker run --rm repronim/neurodocker:latest --help
 ```
 
 The Docker images were moved to [repronim/neurodocker](https://hub.docker.com/r/repronim/neurodocker) from [kaczmarj/neurodocker](https://hub.docker.com/r/kaczmarj/neurodocker).
