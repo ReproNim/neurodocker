@@ -1,3 +1,17 @@
+# 0.9.3 (Mon Jan 16 2023)
+
+#### 🐛 Bug Fix
+
+- FIX: skip minification tests on M1/M2 macs and run them otherwise [#497](https://github.com/ReproNim/neurodocker/pull/497) ([@kaczmarj](https://github.com/kaczmarj))
+- Add/ants24x [#473](https://github.com/ReproNim/neurodocker/pull/473) ([@araikes](https://github.com/araikes) [@kaczmarj](https://github.com/kaczmarj))
+
+#### Authors: 2
+
+- [@araikes](https://github.com/araikes)
+- Jakub Kaczmarzyk ([@kaczmarj](https://github.com/kaczmarj))
+
+---
+
 # 0.9.2 (Sat Jan 14 2023)
 
 #### 🐛 Bug Fix
