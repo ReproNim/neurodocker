@@ -1,20 +1,12 @@
 from pathlib import Path
-import platform
 
 from click.testing import CliRunner
 import pytest
 
+from neurodocker.cli.cli import _arm_on_mac
 from neurodocker.cli.minify.trace import minify
 
 docker = pytest.importorskip("docker", reason="docker-py not found")
-
-
-def _arm_on_mac():
-    """Return True if on an ARM processor (M1/M2) in macos operating system."""
-    is_mac = platform.system().lower() == "darwin"
-    is_arm = platform.processor().lower() == "arm"
-    return is_mac and is_arm
-
 
 skip_arm_on_mac = pytest.mark.skipif(
     _arm_on_mac(), reason="minification does not work on M1/M2 macs"
