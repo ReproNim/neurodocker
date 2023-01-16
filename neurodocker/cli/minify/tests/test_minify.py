@@ -24,13 +24,7 @@ skip_arm_on_mac = pytest.mark.skipif(
 @skip_arm_on_mac
 def test_minify():
     client = docker.from_env()
-    container = client.containers.run(
-        "python:3.9-slim",
-        detach=True,
-        tty=True,
-        platform="Linux/amd64",
-        privileged=True,
-    )
+    container = client.containers.run("python:3.9-slim", detach=True, tty=True)
     commands = ["python --version", """python -c 'print(123)'"""]
     try:
         runner = CliRunner()
