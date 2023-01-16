@@ -1,4 +1,5 @@
 from pathlib import Path
+import platform
 
 from click.testing import CliRunner
 import pytest
@@ -8,11 +9,28 @@ from neurodocker.cli.minify.trace import minify
 docker = pytest.importorskip("docker", reason="docker-py not found")
 
 
-@pytest.mark.skip(reason="ptrace no longer supported under docker")
+def _arm_on_mac():
+    """Return True if on an ARM processor (M1/M2) in macos operating system."""
+    is_mac = platform.system().lower() == "darwin"
+    is_arm = platform.processor().lower() == "arm"
+    return is_mac and is_arm
+
+
+skip_arm_on_mac = pytest.mark.skipif(
+    _arm_on_mac(), reason="minification does not work on M1/M2 macs"
+)
+
+
+@skip_arm_on_mac
 def test_minify():
     client = docker.from_env()
-    container = client.containers.run("python:3.9-slim", detach=True, tty=True,
-                                      platform="Linux/amd64", privileged=True)
+    container = client.containers.run(
+        "python:3.9-slim",
+        detach=True,
+        tty=True,
+        platform="Linux/amd64",
+        privileged=True,
+    )
     commands = ["python --version", """python -c 'print(123)'"""]
     try:
         runner = CliRunner()
@@ -39,7 +57,7 @@ def test_minify():
         container.remove()
 
 
-@pytest.mark.skip(reason="ptrace no longer supported under docker")
+@skip_arm_on_mac
 def test_minify_abort():
     client = docker.from_env()
     container = client.containers.run("python:3.9-slim", detach=True, tty=True)
@@ -68,7 +86,7 @@ def test_minify_abort():
         container.remove()
 
 
-@pytest.mark.skip(reason="ptrace no longer supported under docker")
+@skip_arm_on_mac
 def test_minify_with_mounted_volume(tmp_path: Path):
     client = docker.from_env()
 
