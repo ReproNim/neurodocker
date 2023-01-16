@@ -15,7 +15,7 @@ cli.add_command(generate)
 cli.add_command(genfromjson)
 
 
-def _arm_on_mac():
+def _arm_on_mac() -> bool:
     """Return True if on an ARM processor (M1/M2) in macos operating system."""
     import platform
 
