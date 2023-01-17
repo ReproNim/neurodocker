@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.NEURODOCKER_WORFLOW  }}
+          token: ${{ secrets.CREATE_WORKFLOWS  }}
 
       - name: Set up Python
         uses: actions/setup-python@v2
