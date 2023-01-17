@@ -26,6 +26,14 @@ jobs:
           python .github/workflows/create_workflows.py
           ls -l .github/workflows
 
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b test_docker_build
+          git add .
+          git commit -m "generated"
+          git push          
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           # Optional. Commit message for the created commit.
