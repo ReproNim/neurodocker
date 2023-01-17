@@ -32,7 +32,7 @@ jobs:
           git checkout -b test_docker_build
           git add .
           git commit -m "generated"
-          git push          
+          git push --set-upstream origin test_docker_build         
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
