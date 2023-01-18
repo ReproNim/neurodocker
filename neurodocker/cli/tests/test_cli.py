@@ -6,6 +6,7 @@ from click.testing import CliRunner
 import pytest
 
 from neurodocker.cli.cli import generate
+from neurodocker.cli.generate import OptionEatAll
 
 _cmds = ["docker", "singularity"]
 
@@ -97,6 +98,12 @@ def test_entrypoint_issue_498():
         ],
     )
     assert '\nENTRYPOINT ["printf", "this", "that"]\n' in result.output
+
+
+def test_optioneatall_type_issue_498():
+    with pytest.raises(ValueError):
+        OptionEatAll(["--foo"], type=str)
+    OptionEatAll(["--foo"], type=tuple)
 
 
 @pytest.mark.parametrize("cmd", _cmds)

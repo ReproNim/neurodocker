@@ -122,6 +122,11 @@ class OptionEatAll(click.Option):
         nargs = kwargs.pop("nargs", -1)
         assert nargs == -1, "nargs, if set, must be -1 not {}".format(nargs)
         super(OptionEatAll, self).__init__(*args, **kwargs)
+        if self.type is click.STRING:
+            raise ValueError(
+                "in the current implementation of OptionEatAll, `type` cannot be a"
+                " string."
+            )
         self._previous_parser_process = None
         self._eat_all_parser = None
 
