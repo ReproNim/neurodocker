@@ -1,3 +1,18 @@
+# 0.9.4 (Wed Jan 18 2023)
+
+#### 🐛 Bug Fix
+
+- fix the types in --copy and --entrypoint [#500](https://github.com/ReproNim/neurodocker/pull/500) ([@kaczmarj](https://github.com/kaczmarj))
+- add long_description to setup.cfg [#465](https://github.com/ReproNim/neurodocker/pull/465) ([@kaczmarj](https://github.com/kaczmarj))
+- [FIX] add regression test for 498 [#499](https://github.com/ReproNim/neurodocker/pull/499) ([@Remi-Gau](https://github.com/Remi-Gau))
+
+#### Authors: 2
+
+- Jakub Kaczmarzyk ([@kaczmarj](https://github.com/kaczmarj))
+- Remi Gau ([@Remi-Gau](https://github.com/Remi-Gau))
+
+---
+
 # 0.9.3 (Mon Jan 16 2023)
 
 #### 🐛 Bug Fix
