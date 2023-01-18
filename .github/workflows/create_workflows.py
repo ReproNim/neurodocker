@@ -97,7 +97,7 @@ def create_dashboard_file():
 """,
             file=f)
 
-        # table of content 
+        # table of content
         for software, _ in softwares.items():
             print(f"""- [{software}](#{software})""", file=f)
 
@@ -110,7 +110,7 @@ def create_dashboard_file():
             print(
                 f"""## {software}
 
-[{software} github actions workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
+[{software} workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
 
 ![{software} build status]({image_url})
 """,
