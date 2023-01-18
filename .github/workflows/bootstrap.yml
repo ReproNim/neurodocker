@@ -1,3 +1,10 @@
+# this workflow bootstraps the testing of the build the docker images
+# 
+# - this will run the python script used to generate the workflows 
+#   based on a the jinja template
+# - commit and push the generated workflows to the branch test_docker_build 
+#   where they will be executed
+
 name: bootstrap
 
 concurrency:
@@ -6,7 +13,24 @@ concurrency:
 
 on:
   push:
-    branches: [ "bootstrap" ] 
+    branches: [ "test_build" ] 
+
+# Uses the cron schedule for github actions
+#
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+#
+#         ┌───────────── minute (0 - 59)
+#         │ ┌───────────── hour (0 - 23)
+#         │ │   ┌───────────── day of the month (1 - 31)
+#         │ │   │    ┌───────────── month (1 - 12 or JAN-DEC)
+#         │ │   │    │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         * *   *    * *
+
+  schedule:
+  - cron: 0 0 1,15 * *
 
 jobs:
   bootstrap:
@@ -14,6 +38,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        # requires a token with repo and workflow permissions
         with:
           token: ${{ secrets.BOOTSTRAP }}
 
@@ -28,50 +53,21 @@ jobs:
       - name: Create workflows
         run: |
           python .github/workflows/create_workflows.py
-          ls -l .github/workflows
+          ls -l .github/workflows      
 
-      # # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
-      # - run: |
-      #     git config user.name github-actions
-      #     git config user.email github-actions@github.com
-      #     git checkout -b test_docker_build
-      #     git add .
-      #     git commit -m "add workflows"
-      #     git push --set-upstream origin test_docker_build         
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Push workflows to branch test_docker_build
+        # action: https://github.com/marketplace/actions/git-auto-commit
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          # Optional. Commit message for the created commit.
-          # Defaults to "Apply automatic changes"
           commit_message: add workflows
-
-          # Optional. Local and remote branch name where commit is going to be pushed
-          #  to. Defaults to the current branch.
-          #  You might need to set `create_branch: true` if the branch does not exist.
           branch: test_docker_build
-
-          # Optional. Options used by `git-commit`.
-          # See https://git-scm.com/docs/git-commit#_options
           commit_options: '--no-verify --signoff'
-
-          # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
           commit_user_name: github-actions 
           commit_user_email: github-actions@github.com 
-
-          # Optional. Options used by `git-push`.
-          # See https://git-scm.com/docs/git-push#_options
           push_options: '--force'
-          
-          # Optional. Disable dirty check and always try to create a commit and push
           skip_dirty_check: true    
-          
-          # Optional. Skip internal call to `git fetch`
           skip_fetch: true    
-          
-          # Optional. Skip internal call to `git checkout`
           skip_checkout: true
-
-          # Optional. Create given branch name in local and remote repository.
           create_branch: true
 
 
