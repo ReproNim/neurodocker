@@ -42,6 +42,26 @@ def test_minimal_args(cmd: str, pkg_manager: str):
     assert result.exit_code == 0, result.output
 
 
+@pytest.mark.xfail(reason="https://github.com/ReproNim/neurodocker/issues/498")
+def test_copy():
+    runner = CliRunner()
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            # copy
+            "--copy",
+            "file1",
+            "file2",
+        ],
+    )
+    assert "file1" in (result.output)
+
+
 @pytest.mark.parametrize("cmd", _cmds)
 @pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
 def test_all_args(cmd: str, pkg_manager: str):
