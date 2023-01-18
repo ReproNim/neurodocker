@@ -319,14 +319,16 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {"base_image": value}}
     # arg
     elif param.name == "arg":
-        assert len(value) == 2, "expected key=value pair for --arg"
+        if len(value) != 2:
+            raise click.ClickException("expected key=value pair for --arg")
         k, v = value
         d = {"name": param.name, "kwds": {"key": k, "value": v}}
     # copy
     elif param.name == "copy":
         if not isinstance(value, tuple):
-            raise ValueError("expected this value to be a tuple")
-        assert len(value) > 1, "expected at least two values for --copy"
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        if len(value) < 2:
+            raise click.ClickException("expected at least two values for --copy")
         source, destination = list(value[:-1]), value[-1]
         d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
     # env
@@ -336,7 +338,7 @@ def _get_instruction_for_param(
     # entrypoint
     elif param.name == "entrypoint":
         if not isinstance(value, tuple):
-            raise ValueError("expected this value to be a tuple")
+            raise ValueError("expected this value to be a tuple (contact developers)")
         value = list(value)  # convert from tuple to list
         d = {"name": param.name, "kwds": {"args": value}}
     # install
