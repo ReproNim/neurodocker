@@ -177,7 +177,7 @@ ENV PATH="$PATH:/opt/foo/bin\""""
     )
     d.env(PATH="$PATH:/opt/foo/bin")
     d.label(ORG="myorg")
-    d.labels({'org.test.label': 'another label'})
+    d.labels({"org.test.label": "another label"})
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
     assert (
