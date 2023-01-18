@@ -42,6 +42,7 @@ def test_minimal_args(cmd: str, pkg_manager: str):
     assert result.exit_code == 0, result.output
 
 
+@pytest.mark.xfail(reason="https://github.com/ReproNim/neurodocker/issues/498")
 def test_copy():
     runner = CliRunner()
     result = runner.invoke(
