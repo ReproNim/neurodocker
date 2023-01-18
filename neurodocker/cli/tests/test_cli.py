@@ -42,8 +42,7 @@ def test_minimal_args(cmd: str, pkg_manager: str):
     assert result.exit_code == 0, result.output
 
 
-@pytest.mark.xfail(reason="https://github.com/ReproNim/neurodocker/issues/498")
-def test_copy():
+def test_copy_issue_498():
     runner = CliRunner()
     result = runner.invoke(
         generate,
@@ -59,7 +58,45 @@ def test_copy():
             "file2",
         ],
     )
-    assert "file1" in (result.output)
+    assert "file1" in result.output
+    assert '\nCOPY ["file1", \\\n      "file2"]\n' in result.output
+
+    # Fail if given fewer than two inputs to --copy.
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            # copy
+            "--copy",
+            "file1",
+        ],
+    )
+    assert "Error: expected at least two values for --copy" in result.output
+    assert result.exit_code != 0
+
+
+# Issue #498 references --copy but the same broken behavior is seen in --entrypoint.
+def test_entrypoint_issue_498():
+    runner = CliRunner()
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            "--entrypoint",
+            "printf",
+            "this",
+            "that",
+        ],
+    )
+    assert '\nENTRYPOINT ["printf", "this", "that"]\n' in result.output
 
 
 @pytest.mark.parametrize("cmd", _cmds)
