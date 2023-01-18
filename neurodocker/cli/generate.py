@@ -126,7 +126,7 @@ class OptionEatAll(click.Option):
         self._eat_all_parser = None
 
     def add_to_parser(self, parser, ctx):
-        def parser_process(value, state):
+        def parser_process(value, state: click.parser.ParsingState):
             # method to hook to the parser.process
             done = False
             value = [value]
@@ -201,6 +201,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--copy"],
             multiple=True,
+            type=tuple,
             help=(
                 "Copy files into the container. Provide at least two paths."
                 " The last path is always the destination path in the container."
@@ -215,6 +216,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--entrypoint"],
             multiple=True,
+            type=tuple,
             help="Set entrypoint of the container",
         ),
         OptionEatAll(
@@ -322,6 +324,8 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {"key": k, "value": v}}
     # copy
     elif param.name == "copy":
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple")
         assert len(value) > 1, "expected at least two values for --copy"
         source, destination = list(value[:-1]), value[-1]
         d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
@@ -331,10 +335,9 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {**value}}
     # entrypoint
     elif param.name == "entrypoint":
-        if isinstance(value, str):
-            value = [value]
-        else:
-            value = list(value)
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple")
+        value = list(value)  # convert from tuple to list
         d = {"name": param.name, "kwds": {"args": value}}
     # install
     elif param.name == "install":
