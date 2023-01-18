@@ -1,5 +1,5 @@
 """
-This scripts uses a jinja template to create CI workflows to test:
+This scripts uses a jinja template to create CI workflows to test.
 
     - different linux distributions (split by the package manager they use)
     - different softwares that neurodocker supports
@@ -16,6 +16,11 @@ Each workflow:
     - builds a dockerfile for a combination of OS / software / version / install method
     - cat the dockerfile
     - attempts to build the corresponding image
+
+This script will also create a "dashboard" saved in docs/README.md
+to be picked up to be rendered by the github pages.
+This requires for you to build the pages from the docs folder
+and on the branch where the workflows are pushed to (currently "test_docker_build").
 
 """
 from pathlib import Path
@@ -73,11 +78,18 @@ softwares: dict[str, dict[str, list[str]]] = {
 }
 
 output_dir = Path(__file__).parent
+
 template_folder = Path(__file__).parents[2].joinpath("neurodocker", "templates")
 
-build_dashboard_file = Path(__file__).parents[2].joinpath("build_dashboard.md")
-branch = "test_build"  # "master"
-repo = "Remi-Gau/neurodocker"  # "ReproNim/neurodocker"
+build_dashboard_file = Path(__file__).parents[2].joinpath("docs", "README.md")
+
+# this has to match the name of the branch where the workflows are pushed to
+# see .github/workflows/bootstrap.yml
+branch = "test_docker_build"
+
+# Update to match your username and repo name if you are testing things on your fork
+# "ReproNim/neurodocker"
+repo = "Remi-Gau/neurodocker"
 
 
 def create_dashboard_file():
