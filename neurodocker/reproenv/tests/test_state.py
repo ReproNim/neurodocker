@@ -12,9 +12,7 @@ def test_validate_template_invalid_templates():
     with pytest.raises(exceptions.TemplateError, match="'name' is a required property"):
         _validate_template({})
 
-    with pytest.raises(
-        exceptions.TemplateError, match="{'name': 'bar'} is not valid"
-    ):
+    with pytest.raises(exceptions.TemplateError, match="{'name': 'bar'} is not valid"):
         _validate_template({"name": "bar"})
 
     # missing 'name' top-level key

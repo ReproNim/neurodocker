@@ -36,6 +36,8 @@ jobs:
         run: mypy --install-types --non-interactive neurodocker
       - name: Check style
         run: flake8 neurodocker
+      - name: Check black formatting
+        run: black --check neurodocker
       - name: Run python tests
         run: pytest --numprocesses auto
       - name: Get code coverage
