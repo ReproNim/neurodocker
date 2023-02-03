@@ -42,9 +42,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        # requires a token with repo and workflow permissions
-        with:
-          token: ${{ secrets.BOOTSTRAP }}
 
       - name: Set up Python
         uses: actions/setup-python@v2
