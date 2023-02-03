@@ -12,7 +12,7 @@ jobs:
 
     # Standard usage
     - uses:  totaldebug/action-sphinx@v2
-    with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        sphinx_src: 'docs'
-        target_branch: 'gh-pages'
+      with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sphinx_src: 'docs'
+          target_branch: 'gh-pages'
