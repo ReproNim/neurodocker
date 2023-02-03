@@ -1,0 +1,1156 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>neurodocker.reproenv.renderers &#8212; Neurodocker  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/neurodocker/reproenv/renderers';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">Neurodocker  documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <h1>Source code for neurodocker.reproenv.renderers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Container specification renderers.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">ty</span>
+
+<span class="kn">import</span> <span class="nn">jinja2</span>
+
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">RendererError</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">TemplateError</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_TemplateRegistry</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_validate_renderer</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">_BaseInstallationTemplate</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">_SingularityHeaderType</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">REPROENV_SPEC_FILE_IN_CONTAINER</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">allowed_pkg_managers</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">allowed_installation_methods</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">installation_methods_type</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">pkg_managers_type</span>
+
+<span class="c1"># All jinja2 templates are instantiated from this environment object. It is</span>
+<span class="c1"># configured to dislike undefined attributes. For example, if a template is</span>
+<span class="c1"># created with the string &#39;{{ foo.bar }}&#39; and &#39;foo&#39; does not have a &#39;bar&#39;</span>
+<span class="c1"># attribute, an error will be thrown when the jinja template is instantiated.</span>
+<span class="n">_jinja_env</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">undefined</span><span class="o">=</span><span class="n">jinja2</span><span class="o">.</span><span class="n">StrictUndefined</span><span class="p">)</span>
+
+<span class="c1"># Add globals to the jinja environment. These functions can be called from within a</span>
+<span class="c1"># template.</span>
+
+
+<span class="k">def</span> <span class="nf">_raise_helper</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">NoReturn</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="n">_jinja_env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s2">&quot;raise&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_raise_helper</span>
+
+<span class="c1"># TODO: add a flag that avoids buggy behavior when basing a new container on</span>
+<span class="c1"># one created with ReproEnv.</span>
+
+<span class="n">PathType</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_render_string_from_template</span><span class="p">(</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Take a string from a template and render&quot;&quot;&quot;</span>
+    <span class="c1"># TODO: we could use a while loop or recursive function to render the template until</span>
+    <span class="c1"># there are no jinja-specific things. At this point, we support one level of</span>
+    <span class="c1"># nesting.</span>
+    <span class="n">n_renders</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_renders</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="n">err</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;A template included in this renderer raised an error. Please check the&quot;</span>
+        <span class="s2">&quot; template definition. A required argument might not be included in the&quot;</span>
+        <span class="s2">&quot; required arguments part of the template. Variables in the template should&quot;</span>
+        <span class="s2">&quot; start with `self.`.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Render the string again. This is sometimes necessary because some defaults in the</span>
+    <span class="c1"># template are rendered as {{ self.X }}. These defaults need to be rendered again.</span>
+
+    <span class="k">while</span> <span class="p">(</span>
+        <span class="n">_jinja_env</span><span class="o">.</span><span class="n">variable_start_string</span> <span class="ow">in</span> <span class="n">source</span>
+        <span class="ow">and</span> <span class="n">_jinja_env</span><span class="o">.</span><span class="n">variable_end_string</span> <span class="ow">in</span> <span class="n">source</span>
+    <span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;self.&quot;</span><span class="p">,</span> <span class="s2">&quot;template.&quot;</span><span class="p">)</span>
+        <span class="n">tmpl</span> <span class="o">=</span> <span class="n">_jinja_env</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">tmpl</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UndefinedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="n">n_renders</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">n_renders</span> <span class="o">&gt;</span> <span class="n">max_renders</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;reached maximum rendering iterations (</span><span class="si">{</span><span class="n">max_renders</span><span class="si">}</span><span class="s2">). Templates&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; should not nest variables more than </span><span class="si">{</span><span class="n">max_renders</span><span class="si">}</span><span class="s2"> times.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">source</span>
+
+
+<span class="k">def</span> <span class="nf">_log_instruction</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that logs instructions passed to a Renderer.</span>
+
+<span class="sd">    This adds the logs to the `_instructions` attribute of the Renderer instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">with_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_instructions&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;This wrapper should only be applied to Renderer instances.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># This gets all arguments, even if their value is None.</span>
+        <span class="c1"># We remove key-value pairs where value is None, because the schema does not</span>
+        <span class="c1"># allow for None values.</span>
+        <span class="c1"># TODO: consider this further...</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="c1"># We could apply defaults with `bargs.apply_defaults()` but we do not because</span>
+        <span class="c1"># many defaults are None and the renderer schema does not support null values.</span>
+        <span class="n">bargs</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="c1"># self is not an argument in the spec, but it is present because these are</span>
+        <span class="c1"># instance methods.</span>
+        <span class="k">del</span> <span class="n">bargs</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;self&quot;</span><span class="p">]</span>
+
+        <span class="c1"># If a function takes **kwds, save those without wrapping them in another dict.</span>
+        <span class="c1"># Assume that **kwds arguments are _always_ kwds (eg, not kwargs).</span>
+        <span class="c1"># TODO: generalize this to work on any VAR_KEYWORD parameter.</span>
+        <span class="n">kwds_param</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kwds&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwds_param</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwds_param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">kwds_param</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
+                <span class="n">bargs_kwds</span> <span class="o">=</span> <span class="n">bargs</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kwds&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bargs_kwds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">bargs</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bargs_kwds</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;kwds&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">bargs</span><span class="o">.</span><span class="n">arguments</span><span class="p">)}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">[</span><span class="s2">&quot;instructions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">with_logging</span>
+
+
+<span class="k">class</span> <span class="nc">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pkg_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_pkg_managers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                <span class="s2">&quot;Unknown package manager &#39;</span><span class="si">{}</span><span class="s2">&#39;. Allowed package managers are&quot;</span>
+                <span class="s2">&quot; &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowed_pkg_managers</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span> <span class="o">=</span> <span class="n">pkg_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_users</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;root&quot;</span><span class="p">}</span> <span class="k">if</span> <span class="n">users</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">users</span>
+        <span class="c1"># This keeps track of the current user. This is useful when saving the JSON</span>
+        <span class="c1"># specification to JSON, because if we are not root, we can change to root,</span>
+        <span class="c1"># write the file, and return to whichever user we were.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">=</span> <span class="s2">&quot;root&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pkg_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span>
+            <span class="s2">&quot;existing_users&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="p">),</span>
+            <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Strings (comments) that indicate the beginning and end of saving the JSON</span>
+        <span class="c1"># spec to a file. This helps us in testing because sometimes we don&#39;t care</span>
+        <span class="c1"># about the JSON but we do care about everything else. We can remove the</span>
+        <span class="c1"># content between these two strings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_save_start</span> <span class="o">=</span> <span class="s2">&quot;# Save specification to JSON.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_save_end</span> <span class="o">=</span> <span class="s2">&quot;# End saving to specification to JSON.&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">_Renderer</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">rm_empty_lines</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">j</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Empty lines and commented lines do not affect container definitions.</span>
+        <span class="k">return</span> <span class="n">rm_empty_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">rm_empty_lines</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">masthead</span> <span class="o">=</span> <span class="s2">&quot;# Generated by Neurodocker and Reproenv.&quot;</span>
+        <span class="n">image_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">masthead</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">image_spec</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a new renderer from a dictionary of instructions.&quot;&quot;&quot;</span>
+        <span class="c1"># raise error if invalid</span>
+        <span class="n">_validate_renderer</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="n">pkg_manager</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pkg_manager&quot;</span><span class="p">]</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;existing_users&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># create new renderer object</span>
+        <span class="n">renderer</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mapping</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;instructions&quot;</span><span class="p">]:</span>
+            <span class="n">method_or_template</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="n">kwds</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;kwds&quot;</span><span class="p">]</span>
+            <span class="n">this_instance_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="n">method_or_template</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># Method exists and is something like &#39;copy&#39;, &#39;env&#39;, &#39;run&#39;, etc.</span>
+            <span class="k">if</span> <span class="n">this_instance_method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">this_instance_method</span><span class="p">(</span><span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Error on step &#39;</span><span class="si">{</span><span class="n">method_or_template</span><span class="si">}</span><span class="s2">&#39;. Please see the&quot;</span>
+                        <span class="s2">&quot; traceback above for details.&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="c1"># This is actually a template.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">renderer</span><span class="o">.</span><span class="n">add_registered_template</span><span class="p">(</span><span class="n">method_or_template</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">TemplateError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Error on template &#39;</span><span class="si">{</span><span class="n">method_or_template</span><span class="si">}</span><span class="s2">&#39;. Please see above&quot;</span>
+                        <span class="s2">&quot; for more information.&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">return</span> <span class="n">renderer</span>
+
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a rendered string of the container specification.</span>
+
+<span class="sd">        This method should take care of combining all of the instructions in a way that</span>
+<span class="sd">        makes sense for the container type. For a Dockerfile, it might stack the</span>
+<span class="sd">        sequence of instructions into a string. For a Singularity recipe, it might</span>
+<span class="sd">        organize the instructions into their respective locations, like %post, %files.</span>
+
+<span class="sd">        This method is used by Renderer.__str__ to create the full container spec.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses must implement .render()&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_template</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Template</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">installation_methods_type</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a template to the renderer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        template : Template</span>
+<span class="sd">            The template to add. To reference templates by name, use</span>
+<span class="sd">            `.add_registered_template`.</span>
+<span class="sd">        method : str</span>
+<span class="sd">            The method to use to install the software described in the template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">Template</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                <span class="s2">&quot;template must be an instance of &#39;Template&#39; but got&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">template</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_installation_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                <span class="s2">&quot;method must be &#39;</span><span class="si">{}</span><span class="s2">&#39; but got &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">allowed_installation_methods</span><span class="p">)),</span> <span class="n">method</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">template_method</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">template_method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;template does not have entry for: &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="c1"># Validate kwds passed by user to template, and raise an exception if any are</span>
+        <span class="c1"># invalid.</span>
+        <span class="n">template_method</span><span class="o">.</span><span class="n">validate_kwds</span><span class="p">()</span>
+
+        <span class="c1"># TODO: print a message if the template has a nonempty `alert` property.</span>
+        <span class="c1"># If we print to stdout, however, we can cause problems if the user is piping</span>
+        <span class="c1"># the output to a file or directly to a container build command.</span>
+
+        <span class="c1"># If we keep the `self.VAR` syntax of the template, then we need to pass</span>
+        <span class="c1"># `self=template_method` to the renderer function. But that function is an</span>
+        <span class="c1"># instance method, so passing `self` will override the `self` argument.</span>
+        <span class="c1"># To get around this, we replace `self.` with something that is not an</span>
+        <span class="c1"># argument to the renderer function.</span>
+
+        <span class="c1"># Add environment (render any jinja templates).</span>
+        <span class="k">if</span> <span class="n">template_method</span><span class="o">.</span><span class="n">env</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">_render_string_from_template</span><span class="p">(</span>
+                    <span class="n">k</span><span class="p">,</span> <span class="n">template_method</span>
+                <span class="p">):</span> <span class="n">_render_string_from_template</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">template_method</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">template_method</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="c1"># Patch the `template_method.install_dependencies` instance method so it can be</span>
+        <span class="c1"># used (ie rendered) in a template and have access to the pkg_manager requested.</span>
+        <span class="k">def</span> <span class="nf">install_patch</span><span class="p">(</span>
+            <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="o">=</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">)</span>
+
+        <span class="c1"># mypy complains when we try to patch a class, so we do it behind its back with</span>
+        <span class="c1"># setattr. See https://github.com/python/mypy/issues/2427</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="n">template_method</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">install_patch</span><span class="p">,</span> <span class="n">template_method</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set pkg_manager onto the template.</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">template_method</span><span class="p">,</span> <span class="s2">&quot;pkg_manager&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">)</span>
+
+        <span class="c1"># Patch the `template_method.install_dependencies` instance method so it can be</span>
+        <span class="c1"># used (ie rendered) in a template and have access to the pkg_manager requested.</span>
+        <span class="k">def</span> <span class="nf">install_dependencies_patch</span><span class="p">(</span>
+            <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="c1"># TODO: test that template with empty dependencies (apt: []) does not render</span>
+            <span class="c1"># any installation of dependencies.</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">pkgs</span> <span class="o">=</span> <span class="n">inner_self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pkgs</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">+=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="o">=</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;apt&quot;</span><span class="p">:</span>
+                <span class="n">debs</span> <span class="o">=</span> <span class="n">inner_self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">&quot;debs&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debs</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">_apt_install_debs</span><span class="p">(</span><span class="n">debs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cmd</span>
+
+        <span class="c1"># mypy complains when we try to patch a class, so we do it behind its back with</span>
+        <span class="c1"># setattr. See https://github.com/python/mypy/issues/2427</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="n">template_method</span><span class="p">,</span>
+            <span class="s2">&quot;install_dependencies&quot;</span><span class="p">,</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">install_dependencies_patch</span><span class="p">,</span> <span class="n">template_method</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add installation instructions (render any jinja templates).</span>
+        <span class="k">if</span> <span class="n">template_method</span><span class="o">.</span><span class="n">instructions</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">_render_string_from_template</span><span class="p">(</span>
+                <span class="n">template_method</span><span class="o">.</span><span class="n">instructions</span><span class="p">,</span> <span class="n">template_method</span>
+            <span class="p">)</span>
+            <span class="c1"># TODO: raise exception here or skip the run instruction?</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">command</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;empty rendered instructions in </span><span class="si">{</span><span class="n">template</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">add_registered_template</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">installation_methods_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+
+        <span class="c1"># Template was validated at registration time.</span>
+        <span class="n">template_dict</span> <span class="o">=</span> <span class="n">_TemplateRegistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># By default, prefer &#39;binaries&#39;, but use &#39;source&#39; if &#39;binaries&#39; is not defined.</span>
+        <span class="c1"># TODO: should we require user to provide method?</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;binaries&quot;</span> <span class="k">if</span> <span class="s2">&quot;binaries&quot;</span> <span class="ow">in</span> <span class="n">template_dict</span> <span class="k">else</span> <span class="s2">&quot;source&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">template_dict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Installation method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; not defined for template &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="s2">&quot; Options are &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="p">)</span>
+
+        <span class="n">binaries_kwds</span> <span class="o">=</span> <span class="n">source_kwds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;binaries&quot;</span><span class="p">:</span>
+            <span class="n">binaries_kwds</span> <span class="o">=</span> <span class="n">kwds</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span>
+            <span class="n">source_kwds</span> <span class="o">=</span> <span class="n">kwds</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
+            <span class="n">template</span><span class="o">=</span><span class="n">template_dict</span><span class="p">,</span> <span class="n">binaries_kwds</span><span class="o">=</span><span class="n">binaries_kwds</span><span class="p">,</span> <span class="n">source_kwds</span><span class="o">=</span><span class="n">source_kwds</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_template</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a set of labels to the dockerfile from a dict. This permits</span>
+<span class="sd">        labels that can include special chars (e.g. &#39;.&#39;).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="o">**</span><span class="n">labels_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">run_bash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bash -c &#39;</span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return instructions used in this renderer in JSON format.</span>
+
+<span class="sd">        json_kwds are keyword arguments passed to `json.dumps`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kwds</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_instructions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return string representation of a printf command that writes the renderer</span>
+<span class="sd">        instructions to a JSON file in the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Double-escape escaped sequences so that when printf is done with them, they</span>
+        <span class="c1"># are escaped with a single slash.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Same with parentheses.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">(&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="c1"># Add slash to the end of each line, except the last.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+        <span class="c1"># Escape the % characters so printf does not interpret them as delimiters.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Escape single quotes with &#39;&quot;&#39;&quot;&#39;</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&#39;</span><span class="se">\&quot;</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;printf &#39;</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&#39; &gt; </span><span class="si">{</span><span class="n">REPROENV_SPEC_FILE_IN_CONTAINER</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">cmd</span>
+
+
+<div class="viewcode-block" id="DockerRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer">[docs]</a><span class="k">class</span> <span class="nc">DockerRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="DockerRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the rendered Dockerfile.&quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">)</span>
+
+        <span class="c1"># Save specification to JSON.</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_save_start</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">!=</span> <span class="s2">&quot;root&quot;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">USER root&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">RUN </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_instructions</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">!=</span> <span class="s2">&quot;root&quot;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">USER </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_save_end</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Prune whitespace from beginning and end.</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.arg"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.arg">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `ARG` instruction.&quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ARG </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;ARG </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+        <span class="n">from_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">chown</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `COPY` instruction.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="s1">&#39;[&quot;</span><span class="si">{}</span><span class="s1">&quot;]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&quot;, </span><span class="se">\\\n</span><span class="s1">      &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">)))</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;COPY &quot;</span>
+        <span class="k">if</span> <span class="n">from_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;--from=</span><span class="si">{</span><span class="n">from_</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="k">if</span> <span class="n">chown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;--chown=</span><span class="si">{</span><span class="n">chown</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.env"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.env">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `ENV` instruction.&quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;ENV &quot;</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;ENTRYPOINT [&quot;</span><span class="si">{}</span><span class="s1">&quot;]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&quot;, &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.from_"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.from_">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `FROM` instruction.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">as_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;FROM &quot;</span> <span class="o">+</span> <span class="n">base_image</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">as_</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">_indent_run_instruction</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.label"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.label">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `LABEL` instruction.&quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;LABEL &quot;</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">      &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.run"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.run">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `RUN` instruction.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: should the command be quoted?</span>
+        <span class="c1"># s = shlex.quote(command)</span>
+        <span class="c1"># if s.startswith(&quot;&#39;&quot;):</span>
+        <span class="c1">#     s = s[1:-1]  # Remove quotes on either end of the string.</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">_indent_run_instruction</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RUN </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.user"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.user">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `USER` instruction. If the user is not in</span>
+<span class="sd">        `self.users`, then a `RUN` instruction that creates the user</span>
+<span class="sd">        will also be added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;RUN test &quot;$(getent passwd </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">)&quot; </span><span class="se">\\\n</span><span class="s1">    || useradd &#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;--no-user-group --create-home --shell /bin/bash </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USER </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DockerRenderer.workdir"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.workdir">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `WORKDIR` instruction.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WORKDIR &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+
+<div class="viewcode-block" id="SingularityRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer">[docs]</a><span class="k">class</span> <span class="nc">SingularityRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span> <span class="n">_SingularityHeaderType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># The &#39;%setup&#39; section is intentionally ommitted.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># TODO: is it OK to use a dict here? Labels could be overwritten.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="SingularityRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># Create header.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Bootstrap: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">From: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s1">&#39;from_&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Add files.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">%f</span><span class="s2">iles</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">)</span>
+
+        <span class="c1"># Add environment.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">%e</span><span class="s2">nvironment&quot;</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">export </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+        <span class="c1"># Add post.</span>
+        <span class="c1"># There will always be a post section, because we always want to add the</span>
+        <span class="c1"># reproenv specification.</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">%post</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="c1"># This section might be empty, but that is OK.</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_save_start</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">!=</span> <span class="s2">&quot;root&quot;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">su - root&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_instructions</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">!=</span> <span class="s2">&quot;root&quot;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">su - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_save_end</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Add runscript.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">%r</span><span class="s2">unscript</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span>
+
+        <span class="c1"># Add labels.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">%la</span><span class="s2">bels&quot;</span>
+            <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kv</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.arg"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.arg">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="c1"># TODO: look into whether singularity has something like ARG, like passing in</span>
+        <span class="c1"># environment variables.</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">destination</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">source</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.env"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.env">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="c1"># TODO: why does this raise a type error?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.from_"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.from_">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;://&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_image</span><span class="p">:</span>
+            <span class="n">bootstrap</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">base_image</span>
+        <span class="k">elif</span> <span class="n">base_image</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;docker://&quot;</span><span class="p">):</span>
+            <span class="n">bootstrap</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">base_image</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">base_image</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;library://&quot;</span><span class="p">):</span>
+            <span class="n">bootstrap</span> <span class="o">=</span> <span class="s2">&quot;library&quot;</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">base_image</span><span class="p">[</span><span class="mi">10</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="s2">&quot;Unknown singularity bootstrap agent.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">:</span> <span class="n">bootstrap</span><span class="p">,</span> <span class="s2">&quot;from_&quot;</span><span class="p">:</span> <span class="n">image</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.label"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.label">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="c1"># TODO: why are we getting this error?</span>
+        <span class="c1"># Argument 1 to &quot;update&quot; of &quot;dict&quot; has incompatible type</span>
+        <span class="c1"># &quot;Dict[str, Mapping[str, str]]&quot;; expected &quot;Mapping[str, str]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.run"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.run">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.user"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.user">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="p">:</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;test &quot;$(getent passwd </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">)&quot; </span><span class="se">\\\n</span><span class="s1">|| useradd &#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;--no-user-group --create-home --shell /bin/bash </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;su - </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="SingularityRenderer.workdir"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.workdir">[docs]</a>    <span class="nd">@_log_instruction</span>
+    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mkdir -p </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">cd </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_indent_run_instruction</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return indented string for Dockerfile `RUN` command.&quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">is_last_line</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">already_cont</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;||&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;fi&quot;</span><span class="p">))</span>
+        <span class="n">is_comment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
+        <span class="n">previous_cont</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">ii</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lines</span><span class="p">[</span><span class="n">ii</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;if&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ii</span><span class="p">:</span>  <span class="c1"># do not apply to first line</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">already_cont</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">previous_cont</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_comment</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&amp;&amp; &quot;</span> <span class="o">+</span> <span class="n">line</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">already_cont</span> <span class="ow">and</span> <span class="n">previous_cont</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">line</span>  <span class="c1"># indent + len(&quot;&amp;&amp; &quot;)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">line</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_last_line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_comment</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="se">\\</span><span class="s2">&quot;</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;apt&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;yum&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="c1"># TODO: add debs here?</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown package manager &#39;</span><span class="si">{</span><span class="n">pkg_manager</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
+
+<span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q --no-install-recommends&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pkgs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span> <span class="k">if</span> <span class="n">sort</span> <span class="k">else</span> <span class="n">pkgs</span>
+    <span class="n">opts</span> <span class="o">=</span> <span class="s2">&quot;-q --no-install-recommends&quot;</span> <span class="k">if</span> <span class="n">opts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">opts</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">apt-get update -qq</span>
+<span class="s2">apt-get install -y </span><span class="si">{opts}</span><span class="s2"> </span><span class="se">\\</span>
+<span class="s2">    </span><span class="si">{pkgs}</span>
+<span class="s2">rm -rf /var/lib/apt/lists/*</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_apt_install_debs</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
+
+<span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">install_one</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">_reproenv_tmppath=&quot;$(mktemp -t tmp.XXXXXXXXXX.deb)&quot;</span>
+<span class="s2">curl -fsSL --retry 5 -o &quot;$</span><span class="se">{{</span><span class="s2">_reproenv_tmppath</span><span class="se">}}</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">url</span><span class="si">}</span>
+<span class="s2">apt-get install --yes </span><span class="si">{</span><span class="n">opts</span><span class="si">}</span><span class="s2"> &quot;$</span><span class="se">{{</span><span class="s2">_reproenv_tmppath</span><span class="se">}}</span><span class="s2">&quot;</span>
+<span class="s2">rm &quot;$</span><span class="se">{{</span><span class="s2">_reproenv_tmppath</span><span class="se">}}\&quot;</span><span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">urls</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="k">if</span> <span class="n">sort</span> <span class="k">else</span> <span class="n">urls</span>
+    <span class="n">opts</span> <span class="o">=</span> <span class="s2">&quot;-q&quot;</span> <span class="k">if</span> <span class="n">opts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">opts</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">install_one</span><span class="p">,</span> <span class="n">urls</span><span class="p">))</span>
+    <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">apt-get update -qq</span>
+<span class="s2">apt-get install --yes --quiet --fix-missing</span>
+<span class="s2">rm -rf /var/lib/apt/lists/*&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install packages with `yum` (CentOS, Fedora).</span>
+
+<span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pkgs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span> <span class="k">if</span> <span class="n">sort</span> <span class="k">else</span> <span class="n">pkgs</span>
+    <span class="n">opts</span> <span class="o">=</span> <span class="s2">&quot;-q&quot;</span> <span class="k">if</span> <span class="n">opts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">opts</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">yum install -y </span><span class="si">{opts}</span><span class="s2"> </span><span class="se">\\</span>
+<span class="s2">    </span><span class="si">{pkgs}</span>
+<span class="s2">yum clean all</span>
+<span class="s2">rm -rf /var/cache/yum/*</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2021, Neurodocker Developers.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
