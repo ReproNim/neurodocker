@@ -13,7 +13,7 @@ concurrency:
 
 on:
   push:
-    branches: [ "test_build" ] 
+    branches: [ "master" ] 
 
 # Uses the cron schedule for github actions
 #
