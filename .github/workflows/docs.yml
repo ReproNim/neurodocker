@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+    - master
+  workflow_dispatch:
+  
+jobs:
+  build_docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # Standard usage
+    - uses:  totaldebug/action-sphinx@v2
+    with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        sphinx_src: 'docs'
+        target_branch: 'gh-pages'
