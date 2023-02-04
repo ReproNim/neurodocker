@@ -107,7 +107,8 @@ def create_dashboard_file():
             """<!-- This page is generated automatically. Do not edit manually. -->
 # Build dashboard
 """,
-            file=f)
+            file=f,
+        )
 
         # table of content
         for software, _ in softwares.items():
