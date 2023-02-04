@@ -52,6 +52,6 @@ Before committing changes, initialize `pre-commit` with `pre-commit install`. Th
 
 ## Build status
 
-You can check the status of the build of the Docker images 
+You can check the status of the build of the Docker images
 for several of the neuroimaging software packages that are supported by _Neurodocker_
 on [this page](build_dashboard.md).
