@@ -68,8 +68,8 @@ binaries:
     - git
   env:
     MINC_TOOLKIT: "{{ self.install_path }}"
-    MINC_TOOLKIT_VERSION: "{{ minc.install_path }}"
-    PATH: "{{ minc.install_path }}/bin:{{ minc.install_path }}/volgenmodel-nipype/extra-scripts:{{ minc.install_path }}/pipeline:$PATH"
+    MINC_TOOLKIT_VERSION: "{{ self.install_path }}"
+    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/volgenmodel-nipype/extra-scripts:{{ self.install_path }}/pipeline:$PATH"
     PERL5LIB: "{{ self.install_path }}/perl:{{ self.install_path }}/pipeline:${PERL5LIB}"
     LD_LIBRARY_PATH: "{{ self.install_path }}/lib:{{ self.install_path }}/lib/InsightToolkit:${LD_LIBRARY_PATH}"
     MNI_DATAPATH: "{{ self.install_path }}/share"
@@ -83,8 +83,8 @@ binaries:
     cd /
     # ar allows to extract the debian package so we can also install this in centos based OSs.
     curl {{ self.binaries_url }} -o minc.deb && ar p minc.deb data.tar.gz | tar zx && rm minc.deb
-    ln -s /opt/minc/{{ minc.version }} {{ minc.install_path }} 
-    git clone https://github.com/CAIsr/volgenmodel-nipype.git {{ minc.install_path }}/volgenmodel-nipype/
+    ln -s /opt/minc/{{ self.version }} {{ self.install_path }} 
+    git clone https://github.com/CAIsr/volgenmodel-nipype.git {{ self.install_path }}/volgenmodel-nipype/
     curl -fL http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
     | tar -xz -C {{ self.install_path }}/share
     curl -fL -o /tmp/mni_90a.zip http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_minc2.zip
