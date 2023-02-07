@@ -1,8 +1,8 @@
 # this workflow bootstraps the testing of the build the docker images
-# 
-# - this will run the python script used to generate the workflows 
+#
+# - this will run the python script used to generate the workflows
 #   based on a the jinja template
-# - commit and push the generated workflows to the branch test_docker_build 
+# - commit and push the generated workflows to the branch test_docker_build
 #   where they will be executed
 
 name: bootstrap
@@ -13,7 +13,7 @@ concurrency:
 
 on:
   push:
-    branches: [ "master" ] 
+    branches: [ "master" ]
 
 # Uses the cron schedule for github actions
 #
@@ -33,9 +33,9 @@ on:
   - cron: 0 0 1,15 * *
 
   # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:  
+  workflow_dispatch:
 permissions:
-  contents: write 
+  contents: write
 jobs:
   bootstrap:
     runs-on: ubuntu-22.04
@@ -54,7 +54,7 @@ jobs:
       - name: Create workflows
         run: |
           python .github/workflows/create_workflows.py
-          ls -l .github/workflows      
+          ls -l .github/workflows
 
       - name: Push workflows to branch test_docker_build
         # action: https://github.com/marketplace/actions/git-auto-commit
@@ -63,12 +63,10 @@ jobs:
           commit_message: add workflows
           branch: test_docker_build
           commit_options: '--no-verify --signoff'
-          commit_user_name: github-actions 
-          commit_user_email: github-actions@github.com 
+          commit_user_name: github-actions
+          commit_user_email: github-actions@github.com
           push_options: '--force'
-          skip_dirty_check: true    
-          skip_fetch: true    
+          skip_dirty_check: true
+          skip_fetch: true
           skip_checkout: true
           create_branch: true
-
-

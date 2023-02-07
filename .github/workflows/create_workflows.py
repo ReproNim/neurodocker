@@ -101,7 +101,6 @@ def create_dashboard_file():
     gh_actions_url = "http://github-actions.40ants.com/"
 
     with open(build_dashboard_file, "w") as f:
-
         image_base_url = f"{gh_actions_url}{repo}/matrix.svg?branch={branch}"
         print(
             """<!-- This page is generated automatically. Do not edit manually. -->
@@ -118,7 +117,6 @@ def create_dashboard_file():
 
         # link to the github actions workflow and image of the build status
         for software, _ in softwares.items():
-
             image_url = f"{image_base_url}&only={software}"
             print(
                 f"""## {software}
@@ -146,7 +144,6 @@ def stringify(some_list: list[str]) -> str:
 
 
 def main():
-
     env = Environment(
         loader=FileSystemLoader(Path(__file__).parent),
         autoescape=select_autoescape(),
@@ -163,7 +160,6 @@ def main():
     }
 
     for software, spec in softwares.items():
-
         wf = {
             "header": "# This is file is automatically generated. Do not edit.",
             "os": os,
