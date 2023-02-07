@@ -339,7 +339,6 @@ class _Renderer:
     def add_registered_template(
         self, name: str, method: installation_methods_type = None, **kwds
     ) -> _Renderer:
-
         # Template was validated at registration time.
         template_dict = _TemplateRegistry.get(name)
 

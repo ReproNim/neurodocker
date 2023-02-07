@@ -1,0 +1,72 @@
+# this workflow bootstraps the testing of the build the docker images
+#
+# - this will run the python script used to generate the workflows
+#   based on a the jinja template
+# - commit and push the generated workflows to the branch test_docker_build
+#   where they will be executed
+
+name: bootstrap
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ "master" ]
+
+# Uses the cron schedule for github actions
+#
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+#
+#         ┌───────────── minute (0 - 59)
+#         │ ┌───────────── hour (0 - 23)
+#         │ │   ┌───────────── day of the month (1 - 31)
+#         │ │   │    ┌───────────── month (1 - 12 or JAN-DEC)
+#         │ │   │    │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         * *   *    * *
+
+  schedule:
+  - cron: 0 0 1,15 * *
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install jinja2 pyyaml
+
+      - name: Create workflows
+        run: |
+          python .github/workflows/create_workflows.py
+          ls -l .github/workflows
+
+      - name: Push workflows to branch test_docker_build
+        # action: https://github.com/marketplace/actions/git-auto-commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: add workflows
+          branch: test_docker_build
+          commit_options: '--no-verify --signoff'
+          commit_user_name: github-actions
+          commit_user_email: github-actions@github.com
+          push_options: '--force'
+          skip_dirty_check: true
+          skip_fetch: true
+          skip_checkout: true
+          create_branch: true

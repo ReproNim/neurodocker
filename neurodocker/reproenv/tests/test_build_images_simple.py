@@ -15,7 +15,6 @@ from neurodocker.reproenv.tests.utils import skip_if_no_singularity
     ],
 )
 def test_build_simple(cmd: str, tmp_path):
-
     rcls = DockerRenderer if cmd == "docker" else SingularityRenderer
 
     # Create a Dockerfile.
