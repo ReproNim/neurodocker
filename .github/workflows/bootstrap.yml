@@ -57,4 +57,6 @@ jobs:
           git checkout -b test_docker_build
           python .github/workflows/create_workflows.py
           ls -l .github/workflows
+          git add workflows/*.yml
+          git commit -am "added new workflows"
           git push origin --force test_docker_build
