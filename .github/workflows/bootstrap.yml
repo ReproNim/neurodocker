@@ -58,5 +58,7 @@ jobs:
           python .github/workflows/create_workflows.py
           ls -l .github/workflows
           git add .
+          git config --global user.email "no-reply@repronim.org"
+          git config --global user.name "Repronim neurodocker bot"
           git commit -am "added new workflows"
           git push origin --force test_docker_build
