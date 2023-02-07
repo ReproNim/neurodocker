@@ -54,20 +54,7 @@ jobs:
 
       - name: Create workflows
         run: |
+          git checkout -b test_docker_build
           python .github/workflows/create_workflows.py
           ls -l .github/workflows
-
-      - name: Push workflows to branch test_docker_build
-        # action: https://github.com/marketplace/actions/git-auto-commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: add workflows
-          branch: test_docker_build
-          commit_options: '--no-verify --signoff'
-          commit_user_name: github-actions
-          commit_user_email: github-actions@github.com
-          push_options: '--force'
-          skip_dirty_check: true
-          skip_fetch: true
-          skip_checkout: true
-          create_branch: true
+          git push origin --force test_docker_build
