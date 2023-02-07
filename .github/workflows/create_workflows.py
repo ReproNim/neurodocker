@@ -89,7 +89,7 @@ branch = "test_docker_build"
 
 # Update to match your username and repo name if you are testing things on your fork
 # "ReproNim/neurodocker"
-repo = "Remi-Gau/neurodocker"
+repo = "ReproNim/neurodocker"
 
 
 def create_dashboard_file():
