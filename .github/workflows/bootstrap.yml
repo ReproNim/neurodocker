@@ -43,6 +43,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.CI_FLOW }}
 
       - name: Set up Python
         uses: actions/setup-python@v3
