@@ -80,7 +80,7 @@ binaries:
     echo "Downloading MINC, BEASTLIB, and MODELS..."
     cd /
     # ar allows to extract the debian package so we can also install this in centos based OSs.
-    curl {{ self.binaries_url }} -o minc.deb && ar p minc.deb data.tar.gz | tar zx && rm minc.deb
+    curl {{ self.urls[self.version] }} -o minc.deb && ar p minc.deb data.tar.gz | tar zx && rm minc.deb
     ln -s /opt/minc/{{ self.version }} {{ self.install_path }} 
     git clone https://github.com/CAIsr/volgenmodel-nipype.git {{ self.install_path }}/volgenmodel-nipype/
     curl -fL http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
