@@ -12,7 +12,6 @@ binaries:
       install_python3: "false"
   urls:
     latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
-    latest-fedora-35: https://afni.nimh.nih.gov/pub/dist/tgz/linux_fedora_35_shared.tgz
   env:
     PATH: "{{ self.install_path }}:$PATH"
     AFNI_PLUGINPATH: "{{ self.install_path }}"
