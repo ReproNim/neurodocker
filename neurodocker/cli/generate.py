@@ -344,8 +344,9 @@ def _get_instruction_for_param(
     elif param.name == "entrypoint":
         if not isinstance(value, tuple):
             raise ValueError("expected this value to be a tuple (contact developers)")
-        value = list(value)  # convert from tuple to list
-        d = {"name": param.name, "kwds": {"args": value}}
+        value_spl = []
+        [value_spl.extend(el.split()) for el in value]
+        d = {"name": param.name, "kwds": {"args": value_spl}}
     # install
     elif param.name == "install":
         opts = None
