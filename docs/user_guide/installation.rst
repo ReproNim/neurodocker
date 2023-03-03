@@ -9,11 +9,25 @@ Docker or Singularity.
 
 .. code-block:: bash
 
-    docker run --rm repronim/neurodocker:0.7.0 --help
+    docker run --rm repronim/neurodocker:latest --help
 
 .. code-block:: bash
 
-    singularity run docker://repronim/neurodocker:0.7.0 --help
+    singularity run docker://repronim/neurodocker:latest --help
+
+Note: The version tag `latest` is a moving target and points to the latest stable release.
+
+.. code-block:: bash
+
+    repronim/neurodocker:latest -> latest release (0.9.4 now)
+    repronim/neurodocker:master -> master branch
+    repronim/neurodocker:0.9.4
+    repronim/neurodocker:0.9.2
+    repronim/neurodocker:0.9.1
+    repronim/neurodocker:0.9.0
+    repronim/neurodocker:0.8.0
+    repronim/neurodocker:0.7.0
+    ...
 
 pip
 ---
