@@ -69,7 +69,7 @@ Docker
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
+        --base-image fedora:35 \
         --afni method=binaries version=latest \
     > afni-binaries.Dockerfile
 
@@ -82,7 +82,7 @@ This does not install AFNI's R packages. To install relevant R things, use the f
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
+        --base-image fedora:35 \
         --afni method=binaries version=latest install_r_pkgs=true \
     > afni-binaries-r.Dockerfile
 
@@ -96,7 +96,7 @@ Beware that this is AFNI's bleeding edge!
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
+        --base-image fedora:35 \
         --afni method=source version=master \
     > afni-source.Dockerfile
 
