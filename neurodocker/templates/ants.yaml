@@ -8,7 +8,9 @@ binaries:
     optional:
       install_path: /opt/ants-{{ self.version }}
   urls:
-    # Binaries were compiled by Jakub Kaczmarzyk (https://github.com/kaczmarj)
+    # Official binaries are provided as of 2.4.1 (https://github.com/ANTsX/ANTs/releases)
+    "2.4.1": https://github.com/ANTsX/ANTs/releases/download/v2.4.1/ants-2.4.1-centos7-X64-gcc.zip
+    # Binaries prior to 2.4.x were compiled by Jakub Kaczmarzyk (https://github.com/kaczmarj)
     "2.3.4": https://dl.dropbox.com/s/gwf51ykkk5bifyj/ants-Linux-centos6_x86_64-v2.3.4.tar.gz
     "2.3.2": https://dl.dropbox.com/s/hrm530kcqe3zo68/ants-Linux-centos6_x86_64-v2.3.2.tar.gz
     "2.3.1": https://dl.dropbox.com/s/1xfhydsf4t4qoxg/ants-Linux-centos6_x86_64-v2.3.1.tar.gz
@@ -21,17 +23,26 @@ binaries:
     apt:
     - ca-certificates
     - curl
+    - unzip
     yum:
     - curl
+    - unzip
   env:
     ANTSPATH: "{{ self.install_path }}/"
     PATH: "{{ self.install_path }}:$PATH"
   instructions: |
     {{ self.install_dependencies() }}
     echo "Downloading ANTs ..."
+    {% if self.version == "2.4.1" -%}
+    curl -fsSL -o ants.zip {{ self.urls[self.version] }}
+    unzip ants.zip -d /opt
+    mv {{ self.install_path }}/bin/* {{ self.install_path }}
+    rm ants.zip
+    {% elif self.version != "2.4.1" -%}
     mkdir -p {{ self.install_path }}
     curl -fsSL {{ self.urls[self.version] }} \
     | tar -xz -C {{ self.install_path }} --strip-components 1
+    {% endif -%}
 
 source:
   arguments:
@@ -85,5 +96,3 @@ source:
       mv ../Scripts/* {{ self.install_path }} ; \
     fi
     rm -rf /tmp/ants
-
-    

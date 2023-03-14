@@ -41,7 +41,6 @@ def test_build_using_renderer_from_dict(
     fd_version_startswith: str,
     tmp_path: Path,
 ):
-
     _TemplateRegistry._reset()
     _TemplateRegistry.register(_template_filepath)
 

@@ -21,7 +21,6 @@ def main(
     yaml_file: ty.Union[str, Path],
     directories_to_prune: ty.Union[ty.List[str], ty.List[Path]],
 ):
-
     if not _in_docker():
         raise RuntimeError(
             "Not running in a Docker container. This script should only be used within"

@@ -50,7 +50,7 @@ PathType = ty.Union[str, pathlib.Path, os.PathLike]
 def _render_string_from_template(
     source: str, template: _BaseInstallationTemplate
 ) -> str:
-    """Take a string from a template and render """
+    """Take a string from a template and render"""
     # TODO: we could use a while loop or recursive function to render the template until
     # there are no jinja-specific things. At this point, we support one level of
     # nesting.
@@ -339,7 +339,6 @@ class _Renderer:
     def add_registered_template(
         self, name: str, method: installation_methods_type = None, **kwds
     ) -> _Renderer:
-
         # Template was validated at registration time.
         template_dict = _TemplateRegistry.get(name)
 
@@ -391,6 +390,12 @@ class _Renderer:
     def label(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
 
+    def labels(self, labels_dict: dict) -> _Renderer:
+        """Adds a set of labels to the dockerfile from a dict. This permits
+        labels that can include special chars (e.g. '.')."""
+        self.label(**labels_dict)
+        return self
+
     def run(self, command: str) -> _Renderer:
         raise NotImplementedError()
 
@@ -425,6 +430,8 @@ class _Renderer:
         j = " \\\n".join(j.splitlines())
         # Escape the % characters so printf does not interpret them as delimiters.
         j = j.replace("%", "%%")
+        # Escape single quotes with '"'"'
+        j = j.replace("'", "'\"'\"'")
         cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
@@ -610,9 +617,9 @@ class SingularityRenderer(_Renderer):
 
         # Add labels.
         if self._labels:
-            s += "\n\n%labels\n"
+            s += "\n\n%labels"
             for kv in self._labels.items():
-                s += " ".join(kv)
+                s += "\n" + " ".join(kv)
 
         return s
 
@@ -709,6 +716,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
     lines = string.splitlines()
     for ii, line in enumerate(lines):
         line = line.rstrip()
+        if not line:
+            continue
         is_last_line = ii == len(lines) - 1
         already_cont = line.startswith(("&&", "&", "||", "|", "fi"))
         is_comment = line.startswith("#")

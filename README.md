@@ -15,10 +15,11 @@ Please see our website https://www.repronim.org/neurodocker for more information
 Use the _Neurodocker_ Docker image (recommended):
 
 ```shell
-docker run --rm repronim/neurodocker:0.7.0 --help
+docker run --rm repronim/neurodocker:latest --help
 ```
 
 The Docker images were moved to [repronim/neurodocker](https://hub.docker.com/r/repronim/neurodocker) from [kaczmarj/neurodocker](https://hub.docker.com/r/kaczmarj/neurodocker).
+
 
 This project can also be installed with `pip`:
 
@@ -47,3 +48,10 @@ python -m pip install --no-cache-dir --editable .[all]
 ```
 
 Before committing changes, initialize `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `black` for formatting.
+
+
+## Build status
+
+You can check the status of the build of the Docker images
+for several of the neuroimaging software packages that are supported by _Neurodocker_
+on [this page]([build_dashboard.md](https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md)).
