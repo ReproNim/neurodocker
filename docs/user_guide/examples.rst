@@ -68,7 +68,7 @@ Docker
 .. code-block:: bash
 
     neurodocker generate docker \
-        --pkg-manager apt \
+        --pkg-manager yum \
         --base-image fedora:35 \
         --afni method=binaries version=latest \
     > afni-binaries.Dockerfile
