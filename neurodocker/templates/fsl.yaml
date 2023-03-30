@@ -19,6 +19,7 @@ binaries:
       install_path: /opt/fsl-{{ self.version }}
       exclude_paths: ""
   urls:
+    "6.0.5.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.2-centos7_64.tar.gz
     "6.0.5.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.1-centos7_64.tar.gz
     "6.0.5": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5-centos7_64.tar.gz
     "6.0.4": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.4-centos6_64.tar.gz
