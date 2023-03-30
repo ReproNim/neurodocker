@@ -74,7 +74,6 @@ binaries:
     {{ self.install_dependencies() }}
     echo "Downloading MATLAB Compiler Runtime ..."
     {% if self.version == "2010a" -%}
-    {{ self.install_debs() }}
     curl {{ self.curl_opts }} -o "$TMPDIR/MCRInstaller.bin" {{ self.urls[self.version] }}
     chmod +x "$TMPDIR/MCRInstaller.bin"
     "$TMPDIR/MCRInstaller.bin" -silent -P installLocation="{{ self.install_path }}"
