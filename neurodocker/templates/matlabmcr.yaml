@@ -57,8 +57,6 @@ binaries:
     - unzip
     - java-1.8.0-openjdk
     - dbus-x11
-    debs:
-    - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
   env:
     LD_LIBRARY_PATH: |
       {% set versionTovXX = {"2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
