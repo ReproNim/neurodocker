@@ -163,7 +163,7 @@ neurodocker generate docker
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
+                                        version=[6.0.6.4|6.0.6.3|6.0.6.2|6.0.6.1|6.0.6|6.0.5.2|6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
                                     - install_path [default: /opt/fsl-{{ self.version }}]
                                     - exclude_paths [default: ]
                                 **Note**: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
@@ -392,7 +392,7 @@ neurodocker generate singularity
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
+                                        version=[6.0.6.4|6.0.6.3|6.0.6.2|6.0.6.1|6.0.6|6.0.5.2|6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
                                     - install_path [default: /opt/fsl-{{ self.version }}]
                                     - exclude_paths [default: ]
                                 **Note**: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
