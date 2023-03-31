@@ -81,7 +81,7 @@ This does not install AFNI's R packages. To install relevant R things, use the f
 .. code-block:: bash
 
     neurodocker generate docker \
-        --pkg-manager apt \
+        --pkg-manager yum \
         --base-image fedora:35 \
         --afni method=binaries version=latest install_r_pkgs=true \
     > afni-binaries-r.Dockerfile
