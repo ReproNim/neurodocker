@@ -95,7 +95,7 @@ Beware that this is AFNI's bleeding edge!
 .. code-block:: bash
 
     neurodocker generate docker \
-        --pkg-manager apt \
+        --pkg-manager yum \
         --base-image fedora:35 \
         --afni method=source version=master \
     > afni-source.Dockerfile
