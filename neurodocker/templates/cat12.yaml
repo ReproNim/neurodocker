@@ -39,7 +39,8 @@ binaries:
     mkdir -p {{ self.install_path }}
     mv /tmp/*{{ self.version }}*/* {{ self.install_path }}/
     chmod -R 777 {{ self.install_path }}
-    # rm {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
-    # cp {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.txt {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
     # Test
     {{ self.install_path }}/spm12 function exit
+    # Fix m file
+    rm {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
+    cp {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.txt {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
