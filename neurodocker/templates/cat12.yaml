@@ -13,6 +13,7 @@ binaries:
       install_path: /opt/CAT12-{{ self.version }}
   urls:
     r1933_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8_r1933_R2017b_MCR_Linux.zip
+    r2166_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8.2_r2166_R2017b_MCR_Linux.zip 
   dependencies:
     apt:
     - ca-certificates
@@ -40,3 +41,6 @@ binaries:
     chmod -R 777 {{ self.install_path }}
     # Test
     {{ self.install_path }}/spm12 function exit
+    # Fix m file
+    rm {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
+    cp {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.txt {{ self.install_path }}/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/cat_long_main.m
