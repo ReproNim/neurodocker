@@ -23,7 +23,7 @@ sys.path.insert(1, str(_here / "sphinxext"))
 # -- Project information -----------------------------------------------------
 
 project = "Neurodocker"
-copyright = "2021, Neurodocker Developers"
+copyright = "2017-2023, Neurodocker Developers"
 author = "Neurodocker Developers"
 
 
