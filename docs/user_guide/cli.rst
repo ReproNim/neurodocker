@@ -409,7 +409,7 @@ neurodocker generate singularity
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]
+                                        version=[2023a|2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]
                                     - curl_opts [default: ]
                                     - install_path [default: /opt/MCR-{{ self.version }}]
 
