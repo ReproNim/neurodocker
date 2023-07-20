@@ -12,6 +12,7 @@ binaries:
       curl_opts: ""
       install_path: /opt/MCR-{{ self.version }}
   urls:
+    "2023a": https://ssd.mathworks.com/supportfiles/downloads/R2023a/Release/4/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023a_Update_4_glnxa64.zip
     "2021b": https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/2/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_Update_2_glnxa64.zip
     "2021a": https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_5_glnxa64.zip
     "2020b": https://ssd.mathworks.com/supportfiles/downloads/R2020b/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020b_Update_6_glnxa64.zip
@@ -63,7 +64,7 @@ binaries:
       $LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ self.install_path }}/{{ versionTovXX[self.version] }}/runtime/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/bin/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/sys/os/glnxa64:{{ self.install_path }}/{{ versionTovXX[self.version] }}/extern/bin/glnxa64
     MATLABCMD: "{{ self.install_path }}/{{ self.version }}/toolbox/matlab"
     XAPPLRESDIR: |
-      {% set versionTovXX = {"2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
+      {% set versionTovXX = {"2023a": "v914", "2021b": "v911", "2021a": "v910", "2020b": "v99", "2020a": "v98", "2019b": "v97", "2019a": "v96", "2018b": "v95", "2018a": "v94", "2017b": "v93", "2017a": "v92", "2016b": "v91", "2016a": "v901", "2015b": "v90", "2015aSP1": "v851", "2015a": "v85", "2014b": "v84", "2014a": "v83", "2013b": "v82", "2013a": "v81", "2012b": "v80", "2012a": "v717"} -%}
       /opt/{{ self.install_path }}/{{ versionTovXX[self.version] }}/x11/app-defaults
     MCRROOT: "{{ self.install_path }}/{{ self.version }}"
 
