@@ -569,7 +569,7 @@ class SingularityRenderer(_Renderer):
         super().__init__(pkg_manager=pkg_manager, users=users)
 
         self._header: _SingularityHeaderType = {}
-        # The '%setup' section is intentionally ommitted.
+        # The '%setup' section is intentionally omitted.
         self._files: ty.List[str] = []
         self._environment: ty.List[ty.Tuple[str, str]] = []
         self._post: ty.List[str] = []
