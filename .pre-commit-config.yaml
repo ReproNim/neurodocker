@@ -26,3 +26,8 @@ repos:
         additional_dependencies: [types-all]
         files: neurodocker
         args: ["--config-file", "setup.cfg"]
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.5
+  hooks:
+  - id: codespell
