@@ -311,18 +311,17 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">jinja2</span>
 
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">RendererError</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">TemplateError</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_TemplateRegistry</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_validate_renderer</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">_BaseInstallationTemplate</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">Template</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">_SingularityHeaderType</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">REPROENV_SPEC_FILE_IN_CONTAINER</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">allowed_pkg_managers</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">allowed_installation_methods</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">installation_methods_type</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="n">pkg_managers_type</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">RendererError</span><span class="p">,</span> <span class="n">TemplateError</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_TemplateRegistry</span><span class="p">,</span> <span class="n">_validate_renderer</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">_BaseInstallationTemplate</span>
+<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">REPROENV_SPEC_FILE_IN_CONTAINER</span><span class="p">,</span>
+    <span class="n">_SingularityHeaderType</span><span class="p">,</span>
+    <span class="n">allowed_installation_methods</span><span class="p">,</span>
+    <span class="n">allowed_pkg_managers</span><span class="p">,</span>
+    <span class="n">installation_methods_type</span><span class="p">,</span>
+    <span class="n">pkg_managers_type</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># All jinja2 templates are instantiated from this environment object. It is</span>
 <span class="c1"># configured to dislike undefined attributes. For example, if a template is</span>
