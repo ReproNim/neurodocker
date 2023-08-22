@@ -6,6 +6,7 @@ from click.testing import CliRunner
 import pytest
 
 from neurodocker.cli.cli import generate
+from neurodocker.cli.generate import OptionEatAll
 
 _cmds = ["docker", "singularity"]
 
@@ -40,6 +41,69 @@ def test_minimal_args(cmd: str, pkg_manager: str):
         generate, [cmd, "--pkg-manager", pkg_manager, "--base-image", "debian"]
     )
     assert result.exit_code == 0, result.output
+
+
+def test_copy_issue_498():
+    runner = CliRunner()
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            # copy
+            "--copy",
+            "file1",
+            "file2",
+        ],
+    )
+    assert "file1" in result.output
+    assert '\nCOPY ["file1", \\\n      "file2"]\n' in result.output
+
+    # Fail if given fewer than two inputs to --copy.
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            # copy
+            "--copy",
+            "file1",
+        ],
+    )
+    assert "Error: expected at least two values for --copy" in result.output
+    assert result.exit_code != 0
+
+
+# Issue #498 references --copy but the same broken behavior is seen in --entrypoint.
+def test_entrypoint_issue_498():
+    runner = CliRunner()
+    result = runner.invoke(
+        generate,
+        [
+            "docker",
+            "--pkg-manager",
+            "apt",
+            "--base-image",
+            "debian",
+            "--entrypoint",
+            "printf",
+            "this",
+            "that",
+        ],
+    )
+    assert '\nENTRYPOINT ["printf", "this", "that"]\n' in result.output
+
+
+def test_optioneatall_type_issue_498():
+    with pytest.raises(ValueError):
+        OptionEatAll(["--foo"], type=str)
+    OptionEatAll(["--foo"], type=tuple)
 
 
 @pytest.mark.parametrize("cmd", _cmds)

@@ -122,11 +122,16 @@ class OptionEatAll(click.Option):
         nargs = kwargs.pop("nargs", -1)
         assert nargs == -1, "nargs, if set, must be -1 not {}".format(nargs)
         super(OptionEatAll, self).__init__(*args, **kwargs)
+        if self.type is click.STRING:
+            raise ValueError(
+                "in the current implementation of OptionEatAll, `type` cannot be a"
+                " string."
+            )
         self._previous_parser_process = None
         self._eat_all_parser = None
 
     def add_to_parser(self, parser, ctx):
-        def parser_process(value, state):
+        def parser_process(value, state: click.parser.ParsingState):
             # method to hook to the parser.process
             done = False
             value = [value]
@@ -138,7 +143,6 @@ class OptionEatAll(click.Option):
                 if not done:
                     value.append(state.rargs.pop(0))
             value = tuple(value)
-
             # call the actual process
             self._previous_parser_process(value, state)
 
@@ -202,6 +206,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--copy"],
             multiple=True,
+            type=tuple,
             help=(
                 "Copy files into the container. Provide at least two paths."
                 " The last path is always the destination path in the container."
@@ -216,11 +221,13 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--entrypoint"],
             multiple=True,
+            type=tuple,
             help="Set entrypoint of the container",
         ),
         OptionEatAll(
             ["--install"],
             multiple=True,
+            type=tuple,
             help="Install packages with system package manager",
         ),
         OptionEatAll(
@@ -317,12 +324,16 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {"base_image": value}}
     # arg
     elif param.name == "arg":
-        assert len(value) == 2, "expected key=value pair for --arg"
+        if len(value) != 2:
+            raise click.ClickException("expected key=value pair for --arg")
         k, v = value
         d = {"name": param.name, "kwds": {"key": k, "value": v}}
     # copy
     elif param.name == "copy":
-        assert len(value) > 1, "expected at least two values for --copy"
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        if len(value) < 2:
+            raise click.ClickException("expected at least two values for --copy")
         source, destination = list(value[:-1]), value[-1]
         d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
     # env
@@ -331,11 +342,12 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {**value}}
     # entrypoint
     elif param.name == "entrypoint":
-        if isinstance(value, str):
-            value = [value]
-        else:
-            value = list(value)
-        d = {"name": param.name, "kwds": {"args": value}}
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        value_spl = []
+        for el in value:
+            value_spl += el.split()
+        d = {"name": param.name, "kwds": {"args": value_spl}}
     # install
     elif param.name == "install":
         opts = None

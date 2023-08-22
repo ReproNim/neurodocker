@@ -57,12 +57,13 @@ neurodocker generate docker
     --arg KEY=VALUE              Build-time variables (do not persist after
                                 container is built)
 
-    --copy TEXT                  Copy files into the container. Provide at least
+    --copy TUPLE                 Copy files into the container. Provide at least
                                 two paths. The last path is always the
                                 destination path in the container.
 
     --env KEY=VALUE              Set persistent environment variables
-    --install TEXT               Install packages with system package manager
+    --entrypoint TUPLE           Set entrypoint of the container
+    --install TUPLE              Install packages with system package manager
     --label KEY=VALUE            Set labels on the container
     --run TEXT                   Run commands in /bin/sh
     --run-bash TEXT              Run commands in a bash shell
@@ -70,6 +71,15 @@ neurodocker generate docker
                                 does not exist)
 
     --workdir TEXT               Set the working directory
+    --yes                        Reply yes to all prompts for agreeing to any 
+                                alerts that a neurodocker template might have.
+                                The alert messages will still be printed but 
+                                no confirmation is necessary from the user.
+
+    --json                       Output instructions as JSON. This can be used	
+                                to generate Dockerfiles or Singularity recipes	
+                                with Neurodocker.
+
     --_header KEY=VALUE          Add _header
                                     method=[source]
                                     options for method=source
@@ -83,6 +93,7 @@ neurodocker generate docker
                                     - install_python3 [default: false]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/afni/afni.git]	
                                     - install_path [default: /opt/afni-{{ self.version }}]
                                     - install_r_pkgs [default: false]
                                     - install_python3 [default: false]
@@ -91,10 +102,11 @@ neurodocker generate docker
                                     method=[binaries|source]
                                     options for method=binaries
                                     - version [required]
-                                        version=[2.3.4|2.3.2|2.3.1|2.3.0|2.2.0|2.1.0|2.0.3|2.0.0]
+                                        version=[2.4.1|2.3.4|2.3.2|2.3.1|2.3.0|2.2.0|2.1.0|2.0.3|2.0.0]
                                     - install_path [default: /opt/ants-{{ self.version }}]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/ANTsX/ANTs.git]
                                     - install_path [default: /opt/ants-{{ self.version }}]
                                     - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]
                                     - make_opts [default: -j1]
@@ -121,6 +133,7 @@ neurodocker generate docker
                                     - install_path [default: /opt/dcm2niix-{{ self.version }}]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/rordenlab/dcm2niix]
                                     - install_path [default: /opt/dcm2niix-{{ self.version }}]
                                     - cmake_opts [default: ]
                                     - make_opts [default: -j1]
@@ -129,7 +142,7 @@ neurodocker generate docker
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[7.1.1-min|7.1.1|7.1.0|6.0.1|6.0.0-min|6.0.0]
+                                        version=[7.3.1|7.3.0|7.2.0|7.1.1-min|7.1.1|7.1.0|6.0.1|6.0.0-min|6.0.0]
                                     - install_path [default: /opt/freesurfer-{{ self.version }}]
                                     - exclude_paths [default: average/mult-comp-cor
                                 lib/cuda
@@ -150,7 +163,7 @@ neurodocker generate docker
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
+                                        version=[6.0.6.4|6.0.6.3|6.0.6.2|6.0.6.1|6.0.6|6.0.5.2|6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
                                     - install_path [default: /opt/fsl-{{ self.version }}]
                                     - exclude_paths [default: ]
                                 **Note**: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
@@ -163,11 +176,19 @@ neurodocker generate docker
                                     options for method=source
                                     - version [required]
 
+    --matlabmcr KEY=VALUE        Add matlabmcr	
+                                    method=[binaries]
+                                    options for method=binaries
+                                    - version [required]	
+                                        version=[2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]	
+                                    - curl_opts [default: ]	
+                                    - install_path [default: /opt/MCR-{{ self.version }}]	
+  
     --minc KEY=VALUE             Add minc
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[1.9.15]
+                                        version=[1.9.18|1.9.17|1.9.16|1.9.15]
                                     - install_path [default: /opt/minc-{{ self.version }}]
 
     --miniconda KEY=VALUE        Add miniconda
@@ -201,6 +222,7 @@ neurodocker generate docker
                                     - build_processes [default: 1]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/MRtrix3/mrtrix3.git]
                                     - install_path [default: /opt/mrtrix3-{{ self.version }}]
                                     - build_processes [default: ]
 
@@ -217,6 +239,15 @@ neurodocker generate docker
                                         version=[usa-tn|usa-nh|usa-ca|japan|greece|germany-munich|germany-magdeburg|china-zhejiang|china-tsinghua|china-scitech|australia]
                                     - os_codename [required]
                                     - full_or_libre [default: full]
+
+    --niftyreg KEY=VALUE         Add niftyreg	
+                                    method=[source]	
+                                    options for method=source	
+                                    - version [required]	
+                                    - repo [default: https://github.com/KCL-BMEIS/niftyreg]	
+                                    - install_path [default: /opt/niftyreg-{{ self.version }}]	
+                                    - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]	
+                                    - make_opts [default: -j1]
 
     --petpvc KEY=VALUE           Add petpvc
                                     method=[binaries]
@@ -255,12 +286,13 @@ neurodocker generate singularity
     --arg KEY=VALUE              Build-time variables (do not persist after
                                 container is built)
 
-    --copy TEXT                  Copy files into the container. Provide at least
+    --copy TUPLE                 Copy files into the container. Provide at least
                                 two paths. The last path is always the
                                 destination path in the container.
 
     --env KEY=VALUE              Set persistent environment variables
-    --install TEXT               Install packages with system package manager
+    --entrypoint TUPLE           Set entrypoint of the container
+    --install TUPLE               Install packages with system package manager
     --label KEY=VALUE            Set labels on the container
     --run TEXT                   Run commands in /bin/sh
     --run-bash TEXT              Run commands in a bash shell
@@ -268,6 +300,14 @@ neurodocker generate singularity
                                 does not exist)
 
     --workdir TEXT               Set the working directory
+    --yes                        Reply yes to all prompts for agreeing to any
+                                alerts that a neurodocker template might have.
+                                The alert messages will still be printed but
+                                no confirmation is necessary from the user.
+
+    --json                       Output instructions as JSON. This can be used
+                                 to generate Dockerfiles or Singularity recipes
+                                 with Neurodocker.
     --_header KEY=VALUE          Add _header
                                     method=[source]
                                     options for method=source
@@ -281,6 +321,7 @@ neurodocker generate singularity
                                     - install_python3 [default: false]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/afni/afni.git]
                                     - install_path [default: /opt/afni-{{ self.version }}]
                                     - install_r_pkgs [default: false]
                                     - install_python3 [default: false]
@@ -289,13 +330,22 @@ neurodocker generate singularity
                                     method=[binaries|source]
                                     options for method=binaries
                                     - version [required]
-                                        version=[2.3.4|2.3.2|2.3.1|2.3.0|2.2.0|2.1.0|2.0.3|2.0.0]
+                                        version=[2.4.1|2.3.4|2.3.2|2.3.1|2.3.0|2.2.0|2.1.0|2.0.3|2.0.0]
                                     - install_path [default: /opt/ants-{{ self.version }}]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/ANTsX/ANTs.git]
                                     - install_path [default: /opt/ants-{{ self.version }}]
                                     - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]
                                     - make_opts [default: -j1]
+
+    --cat12 KEY=VALUE            Add cat12
+                                    method=[binaries]
+                                    options for method=binaries
+                                    - version [required]
+                                        version=[r1933_R2017b]
+                                    - install_path [default: /opt/CAT12-{{ self.version }}]
+
 
     --convert3d KEY=VALUE        Add convert3d
                                     method=[binaries]
@@ -312,6 +362,7 @@ neurodocker generate singularity
                                     - install_path [default: /opt/dcm2niix-{{ self.version }}]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/rordenlab/dcm2niix]
                                     - install_path [default: /opt/dcm2niix-{{ self.version }}]
                                     - cmake_opts [default: ]
                                     - make_opts [default: -j1]
@@ -320,7 +371,7 @@ neurodocker generate singularity
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[7.1.1-min|7.1.1|7.1.0|6.0.1|6.0.0-min|6.0.0]
+                                        version=[7.3.1|7.3.0|7.2.0|7.1.1-min|7.1.1|7.1.0|6.0.1|6.0.0-min|6.0.0]
                                     - install_path [default: /opt/freesurfer-{{ self.version }}]
                                     - exclude_paths [default: average/mult-comp-cor
                                 lib/cuda
@@ -341,7 +392,7 @@ neurodocker generate singularity
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
+                                        version=[6.0.6.4|6.0.6.3|6.0.6.2|6.0.6.1|6.0.6|6.0.5.2|6.0.5.1|6.0.5|6.0.4|6.0.3|6.0.2|6.0.1|6.0.0|5.0.9|5.0.8|5.0.11|5.0.10]
                                     - install_path [default: /opt/fsl-{{ self.version }}]
                                     - exclude_paths [default: ]
                                 **Note**: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
@@ -354,11 +405,19 @@ neurodocker generate singularity
                                     options for method=source
                                     - version [required]
 
+	  --matlabmcr KEY=VALUE        Add matlabmcr
+                                    method=[binaries]
+                                    options for method=binaries
+                                    - version [required]
+                                        version=[2023a|2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]
+                                    - curl_opts [default: ]
+                                    - install_path [default: /opt/MCR-{{ self.version }}]
+
     --minc KEY=VALUE             Add minc
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
-                                        version=[1.9.15]
+                                        version=[1.9.18|1.9.17|1.9.16|1.9.15]
                                     - install_path [default: /opt/minc-{{ self.version }}]
 
     --miniconda KEY=VALUE        Add miniconda
@@ -392,6 +451,7 @@ neurodocker generate singularity
                                     - build_processes [default: 1]
                                     options for method=source
                                     - version [required]
+                                    - repo [default: https://github.com/MRtrix3/mrtrix3.git]
                                     - install_path [default: /opt/mrtrix3-{{ self.version }}]
                                     - build_processes [default: ]
 
@@ -409,7 +469,16 @@ neurodocker generate singularity
                                     - os_codename [required]
                                     - full_or_libre [default: full]
 
-    --petpvc KEY=VALUE           Add petpvc
+    --niftyreg KEY=VALUE         Add niftyreg
+                                     method=[source]
+                                     options for method=source
+                                     - version [required]
+                                     - repo [default: https://github.com/KCL-BMEIS/niftyreg]
+                                     - install_path [default: /opt/niftyreg-{{ self.version }}]
+                                     - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]
+                                     - make_opts [default: -j1]
+
+    -petpvc KEY=VALUE           Add petpvc
                                     method=[binaries]
                                     options for method=binaries
                                     - version [required]
