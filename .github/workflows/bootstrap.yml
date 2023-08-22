@@ -1,0 +1,66 @@
+# this workflow bootstraps the testing of the build the docker images
+#
+# - this will run the python script used to generate the workflows
+#   based on a the jinja template
+# - commit and push the generated workflows to the branch test_docker_build
+#   where they will be executed
+
+name: bootstrap
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ "master" ]
+
+# Uses the cron schedule for github actions
+#
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+#
+#         ┌───────────── minute (0 - 59)
+#         │ ┌───────────── hour (0 - 23)
+#         │ │   ┌───────────── day of the month (1 - 31)
+#         │ │   │    ┌───────────── month (1 - 12 or JAN-DEC)
+#         │ │   │    │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         │ │   │    │ │
+#         * *   *    * *
+
+  schedule:
+  - cron: 0 0 1,15 * *
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.CI_FLOW }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install jinja2 pyyaml
+
+      - name: Create workflows
+        run: |
+          git checkout -b test_docker_build
+          python .github/workflows/create_workflows.py
+          ls -l .github/workflows
+          git add .
+          git config --global user.email "no-reply@repronim.org"
+          git config --global user.name "Repronim neurodocker bot"
+          git commit -am "added new workflows"
+          git push origin --force test_docker_build

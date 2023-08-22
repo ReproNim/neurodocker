@@ -177,6 +177,7 @@ ENV PATH="$PATH:/opt/foo/bin\""""
     )
     d.env(PATH="$PATH:/opt/foo/bin")
     d.label(ORG="myorg")
+    d.labels({"org.test.label": "another label"})
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
     assert (
@@ -188,7 +189,8 @@ COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
       "foo/baz/cat.txt", \\
       "/opt/"]
 ENV PATH="$PATH:/opt/foo/bin"
-LABEL ORG="myorg\""""
+LABEL ORG="myorg"
+LABEL org.test.label="another label\""""
     )
 
     d = DockerRenderer("apt")
