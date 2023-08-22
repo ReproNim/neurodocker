@@ -7,9 +7,11 @@ import typing as ty
 
 from neurodocker.reproenv.exceptions import TemplateKeywordArgumentError
 from neurodocker.reproenv.state import _validate_template
-from neurodocker.reproenv.types import _BinariesTemplateType
-from neurodocker.reproenv.types import _SourceTemplateType
-from neurodocker.reproenv.types import TemplateType
+from neurodocker.reproenv.types import (
+    TemplateType,
+    _BinariesTemplateType,
+    _SourceTemplateType,
+)
 
 
 class Template:

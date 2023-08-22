@@ -3,8 +3,8 @@
 import copy
 import json
 import os
-from pathlib import Path
 import typing as ty
+from pathlib import Path
 
 import jsonschema
 import yaml
@@ -16,9 +16,11 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import SafeLoader  # type: ignore  # pragma: no cover
 
-from neurodocker.reproenv.exceptions import RendererError
-from neurodocker.reproenv.exceptions import TemplateError
-from neurodocker.reproenv.exceptions import TemplateNotFound
+from neurodocker.reproenv.exceptions import (
+    RendererError,
+    TemplateError,
+    TemplateNotFound,
+)
 from neurodocker.reproenv.types import TemplateType
 
 _schemas_path = Path(__file__).parent / "schemas"

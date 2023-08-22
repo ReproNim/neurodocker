@@ -9,9 +9,9 @@ by the given command(s).
 
 import io
 import logging
-from pathlib import Path
 import tarfile
 import typing as ty
+from pathlib import Path
 
 import click
 

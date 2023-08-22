@@ -1,10 +1,11 @@
 import pytest
 
-from neurodocker.reproenv.renderers import DockerRenderer
-from neurodocker.reproenv.renderers import SingularityRenderer
-from neurodocker.reproenv.tests.utils import get_build_and_run_fns
-from neurodocker.reproenv.tests.utils import skip_if_no_docker
-from neurodocker.reproenv.tests.utils import skip_if_no_singularity
+from neurodocker.reproenv.renderers import DockerRenderer, SingularityRenderer
+from neurodocker.reproenv.tests.utils import (
+    get_build_and_run_fns,
+    skip_if_no_docker,
+    skip_if_no_singularity,
+)
 
 
 @pytest.mark.parametrize(

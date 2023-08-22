@@ -1,8 +1,7 @@
 import click
 
 from neurodocker import __version__
-from neurodocker.cli.generate import generate
-from neurodocker.cli.generate import genfromjson
+from neurodocker.cli.generate import generate, genfromjson
 
 
 @click.group()

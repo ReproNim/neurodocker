@@ -1,7 +1,7 @@
 """Remove all files under a directory but not caught by `reprozip trace`."""
 
-from pathlib import Path
 import typing as ty
+from pathlib import Path
 
 import yaml
 
