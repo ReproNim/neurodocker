@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-import typing as ty
+from typing import Mapping, Optional, cast
 
 from neurodocker.reproenv.exceptions import TemplateKeywordArgumentError
 from neurodocker.reproenv.state import _validate_template
@@ -41,8 +41,8 @@ class Template:
     def __init__(
         self,
         template: TemplateType,
-        binaries_kwds: ty.Mapping[str, str] = None,
-        source_kwds: ty.Mapping[str, str] = None,
+        binaries_kwds: Mapping[str, str] = None,
+        source_kwds: Mapping[str, str] = None,
     ):
         # Validate against JSON schema. Registered templates were already validated at
         # registration time, but if we do not validate here, then in-memory templates
@@ -50,9 +50,9 @@ class Template:
         _validate_template(template)
 
         self._template = copy.deepcopy(template)
-        self._binaries: ty.Optional[_BinariesTemplate] = None
+        self._binaries: Optional[_BinariesTemplate] = None
         self._binaries_kwds = {} if binaries_kwds is None else binaries_kwds
-        self._source: ty.Optional[_SourceTemplate] = None
+        self._source: Optional[_SourceTemplate] = None
         self._source_kwds = {} if source_kwds is None else source_kwds
 
         if "binaries" in self._template:
@@ -69,11 +69,11 @@ class Template:
         return self._template["name"]
 
     @property
-    def binaries(self) -> ty.Union[None, _BinariesTemplate]:
+    def binaries(self) -> None | _BinariesTemplate:
         return self._binaries
 
     @property
-    def source(self) -> ty.Union[None, _SourceTemplate]:
+    def source(self) -> None | _SourceTemplate:
         return self._source
 
     @property
@@ -104,7 +104,7 @@ class _BaseInstallationTemplate:
 
     def __init__(
         self,
-        template: ty.Union[_BinariesTemplateType, _SourceTemplateType],
+        template: _BinariesTemplateType | _SourceTemplateType,
         **kwds: str,
     ) -> None:
         self._template = copy.deepcopy(template)
@@ -192,7 +192,7 @@ class _BaseInstallationTemplate:
         return self._template
 
     @property
-    def env(self) -> ty.Mapping[str, str]:
+    def env(self) -> Mapping[str, str]:
         return self._template.get("env", {})
 
     @property
@@ -200,29 +200,29 @@ class _BaseInstallationTemplate:
         return self._template.get("instructions", "")
 
     @property
-    def arguments(self) -> ty.Mapping:
+    def arguments(self) -> Mapping:
         return self._template.get("arguments", {})
 
     @property
-    def required_arguments(self) -> ty.Set[str]:
+    def required_arguments(self) -> set[str]:
         args = self.arguments.get("required", None)
         return set(args) if args is not None else set()
 
     @property
-    def optional_arguments(self) -> ty.Dict[str, str]:
+    def optional_arguments(self) -> dict[str, str]:
         args = self.arguments.get("optional", None)
         return args if args is not None else {}
 
     @property
-    def versions(self) -> ty.Set[str]:
+    def versions(self) -> set[str]:
         raise NotImplementedError()
 
-    def dependencies(self, pkg_manager: str) -> ty.List[str]:
+    def dependencies(self, pkg_manager: str) -> list[str]:
         deps_dict = self._template.get("dependencies", {})
         # TODO: not sure why the following line raises a type error in mypy.
         return deps_dict.get(pkg_manager, [])  # type: ignore
 
-    def install(self, pkgs: ty.List[str], opts: str = None) -> str:
+    def install(self, pkgs: list[str], opts: str = None) -> str:
         raise NotImplementedError(
             "This method is meant to be patched by renderer objects, so it can be used"
             " in templates and have access to the pkg_manager being used."
@@ -240,15 +240,15 @@ class _BinariesTemplate(_BaseInstallationTemplate):
         super().__init__(template=template, **kwds)
 
     @property
-    def urls(self) -> ty.Mapping[str, str]:
+    def urls(self) -> Mapping[str, str]:
         # TODO: how can the code be changed so this cast is not necessary?
-        self._template = ty.cast(_BinariesTemplateType, self._template)
+        self._template = cast(_BinariesTemplateType, self._template)
         return self._template.get("urls", {})
 
     @property
-    def versions(self) -> ty.Set[str]:
+    def versions(self) -> set[str]:
         # TODO: how can the code be changed so this cast is not necessary?
-        self._template = ty.cast(_BinariesTemplateType, self._template)
+        self._template = cast(_BinariesTemplateType, self._template)
         return set(self.urls.keys())
 
 
@@ -257,5 +257,5 @@ class _SourceTemplate(_BaseInstallationTemplate):
         super().__init__(template=template, **kwds)
 
     @property
-    def versions(self) -> ty.Set[str]:
+    def versions(self) -> set[str]:
         return {"ANY"}

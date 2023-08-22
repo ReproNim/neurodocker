@@ -1,5 +1,9 @@
 name: CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches: [ master ]
@@ -10,6 +14,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11', '3.10', '3.9', '3.8']
+      fail-fast: false
     steps:
       - name: Install Apptainer
         env:
