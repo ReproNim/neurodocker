@@ -43,7 +43,7 @@ _jinja_env.globals["raise"] = _raise_helper
 # TODO: add a flag that avoids buggy behavior when basing a new container on
 # one created with ReproEnv.
 
-PathType = Union[str | pathlib.Path | os.PathLike]
+PathType = Union[str, pathlib.Path, os.PathLike]
 
 
 def _render_string_from_template(
