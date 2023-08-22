@@ -1,6 +1,7 @@
 """Define types used in ReproEnv."""
+from __future__ import annotations
 
-import typing as ty
+from typing import Mapping
 
 from mypy_extensions import TypedDict
 from typing_extensions import Literal
@@ -28,23 +29,23 @@ class _InstallationDependenciesType(TypedDict, total=False):
     `yum`, and Debian and Ubuntu use `apt` and `dpkg`.
     """
 
-    apt: ty.List[str]
-    debs: ty.List[str]
-    yum: ty.List[str]
+    apt: list[str]
+    debs: list[str]
+    yum: list[str]
 
 
 class _TemplateArgumentsType(TypedDict):
     """Arguments (i.e., variables) that are used in the template."""
 
-    required: ty.List[str]
-    optional: ty.Mapping[str, str]
+    required: list[str]
+    optional: Mapping[str, str]
 
 
 class _BaseTemplateType(TypedDict, total=False):
     """Keys common to both types of templates: binaries and source."""
 
     arguments: _TemplateArgumentsType
-    env: ty.Mapping[str, str]
+    env: Mapping[str, str]
     dependencies: _InstallationDependenciesType
     instructions: str
 
@@ -58,7 +59,7 @@ class _SourceTemplateType(_BaseTemplateType):
 class _BinariesTemplateType(_BaseTemplateType):
     """Template that defines how to install software from pre-compiled binaries."""
 
-    urls: ty.Mapping[str, str]
+    urls: Mapping[str, str]
 
 
 class TemplateType(TypedDict, total=False):

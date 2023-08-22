@@ -1,10 +1,11 @@
 """Stateful objects in reproenv runtime."""
+from __future__ import annotations
 
 import copy
 import json
 import os
-import typing as ty
 from pathlib import Path
+from typing import ItemsView, KeysView
 
 import jsonschema
 import yaml
@@ -26,10 +27,10 @@ from neurodocker.reproenv.types import TemplateType
 _schemas_path = Path(__file__).parent / "schemas"
 
 with (_schemas_path / "template.json").open("r") as f:
-    _TEMPLATE_SCHEMA: ty.Dict = json.load(f)
+    _TEMPLATE_SCHEMA: dict = json.load(f)
 
 with (_schemas_path / "renderer.json").open("r") as f:
-    _RENDERER_SCHEMA: ty.Dict = json.load(f)
+    _RENDERER_SCHEMA: dict = json.load(f)
 
 
 def _validate_template(template: TemplateType):
@@ -59,7 +60,7 @@ def _validate_renderer(d):
 class _TemplateRegistry:
     """Object to hold templates in memory."""
 
-    _templates: ty.Dict[str, TemplateType] = {}
+    _templates: dict[str, TemplateType] = {}
 
     @classmethod
     def _reset(cls):
@@ -69,7 +70,7 @@ class _TemplateRegistry:
     @classmethod
     def register(
         cls,
-        path_or_template: ty.Union[str, os.PathLike, TemplateType],
+        path_or_template: str | os.PathLike | TemplateType,
         name: str = None,
     ) -> TemplateType:
         """Register a template. This will overwrite an existing template with the
@@ -150,12 +151,12 @@ class _TemplateRegistry:
             )
 
     @classmethod
-    def keys(cls) -> ty.KeysView[str]:
+    def keys(cls) -> KeysView[str]:
         """Return names of registered templates."""
         return cls._templates.keys()
 
     @classmethod
-    def items(cls) -> ty.ItemsView[str, TemplateType]:
+    def items(cls) -> ItemsView[str, TemplateType]:
         return cls._templates.items()
 
 
