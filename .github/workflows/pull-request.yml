@@ -30,7 +30,7 @@ jobs:
           # Give reproenv the full path to apptainer, so it still works with `sudo`.
           echo REPROENV_APPTAINER_PROGRAM=apptainer >> $GITHUB_ENV
           echo APPTAINER_CACHEDIR=/dev/shm/$(whoami)/singularity >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
