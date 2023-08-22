@@ -71,13 +71,13 @@ neurodocker generate docker
                                 does not exist)
 
     --workdir TEXT               Set the working directory
-    --yes                        Reply yes to all prompts for agreeing to any 
+    --yes                        Reply yes to all prompts for agreeing to any
                                 alerts that a neurodocker template might have.
-                                The alert messages will still be printed but 
+                                The alert messages will still be printed but
                                 no confirmation is necessary from the user.
 
-    --json                       Output instructions as JSON. This can be used	
-                                to generate Dockerfiles or Singularity recipes	
+    --json                       Output instructions as JSON. This can be used
+                                to generate Dockerfiles or Singularity recipes
                                 with Neurodocker.
 
     --_header KEY=VALUE          Add _header
@@ -93,7 +93,7 @@ neurodocker generate docker
                                     - install_python3 [default: false]
                                     options for method=source
                                     - version [required]
-                                    - repo [default: https://github.com/afni/afni.git]	
+                                    - repo [default: https://github.com/afni/afni.git]
                                     - install_path [default: /opt/afni-{{ self.version }}]
                                     - install_r_pkgs [default: false]
                                     - install_python3 [default: false]
@@ -176,14 +176,14 @@ neurodocker generate docker
                                     options for method=source
                                     - version [required]
 
-    --matlabmcr KEY=VALUE        Add matlabmcr	
+    --matlabmcr KEY=VALUE        Add matlabmcr
                                     method=[binaries]
                                     options for method=binaries
-                                    - version [required]	
-                                        version=[2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]	
-                                    - curl_opts [default: ]	
-                                    - install_path [default: /opt/MCR-{{ self.version }}]	
-  
+                                    - version [required]
+                                        version=[2021b|2021a|2020b|2020a|2019b|2019a|2018b|2018a|2017b|2017a|2016b|2016a|2015b|2015aSP1|2015a|2014b|2014a|2013b|2013a|2012b|2012a|2010a]
+                                    - curl_opts [default: ]
+                                    - install_path [default: /opt/MCR-{{ self.version }}]
+
     --minc KEY=VALUE             Add minc
                                     method=[binaries]
                                     options for method=binaries
@@ -240,13 +240,13 @@ neurodocker generate docker
                                     - os_codename [required]
                                     - full_or_libre [default: full]
 
-    --niftyreg KEY=VALUE         Add niftyreg	
-                                    method=[source]	
-                                    options for method=source	
-                                    - version [required]	
-                                    - repo [default: https://github.com/KCL-BMEIS/niftyreg]	
-                                    - install_path [default: /opt/niftyreg-{{ self.version }}]	
-                                    - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]	
+    --niftyreg KEY=VALUE         Add niftyreg
+                                    method=[source]
+                                    options for method=source
+                                    - version [required]
+                                    - repo [default: https://github.com/KCL-BMEIS/niftyreg]
+                                    - install_path [default: /opt/niftyreg-{{ self.version }}]
+                                    - cmake_opts [default: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF]
                                     - make_opts [default: -j1]
 
     --petpvc KEY=VALUE           Add petpvc

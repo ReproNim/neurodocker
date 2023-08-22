@@ -31,17 +31,17 @@ binaries:
     - libgomp1
     - libjpeg62
     - unzip
-    - octave 
-    - libglu1-mesa 
-    - libgl1-mesa-glx 
-    - perl 
-    - imagemagick 
-    - bc 
-    - ed 
-    - libc6 
-    - libstdc++6 
-    - gdebi-core 
-    - binutils 
+    - octave
+    - libglu1-mesa
+    - libgl1-mesa-glx
+    - perl
+    - imagemagick
+    - bc
+    - ed
+    - libc6
+    - libstdc++6
+    - gdebi-core
+    - binutils
     - git
     yum:
     - curl
@@ -57,12 +57,12 @@ binaries:
     - unzip
     - octave
     - mesa-dri-drivers
-    - epel-release 
-    - glibc 
-    - libstdc++ 
-    - ImageMagick 
-    - perl 
-    - binutils 
+    - epel-release
+    - glibc
+    - libstdc++
+    - ImageMagick
+    - perl
+    - binutils
     - git
   env:
     MINC_TOOLKIT: "{{ self.install_path }}"
@@ -81,7 +81,7 @@ binaries:
     cd /
     # ar allows to extract the debian package so we can also install this in centos based OSs.
     curl {{ self.urls[self.version] }} -o minc.deb && ar p minc.deb data.tar.gz | tar zx && rm minc.deb
-    ln -s /opt/minc/{{ self.version }} {{ self.install_path }} 
+    ln -s /opt/minc/{{ self.version }} {{ self.install_path }}
     git clone https://github.com/CAIsr/volgenmodel-nipype.git {{ self.install_path }}/volgenmodel-nipype/
     curl -fL http://packages.bic.mni.mcgill.ca/tgz/beast-library-1.1.tar.gz \
     | tar -xz -C {{ self.install_path }}/share
