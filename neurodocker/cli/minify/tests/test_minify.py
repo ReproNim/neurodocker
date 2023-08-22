@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
 from neurodocker.cli.cli import _arm_on_mac
 from neurodocker.cli.minify.trace import minify

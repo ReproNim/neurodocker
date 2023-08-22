@@ -12,18 +12,17 @@ import typing as ty
 
 import jinja2
 
-from neurodocker.reproenv.exceptions import RendererError
-from neurodocker.reproenv.exceptions import TemplateError
-from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.state import _validate_renderer
-from neurodocker.reproenv.template import _BaseInstallationTemplate
-from neurodocker.reproenv.template import Template
-from neurodocker.reproenv.types import _SingularityHeaderType
-from neurodocker.reproenv.types import REPROENV_SPEC_FILE_IN_CONTAINER
-from neurodocker.reproenv.types import allowed_pkg_managers
-from neurodocker.reproenv.types import allowed_installation_methods
-from neurodocker.reproenv.types import installation_methods_type
-from neurodocker.reproenv.types import pkg_managers_type
+from neurodocker.reproenv.exceptions import RendererError, TemplateError
+from neurodocker.reproenv.state import _TemplateRegistry, _validate_renderer
+from neurodocker.reproenv.template import Template, _BaseInstallationTemplate
+from neurodocker.reproenv.types import (
+    REPROENV_SPEC_FILE_IN_CONTAINER,
+    _SingularityHeaderType,
+    allowed_installation_methods,
+    allowed_pkg_managers,
+    installation_methods_type,
+    pkg_managers_type,
+)
 
 # All jinja2 templates are instantiated from this environment object. It is
 # configured to dislike undefined attributes. For example, if a template is

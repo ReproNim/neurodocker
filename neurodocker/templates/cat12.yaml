@@ -13,7 +13,7 @@ binaries:
       install_path: /opt/CAT12-{{ self.version }}
   urls:
     r1933_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8_r1933_R2017b_MCR_Linux.zip
-    r2166_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8.2_r2166_R2017b_MCR_Linux.zip 
+    r2166_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8.2_r2166_R2017b_MCR_Linux.zip
   dependencies:
     apt:
     - ca-certificates

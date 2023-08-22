@@ -6,19 +6,23 @@
 # TODO: add a dedicated class for key=value in the eat-all class.
 
 import json as json_lib
-from pathlib import Path
 import sys
 import typing as ty
+from pathlib import Path
 
 import click
 
-from neurodocker.reproenv.renderers import _Renderer
-from neurodocker.reproenv.renderers import DockerRenderer
-from neurodocker.reproenv.renderers import SingularityRenderer
-from neurodocker.reproenv.state import get_template
-from neurodocker.reproenv.state import register_template
-from neurodocker.reproenv.state import registered_templates
-from neurodocker.reproenv.state import registered_templates_items
+from neurodocker.reproenv.renderers import (
+    DockerRenderer,
+    SingularityRenderer,
+    _Renderer,
+)
+from neurodocker.reproenv.state import (
+    get_template,
+    register_template,
+    registered_templates,
+    registered_templates_items,
+)
 from neurodocker.reproenv.template import Template
 from neurodocker.reproenv.types import allowed_pkg_managers
 

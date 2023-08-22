@@ -10,7 +10,7 @@ binaries:
   urls:
     # Official binaries are provided as of 2.4.1 (https://github.com/ANTsX/ANTs/releases)
     "2.4.3": https://github.com/ANTsX/ANTs/releases/download/v2.4.3/ants-2.4.3-centos7-X64-gcc.zip
-    "2.4.2": https://github.com/ANTsX/ANTs/releases/download/v2.4.2/ants-2.4.2-centos7-X64-gcc.zip   
+    "2.4.2": https://github.com/ANTsX/ANTs/releases/download/v2.4.2/ants-2.4.2-centos7-X64-gcc.zip
     "2.4.1": https://github.com/ANTsX/ANTs/releases/download/v2.4.1/ants-2.4.1-centos7-X64-gcc.zip
     # Binaries prior to 2.4.x were compiled by Jakub Kaczmarzyk (https://github.com/kaczmarj)
     "2.3.4": https://dl.dropbox.com/s/gwf51ykkk5bifyj/ants-Linux-centos6_x86_64-v2.3.4.tar.gz

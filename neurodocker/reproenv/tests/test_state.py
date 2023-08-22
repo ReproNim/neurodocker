@@ -3,9 +3,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-from neurodocker.reproenv import exceptions
+from neurodocker.reproenv import exceptions, types
 from neurodocker.reproenv.state import _TemplateRegistry, _validate_template
-from neurodocker.reproenv import types
 
 
 def test_validate_template_invalid_templates():

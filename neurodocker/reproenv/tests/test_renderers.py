@@ -1,9 +1,11 @@
 import pytest
 
 from neurodocker.reproenv.exceptions import RendererError
-from neurodocker.reproenv.renderers import _Renderer
-from neurodocker.reproenv.renderers import DockerRenderer
-from neurodocker.reproenv.renderers import SingularityRenderer
+from neurodocker.reproenv.renderers import (
+    DockerRenderer,
+    SingularityRenderer,
+    _Renderer,
+)
 
 
 def test_renderer():
