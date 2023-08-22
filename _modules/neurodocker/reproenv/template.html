@@ -302,7 +302,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">ty</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">TemplateKeywordArgumentError</span>
 <span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_validate_template</span>
@@ -340,8 +340,8 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">template</span><span class="p">:</span> <span class="n">TemplateType</span><span class="p">,</span>
-        <span class="n">binaries_kwds</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">source_kwds</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">binaries_kwds</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source_kwds</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># Validate against JSON schema. Registered templates were already validated at</span>
         <span class="c1"># registration time, but if we do not validate here, then in-memory templates</span>
@@ -349,9 +349,9 @@ document.write(`
         <span class="n">_validate_template</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_binaries</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">_BinariesTemplate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binaries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_BinariesTemplate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_binaries_kwds</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">binaries_kwds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">binaries_kwds</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">_SourceTemplate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_SourceTemplate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_source_kwds</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">source_kwds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">source_kwds</span>
 
         <span class="k">if</span> <span class="s2">&quot;binaries&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">:</span>
@@ -368,11 +368,11 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">binaries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_BinariesTemplate</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">binaries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">_BinariesTemplate</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binaries</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_SourceTemplate</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">_SourceTemplate</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
 
     <span class="nd">@property</span>
@@ -403,7 +403,7 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">template</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">_BinariesTemplateType</span><span class="p">,</span> <span class="n">_SourceTemplateType</span><span class="p">],</span>
+        <span class="n">template</span><span class="p">:</span> <span class="n">_BinariesTemplateType</span> <span class="o">|</span> <span class="n">_SourceTemplateType</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
@@ -491,7 +491,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
     <span class="nd">@property</span>
@@ -499,29 +499,29 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;instructions&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">required_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">required_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">optional_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">optional_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;optional&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">args</span> <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">deps_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dependencies&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="c1"># TODO: not sure why the following line raises a type error in mypy.</span>
         <span class="k">return</span> <span class="n">deps_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="p">[])</span>  <span class="c1"># type: ignore</span>
 
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;This method is meant to be patched by renderer objects, so it can be used&quot;</span>
             <span class="s2">&quot; in templates and have access to the pkg_manager being used.&quot;</span>
@@ -539,15 +539,15 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">urls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">urls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># TODO: how can the code be changed so this cast is not necessary?</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">_BinariesTemplateType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">_BinariesTemplateType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;urls&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># TODO: how can the code be changed so this cast is not necessary?</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">_BinariesTemplateType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">_BinariesTemplateType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urls</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 
@@ -556,7 +556,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ANY&quot;</span><span class="p">}</span>
 </pre></div>
 

@@ -307,7 +307,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">ty</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NoReturn</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">jinja2</span>
 
@@ -333,7 +333,7 @@ document.write(`
 <span class="c1"># template.</span>
 
 
-<span class="k">def</span> <span class="nf">_raise_helper</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_raise_helper</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
     <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
@@ -342,7 +342,7 @@ document.write(`
 <span class="c1"># TODO: add a flag that avoids buggy behavior when basing a new container on</span>
 <span class="c1"># one created with ReproEnv.</span>
 
-<span class="n">PathType</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span>
+<span class="n">PathType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_render_string_from_template</span><span class="p">(</span>
@@ -385,7 +385,7 @@ document.write(`
     <span class="k">return</span> <span class="n">source</span>
 
 
-<span class="k">def</span> <span class="nf">_log_instruction</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_log_instruction</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that logs instructions passed to a Renderer.</span>
 
 <span class="sd">    This adds the logs to the `_instructions` attribute of the Renderer instance.</span>
@@ -430,7 +430,7 @@ document.write(`
 
 <span class="k">class</span> <span class="nc">_Renderer</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pkg_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_pkg_managers</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
@@ -444,7 +444,7 @@ document.write(`
         <span class="c1"># specification to JSON, because if we are not root, we can change to root,</span>
         <span class="c1"># write the file, and return to whichever user we were.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_user</span> <span class="o">=</span> <span class="s2">&quot;root&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;pkg_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span>
             <span class="s2">&quot;existing_users&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="p">),</span>
             <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -477,11 +477,11 @@ document.write(`
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">masthead</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">image_spec</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a new renderer from a dictionary of instructions.&quot;&quot;&quot;</span>
         <span class="c1"># raise error if invalid</span>
         <span class="n">_validate_renderer</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
@@ -573,7 +573,7 @@ document.write(`
 
         <span class="c1"># Add environment (render any jinja templates).</span>
         <span class="k">if</span> <span class="n">template_method</span><span class="o">.</span><span class="n">env</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">_render_string_from_template</span><span class="p">(</span>
                     <span class="n">k</span><span class="p">,</span> <span class="n">template_method</span>
                 <span class="p">):</span> <span class="n">_render_string_from_template</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">template_method</span><span class="p">)</span>
@@ -584,7 +584,7 @@ document.write(`
         <span class="c1"># Patch the `template_method.install_dependencies` instance method so it can be</span>
         <span class="c1"># used (ie rendered) in a template and have access to the pkg_manager requested.</span>
         <span class="k">def</span> <span class="nf">install_patch</span><span class="p">(</span>
-            <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="o">=</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">)</span>
 
@@ -668,21 +668,21 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
-        <span class="n">destination</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
@@ -735,11 +735,9 @@ document.write(`
 
 
 <div class="viewcode-block" id="DockerRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer">[docs]</a><span class="k">class</span> <span class="nc">DockerRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="DockerRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the rendered Dockerfile.&quot;&quot;&quot;</span>
@@ -766,7 +764,7 @@ document.write(`
 <div class="viewcode-block" id="DockerRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
         <span class="n">from_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">chown</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -793,7 +791,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;ENTRYPOINT [&quot;</span><span class="si">{}</span><span class="s1">&quot;]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&quot;, &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -809,7 +807,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_indent_run_instruction</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
@@ -862,18 +860,18 @@ document.write(`
 
 <div class="viewcode-block" id="SingularityRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer">[docs]</a><span class="k">class</span> <span class="nc">SingularityRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span> <span class="n">_SingularityHeaderType</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># The &#39;%setup&#39; section is intentionally omitted.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="c1"># TODO: is it OK to use a dict here? Labels could be overwritten.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="SingularityRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -932,7 +930,7 @@ document.write(`
 <div class="viewcode-block" id="SingularityRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">source</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">PathType</span><span class="p">,</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
@@ -948,7 +946,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -970,7 +968,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
@@ -1033,7 +1031,7 @@ document.write(`
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;apt&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;yum&quot;</span><span class="p">:</span>
@@ -1043,7 +1041,7 @@ document.write(`
         <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown package manager &#39;</span><span class="si">{</span><span class="n">pkg_manager</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q --no-install-recommends&quot;.</span>
@@ -1061,7 +1059,7 @@ document.write(`
     <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_apt_install_debs</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_apt_install_debs</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>
@@ -1085,7 +1083,7 @@ document.write(`
     <span class="k">return</span> <span class="n">s</span>
 
 
-<span class="k">def</span> <span class="nf">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install packages with `yum` (CentOS, Fedora).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>

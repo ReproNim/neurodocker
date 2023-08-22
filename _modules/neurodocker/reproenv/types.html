@@ -298,8 +298,9 @@ document.write(`
                   
   <h1>Source code for neurodocker.reproenv.types</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Define types used in ReproEnv.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">ty</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Mapping</span>
 
 <span class="kn">from</span> <span class="nn">mypy_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
@@ -327,23 +328,23 @@ document.write(`
 <span class="sd">    `yum`, and Debian and Ubuntu use `apt` and `dpkg`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">apt</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">debs</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">yum</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">apt</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">debs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">yum</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
 <span class="k">class</span> <span class="nc">_TemplateArgumentsType</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments (i.e., variables) that are used in the template.&quot;&quot;&quot;</span>
 
-    <span class="n">required</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">optional</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">optional</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 
 
 <span class="k">class</span> <span class="nc">_BaseTemplateType</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Keys common to both types of templates: binaries and source.&quot;&quot;&quot;</span>
 
     <span class="n">arguments</span><span class="p">:</span> <span class="n">_TemplateArgumentsType</span>
-    <span class="n">env</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">env</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">dependencies</span><span class="p">:</span> <span class="n">_InstallationDependenciesType</span>
     <span class="n">instructions</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -357,7 +358,7 @@ document.write(`
 <span class="k">class</span> <span class="nc">_BinariesTemplateType</span><span class="p">(</span><span class="n">_BaseTemplateType</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Template that defines how to install software from pre-compiled binaries.&quot;&quot;&quot;</span>
 
-    <span class="n">urls</span><span class="p">:</span> <span class="n">ty</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">urls</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="TemplateType"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.types.html#neurodocker.reproenv.types.TemplateType">[docs]</a><span class="k">class</span> <span class="nc">TemplateType</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
