@@ -1,0 +1,9 @@
+[tool.isort]
+combine_as_imports = true
+line_length = 88
+profile = "black"
+skip_gitignore = true
+src_paths = [
+    'neurodocker',
+    'docs'
+]
