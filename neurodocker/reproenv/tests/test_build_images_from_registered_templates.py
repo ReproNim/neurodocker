@@ -1,7 +1,7 @@
 # TODO: add more tests for `from_dict` method.
 
-import typing as ty
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -101,8 +101,8 @@ def test_build_using_renderer_instance_methods(
     _TemplateRegistry._reset()
     _TemplateRegistry.register(_template_filepath)
 
-    pkg_manager = ty.cast(pkg_managers_type, pkg_manager)
-    method = ty.cast(installation_methods_type, method)
+    pkg_manager = cast(pkg_managers_type, pkg_manager)
+    method = cast(installation_methods_type, method)
 
     fd_exe = "fdfind" if pkg_manager == "apt" else "fd"
 
