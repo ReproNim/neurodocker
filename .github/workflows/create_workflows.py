@@ -31,10 +31,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 apt_based = [
     "ubuntu:22.04",
     "ubuntu:18.04",
-    "ubuntu:16.04",
     "debian:bullseye-slim",
     "debian:buster-slim",
-    "debian:stretch-slim",
 ]
 yum_based = ["fedora:36", "centos:7"]
 
