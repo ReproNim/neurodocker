@@ -73,6 +73,7 @@ software: dict[str, dict[str, list[str]]] = {
         "methods": ["binaries", "source"],
     },
     "spm12": {"methods": ["binaries"]},
+    "miniconda": {},
 }
 
 output_dir = Path(__file__).parent
@@ -167,6 +168,8 @@ def main():
         versions = get_versions_from_neurodocker_template(software_)
         for i in spec.get("skip_versions", []):
             versions.remove(i)
+        if software_ == "miniconda":
+            versions = ["latest"]
 
         if versions is not None and len(versions) > 0:
             wf["add_version"] = True
