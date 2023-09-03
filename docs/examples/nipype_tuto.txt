@@ -5,10 +5,7 @@ neurodocker generate docker \
         --ants version=2.4.3 \
         --fsl version=6.0.7.1 \
         --convert3d version=1.0.0 \
-        --install gcc g++ graphviz tree \
-                git-annex-standalone vim emacs-nox nano less ncdu \
-                tig git-annex-remote-rclone octave netbase \
-        --spm12 version=r7771 \
+        --install gcc g++ graphviz tree git-annex vim emacs-nox nano less ncdu tig octave netbase \
         --miniconda \
                 version=latest \
                 conda_install="python=3.11 nipype pybids pytest jupyter jupyterlab jupyter_contrib_nbextensions traits pandas matplotlib scikit-learn scikit-image seaborn nbformat nb_conda" \
@@ -16,6 +13,7 @@ neurodocker generate docker \
         --run 'jupyter nbextension enable exercise2/main && jupyter nbextension enable spellchecker/main' \
         --run 'mkdir /data && chmod 777 /data && chmod a+s /data' \
         --run 'mkdir /output && chmod 777 /output && chmod a+s /output' \
+        --spm12 version=r7771 \
         --user neuro \
         --run-bash 'cd /data
                 && datalad install -r ///workshops/nih-2017/ds000114
