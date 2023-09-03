@@ -63,6 +63,7 @@ jobs:
           else
             echo "testing ${software_name}"
           fi
+          export SOFTWARE_NAME=${software_name}
 
       - uses: actions/checkout@v3
         with:
@@ -79,7 +80,7 @@ jobs:
       - name: Create workflows
         run: |
           git checkout -b test_docker_build
-          python .github/workflows/create_workflows.py ${software_name}
+          python .github/workflows/create_workflows.py ${SOFTWARE_NAME}
           ls -l .github/workflows
           git add .
           git config --global user.email "no-reply@repronim.org"
