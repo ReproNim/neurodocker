@@ -39,14 +39,10 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
-    # "sphinx.ext.mathjax",
-    # "sphinx.ext.ifconfig",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    # "sphinx.ext.linkcode",
     "sphinxcontrib.apidoc",
-    'sphinx_click',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,6 +59,30 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
+
+html_theme_options = {
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/ReproNim/neurodocker",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "Docker Hub",
+            "url": "https://hub.docker.com/r/repronim/neurodocker",
+            "icon": "fa-brands fa-docker",
+        },
+    ],
+}
+
+
+html_context = {
+    "github_user": "ReproNim",
+    "github_repo": "neurodocker",
+    "github_version": "master",
+    "doc_path": "docs",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
