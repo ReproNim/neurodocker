@@ -31,6 +31,7 @@ binaries:
       conda_opts: ""
       pip_opts: ""
       yaml_file: ""
+      mamba: "false"
   instructions: |
     {% if not self.installed.lower() in ["true", "y", "1"] -%}
     {{ self.install_dependencies() }}
@@ -43,6 +44,10 @@ binaries:
     rm -f "$conda_installer"
     {% if self.version == "latest" -%}
     conda update -yq -nbase conda
+    {% endif -%}
+    {% if self.mamba == "true" -%}
+    conda install -yq -nbase conda-libmamba-solver
+    conda config --set solver libmamba
     {% endif -%}
     # Prefer packages in conda-forge
     conda config --system --prepend channels conda-forge

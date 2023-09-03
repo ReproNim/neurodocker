@@ -2,7 +2,7 @@
 This scripts uses a jinja template to create CI workflows to test.
 
     - different linux distributions (split by the package manager they use)
-    - different softwares that neurodocker supports
+    - different software that neurodocker supports
     - different install method for a given software
 
 All of those are defined in a python dictionary.
@@ -31,10 +31,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 apt_based = [
     "ubuntu:22.04",
     "ubuntu:18.04",
-    "ubuntu:16.04",
     "debian:bullseye-slim",
     "debian:buster-slim",
-    "debian:stretch-slim",
 ]
 yum_based = ["fedora:36", "centos:7"]
 
@@ -50,7 +48,7 @@ version 1.0.0 of afni, add the following to the software dictionary:
         },
 
 """
-softwares: dict[str, dict[str, list[str]]] = {
+software: dict[str, dict[str, list[str]]] = {
     "afni": {
         "methods": ["binaries", "source"],
         "afni_python": ["true", "false"],
@@ -75,6 +73,7 @@ softwares: dict[str, dict[str, list[str]]] = {
         "methods": ["binaries", "source"],
     },
     "spm12": {"methods": ["binaries"]},
+    "miniconda": {},
 }
 
 output_dir = Path(__file__).parent
@@ -110,20 +109,20 @@ def create_dashboard_file():
         )
 
         # table of content
-        for software, _ in softwares.items():
-            print(f"""- [{software}](#{software})""", file=f)
+        for software_, _ in software.items():
+            print(f"""- [{software_}](#{software_})""", file=f)
 
         print("", file=f)
 
         # link to the github actions workflow and image of the build status
-        for software, _ in softwares.items():
-            image_url = f"{image_base_url}&only={software}"
+        for software_, _ in software.items():
+            image_url = f"{image_base_url}&only={software_}"
             print(
-                f"""## {software}
+                f"""## {software_}
 
-[{software} workflow](https://github.com/{repo}/actions/workflows/{software}.yml)
+[{software_} workflow](https://github.com/{repo}/actions/workflows/{software_}.yml)
 
-![{software} build status]({image_url})
+![{software_} build status]({image_url})
 """,
                 file=f,
             )
@@ -159,16 +158,18 @@ def main():
         "all": stringify(apt_based + yum_based),
     }
 
-    for software, spec in softwares.items():
+    for software_, spec in software.items():
         wf = {
             "header": "# This is file is automatically generated. Do not edit.",
             "os": os,
-            "software": software,
+            "software": software_,
         }
 
-        versions = get_versions_from_neurodocker_template(software)
+        versions = get_versions_from_neurodocker_template(software_)
         for i in spec.get("skip_versions", []):
             versions.remove(i)
+        if software_ == "miniconda":
+            versions = ["latest"]
 
         if versions is not None and len(versions) > 0:
             wf["add_version"] = True
@@ -182,7 +183,7 @@ def main():
             wf["add_afni_python"] = True
             wf["afni_python"] = stringify(spec["afni_python"])
 
-        output_file = output_dir.joinpath(software).with_suffix(".yml")
+        output_file = output_dir.joinpath(software_).with_suffix(".yml")
         print("creating workflow")
         print(f"{output_file}")
         with open(output_file, "w") as f:

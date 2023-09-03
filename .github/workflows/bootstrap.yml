@@ -14,6 +14,10 @@ concurrency:
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - .github/workflows/bootstrap.yml
+      - .github/workflows/create_workflows.py
+      - neurodocker/**
 
 # Uses the cron schedule for github actions
 #
@@ -47,7 +51,7 @@ jobs:
           token: ${{ secrets.CI_FLOW }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
