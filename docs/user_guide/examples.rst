@@ -48,14 +48,14 @@ Docker
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
-        --fsl version=6.0.4 \
-    > fsl604.Dockerfile
+        --base-image debian:bullseye-slim \
+        --fsl version=6.0.7.1 \
+    > fsl6071.Dockerfile
 
-    docker build --tag fsl:6.0.4 --file fsl604.Dockerfile .
+    docker build --tag fsl:6.0.7.1 --file fsl6071.Dockerfile .
 
     # Run fsl's bet program.
-    docker run --rm -it fsl:6.0.4 bet
+    docker run --rm -it fsl:6.0.7.1 bet
 
 AFNI
 ----
@@ -69,7 +69,7 @@ Docker
 
     neurodocker generate docker \
         --pkg-manager yum \
-        --base-image fedora:35 \
+        --base-image fedora:36 \
         --afni method=binaries version=latest \
     > afni-binaries.Dockerfile
 
@@ -82,25 +82,30 @@ This does not install AFNI's R packages. To install relevant R things, use the f
 
     neurodocker generate docker \
         --pkg-manager yum \
-        --base-image fedora:35 \
+        --base-image fedora:36 \
         --afni method=binaries version=latest install_r_pkgs=true \
     > afni-binaries-r.Dockerfile
 
     docker build --tag afni:latest-with-r --file afni-binaries-r.Dockerfile .
 
+.. todo::
 
-One can also build AFNI from source. The code below builds the current master branch.
-Beware that this is AFNI's bleeding edge!
+    Building AFNI from source is currently failing on most tested distributions.
 
-.. code-block:: bash
+.. https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md#afni
 
-    neurodocker generate docker \
-        --pkg-manager yum \
-        --base-image fedora:35 \
-        --afni method=source version=master \
-    > afni-source.Dockerfile
+.. One can also build AFNI from source. The code below builds the current master branch.
+.. Beware that this is AFNI's bleeding edge!
 
-    docker build --tag afni:master --file afni-source.Dockerfile .
+.. .. code-block:: bash
+
+..     neurodocker generate docker \
+..         --pkg-manager yum \
+..         --base-image fedora:36 \
+..         --afni method=source version=master \
+..     > afni-source.Dockerfile
+
+..     docker build --tag afni:master --file afni-source.Dockerfile .
 
 FreeSurfer
 ----------
@@ -111,19 +116,25 @@ FreeSurfer
 Docker
 ~~~~~~
 
-The FreeSurfer installation is several gigabytes in size, but sometimes, users just
-the pieces for :code:`recon-all`. For this reason, Neurodocker provides a FreeSurfer
-minified for :code:`recon-all`.
-
 .. code-block:: bash
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
-        --freesurfer version=7.1.1-min \
-    > freesurfer7-min.Dockerfile
+        --base-image debian:bullseye-slim \
+        --freesurfer version=7.4.1 \
+    > freesurfer741.Dockerfile
 
-    docker build --tag freesurfer:7.1.1-min --file freesurfer7-min.Dockerfile .
+    docker build --tag freesurfer:7.4.1 --file freesurfer741.Dockerfile .
+
+.. todo::
+
+    The minified version on Freesurfer currently fails to build on all tested distributions.
+
+.. https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md#freesurfer
+
+.. The FreeSurfer installation is several gigabytes in size, but sometimes, users just
+.. the pieces for :code:`recon-all`. For this reason, Neurodocker provides a FreeSurfer
+.. minified for :code:`recon-all`.
 
 ANTS
 ----
@@ -132,51 +143,59 @@ ANTS
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
-        --ants version=2.3.4 \
+        --base-image debian:bullseye-slim \
+        --ants version=2.4.3 \
     > ants-234.Dockerfile
 
-    docker build --tag ants:2.3.4 --file ants-234.Dockerfile .
+    docker build --tag ants:2.4.3 --file ants-243.Dockerfile .
 
+.. note::
 
+    Building docker images of ANTS from source fails on most tested distributions.
+
+.. https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md#ants
 
 CAT12
 ---
 
-CAT12 requires the MCR in the correction version. Miniconda and nipype is optional but recommended to use CAT12 from NiPype.
+CAT12 requires the MCR in the correction version.
+Miniconda and nipype is optionalbut recommended to use CAT12 from NiPype.
 
 .. code-block:: bash
 
     neurodocker generate docker \
-        --base-image ubuntu:16.04 \
+        --base-image ubuntu:22.04 \
         --pkg-manager apt \
         --mcr 2017b \
-        --cat12 version=r1933_R2017b \
+        --cat12 version=r2166_R2017b \
         --miniconda \
          version=latest \
          conda_install='python=3.8 traits nipype numpy scipy h5py scikit-image' \
-    > cat12-r1933_R2017b.Dockerfile
+    > cat12-r2166_R2017b.Dockerfile
 
-    docker build --tag cat12:r1933_R2017b --file cat12-r1933_R2017b.Dockerfile .
+    docker build --tag cat12:r2166_R2017b --file cat12-r2166_R2017b.Dockerfile .
 
 SPM
 ---
 
-.. note::
-
-    Due to the version of the Matlab Compiler Runtime used, SPM12 should be used with
-    a Debian Stretch base image.
+..     Due to the version of the Matlab Compiler Runtime used,
+..     SPM12 should be used with a Debian Stretch base image.
 
 .. code-block:: bash
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:stretch-slim \
+        --base-image centos:7 \
         --spm12 version=r7771 \
     > spm12-r7771.Dockerfile
 
     docker build --tag spm12:r7771 --file spm12-r7771.Dockerfile .
 
+.. note::
+
+    Building docker images of SPM12 from source fails on most tested distributions.
+
+.. https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md#spm12
 
 Miniconda
 ---------
@@ -187,7 +206,7 @@ Docker with new :code:`conda` environment, python packages installed with :code:
 
     neurodocker generate docker \
         --pkg-manager apt \
-        --base-image debian:buster-slim \
+        --base-image debian:bullseye-slim \
         --miniconda \
             version=latest \
             env_name=env_scipy \

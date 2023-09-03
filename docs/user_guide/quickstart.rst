@@ -20,9 +20,10 @@ This is a file that defines how to build a Docker image.
 
 .. code-block:: bash
 
-    neurodocker generate docker --pkg-manager apt \
-        --base-image neurodebian:buster \
-        --ants version=2.3.4 \
+    neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image neurodebian:bullseye \
+        --ants version=2.4.3 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot
 
@@ -37,9 +38,10 @@ file in an empty directory, and build with :code:`docker build`:
     mkdir docker-example
     cd docker-example
     # saving the output of neurodocker command in a file: Dockerfile
-    neurodocker generate docker --pkg-manager apt \
-        --base-image neurodebian:buster \
-        --ants version=2.3.4 \
+    neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image neurodebian:bullseye \
+        --ants version=2.4.3 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Dockerfile
     # building a new image using the Dockerfile (use --file <dockerfile_name> option if other name is used)
@@ -54,7 +56,10 @@ created in :code:`/work` would be gone after the container was stopped.
 
 .. code-block:: bash
 
-    docker run --rm -it --workdir /work --volume $PWD:/work --publish 8888:8888 \
+    docker run --rm -it \
+        --workdir /work \
+        --volume $PWD:/work \
+        --publish 8888:8888 \
         nipype-ants jupyter-notebook --ip 0.0.0.0 --port 8888
 
 Feel free to create a new notebook and :code:`import nipype`.
@@ -70,9 +75,10 @@ a form of :code:`neurodocker generate` command,  `neurodocker generate singulari
 
 .. code-block:: bash
 
-    neurodocker generate singularity --pkg-manager apt \
-        --base-image neurodebian:buster \
-        --ants version=2.3.4 \
+    neurodocker generate singularity \
+        --pkg-manager apt \
+        --base-image neurodebian:bullseye\
+        --ants version=2.4.3 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot
 
@@ -87,9 +93,10 @@ will not be able to run this on a shared computing environment, like a high perf
     mkdir singularity-example
     cd singularity-example
     # saving the output of the Neurodocker command in the Singularity file
-    neurodocker generate singularity --pkg-manager apt \
-        --base-image neurodebian:buster \
-        --ants version=2.3.4 \
+    neurodocker generate singularity \
+        --pkg-manager apt \
+        --base-image neurodebian:bullseye\
+        --ants version=2.4.3 \
         --miniconda version=latest conda_install="nipype notebook" \
         --user nonroot > Singularity
     # building a new image using the Singularity file
