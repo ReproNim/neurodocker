@@ -54,7 +54,15 @@ jobs:
     steps:
       - name: check workflow inputs
         run: |
-          echo "software_name: ${{ inputs.software_name }}"
+          software_name = ${{ inputs.software_name }}
+          if [ -z "$software_name" ]; then
+            software_name="all"
+          fi
+          if [ "$software_name" = "all" ]; then
+            echo "testing all software"
+          else
+            echo "testing ${software_name}"
+          fi
 
       - uses: actions/checkout@v3
         with:
