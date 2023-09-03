@@ -38,6 +38,12 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      software_name:
+        description: 'software to test'
+        required: true
+        default: 'all'
+
 permissions:
   contents: write
   actions: write
@@ -46,6 +52,18 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: check workflow inputs
+        run: |
+          software_name=${{ inputs.software_name }}
+          if [ -z "$software_name" ]; then
+            software_name="all"
+          fi
+          if [ "$software_name" = "all" ]; then
+            echo "testing all software"
+          else
+            echo "testing ${software_name}"
+          fi
+
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.CI_FLOW }}
@@ -61,7 +79,7 @@ jobs:
       - name: Create workflows
         run: |
           git checkout -b test_docker_build
-          python .github/workflows/create_workflows.py
+          python .github/workflows/create_workflows.py ${software_name}
           ls -l .github/workflows
           git add .
           git config --global user.email "no-reply@repronim.org"

@@ -23,6 +23,7 @@ This requires for you to build the pages from the docs folder
 and on the branch where the workflows are pushed to (currently "test_docker_build").
 
 """
+import argparse
 from pathlib import Path
 
 import yaml  # type: ignore
@@ -48,34 +49,6 @@ version 1.0.0 of afni, add the following to the software dictionary:
         },
 
 """
-software: dict[str, dict[str, list[str]]] = {
-    "afni": {
-        "methods": ["binaries", "source"],
-        "afni_python": ["true", "false"],
-    },
-    "ants": {
-        "methods": ["binaries", "source"],
-    },
-    "cat12": {"methods": ["binaries"]},
-    "convert3d": {"methods": ["binaries"]},
-    "dcm2niix": {
-        "methods": ["binaries", "source"],
-    },
-    "freesurfer": {"methods": []},
-    "fsl": {
-        "methods": ["binaries"],
-    },
-    "matlabmcr": {
-        "methods": ["binaries"],
-    },
-    "mricron": {"methods": ["binaries"]},
-    "mrtrix3": {
-        "methods": ["binaries", "source"],
-    },
-    "spm12": {"methods": ["binaries"]},
-    "miniconda": {},
-}
-
 output_dir = Path(__file__).parent
 
 template_folder = Path(__file__).parents[2].joinpath("neurodocker", "templates")
@@ -89,6 +62,36 @@ branch = "test_docker_build"
 # Update to match your username and repo name if you are testing things on your fork
 # "ReproNim/neurodocker"
 repo = "ReproNim/neurodocker"
+
+
+def software() -> dict[str, dict[str, list[str]]]:
+    return {
+        "afni": {
+            "methods": ["binaries", "source"],
+            "afni_python": ["true", "false"],
+        },
+        "ants": {
+            "methods": ["binaries", "source"],
+        },
+        "cat12": {"methods": ["binaries"]},
+        "convert3d": {"methods": ["binaries"]},
+        "dcm2niix": {
+            "methods": ["binaries", "source"],
+        },
+        "freesurfer": {"methods": []},
+        "fsl": {
+            "methods": ["binaries"],
+        },
+        "matlabmcr": {
+            "methods": ["binaries"],
+        },
+        "mricron": {"methods": ["binaries"]},
+        "mrtrix3": {
+            "methods": ["binaries", "source"],
+        },
+        "spm12": {"methods": ["binaries"]},
+        "miniconda": {},
+    }
 
 
 def create_dashboard_file():
@@ -109,13 +112,13 @@ def create_dashboard_file():
         )
 
         # table of content
-        for software_, _ in software.items():
+        for software_, _ in software().items():
             print(f"""- [{software_}](#{software_})""", file=f)
 
         print("", file=f)
 
         # link to the github actions workflow and image of the build status
-        for software_, _ in software.items():
+        for software_, _ in software().items():
             image_url = f"{image_base_url}&only={software_}"
             print(
                 f"""## {software_}
@@ -142,7 +145,7 @@ def stringify(some_list: list[str]) -> str:
     return "'" + "', '".join(some_list) + "'"
 
 
-def main():
+def main(software_name="all"):
     env = Environment(
         loader=FileSystemLoader(Path(__file__).parent),
         autoescape=select_autoescape(),
@@ -158,7 +161,12 @@ def main():
         "all": stringify(apt_based + yum_based),
     }
 
-    for software_, spec in software.items():
+    # only keep relevant software
+    software_to_test = software()
+    if software_name in software_to_test:
+        software_to_test = {software_name: software_to_test[software_name]}
+
+    for software_, spec in software_to_test.items():
         wf = {
             "header": "# This is file is automatically generated. Do not edit.",
             "os": os,
@@ -193,4 +201,18 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+
+    choices = list(software().keys())
+    choices.append("all")
+
+    parser.add_argument(
+        "--software",
+        required=False,
+        default="all",
+        choices=choices,
+        nargs=1,
+    )
+    args = parser.parse_args()
+
+    main(software_name=args.software[0])
