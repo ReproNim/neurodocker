@@ -2,7 +2,6 @@
 
 [![build status](https://github.com/ReproNim/neurodocker/actions/workflows/pull-request.yml/badge.svg)](https://github.com/ReproNim/neurodocker/actions/workflows/pull-request.yml)
 [![docker pulls](https://img.shields.io/docker/pulls/repronim/neurodocker.svg)](https://hub.docker.com/r/repronim/neurodocker/)
-[![docker pulls](https://img.shields.io/docker/pulls/repronim/neurodocker.svg)](https://hub.docker.com/r/repronim/neurodocker/)
 [![python versions](https://img.shields.io/pypi/pyversions/neurodocker.svg)](https://pypi.org/project/neurodocker/)
 [![DOI](https://zenodo.org/badge/88654995.svg)](https://zenodo.org/badge/latestdoi/88654995)
 
