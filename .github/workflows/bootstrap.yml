@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: check workflow inputs
         run: |
-          software_name = ${{ inputs.software_name }}
+          software_name=${{ inputs.software_name }}
           if [ -z "$software_name" ]; then
             software_name="all"
           fi
