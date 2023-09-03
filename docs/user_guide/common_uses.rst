@@ -55,25 +55,7 @@ Multiple Conda Environments
 
 This example demonstrates how to create a Docker image with multiple conda environments.
 
-.. code-block:: bash
-
-    neurodocker generate docker \
-        --pkg-manager apt \
-        --base-image debian:bullseye-slim \
-        --miniconda \
-            version=latest \
-            env_name=envA \
-            env_exists=false \
-            conda_install=pandas \
-        --miniconda \
-            version=latest \
-            installed=true \
-            env_name=envB \
-            env_exists=false \
-            conda_install=scipy \
-    > multi-conda-env.Dockerfile
-
-    docker build --tag multi-conda-env --file multi-conda-env.Dockerfile .
+.. literalinclude:: common_uses/conda_multiple_env.txt
 
 One can use the image in the following way:
 
