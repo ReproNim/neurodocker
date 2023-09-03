@@ -16,7 +16,9 @@ jobs:
       - name: Install neurodocker
         run: python -m pip install --editable .[docs]
       - name: build docs
-        run: sphinx-build docs docs-build
+        run: |
+          make -C docs cli
+          sphinx-build docs docs-build
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
