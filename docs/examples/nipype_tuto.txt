@@ -8,8 +8,9 @@ neurodocker generate docker \
         --install gcc g++ graphviz tree git-annex vim emacs-nox nano less ncdu tig octave netbase \
         --miniconda \
                 version=latest \
-                conda_install="python=3.11 nipype pybids pytest jupyter jupyterlab jupyter_contrib_nbextensions traits pandas matplotlib scikit-learn scikit-image seaborn nbformat nb_conda" \
-                pip_install="nilearn datalad[full] nipy duecredit nbval" \
+                mamba=true \
+                conda_install="python=3.11 nipype pybids=0.16.3 pytest jupyterlab jupyter_contrib_nbextensions traits scikit-image seaborn nbformat nb_conda" \
+                pip_install="nilearn=0.10.1 datalad[full] nipy duecredit nbval" \
         --run 'jupyter nbextension enable exercise2/main && jupyter nbextension enable spellchecker/main' \
         --run 'mkdir /data && chmod 777 /data && chmod a+s /data' \
         --run 'mkdir /output && chmod 777 /output && chmod a+s /output' \
