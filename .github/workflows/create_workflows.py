@@ -207,7 +207,7 @@ if __name__ == "__main__":
     choices.append("all")
 
     parser.add_argument(
-        "--software",
+        "--software_name",
         required=False,
         default="all",
         choices=choices,
@@ -215,4 +215,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(software_name=args.software[0])
+    main(software_name=args.software_name[0])
