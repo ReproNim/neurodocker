@@ -52,6 +52,17 @@ Docker
         --fsl version=6.0.4 \
     > fsl604.Dockerfile
 
+# This will ask the following question interactively: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s). Proceed? [y/N]
+
+# If you are using neurodocker non-interactively, this problem can be avoided using:
+
+    yes | neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image debian:buster-slim \
+        --fsl version=6.0.4 \
+    > fsl604.Dockerfile
+
+
     docker build --tag fsl:6.0.4 --file fsl604.Dockerfile .
 
     # Run fsl's bet program.
