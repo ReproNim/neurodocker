@@ -56,9 +56,10 @@ Docker
 
 # If you are using neurodocker non-interactively, this problem can be avoided using:
 
-    yes | neurodocker generate docker \
+    neurodocker generate docker \
         --pkg-manager apt \
         --base-image debian:buster-slim \
+        --yes \
         --fsl version=6.0.4 \
     > fsl604.Dockerfile
 
