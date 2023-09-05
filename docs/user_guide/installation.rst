@@ -11,6 +11,14 @@ Docker or Singularity.
 
     docker run --rm repronim/neurodocker:latest --help
 
+Note: Some tools require an interactive input during installation (e.g. FSL). Running the container interactively will allow to answer this question:
+
+.. code-block:: bash
+
+    docker run -i --rm
+
+Alternatively, a singularity container:
+
 .. code-block:: bash
 
     singularity run docker://repronim/neurodocker:latest --help
