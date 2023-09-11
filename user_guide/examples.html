@@ -413,13 +413,20 @@ possible that this will change in the future.</p>
 <span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--fsl<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">6</span>.0.4<span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>fsl604.Dockerfile
-
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>fsl:6.0.4<span class="w"> </span>--file<span class="w"> </span>fsl604.Dockerfile<span class="w"> </span>.
-
-<span class="c1"># Run fsl&#39;s bet program.</span>
-docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>fsl:6.0.4<span class="w"> </span>bet
 </pre></div>
 </div>
+<p># This will ask the following question interactively: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s). Proceed? [y/N]</p>
+<p># If you are using neurodocker non-interactively, this problem can be avoided using:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>neurodocker generate docker </dt><dd><p>–pkg-manager apt –base-image debian:buster-slim –yes –fsl version=6.0.4 </p>
+</dd>
+</dl>
+<p>&gt; fsl604.Dockerfile</p>
+<p>docker build –tag fsl:6.0.4 –file fsl604.Dockerfile .</p>
+<p># Run fsl’s bet program.
+docker run –rm -it fsl:6.0.4 bet</p>
+</div></blockquote>
 </section>
 </section>
 <section id="afni">
