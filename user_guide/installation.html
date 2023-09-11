@@ -387,6 +387,11 @@ Docker or Singularity.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>repronim/neurodocker:latest<span class="w"> </span>--help
 </pre></div>
 </div>
+<p>Note: Some tools require an interactive input during installation (e.g. FSL). This can either be handled using the Neurodocker <cite>–yes</cite> option (see examples -&gt; FSL) or running the container interactively will also allow to answer this question:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-i<span class="w"> </span>--rm
+</pre></div>
+</div>
+<p>Alternatively, a singularity container:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>singularity<span class="w"> </span>run<span class="w"> </span>docker://repronim/neurodocker:latest<span class="w"> </span>--help
 </pre></div>
 </div>
