@@ -22,6 +22,8 @@ binaries:
     - libpng
     - libtiff
   urls:
+    "3.0.4": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.4/conda-linux-mrtrix3-3.0.4-h2bc3f7f_0.tar.bz2
+    "3.0.3": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.3/conda-linux-mrtrix3-3.0.3-h2bc3f7f_0.tar.bz2
     "3.0.2": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.2/conda-linux-mrtrix3-3.0.2-h6bb024c_0.tar.bz2
     "3.0.1": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.1/conda-linux-mrtrix3-3.0.1-h6bb024c_0.tar.bz2
     "3.0.0": https://github.com/MRtrix3/mrtrix3/releases/download/3.0.0/conda-linux-mrtrix3-3.0.0-h6bb024c_0.tar.bz2
@@ -42,7 +44,7 @@ source:
     optional:
       repo: https://github.com/MRtrix3/mrtrix3.git
       install_path: /opt/mrtrix3-{{ self.version }}
-      build_processes: ""
+      build_processes: "1"
   dependencies:
     apt:
     - ca-certificates
