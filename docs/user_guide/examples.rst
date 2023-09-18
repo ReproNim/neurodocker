@@ -237,10 +237,10 @@ Docker with new :code:`conda` environment, python packages installed with :code:
     docker build --tag conda-env --file conda-env.Dockerfile .
 
 
-Nipype tutorial
----------------
+.. Nipype tutorial
+.. ---------------
 
-.. _nipype_tutorial_docker:
+.. .. _nipype_tutorial_docker:
 
 Docker
 ~~~~~~
