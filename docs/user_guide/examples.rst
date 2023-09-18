@@ -154,7 +154,7 @@ ANTS
 
 
 CAT12
----
+-----
 
 CAT12 requires the MCR in the correction version. Miniconda and nipype is optional but recommended to use CAT12 from NiPype.
 
