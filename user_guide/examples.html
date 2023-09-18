@@ -424,13 +424,18 @@ possible that this will change in the future.</p>
 <span id="fsl-docker"></span><h3>Docker<a class="headerlink" href="#docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--fsl<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">6</span>.0.4<span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>fsl604.Dockerfile
+<span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fsl<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">6</span>.0.7.1<span class="w"> </span><span class="se">\</span>
+&gt;<span class="w"> </span>fsl6071.Dockerfile
+
+docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>fsl:6.0.7.1<span class="w"> </span>--file<span class="w"> </span>fsl6071.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-<p># This will ask the following question interactively: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s). Proceed? [y/N]</p>
-<p># If you are using neurodocker non-interactively, this problem can be avoided using:</p>
+<p>This will ask the following question interactively:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>FSL<span class="w"> </span>is<span class="w"> </span>non-free.<span class="w"> </span>If<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>considering<span class="w"> </span>commercial<span class="w"> </span>use<span class="w"> </span>of<span class="w"> </span>FSL,<span class="w"> </span>please<span class="w"> </span>consult<span class="w"> </span>the<span class="w"> </span>relevant<span class="w"> </span>license<span class="o">(</span>s<span class="o">)</span>.<span class="w"> </span>Proceed?<span class="w"> </span><span class="o">[</span>y/N<span class="o">]</span>
+</pre></div>
+</div>
+<p>If you are using neurodocker non-interactively, this problem can be avoided using:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
@@ -452,7 +457,7 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 <span id="id1"></span><h3>Docker<a class="headerlink" href="#afni-docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>fedora:35<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>fedora:36<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--afni<span class="w"> </span><span class="nv">method</span><span class="o">=</span>binaries<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>afni-binaries.Dockerfile
 
@@ -462,41 +467,35 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <p>This does not install AFNI’s R packages. To install relevant R things, use the following:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>fedora:35<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>fedora:36<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--afni<span class="w"> </span><span class="nv">method</span><span class="o">=</span>binaries<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">install_r_pkgs</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>afni-binaries-r.Dockerfile
 
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>afni:latest-with-r<span class="w"> </span>--file<span class="w"> </span>afni-binaries-r.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-<p>One can also build AFNI from source. The code below builds the current master branch.
-Beware that this is AFNI’s bleeding edge!</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>fedora:35<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--afni<span class="w"> </span><span class="nv">method</span><span class="o">=</span><span class="nb">source</span><span class="w"> </span><span class="nv">version</span><span class="o">=</span>master<span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>afni-source.Dockerfile
-
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>afni:master<span class="w"> </span>--file<span class="w"> </span>afni-source.Dockerfile<span class="w"> </span>.
-</pre></div>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Building AFNI from source is currently failing on most tested distributions.</p>
 </div>
 </section>
 </section>
 <section id="freesurfer">
 <h2>FreeSurfer<a class="headerlink" href="#freesurfer" title="Permalink to this heading">#</a></h2>
 <section id="freesurfer-docker">
-<span id="id2"></span><h3>Docker<a class="headerlink" href="#freesurfer-docker" title="Permalink to this heading">#</a></h3>
-<p>The FreeSurfer installation is several gigabytes in size, but sometimes, users just
-the pieces for <code class="code docutils literal notranslate"><span class="pre">recon-all</span></code>. For this reason, Neurodocker provides a FreeSurfer
-minified for <code class="code docutils literal notranslate"><span class="pre">recon-all</span></code>.</p>
+<span id="id3"></span><h3>Docker<a class="headerlink" href="#freesurfer-docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--freesurfer<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.1.1-min<span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>freesurfer7-min.Dockerfile
+<span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--freesurfer<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.4.1<span class="w"> </span><span class="se">\</span>
+&gt;<span class="w"> </span>freesurfer741.Dockerfile
 
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>freesurfer:7.1.1-min<span class="w"> </span>--file<span class="w"> </span>freesurfer7-min.Dockerfile<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>freesurfer:7.4.1<span class="w"> </span>--file<span class="w"> </span>freesurfer741.Dockerfile<span class="w"> </span>.
 </pre></div>
+</div>
+<div class="admonition-todo admonition" id="id4">
+<p class="admonition-title">Todo</p>
+<p>The minified version on Freesurfer currently fails to build on all tested distributions.</p>
 </div>
 </section>
 </section>
@@ -504,46 +503,50 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <h2>ANTS<a class="headerlink" href="#ants" title="Permalink to this heading">#</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.3.4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.4.3<span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>ants-234.Dockerfile
 
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>ants:2.3.4<span class="w"> </span>--file<span class="w"> </span>ants-234.Dockerfile<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>ants:2.4.3<span class="w"> </span>--file<span class="w"> </span>ants-243.Dockerfile<span class="w"> </span>.
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Building docker images of ANTS from source fails on most tested distributions.</p>
 </div>
 </section>
 <section id="cat12">
 <h2>CAT12<a class="headerlink" href="#cat12" title="Permalink to this heading">#</a></h2>
-<p>CAT12 requires the MCR in the correction version. Miniconda and nipype is optional but recommended to use CAT12 from NiPype.</p>
+<p>CAT12 requires the MCR in the correction version.
+Miniconda and nipype is optional but recommended to use CAT12 from NiPype.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>ubuntu:16.04<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>ubuntu:22.04<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--mcr<span class="w"> </span>2017b<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--cat12<span class="w"> </span><span class="nv">version</span><span class="o">=</span>r1933_R2017b<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cat12<span class="w"> </span><span class="nv">version</span><span class="o">=</span>r2166_R2017b<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="se">\</span>
 <span class="w">     </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span><span class="nv">conda_install</span><span class="o">=</span><span class="s1">&#39;python=3.8 traits nipype numpy scipy h5py scikit-image&#39;</span><span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>cat12-r1933_R2017b.Dockerfile
+<span class="w">     </span><span class="nv">conda_install</span><span class="o">=</span><span class="s1">&#39;python=3.11 traits nipype numpy scipy h5py scikit-image&#39;</span><span class="w"> </span><span class="se">\</span>
+&gt;<span class="w"> </span>cat12-r2166_R2017b.Dockerfile
 
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>cat12:r1933_R2017b<span class="w"> </span>--file<span class="w"> </span>cat12-r1933_R2017b.Dockerfile<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>cat12:r2166_R2017b<span class="w"> </span>--file<span class="w"> </span>cat12-r2166_R2017b.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
 <section id="spm">
 <h2>SPM<a class="headerlink" href="#spm" title="Permalink to this heading">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Due to the version of the Matlab Compiler Runtime used, SPM12 should be used with
-a Debian Stretch base image.</p>
-</div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:stretch-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>centos:7<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--spm12<span class="w"> </span><span class="nv">version</span><span class="o">=</span>r7771<span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>spm12-r7771.Dockerfile
 
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>spm12:r7771<span class="w"> </span>--file<span class="w"> </span>spm12-r7771.Dockerfile<span class="w"> </span>.
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Building docker images of SPM12 from source fails on most tested distributions.</p>
 </div>
 </section>
 <section id="miniconda">
@@ -551,7 +554,7 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <p>Docker with new <code class="code docutils literal notranslate"><span class="pre">conda</span></code> environment, python packages installed with <code class="code docutils literal notranslate"><span class="pre">conda</span></code> and <code class="code docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="se">\</span>
 <span class="w">        </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
 <span class="w">        </span><span class="nv">env_name</span><span class="o">=</span>env_scipy<span class="w"> </span><span class="se">\</span>
@@ -563,53 +566,8 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>conda-env<span class="w"> </span>--file<span class="w"> </span>conda-env.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-</section>
-<section id="nipype-tutorial">
-<h2>Nipype tutorial<a class="headerlink" href="#nipype-tutorial" title="Permalink to this heading">#</a></h2>
-<section id="nipype-tutorial-docker">
-<span id="id3"></span><h3>Docker<a class="headerlink" href="#nipype-tutorial-docker" title="Permalink to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
---pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
---base-image<span class="w"> </span>neurodebian:stretch-non-free<span class="w"> </span><span class="se">\</span>
---arg<span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive<span class="w"> </span><span class="se">\</span>
---install<span class="w"> </span>convert3d<span class="w"> </span>ants<span class="w"> </span>fsl<span class="w"> </span>gcc<span class="w"> </span>g++<span class="w"> </span>graphviz<span class="w"> </span>tree<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span>git-annex-standalone<span class="w"> </span>vim<span class="w"> </span>emacs-nox<span class="w"> </span>nano<span class="w"> </span>less<span class="w"> </span>ncdu<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span>tig<span class="w"> </span>git-annex-remote-rclone<span class="w"> </span>octave<span class="w"> </span>netbase<span class="w"> </span><span class="se">\</span>
---spm12<span class="w"> </span><span class="nv">version</span><span class="o">=</span>r7771<span class="w"> </span><span class="se">\</span>
---miniconda<span class="w"> </span><span class="se">\</span>
-<span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
-<span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;python=3.8 pytest jupyter jupyterlab jupyter_contrib_nbextensions</span>
-<span class="s2">                traits pandas matplotlib scikit-learn scikit-image seaborn nbformat</span>
-<span class="s2">                nb_conda&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="nv">pip_install</span><span class="o">=</span><span class="s2">&quot;https://github.com/nipy/nipype/tarball/master</span>
-<span class="s2">                https://github.com/INCF/pybids/tarball/master</span>
-<span class="s2">                nilearn datalad[full] nipy duecredit nbval&quot;</span><span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;jupyter nbextension enable exercise2/main &amp;&amp; jupyter nbextension enable spellchecker/main&#39;</span><span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;mkdir /data &amp;&amp; chmod 777 /data &amp;&amp; chmod a+s /data&#39;</span><span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;mkdir /output &amp;&amp; chmod 777 /output &amp;&amp; chmod a+s /output&#39;</span><span class="w"> </span><span class="se">\</span>
---user<span class="w"> </span>neuro<span class="w"> </span><span class="se">\</span>
---run-bash<span class="w"> </span><span class="s1">&#39;cd /data</span>
-<span class="s1">&amp;&amp; datalad install -r ///workshops/nih-2017/ds000114</span>
-<span class="s1">&amp;&amp; cd ds000114</span>
-<span class="s1">&amp;&amp; datalad update -r</span>
-<span class="s1">&amp;&amp; datalad get -r sub-01/ses-test/anat sub-01/ses-test/func/*fingerfootlips*&#39;</span><span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;curl -fL https://files.osf.io/v1/resources/fvuh8/providers/osfstorage/580705089ad5a101f17944a9 -o /data/ds000114/derivatives/fmriprep/mni_icbm152_nlin_asym_09c.tar.gz</span>
-<span class="s1">&amp;&amp; tar xf /data/ds000114/derivatives/fmriprep/mni_icbm152_nlin_asym_09c.tar.gz -C /data/ds000114/derivatives/fmriprep/.</span>
-<span class="s1">&amp;&amp; rm /data/ds000114/derivatives/fmriprep/mni_icbm152_nlin_asym_09c.tar.gz</span>
-<span class="s1">&amp;&amp; find /data/ds000114/derivatives/fmriprep/mni_icbm152_nlin_asym_09c -type f -not -name ?mm_T1.nii.gz -not -name ?mm_brainmask.nii.gz -not -name ?mm_tpm*.nii.gz -delete&#39;</span><span class="w"> </span><span class="se">\</span>
---copy<span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;/home/neuro/nipype_tutorial&quot;</span><span class="w"> </span><span class="se">\</span>
---user<span class="w"> </span>root<span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;chown -R neuro /home/neuro/nipype_tutorial&#39;</span><span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;rm -rf /opt/conda/pkgs/*&#39;</span><span class="w"> </span><span class="se">\</span>
---user<span class="w"> </span>neuro<span class="w"> </span><span class="se">\</span>
---run<span class="w"> </span><span class="s1">&#39;mkdir -p ~/.jupyter &amp;&amp; echo c.NotebookApp.ip = \&quot;0.0.0.0\&quot; &gt; ~/.jupyter/jupyter_notebook_config.py&#39;</span><span class="w"> </span><span class="se">\</span>
---workdir<span class="w"> </span>/home/neuro/nipype_tutorial<span class="w"> </span><span class="se">\</span>
---entrypoint<span class="w"> </span>jupyter-notebook<span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>nipype-tutorial.Dockerfile
-
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>nipype-tutorial<span class="w"> </span>.
-</pre></div>
-</div>
+<section id="id5">
+<h3>Docker<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 </section>
 </section>
 </section>
@@ -672,9 +630,8 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ants">ANTS</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cat12">CAT12</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spm">SPM</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#miniconda">Miniconda</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nipype-tutorial">Nipype tutorial</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nipype-tutorial-docker">Docker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#miniconda">Miniconda</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Docker</a></li>
 </ul>
 </li>
 </ul>

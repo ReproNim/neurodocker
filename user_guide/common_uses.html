@@ -420,7 +420,7 @@ after you exit the Docker image.</p>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="se">\</span>
 <span class="w">        </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
 <span class="w">        </span><span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;matplotlib notebook numpy pandas seaborn&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -433,7 +433,9 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 
 <span class="c1"># Run the image. The current directory is mounted to the working directory of the</span>
 <span class="c1"># Docker image, so our notebooks are saved to the current directory.</span>
-docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>--publish<span class="w"> </span><span class="m">8888</span>:8888<span class="w"> </span>--volume<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/work<span class="w"> </span>notebook<span class="w"> </span><span class="se">\</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--publish<span class="w"> </span><span class="m">8888</span>:8888<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--volume<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/work<span class="w"> </span>notebook<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>jupyter-notebook<span class="w"> </span>--no-browser<span class="w"> </span>--ip<span class="w"> </span><span class="m">0</span>.0.0.0
 </pre></div>
 </div>
@@ -441,25 +443,6 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 <section id="multiple-conda-environments">
 <h2>Multiple Conda Environments<a class="headerlink" href="#multiple-conda-environments" title="Permalink to this heading">#</a></h2>
 <p>This example demonstrates how to create a Docker image with multiple conda environments.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>debian:buster-slim<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--miniconda<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">env_name</span><span class="o">=</span>envA<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">env_exists</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">conda_install</span><span class="o">=</span>pandas<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--miniconda<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">installed</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">env_name</span><span class="o">=</span>envB<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">env_exists</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
-<span class="w">        </span><span class="nv">conda_install</span><span class="o">=</span>scipy<span class="w"> </span><span class="se">\</span>
-&gt;<span class="w"> </span>multi-conda-env.Dockerfile
-
-docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>multi-conda-env<span class="w"> </span>--file<span class="w"> </span>multi-conda-env.Dockerfile<span class="w"> </span>.
-</pre></div>
-</div>
 <p>One can use the image in the following way:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>multi-conda-env<span class="w"> </span>bash
 <span class="c1"># Pandas is installed in envA.</span>

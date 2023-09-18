@@ -405,9 +405,10 @@ we generate containers with <a class="reference external" href="https://nipype.r
 <p>Run the following code snippet to generate a <a class="reference external" href="https://docs.docker.com/engine/reference/builder/">Dockerfile</a>.
 This is a file that defines how to build a Docker image.</p>
 <p><strong>This requires having `Docker &lt;https://docs.docker.com/get-docker/&gt;`_ installed first</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:buster<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.3.4<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:bullseye<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.4.3<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;nipype notebook&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--user<span class="w"> </span>nonroot
 </pre></div>
@@ -420,9 +421,10 @@ file in an empty directory, and build with <code class="code docutils literal no
 mkdir<span class="w"> </span>docker-example
 <span class="nb">cd</span><span class="w"> </span>docker-example
 <span class="c1"># saving the output of neurodocker command in a file: Dockerfile</span>
-neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:buster<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.3.4<span class="w"> </span><span class="se">\</span>
+neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:bullseye<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.4.3<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;nipype notebook&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--user<span class="w"> </span>nonroot<span class="w"> </span>&gt;<span class="w"> </span>Dockerfile
 <span class="c1"># building a new image using the Dockerfile (use --file &lt;dockerfile_name&gt; option if other name is used)</span>
@@ -435,7 +437,10 @@ the current working directory to <code class="code docutils literal notranslate"
 create in this directory are saved. If we had not mounted this directory, all of the files
 created in <code class="code docutils literal notranslate"><span class="pre">/work</span></code> would be gone after the container was stopped.
 :code: <cite>–publish 8888:8888</cite> and :code: <cite>–ip 0.0.0.0 –port 8888</cite> is required in order to use Jupyter Notebook from a Docker container.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>--workdir<span class="w"> </span>/work<span class="w"> </span>--volume<span class="w"> </span><span class="nv">$PWD</span>:/work<span class="w"> </span>--publish<span class="w"> </span><span class="m">8888</span>:8888<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--workdir<span class="w"> </span>/work<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--volume<span class="w"> </span><span class="nv">$PWD</span>:/work<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--publish<span class="w"> </span><span class="m">8888</span>:8888<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>nipype-ants<span class="w"> </span>jupyter-notebook<span class="w"> </span>--ip<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="w"> </span><span class="m">8888</span>
 </pre></div>
 </div>
@@ -447,9 +452,10 @@ created in <code class="code docutils literal notranslate"><span class="pre">/wo
 <a class="reference external" href="https://sylabs.io/guides/3.7/user-guide/definition_files.html">Singularity definition file</a> (the file that is used to create a Singularity container) is in
 a form of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span></code> command,  <cite>neurodocker generate singularity</cite> has to be used instead of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span> <span class="pre">docker</span></code>.</p>
 <p><strong>This requires having `Singularity &lt;https://sylabs.io/guides/3.7/user-guide/quick_start.html&gt;`_ installed first.</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>singularity<span class="w"> </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:buster<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.3.4<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>singularity<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:bullseye<span class="se">\</span>
+<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.4.3<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;nipype notebook&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--user<span class="w"> </span>nonroot
 </pre></div>
@@ -462,9 +468,10 @@ will not be able to run this on a shared computing environment, like a high perf
 mkdir<span class="w"> </span>singularity-example
 <span class="nb">cd</span><span class="w"> </span>singularity-example
 <span class="c1"># saving the output of the Neurodocker command in the Singularity file</span>
-neurodocker<span class="w"> </span>generate<span class="w"> </span>singularity<span class="w"> </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:buster<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.3.4<span class="w"> </span><span class="se">\</span>
+neurodocker<span class="w"> </span>generate<span class="w"> </span>singularity<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>neurodebian:bullseye<span class="se">\</span>
+<span class="w">    </span>--ants<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">2</span>.4.3<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--miniconda<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">conda_install</span><span class="o">=</span><span class="s2">&quot;nipype notebook&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--user<span class="w"> </span>nonroot<span class="w"> </span>&gt;<span class="w"> </span>Singularity
 <span class="c1"># building a new image using the Singularity file</span>
