@@ -1,0 +1,17 @@
+neurodocker generate docker \
+    --pkg-manager apt \
+    --base-image debian:bullseye-slim \
+    --miniconda \
+        version=latest \
+        env_name=envA \
+        env_exists=false \
+        conda_install=pandas \
+    --miniconda \
+        version=latest \
+        installed=true \
+        env_name=envB \
+        env_exists=false \
+        conda_install=scipy \
+> multi-conda-env.Dockerfile
+
+docker build --tag multi-conda-env --file multi-conda-env.Dockerfile .
