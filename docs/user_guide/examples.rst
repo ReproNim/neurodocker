@@ -54,8 +54,27 @@ Docker
 
     docker build --tag fsl:6.0.7.1 --file fsl6071.Dockerfile .
 
+This will ask the following question interactively:
+
+.. code-block:: bash
+
+    FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s). Proceed? [y/N]
+
+If you are using neurodocker non-interactively, this problem can be avoided using:
+
+.. code-block:: bash
+
+    neurodocker generate docker \
+        --pkg-manager apt \
+        --base-image debian:buster-slim \
+        --yes \
+        --fsl version=6.0.4 \
+    > fsl604.Dockerfile
+
+    docker build --tag fsl:6.0.4 --file fsl604.Dockerfile .
+
     # Run fsl's bet program.
-    docker run --rm -it fsl:6.0.7.1 bet
+    docker run --rm -it fsl:6.0.4 bet
 
 AFNI
 ----
@@ -156,7 +175,7 @@ ANTS
 .. https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md#ants
 
 CAT12
----
+-----
 
 CAT12 requires the MCR in the correction version.
 Miniconda and nipype is optional but recommended to use CAT12 from NiPype.
