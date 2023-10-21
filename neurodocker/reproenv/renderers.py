@@ -8,22 +8,21 @@ import json
 import os
 import pathlib
 import types
-import typing as ty
+from typing import Callable, Mapping, NoReturn, Optional, Union
 
 import jinja2
 
-from neurodocker.reproenv.exceptions import RendererError
-from neurodocker.reproenv.exceptions import TemplateError
-from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.state import _validate_renderer
-from neurodocker.reproenv.template import _BaseInstallationTemplate
-from neurodocker.reproenv.template import Template
-from neurodocker.reproenv.types import _SingularityHeaderType
-from neurodocker.reproenv.types import REPROENV_SPEC_FILE_IN_CONTAINER
-from neurodocker.reproenv.types import allowed_pkg_managers
-from neurodocker.reproenv.types import allowed_installation_methods
-from neurodocker.reproenv.types import installation_methods_type
-from neurodocker.reproenv.types import pkg_managers_type
+from neurodocker.reproenv.exceptions import RendererError, TemplateError
+from neurodocker.reproenv.state import _TemplateRegistry, _validate_renderer
+from neurodocker.reproenv.template import Template, _BaseInstallationTemplate
+from neurodocker.reproenv.types import (
+    REPROENV_SPEC_FILE_IN_CONTAINER,
+    _SingularityHeaderType,
+    allowed_installation_methods,
+    allowed_pkg_managers,
+    installation_methods_type,
+    pkg_managers_type,
+)
 
 # All jinja2 templates are instantiated from this environment object. It is
 # configured to dislike undefined attributes. For example, if a template is
@@ -35,7 +34,7 @@ _jinja_env = jinja2.Environment(undefined=jinja2.StrictUndefined)
 # template.
 
 
-def _raise_helper(msg: str) -> ty.NoReturn:
+def _raise_helper(msg: str) -> NoReturn:
     raise RendererError(msg)
 
 
@@ -44,13 +43,13 @@ _jinja_env.globals["raise"] = _raise_helper
 # TODO: add a flag that avoids buggy behavior when basing a new container on
 # one created with ReproEnv.
 
-PathType = ty.Union[str, pathlib.Path, os.PathLike]
+PathType = Union[str, pathlib.Path, os.PathLike]
 
 
 def _render_string_from_template(
     source: str, template: _BaseInstallationTemplate
 ) -> str:
-    """Take a string from a template and render """
+    """Take a string from a template and render"""
     # TODO: we could use a while loop or recursive function to render the template until
     # there are no jinja-specific things. At this point, we support one level of
     # nesting.
@@ -87,7 +86,7 @@ def _render_string_from_template(
     return source
 
 
-def _log_instruction(func: ty.Callable):
+def _log_instruction(func: Callable):
     """Decorator that logs instructions passed to a Renderer.
 
     This adds the logs to the `_instructions` attribute of the Renderer instance.
@@ -132,7 +131,7 @@ def _log_instruction(func: ty.Callable):
 
 class _Renderer:
     def __init__(
-        self, pkg_manager: pkg_managers_type, users: ty.Optional[ty.Set[str]] = None
+        self, pkg_manager: pkg_managers_type, users: Optional[set[str]] = None
     ) -> None:
         if pkg_manager not in allowed_pkg_managers:
             raise RendererError(
@@ -146,7 +145,7 @@ class _Renderer:
         # specification to JSON, because if we are not root, we can change to root,
         # write the file, and return to whichever user we were.
         self._current_user = "root"
-        self._instructions: ty.Mapping = {
+        self._instructions: Mapping = {
             "pkg_manager": self.pkg_manager,
             "existing_users": list(self._users),
             "instructions": [],
@@ -179,11 +178,11 @@ class _Renderer:
         return f"{masthead}\n\n{image_spec}"
 
     @property
-    def users(self) -> ty.Set[str]:
+    def users(self) -> set[str]:
         return self._users
 
     @classmethod
-    def from_dict(cls, d: ty.Mapping) -> _Renderer:
+    def from_dict(cls, d: Mapping) -> _Renderer:
         """Instantiate a new renderer from a dictionary of instructions."""
         # raise error if invalid
         _validate_renderer(d)
@@ -275,7 +274,7 @@ class _Renderer:
 
         # Add environment (render any jinja templates).
         if template_method.env:
-            d: ty.Mapping[str, str] = {
+            d: Mapping[str, str] = {
                 _render_string_from_template(
                     k, template_method
                 ): _render_string_from_template(v, template_method)
@@ -286,7 +285,7 @@ class _Renderer:
         # Patch the `template_method.install_dependencies` instance method so it can be
         # used (ie rendered) in a template and have access to the pkg_manager requested.
         def install_patch(
-            inner_self: _BaseInstallationTemplate, pkgs: ty.List[str], opts: str = None
+            inner_self: _BaseInstallationTemplate, pkgs: list[str], opts: str = None
         ) -> str:
             return _install(pkgs=pkgs, pkg_manager=self.pkg_manager)
 
@@ -339,7 +338,6 @@ class _Renderer:
     def add_registered_template(
         self, name: str, method: installation_methods_type = None, **kwds
     ) -> _Renderer:
-
         # Template was validated at registration time.
         template_dict = _TemplateRegistry.get(name)
 
@@ -371,25 +369,31 @@ class _Renderer:
 
     def copy(
         self,
-        source: ty.Union[PathType, ty.List[PathType]],
-        destination: ty.Union[PathType, ty.List[PathType]],
+        source: PathType | list[PathType],
+        destination: PathType | list[PathType],
     ) -> _Renderer:
         raise NotImplementedError()
 
     def env(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
 
-    def entrypoint(self, args: ty.List[str]) -> _Renderer:
+    def entrypoint(self, args: list[str]) -> _Renderer:
         raise NotImplementedError()
 
     def from_(self, base_image: str) -> _Renderer:
         raise NotImplementedError()
 
-    def install(self, pkgs: ty.List[str], opts: str = None) -> _Renderer:
+    def install(self, pkgs: list[str], opts: str = None) -> _Renderer:
         raise NotImplementedError()
 
     def label(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
+
+    def labels(self, labels_dict: dict) -> _Renderer:
+        """Adds a set of labels to the dockerfile from a dict. This permits
+        labels that can include special chars (e.g. '.')."""
+        self.label(**labels_dict)
+        return self
 
     def run(self, command: str) -> _Renderer:
         raise NotImplementedError()
@@ -425,16 +429,16 @@ class _Renderer:
         j = " \\\n".join(j.splitlines())
         # Escape the % characters so printf does not interpret them as delimiters.
         j = j.replace("%", "%%")
+        # Escape single quotes with '"'"'
+        j = j.replace("'", "'\"'\"'")
         cmd = f"printf '{j}' > {REPROENV_SPEC_FILE_IN_CONTAINER}"
         return cmd
 
 
 class DockerRenderer(_Renderer):
-    def __init__(
-        self, pkg_manager: pkg_managers_type, users: ty.Set[str] = None
-    ) -> None:
+    def __init__(self, pkg_manager: pkg_managers_type, users: set[str] = None) -> None:
         super().__init__(pkg_manager=pkg_manager, users=users)
-        self._parts: ty.List[str] = []
+        self._parts: list[str] = []
 
     def render(self) -> str:
         """Return the rendered Dockerfile."""
@@ -461,7 +465,7 @@ class DockerRenderer(_Renderer):
     @_log_instruction
     def copy(
         self,
-        source: ty.Union[PathType, ty.List[PathType]],
+        source: PathType | list[PathType],
         destination: PathType,
         from_: str = None,
         chown: str = None,
@@ -488,7 +492,7 @@ class DockerRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def entrypoint(self, args: ty.List[str]) -> DockerRenderer:
+    def entrypoint(self, args: list[str]) -> DockerRenderer:
         s = 'ENTRYPOINT ["{}"]'.format('", "'.join(args))
         self._parts.append(s)
         return self
@@ -504,7 +508,7 @@ class DockerRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def install(self, pkgs: ty.List[str], opts=None) -> DockerRenderer:
+    def install(self, pkgs: list[str], opts=None) -> DockerRenderer:
         """Install system packages."""
         command = _install(pkgs, pkg_manager=self.pkg_manager, opts=opts)
         command = _indent_run_instruction(command)
@@ -557,18 +561,18 @@ class DockerRenderer(_Renderer):
 
 class SingularityRenderer(_Renderer):
     def __init__(
-        self, pkg_manager: pkg_managers_type, users: ty.Optional[ty.Set[str]] = None
+        self, pkg_manager: pkg_managers_type, users: Optional[set[str]] = None
     ) -> None:
         super().__init__(pkg_manager=pkg_manager, users=users)
 
         self._header: _SingularityHeaderType = {}
-        # The '%setup' section is intentionally ommitted.
-        self._files: ty.List[str] = []
-        self._environment: ty.List[ty.Tuple[str, str]] = []
-        self._post: ty.List[str] = []
+        # The '%setup' section is intentionally omitted.
+        self._files: list[str] = []
+        self._environment: list[tuple[str, str]] = []
+        self._post: list[str] = []
         self._runscript = ""
         # TODO: is it OK to use a dict here? Labels could be overwritten.
-        self._labels: ty.Dict[str, str] = {}
+        self._labels: dict[str, str] = {}
 
     def render(self) -> str:
         s = ""
@@ -610,9 +614,9 @@ class SingularityRenderer(_Renderer):
 
         # Add labels.
         if self._labels:
-            s += "\n\n%labels\n"
+            s += "\n\n%labels"
             for kv in self._labels.items():
-                s += " ".join(kv)
+                s += "\n" + " ".join(kv)
 
         return s
 
@@ -627,7 +631,7 @@ class SingularityRenderer(_Renderer):
     @_log_instruction
     def copy(
         self,
-        source: ty.Union[PathType, ty.List[PathType]],
+        source: PathType | list[PathType],
         destination: PathType,
     ) -> SingularityRenderer:
         if not isinstance(source, (list, tuple)):
@@ -643,7 +647,7 @@ class SingularityRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def entrypoint(self, args: ty.List[str]) -> SingularityRenderer:
+    def entrypoint(self, args: list[str]) -> SingularityRenderer:
         self._runscript = " ".join(args)
         return self
 
@@ -665,7 +669,7 @@ class SingularityRenderer(_Renderer):
         return self
 
     @_log_instruction
-    def install(self, pkgs: ty.List[str], opts=None) -> SingularityRenderer:
+    def install(self, pkgs: list[str], opts=None) -> SingularityRenderer:
         """Install system packages."""
         command = _install(pkgs, pkg_manager=self.pkg_manager, opts=opts)
         self.run(command)
@@ -709,6 +713,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
     lines = string.splitlines()
     for ii, line in enumerate(lines):
         line = line.rstrip()
+        if not line:
+            continue
         is_last_line = ii == len(lines) - 1
         already_cont = line.startswith(("&&", "&", "||", "|", "fi"))
         is_comment = line.startswith("#")
@@ -726,7 +732,7 @@ def _indent_run_instruction(string: str, indent=4) -> str:
     return "\n".join(out)
 
 
-def _install(pkgs: ty.List[str], pkg_manager: str, opts: str = None) -> str:
+def _install(pkgs: list[str], pkg_manager: str, opts: str = None) -> str:
     if pkg_manager == "apt":
         return _apt_install(pkgs, opts)
     elif pkg_manager == "yum":
@@ -736,7 +742,7 @@ def _install(pkgs: ty.List[str], pkg_manager: str, opts: str = None) -> str:
         raise RendererError(f"Unknown package manager '{pkg_manager}'.")
 
 
-def _apt_install(pkgs: ty.List[str], opts: str = None, sort=True) -> str:
+def _apt_install(pkgs: list[str], opts: str = None, sort=True) -> str:
     """Return command to install deb packages with `apt-get` (Debian-based distros).
 
     `opts` are options passed to `yum install`. Default is "-q --no-install-recommends".
@@ -754,7 +760,7 @@ rm -rf /var/lib/apt/lists/*
     return s.strip()
 
 
-def _apt_install_debs(urls: ty.List[str], opts: str = None, sort=True) -> str:
+def _apt_install_debs(urls: list[str], opts: str = None, sort=True) -> str:
     """Return command to install deb packages with `apt-get` (Debian-based distros).
 
     `opts` are options passed to `yum install`. Default is "-q".
@@ -778,7 +784,7 @@ rm -rf /var/lib/apt/lists/*"""
     return s
 
 
-def _yum_install(pkgs: ty.List[str], opts: str = None, sort=True) -> str:
+def _yum_install(pkgs: list[str], opts: str = None, sort=True) -> str:
     """Return command to install packages with `yum` (CentOS, Fedora).
 
     `opts` are options passed to `yum install`. Default is "-q".

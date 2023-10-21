@@ -1,0 +1,43 @@
+name: Auto-release on PR merge
+
+on:
+  # ATM, this is the closest trigger to a PR merging
+  push:
+    branches:
+      - master
+
+env:
+  AUTO_VERSION: v10.37.6
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare repository
+        # Fetch full git history and tags
+        run: git fetch --unshallow --tags
+
+      - name: Unset header
+        # checkout@v2 adds a header that makes branch protection report errors
+        # because the Github action bot is not a collaborator on the repo
+        run: git config --local --unset http.https://github.com/.extraheader
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Download auto
+        run: |
+          auto_download_url="$(curl -fsSL https://api.github.com/repos/intuit/auto/releases/tags/$AUTO_VERSION | jq -r '.assets[] | select(.name == "auto-linux.gz") | .browser_download_url')"
+          wget -O- "$auto_download_url" | gunzip > ~/auto
+          chmod a+x ~/auto
+
+      - name: Create release
+        run: |
+          ~/auto shipit -vv
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_USER_TOKEN }}

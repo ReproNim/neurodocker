@@ -5,20 +5,26 @@
 
 # TODO: add a dedicated class for key=value in the eat-all class.
 
+from __future__ import annotations
+
 import json as json_lib
-from pathlib import Path
 import sys
-import typing as ty
+from pathlib import Path
+from typing import IO, Any, Optional, Type, cast
 
 import click
 
-from neurodocker.reproenv.renderers import _Renderer
-from neurodocker.reproenv.renderers import DockerRenderer
-from neurodocker.reproenv.renderers import SingularityRenderer
-from neurodocker.reproenv.state import get_template
-from neurodocker.reproenv.state import register_template
-from neurodocker.reproenv.state import registered_templates
-from neurodocker.reproenv.state import registered_templates_items
+from neurodocker.reproenv.renderers import (
+    DockerRenderer,
+    SingularityRenderer,
+    _Renderer,
+)
+from neurodocker.reproenv.state import (
+    get_template,
+    register_template,
+    registered_templates,
+    registered_templates_items,
+)
 from neurodocker.reproenv.template import Template
 from neurodocker.reproenv.types import allowed_pkg_managers
 
@@ -44,15 +50,15 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
             )
         ]
 
-    def get_command(self, ctx: click.Context, name: str) -> ty.Optional[click.Command]:
+    def get_command(self, ctx: click.Context, name: str) -> Optional[click.Command]:
         command = self.commands.get(name)
         if command is None:
             return command  # return immediately to error can be logged
 
         # This is only set if a subcommand is called. Calling --help on the group
         # does not set --template-path.
-        template_path: ty.Tuple[str] = ctx.params.get("template_path", tuple())
-        yamls: ty.List[Path] = []
+        template_path: tuple[str] = ctx.params.get("template_path", tuple())
+        yamls: list[Path] = []
         for p in template_path:
             path = Path(p)
             for pattern in ("*.yaml", "*.yml"):
@@ -61,7 +67,7 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
         for path in yamls:
             _ = register_template(path)
 
-        params: ty.List[click.Parameter] = [
+        params: list[click.Parameter] = [
             click.Option(
                 ["-p", "--pkg-manager"],
                 type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
@@ -82,11 +88,11 @@ class OrderedParamsCommand(click.Command):
     parameters.
     """
 
-    def parse_args(self, ctx: click.Context, args: ty.List[str]):
-        self._options: ty.List[ty.Tuple[click.Parameter, ty.Any]] = []
+    def parse_args(self, ctx: click.Context, args: list[str]):
+        self._options: list[tuple[click.Parameter, Any]] = []
         # run the parser for ourselves to preserve the passed order
         parser = self.make_parser(ctx)
-        param_order: ty.List[click.Parameter]
+        param_order: list[click.Parameter]
         opts, _, param_order = parser.parse_args(args=list(args))
         for param in param_order:
             # We need the parameter name... so if it's None, let's panic.
@@ -122,11 +128,16 @@ class OptionEatAll(click.Option):
         nargs = kwargs.pop("nargs", -1)
         assert nargs == -1, "nargs, if set, must be -1 not {}".format(nargs)
         super(OptionEatAll, self).__init__(*args, **kwargs)
+        if self.type is click.STRING:
+            raise ValueError(
+                "in the current implementation of OptionEatAll, `type` cannot be a"
+                " string."
+            )
         self._previous_parser_process = None
         self._eat_all_parser = None
 
     def add_to_parser(self, parser, ctx):
-        def parser_process(value, state):
+        def parser_process(value, state: click.parser.ParsingState):
             # method to hook to the parser.process
             done = False
             value = [value]
@@ -138,7 +149,6 @@ class OptionEatAll(click.Option):
                 if not done:
                     value.append(state.rargs.pop(0))
             value = tuple(value)
-
             # call the actual process
             self._previous_parser_process(value, state)
 
@@ -178,8 +188,8 @@ class KeyValuePair(click.ParamType):
             return fn(value)
 
 
-def _get_common_renderer_params() -> ty.List[click.Parameter]:
-    params: ty.List[click.Parameter] = [
+def _get_common_renderer_params() -> list[click.Parameter]:
+    params: list[click.Parameter] = [
         click.Option(
             ["-p", "--pkg-manager"],
             type=click.Choice(list(allowed_pkg_managers), case_sensitive=False),
@@ -202,6 +212,7 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--copy"],
             multiple=True,
+            type=tuple,
             help=(
                 "Copy files into the container. Provide at least two paths."
                 " The last path is always the destination path in the container."
@@ -216,11 +227,13 @@ def _get_common_renderer_params() -> ty.List[click.Parameter]:
         OptionEatAll(
             ["--entrypoint"],
             multiple=True,
+            type=tuple,
             help="Set entrypoint of the container",
         ),
         OptionEatAll(
             ["--install"],
             multiple=True,
+            type=tuple,
             help="Install packages with system package manager",
         ),
         OptionEatAll(
@@ -279,9 +292,9 @@ def _create_help_for_template(template: Template) -> str:
     return h
 
 
-def _get_params_for_registered_templates() -> ty.List[click.Parameter]:
+def _get_params_for_registered_templates() -> list[click.Parameter]:
     """Return list of click parameters for registered templates."""
-    params: ty.List[click.Parameter] = []
+    params: list[click.Parameter] = []
     names_tmpls = list(registered_templates_items())
     names_tmpls.sort(key=lambda r: r[0])  # sort by name
     for name, tmpl in names_tmpls:
@@ -297,7 +310,7 @@ def _params_to_renderer_dict(ctx: click.Context, pkg_manager) -> dict:
     """Return dictionary compatible with compatible with `_Renderer.from_dict()`."""
     renderer_dict = {"pkg_manager": pkg_manager, "instructions": []}
     cmd = ctx.command
-    cmd = ty.cast(OrderedParamsCommand, cmd)
+    cmd = cast(OrderedParamsCommand, cmd)
     for param, value in cmd._options:
         d = _get_instruction_for_param(ctx=ctx, param=param, value=value)
         # TODO: what happens if `d is None`?
@@ -308,21 +321,23 @@ def _params_to_renderer_dict(ctx: click.Context, pkg_manager) -> dict:
     return renderer_dict
 
 
-def _get_instruction_for_param(
-    ctx: click.Context, param: click.Parameter, value: ty.Any
-):
+def _get_instruction_for_param(ctx: click.Context, param: click.Parameter, value: Any):
     # TODO: clean this up.
     d = None
     if param.name == "from_":
         d = {"name": param.name, "kwds": {"base_image": value}}
     # arg
     elif param.name == "arg":
-        assert len(value) == 2, "expected key=value pair for --arg"
+        if len(value) != 2:
+            raise click.ClickException("expected key=value pair for --arg")
         k, v = value
         d = {"name": param.name, "kwds": {"key": k, "value": v}}
     # copy
     elif param.name == "copy":
-        assert len(value) > 1, "expected at least two values for --copy"
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        if len(value) < 2:
+            raise click.ClickException("expected at least two values for --copy")
         source, destination = list(value[:-1]), value[-1]
         d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
     # env
@@ -331,11 +346,12 @@ def _get_instruction_for_param(
         d = {"name": param.name, "kwds": {**value}}
     # entrypoint
     elif param.name == "entrypoint":
-        if isinstance(value, str):
-            value = [value]
-        else:
-            value = list(value)
-        d = {"name": param.name, "kwds": {"args": value}}
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        value_spl = []
+        for el in value:
+            value_spl += el.split()
+        d = {"name": param.name, "kwds": {"args": value_spl}}
     # install
     elif param.name == "install":
         opts = None
@@ -399,7 +415,7 @@ def generate(*, template_path):
 
 
 def _base_generate(
-    ctx: click.Context, renderer: ty.Type[_Renderer], pkg_manager: str, **kwds
+    ctx: click.Context, renderer: Type[_Renderer], pkg_manager: str, **kwds
 ):
     """Function that does all of the work of `generate docker` and
     `generate singularity`. The difference between those two is the renderer used.
@@ -459,14 +475,14 @@ def singularity(ctx: click.Context, pkg_manager: str, **kwds):
     type=click.File("r"),
     default=sys.stdin,
 )
-def genfromjson(*, container_type: str, input: ty.IO):
+def genfromjson(*, container_type: str, input: IO):
     """Generate a container from a ReproEnv JSON file.
 
     INPUT is standard input by default or a path to a JSON file.
     """
     d = json_lib.load(input)
 
-    renderer: ty.Type[_Renderer]
+    renderer: Type[_Renderer]
     if container_type.lower() == "docker":
         renderer = DockerRenderer
     elif container_type.lower() == "singularity":

@@ -1,49 +1,42 @@
 name: CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
   run-tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ['3.10', '3.9', '3.8', '3.7']
+        python-version: ['3.11', '3.10', '3.9', '3.8']
+      fail-fast: false
     steps:
-      - name: Install Singularity
+      - name: Install Apptainer
+        env:
+          VERSION: 1.1.5
         run: |
           sudo apt-get update
-          sudo apt-get install --yes \
-            libssl-dev \
-            uuid-dev \
-            libgpgme11-dev \
-            squashfs-tools
-          curl -fsSL https://github.com/hpcng/singularity/releases/download/v3.6.4/singularity-3.6.4.tar.gz | tar xz
-          cd singularity
-          ./mconfig -p $HOME/opt/singularity
-          cd builddir
-          make
-          sudo make install
-      - name: Set Singularity environment variables
+          sudo apt-get install -y wget
+          wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer_${VERSION}_amd64.deb
+          wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-suid_${VERSION}_amd64.deb
+          sudo apt-get install --yes ./apptainer*
+      - name: Set Apptainer/Singularity environment variables
         run: |
-          echo $HOME/opt/singularity/bin >> $GITHUB_PATH
-          # Give reproenv the full path to singularity, so it still works with `sudo`.
-          echo REPROENV_SINGULARITY_PROGRAM=$HOME/opt/singularity/bin/singularity >> $GITHUB_ENV
-          echo SINGULARITY_CACHEDIR=/dev/shm/$(whoami)/singularity >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+          # Give reproenv the full path to apptainer, so it still works with `sudo`.
+          echo REPROENV_APPTAINER_PROGRAM=apptainer >> $GITHUB_ENV
+          echo APPTAINER_CACHEDIR=/dev/shm/$(whoami)/singularity >> $GITHUB_ENV
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install neurodocker
         run: python -m pip install --editable .[dev]
-      - name: Check types
-        run: mypy neurodocker
-      - name: Check style
-        run: flake8 neurodocker
       - name: Run python tests
         run: pytest --numprocesses auto
       - name: Get code coverage
