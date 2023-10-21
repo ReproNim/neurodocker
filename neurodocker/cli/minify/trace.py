@@ -7,11 +7,13 @@ by the given command(s).
 # TODO: consider implementing custom types for Docker container and paths within a
 # Docker container.
 
+from __future__ import annotations
+
 import io
 import logging
-from pathlib import Path
 import tarfile
-import typing as ty
+from pathlib import Path
+from typing import Generator, cast
 
 import click
 
@@ -36,9 +38,9 @@ _prune_script = Path(__file__).parent / "_prune.py"
 
 
 def copy_file_to_container(
-    container: ty.Union[str, docker.models.containers.Container],
-    src: ty.Union[str, Path],
-    dest: ty.Union[str, Path],
+    container: str | docker.models.containers.Container,
+    src: str | Path,
+    dest: str | Path,
 ) -> bool:
     """Copy `local_filepath` into `container`:`container_path`.
 
@@ -98,10 +100,10 @@ def _get_mounts(container: docker.models.containers.Container) -> dict:
 @click.option("--yes", is_flag=True, help="Reply yes to all prompts.")
 @click.argument("command", nargs=-1, required=True)
 def minify(
-    container: ty.Union[str, docker.models.containers.Container],
-    directories_to_prune: ty.Tuple[str],
+    container: str | docker.models.containers.Container,
+    directories_to_prune: tuple[str],
     yes: bool,
-    command: ty.Tuple[str],
+    command: tuple[str],
 ) -> None:
     """Minify a container.
 
@@ -118,7 +120,7 @@ def minify(
         "python -c 'a = 1 + 1; print(a)'"
     """
     container = client.containers.get(container)
-    container = ty.cast(docker.models.containers.Container, container)
+    container = cast(docker.models.containers.Container, container)
 
     cmds = " ".join(f'"{c}"' for c in command)
 
@@ -132,7 +134,7 @@ def minify(
     # iteration.
     exec_dict: dict = container.client.api.exec_create(container.id, cmd=trace_cmd)
     exec_id: str = exec_dict["Id"]
-    log_gen: ty.Generator[bytes, None, None] = container.client.api.exec_start(
+    log_gen: Generator[bytes, None, None] = container.client.api.exec_start(
         exec_id, stream=True
     )
     for log in log_gen:

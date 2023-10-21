@@ -64,6 +64,12 @@ binaries:
     - which
     - xorg-x11-fonts-misc
     - xorg-x11-server-Xvfb
+    - wget
+    - mesa-dri-drivers
+    - mesa-libGLw
+    - which
+    - unzip
+    - ncurses-compat-libs
     debs:
       - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
       - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb

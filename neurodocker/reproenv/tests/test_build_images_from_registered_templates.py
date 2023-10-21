@@ -1,18 +1,18 @@
 # TODO: add more tests for `from_dict` method.
 
 from pathlib import Path
-import typing as ty
+from typing import cast
 
 import pytest
 
-from neurodocker.reproenv.renderers import DockerRenderer
-from neurodocker.reproenv.renderers import SingularityRenderer
+from neurodocker.reproenv.renderers import DockerRenderer, SingularityRenderer
 from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.tests.utils import get_build_and_run_fns
-from neurodocker.reproenv.tests.utils import skip_if_no_docker
-from neurodocker.reproenv.tests.utils import skip_if_no_singularity
-from neurodocker.reproenv.types import installation_methods_type
-from neurodocker.reproenv.types import pkg_managers_type
+from neurodocker.reproenv.tests.utils import (
+    get_build_and_run_fns,
+    skip_if_no_docker,
+    skip_if_no_singularity,
+)
+from neurodocker.reproenv.types import installation_methods_type, pkg_managers_type
 
 _template_filepath = Path(__file__).parent / "sample-template-jq.yaml"
 
@@ -41,7 +41,6 @@ def test_build_using_renderer_from_dict(
     fd_version_startswith: str,
     tmp_path: Path,
 ):
-
     _TemplateRegistry._reset()
     _TemplateRegistry.register(_template_filepath)
 
@@ -102,8 +101,8 @@ def test_build_using_renderer_instance_methods(
     _TemplateRegistry._reset()
     _TemplateRegistry.register(_template_filepath)
 
-    pkg_manager = ty.cast(pkg_managers_type, pkg_manager)
-    method = ty.cast(installation_methods_type, method)
+    pkg_manager = cast(pkg_managers_type, pkg_manager)
+    method = cast(installation_methods_type, method)
 
     fd_exe = "fdfind" if pkg_manager == "apt" else "fd"
 

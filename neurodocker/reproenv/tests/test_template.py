@@ -1,8 +1,6 @@
 import pytest
 
-from neurodocker.reproenv import exceptions
-from neurodocker.reproenv import template
-from neurodocker.reproenv import types
+from neurodocker.reproenv import exceptions, template, types
 
 
 def test_template():

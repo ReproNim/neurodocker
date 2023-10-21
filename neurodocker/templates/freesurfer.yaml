@@ -22,6 +22,8 @@ binaries:
         subjects/fsaverage_sym
         trctrain
   urls:
+    "7.4.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer-linux-centos7_x86_64-7.4.1.tar.gz
+    "7.3.2": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.3.2/freesurfer-linux-centos7_x86_64-7.3.2.tar.gz
     "7.3.1": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.3.1/freesurfer-linux-centos7_x86_64-7.3.1.tar.gz
     "7.3.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.3.0/freesurfer-linux-centos7_x86_64-7.3.0.tar.gz
     "7.2.0": https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz

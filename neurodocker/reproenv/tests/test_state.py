@@ -3,18 +3,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from neurodocker.reproenv import exceptions
+from neurodocker.reproenv import exceptions, types
 from neurodocker.reproenv.state import _TemplateRegistry, _validate_template
-from neurodocker.reproenv import types
 
 
 def test_validate_template_invalid_templates():
     with pytest.raises(exceptions.TemplateError, match="'name' is a required property"):
         _validate_template({})
 
-    with pytest.raises(
-        exceptions.TemplateError, match="'binaries' is a required property"
-    ):
+    with pytest.raises(exceptions.TemplateError, match="{'name': 'bar'} is not valid"):
         _validate_template({"name": "bar"})
 
     # missing 'name' top-level key
