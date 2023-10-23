@@ -16,7 +16,6 @@ This website is in progress. Is there is something you would like to see here, p
    :caption: Contents:
 
    user_guide/index
-   build_results
    api
 
 

@@ -1,7 +1,7 @@
 """Remove all files under a directory but not caught by `reprozip trace`."""
+from __future__ import annotations
 
 from pathlib import Path
-import typing as ty
 
 import yaml
 
@@ -18,10 +18,9 @@ def _in_docker() -> bool:
 
 def main(
     *,
-    yaml_file: ty.Union[str, Path],
-    directories_to_prune: ty.Union[ty.List[str], ty.List[Path]],
+    yaml_file: str | Path,
+    directories_to_prune: list[str] | list[Path],
 ):
-
     if not _in_docker():
         raise RuntimeError(
             "Not running in a Docker container. This script should only be used within"
@@ -51,7 +50,7 @@ def main(
         if not d.is_dir():
             raise ValueError(f"Directory does not exist: {d}")
 
-    all_files: ty.Set[Path] = set()
+    all_files: set[Path] = set()
     for d in directories_to_prune:
         all_files.update(Path(d).rglob("*"))
 

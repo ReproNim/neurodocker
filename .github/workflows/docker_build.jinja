@@ -1,0 +1,78 @@
+{{ wf.header }}
+name: '{{ wf.software }}'
+
+concurrency:
+  group: ${{ '{{' }} github.workflow {{ '}}' }}-${{ '{{' }} github.ref {{ '}}' }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["test_docker_build"]
+
+jobs:
+
+  {{ wf.software }}:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        base_image: [{{ wf.os.all }}]
+        {% if wf.add_version %}
+        version: [{{ wf.versions }}]
+        {% endif %}
+        {% if wf.add_method %}
+        method: [{{ wf.methods }}]
+        {% endif %}
+        {% if wf.add_afni_python %}
+        afni_python: [{{ wf.afni_python }}]
+        {% endif %}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
+
+      - name: Generate Dockerfile
+        run: |
+
+          apt_based=({{ wf.os.apt_based }})
+          if [[ " ${apt_based[*]} " =~ ${{ '{{' }} matrix.base_image {{ '}}' }} ]]; then
+            pkg_manager="apt"
+          fi
+
+          yum_based=({{ wf.os.yum_based }})
+          if [[ " ${yum_based[*]} " =~ ${{ '{{' }} matrix.base_image {{ '}}' }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ '{{' }} matrix.base_image {{ '}}' }} \
+            --pkg-manager=${pkg_manager} \
+            --yes \
+{% if wf.software == 'cat12' %}
+            --matlabmcr method='binaries' version='2017b' \
+{% endif %}
+            --{{ wf.software }} \
+{% if wf.add_version %}
+            version=${{ '{{' }} matrix.version {{ '}}' }} \
+{% endif %}
+{% if wf.add_method %}
+            method=${{ '{{' }} matrix.method {{ '}}' }} \
+{% endif %}
+{% if wf.add_afni_python %}
+            install_python3=${{ '{{' }} matrix.afni_python {{ '}}' }} \
+{% endif %}            > Dockerfile_tmp
+
+          cat Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .

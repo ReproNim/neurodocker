@@ -40,13 +40,11 @@ function install_missing_dependencies() {
 function install_conda_reprozip() {
   TMP_CONDA_INSTALLER=/tmp/miniconda.sh
   ls /tmp
-  curl -sSL -o "$TMP_CONDA_INSTALLER" "$CONDA_URL"
-  ls /tmp
+  curl -sSL -o "$TMP_CONDA_INSTALLER" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
   bash $TMP_CONDA_INSTALLER -b -f -p $REPROZIP_CONDA
   rm -f $TMP_CONDA_INSTALLER
-  ${REPROZIP_CONDA}/bin/python -m pip install --no-cache-dir reprozip
+  ${REPROZIP_CONDA}/bin/mamba install -c conda-forge -y reprozip
 }
-
 
 function run_reprozip_trace() {
   # https://askubuntu.com/a/674347

@@ -1,0 +1,4 @@
+[codespell]
+skip = .git,*.pdf,*.svg,versioneer.py,_version.py
+# didi -- some name Dear to someone
+ignore-words-list = didi

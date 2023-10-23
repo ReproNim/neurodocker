@@ -1,14 +1,15 @@
 from pathlib import Path
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
-from neurodocker.cli.cli import generate
-from neurodocker.cli.cli import genfromjson
+from neurodocker.cli.cli import generate, genfromjson
 from neurodocker.reproenv.state import _TemplateRegistry
-from neurodocker.reproenv.tests.utils import get_build_and_run_fns
-from neurodocker.reproenv.tests.utils import skip_if_no_docker
-from neurodocker.reproenv.tests.utils import skip_if_no_singularity
+from neurodocker.reproenv.tests.utils import (
+    get_build_and_run_fns,
+    skip_if_no_docker,
+    skip_if_no_singularity,
+)
 
 # Test that a template can be rendered
 # We need to use `reproenv generate` as the entrypoint here because the generate command
