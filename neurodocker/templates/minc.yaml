@@ -1,11 +1,10 @@
 # Instructions to install MINC toolkit v2.
 #
-# Repository: https://github.com/BIC-MNI/minc-toolkit-v2
-#
 # Instructions: http://bic-mni.github.io/#on-debianubuntu
 # The Debian packages are unpacked for yum based distributions as well
 
 name: minc
+url:  https://github.com/BIC-MNI/minc-toolkit-v2
 binaries:
   arguments:
     required:

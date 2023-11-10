@@ -1,8 +1,7 @@
 # Instructions to install PETPVC.
-#
-# Repository: https://github.com/UCL/PETPVC
 
 name: petpvc
+url: https://github.com/UCL/PETPVC
 binaries:
   arguments:
     required:

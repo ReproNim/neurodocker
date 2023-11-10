@@ -1,11 +1,9 @@
 # Instructions to install SPM.
 #
-# Website: https://www.fil.ion.ucl.ac.uk/spm/
 # Documentation: https://www.fil.ion.ucl.ac.uk/spm/doc/
 
-# TODO:
-
 name: spm12
+url: https://www.fil.ion.ucl.ac.uk/spm/
 binaries:
   arguments:
     required:

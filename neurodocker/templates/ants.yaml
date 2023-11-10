@@ -1,6 +1,7 @@
 # Instructions to install ANTs (https://github.com/ANTsX/ANTs)
 
 name: ants
+url: http://stnava.github.io/ANTs/
 binaries:
   arguments:
     required:

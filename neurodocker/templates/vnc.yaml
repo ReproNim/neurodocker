@@ -3,6 +3,7 @@
 # Run:
 #   vncserver -geometry 1600x1200
 name: vnc
+url: https://www.realvnc.com/
 # Not actually source, but we do not want to provide binaries.
 source:
   arguments:

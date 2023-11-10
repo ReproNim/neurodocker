@@ -1,8 +1,7 @@
 # Instructions to install MRIcron.
-#
-# Repository: https://github.com/neurolabusc/MRIcron
 
 name: mricron
+url: https://github.com/neurolabusc/MRIcron
 binaries:
   arguments:
     required:

@@ -1,9 +1,8 @@
 ---
 # Instructions to install MATLAB Compiler Runtime.
-#
-# Website: https://www.mathworks.com/products/compiler/matlab-runtime.html
 
 name: matlabmcr
+url: https://www.mathworks.com/products/compiler/matlab-runtime.html
 binaries:
   arguments:
     required:

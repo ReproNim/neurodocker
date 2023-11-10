@@ -1,6 +1,7 @@
 # Instructions to install MRtrix3.
 
 name: mrtrix3
+url: https://www.mrtrix.org/
 binaries:
   arguments:
     required:

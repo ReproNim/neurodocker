@@ -1,6 +1,7 @@
 # Instructions to install Miniconda.
 
 name: miniconda
+url: https://docs.conda.io/projects/miniconda/en/latest/
 binaries:
   urls:
     latest: https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-x86_64.sh

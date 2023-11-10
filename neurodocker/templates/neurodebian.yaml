@@ -1,6 +1,7 @@
 # Instructions to add NeuroDebian repositories.
 
 name: neurodebian
+url: http://neuro.debian.net
 binaries:
   urls:
     australia: "http://neuro.debian.net/lists/{{ self.os_codename }}.au.{{ self.full_or_libre }}"

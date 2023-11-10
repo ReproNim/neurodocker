@@ -4,6 +4,7 @@
 # TODO: read this about locales http://jaredmarkell.com/docker-and-locales/
 
 name: _header
+url: "n/a"
 # Not actually source, but we do not want to provide URLs.
 source:
   dependencies:

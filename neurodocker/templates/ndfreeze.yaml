@@ -1,6 +1,7 @@
 # Instructions to run `nd_freeze` in NeuroDebian images.
 
 name: ndfreeze
+url: https://neuro.debian.net/pkgs/neurodebian-freeze.html
 # not actually source, but we have a choice between binaries and source. Using binaries
 # requires the urls property.
 source:

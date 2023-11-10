@@ -1,6 +1,7 @@
 # Sample template. Installs `jq` (a JSON parser) from binaries or from source.
 
 name: jq
+url: https://jqlang.github.io/jq/
 binaries:
   arguments:
     required:
