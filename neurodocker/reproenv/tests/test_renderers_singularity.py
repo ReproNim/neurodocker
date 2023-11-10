@@ -11,6 +11,7 @@ def test_singularity_renderer_add_template():
 
     d = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar"},
             "env": {"foo": "bar"},
@@ -59,6 +60,7 @@ echo hello Bjork"""
 
     d = {
         "name": "baz",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar"},
             "env": {"foo": "bar"},

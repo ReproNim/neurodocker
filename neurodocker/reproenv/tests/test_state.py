@@ -11,8 +11,10 @@ def test_validate_template_invalid_templates():
     with pytest.raises(exceptions.TemplateError, match="'name' is a required property"):
         _validate_template({})
 
-    with pytest.raises(exceptions.TemplateError, match="{'name': 'bar'} is not valid"):
-        _validate_template({"name": "bar"})
+    with pytest.raises(
+        exceptions.TemplateError, match="is not valid under any of the given schemas"
+    ):
+        _validate_template({"name": "bar", "url": "some-url"})
 
     # missing 'name' top-level key
     with pytest.raises(exceptions.TemplateError, match="'name' is a required property"):
@@ -28,6 +30,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": 1234,
+                "url": "some-url",
                 "binaries": {"urls": {"1.0.0": "foobar.com"}, "instructions": "foobar"},
             }
         )
@@ -43,6 +46,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "binaries": {
                     "urls": {"1.0.0": "foobar.com"},
                     # "instructions": "foobar",
@@ -58,6 +62,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "binaries": {
                     "urls": {"1.0.0": "foobar.com"},
                     "env": {"foo": ["foo"]},
@@ -71,6 +76,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "binaries": {
                     # "urls": {"1.0.0": "foobar.com"},
                     "instructions": "foobar"
@@ -89,6 +95,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "binaries": {
                     "urls": {"1.0.0": "foobar.com"},
                     "instructions": "foobar",
@@ -108,6 +115,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "binaries": {
                     "urls": {"1.0.0": "foobar.com"},
                     "instructions": "foobar",
@@ -134,6 +142,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "source": {"urls": {"1.0.0": "foobar.com"}, "instructions": "foobar"},
             }
         )
@@ -145,6 +154,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "source": {
                     # "instructions": "foobar",
                 },
@@ -159,6 +169,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "source": {"env": {"foo": ["foo"]}, "instructions": "foobar"},
             }
         )
@@ -172,7 +183,11 @@ def test_validate_template_invalid_templates():
         ),
     ):
         _validate_template(
-            {"name": "foobar", "source": {"instructions": "foobar", "extra": ""}}
+            {
+                "name": "foobar",
+                "url": "some-url",
+                "source": {"instructions": "foobar", "extra": ""},
+            }
         )
 
     # extra keys in dependencies
@@ -186,6 +201,7 @@ def test_validate_template_invalid_templates():
         _validate_template(
             {
                 "name": "foobar",
+                "url": "some-url",
                 "source": {
                     "instructions": "foobar",
                     "dependencies": {"apt": [], "fakemngr": []},
@@ -202,15 +218,19 @@ def test_validate_template_valid_templates():
     _validate_template(
         {
             "name": "foobar",
+            "url": "some-url",
             "binaries": {"urls": {"v1": "foo"}, "instructions": "foobar"},
         }
     )
-    _validate_template({"name": "foobar", "source": {"instructions": "foobar"}})
+    _validate_template(
+        {"name": "foobar", "url": "some-url", "source": {"instructions": "foobar"}}
+    )
 
     # bigger templates
     _validate_template(
         {
             "name": "foobar",
+            "url": "some-url",
             "binaries": {
                 "urls": {"v1": "foo"},
                 "env": {"baz": "cat", "boo": "123"},
@@ -233,6 +253,7 @@ def test_register(tmp_path: Path):
 
     _one_test_template: types.TemplateType = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar.com"},
             "env": {"foo": "bar"},

@@ -6,6 +6,7 @@ from neurodocker.reproenv import exceptions, template, types
 def test_template():
     d = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"v1": "foo"},
             "env": {"baz": "cat", "boo": "123"},
@@ -62,6 +63,7 @@ def test_template():
     t = template.Template(
         {
             "name": "foobar",
+            "url": "some-url",
             "binaries": {
                 "urls": {"v1": "foo"},
                 "env": {"baz": "cat", "boo": "123"},
@@ -78,6 +80,7 @@ def test_template():
     t = template.Template(
         {
             "name": "foobar",
+            "url": "some-url",
             "source": {
                 "env": {"foo": "bar"},
                 "instructions": "echo foo\n{{ self.boo }}",
@@ -197,6 +200,7 @@ def test_template_alert():
     d: types.TemplateType = {
         "alert": "This is an alert!",
         "name": "testing",
+        "url": "some-url",
         "binaries": {"urls": {"foo": "foo.baz.tar.gz"}, "instructions": "do nothing"},
     }
     tmpl = template.Template(d)
