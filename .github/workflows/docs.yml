@@ -18,6 +18,7 @@ jobs:
       - name: build docs
         run: |
           make -C docs cli
+          make -C docs list
           sphinx-build docs docs-build
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4

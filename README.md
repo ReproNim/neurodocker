@@ -9,6 +9,8 @@ _Neurodocker_ is a command-line program that generates custom Dockerfiles and Si
 
 Please see our website https://www.repronim.org/neurodocker for more information.
 
+See our [list of supported software](https://www.repronim.org/neurodocker/user_guide/examples.html#supported-software)
+
 # Installation
 
 Use the _Neurodocker_ Docker image (recommended):
