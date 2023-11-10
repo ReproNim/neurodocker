@@ -1,15 +1,16 @@
 name: bids_validator
-# How to install this software from pre-compiled binaries.
 binaries:
-  # The available versions and their corresponding urls.
   urls:
-    "1.13": "https://github.com/bids-standard/bids-validator/releases/tag/v1.13.0"
-    "1.12": "https://github.com/bids-standard/bids-validator/releases/tag/v1.12.0"
+    "1.13.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.13.0"
+    "1.12.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.12.0"
+    "1.11.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.11.0"
+    "1.10.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0"
+    "1.9.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0"
   arguments:
     required:
     - version
-  env:
-    NODE_MAJOR: "18"
+    optional:
+      node_version: "20"
   dependencies:
     apt:
     - ca-certificates
@@ -18,10 +19,18 @@ binaries:
     - gnupg
     yum:
     - curl
+  # see install for node https://github.com/nodesource/distributions#installation-scripts
   instructions: |
     {{ self.install_dependencies() }}
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-    {{ self.install(["nodejs"]) }}
+    {%- if self.pkg_manager == "apt" %}
+      curl -SLO https://deb.nodesource.com/nsolid_setup_deb.sh
+      chmod 500 nsolid_setup_deb.sh
+      ./nsolid_setup_deb.sh {{ self.node_version }}
+      {{ self.install(["nodejs"]) }}
+    {% elif self.pkg_manager == "yum" %}
+      curl -SLO https://rpm.nodesource.com/nsolid_setup_rpm.sh
+      chmod 500 nsolid_setup_rpm.sh
+      ./nsolid_setup_rpm.sh {{ self.node_version }}
+      {{ self.install(["nodejs --setopt=nodesource-nodejs.module_hotfixes=1"]) }}
+    {% endif -%}
     npm install -g bids-validator@{{ self.version }}
