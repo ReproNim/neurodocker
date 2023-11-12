@@ -396,7 +396,32 @@ document.write(`
   <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h1>
 <p>This page includes examples of using Neurodocker to build containers with popular
-neuroimaging packages. The commands generate Dockerfiles. To generate Singularity
+neuroimaging packages.</p>
+<section id="supported-software">
+<h2>Supported software<a class="headerlink" href="#supported-software" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://afni.nimh.nih.gov">afni</a></p></li>
+<li><p><a class="reference external" href="http://stnava.github.io/ANTs/">ants</a></p></li>
+<li><p><a class="reference external" href="https://github.com/bids-standard/bids-validator">bids_validator</a></p></li>
+<li><p><a class="reference external" href="https://neuro-jena.github.io/cat/">cat12</a></p></li>
+<li><p><a class="reference external" href="http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Convert3D">convert3d</a></p></li>
+<li><p><a class="reference external" href="https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage">dcm2niix</a></p></li>
+<li><p><a class="reference external" href="https://surfer.nmr.mgh.harvard.edu/">freesurfer</a></p></li>
+<li><p><a class="reference external" href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/">fsl</a></p></li>
+<li><p><a class="reference external" href="https://jqlang.github.io/jq/">jq</a></p></li>
+<li><p><a class="reference external" href="https://www.mathworks.com/products/compiler/matlab-runtime.html">matlabmcr</a></p></li>
+<li><p><a class="reference external" href="https://github.com/BIC-MNI/minc-toolkit-v2">minc</a></p></li>
+<li><p><a class="reference external" href="https://docs.conda.io/projects/miniconda/en/latest/">miniconda</a></p></li>
+<li><p><a class="reference external" href="https://github.com/neurolabusc/MRIcron">mricron</a></p></li>
+<li><p><a class="reference external" href="https://www.mrtrix.org/">mrtrix3</a></p></li>
+<li><p><a class="reference external" href="https://neuro.debian.net/pkgs/neurodebian-freeze.html">ndfreeze</a></p></li>
+<li><p><a class="reference external" href="http://neuro.debian.net">neurodebian</a></p></li>
+<li><p><a class="reference external" href="https://github.com/KCL-BMEIS/niftyreg">niftyreg</a></p></li>
+<li><p><a class="reference external" href="https://github.com/UCL/PETPVC">petpvc</a></p></li>
+<li><p><a class="reference external" href="https://www.fil.ion.ucl.ac.uk/spm/">spm12</a></p></li>
+<li><p><a class="reference external" href="https://www.realvnc.com/">vnc</a></p></li>
+</ul>
+<p>The commands generate Dockerfiles. To generate Singularity
 recipes, simply replace</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker
 </pre></div>
@@ -419,8 +444,9 @@ recipes, simply replace</p>
 user interfaces (like FreeView and FSLEyes) are not installed properly. It is
 possible that this will change in the future.</p>
 </div>
-<section id="fsl">
-<h2>FSL<a class="headerlink" href="#fsl" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="id1">
+<h2>FSL<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
 <section id="docker">
 <span id="fsl-docker"></span><h3>Docker<a class="headerlink" href="#docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
@@ -452,10 +478,10 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 </div>
 </section>
 </section>
-<section id="afni">
-<h2>AFNI<a class="headerlink" href="#afni" title="Permalink to this heading">#</a></h2>
+<section id="id2">
+<h2>AFNI<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
 <section id="afni-docker">
-<span id="id1"></span><h3>Docker<a class="headerlink" href="#afni-docker" title="Permalink to this heading">#</a></h3>
+<span id="id3"></span><h3>Docker<a class="headerlink" href="#afni-docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--base-image<span class="w"> </span>fedora:36<span class="w"> </span><span class="se">\</span>
@@ -475,16 +501,16 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>afni:latest-with-r<span class="w"> </span>--file<span class="w"> </span>afni-binaries-r.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-<div class="admonition-todo admonition" id="id2">
+<div class="admonition-todo admonition" id="id4">
 <p class="admonition-title">Todo</p>
 <p>Building AFNI from source is currently failing on most tested distributions.</p>
 </div>
 </section>
 </section>
-<section id="freesurfer">
-<h2>FreeSurfer<a class="headerlink" href="#freesurfer" title="Permalink to this heading">#</a></h2>
+<section id="id5">
+<h2>FreeSurfer<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h2>
 <section id="freesurfer-docker">
-<span id="id3"></span><h3>Docker<a class="headerlink" href="#freesurfer-docker" title="Permalink to this heading">#</a></h3>
+<span id="id6"></span><h3>Docker<a class="headerlink" href="#freesurfer-docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
@@ -494,14 +520,14 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>freesurfer:7.4.1<span class="w"> </span>--file<span class="w"> </span>freesurfer741.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-<div class="admonition-todo admonition" id="id4">
+<div class="admonition-todo admonition" id="id7">
 <p class="admonition-title">Todo</p>
 <p>The minified version on Freesurfer currently fails to build on all tested distributions.</p>
 </div>
 </section>
 </section>
-<section id="ants">
-<h2>ANTS<a class="headerlink" href="#ants" title="Permalink to this heading">#</a></h2>
+<section id="id8">
+<h2>ANTS<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--base-image<span class="w"> </span>debian:bullseye-slim<span class="w"> </span><span class="se">\</span>
@@ -516,8 +542,8 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <p>Building docker images of ANTS from source fails on most tested distributions.</p>
 </div>
 </section>
-<section id="cat12">
-<h2>CAT12<a class="headerlink" href="#cat12" title="Permalink to this heading">#</a></h2>
+<section id="id9">
+<h2>CAT12<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h2>
 <p>CAT12 requires the MCR in the correction version.
 Miniconda and nipype is optional but recommended to use CAT12 from NiPype.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
@@ -550,8 +576,8 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <p>Building docker images of SPM12 from source fails on most tested distributions.</p>
 </div>
 </section>
-<section id="miniconda">
-<h2>Miniconda<a class="headerlink" href="#miniconda" title="Permalink to this heading">#</a></h2>
+<section id="id10">
+<h2>Miniconda<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h2>
 <p>Docker with new <code class="code docutils literal notranslate"><span class="pre">conda</span></code> environment, python packages installed with <code class="code docutils literal notranslate"><span class="pre">conda</span></code> and <code class="code docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
@@ -567,8 +593,8 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>conda-env<span class="w"> </span>--file<span class="w"> </span>conda-env.Dockerfile<span class="w"> </span>.
 </pre></div>
 </div>
-<section id="id5">
-<h3>Docker<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id11">
+<h3>Docker<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
 </section>
 </section>
 </section>
@@ -616,23 +642,24 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fsl">FSL</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-software">Supported software</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">FSL</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#docker">Docker</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#afni">AFNI</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">AFNI</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#afni-docker">Docker</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#freesurfer">FreeSurfer</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">FreeSurfer</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#freesurfer-docker">Docker</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ants">ANTS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cat12">CAT12</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">ANTS</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">CAT12</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spm">SPM</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#miniconda">Miniconda</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Docker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Miniconda</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Docker</a></li>
 </ul>
 </li>
 </ul>

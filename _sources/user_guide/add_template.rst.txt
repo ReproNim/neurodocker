@@ -19,6 +19,7 @@ This example installs :code:`jq`, a
     # The name of the software. This becomes the name in the template registry.
     # The CLI option would be rendered as `--jq`.
     name: jq
+    url: https://jqlang.github.io/jq/
     # An alert that is printed when using this template in the CLI.
     alert: Please be advised that this software uses
     # How to install this software from pre-compiled binaries.
