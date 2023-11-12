@@ -73,6 +73,7 @@ def software() -> dict[str, dict[str, list[str]]]:
         "ants": {
             "methods": ["binaries", "source"],
         },
+        "bids_validator": {"methods": ["binaries"]},
         "cat12": {"methods": ["binaries"]},
         "convert3d": {"methods": ["binaries"]},
         "dcm2niix": {

@@ -1,0 +1,42 @@
+name: bids_validator
+binaries:
+  urls:
+    "1.13.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.13.0"
+    "1.12.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.12.0"
+    "1.11.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.11.0"
+    "1.10.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0"
+    "1.9.0": "https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0"
+  arguments:
+    required:
+    - version
+    optional:
+      node_version: "20"
+  dependencies:
+    apt:
+    - ca-certificates
+    - curl
+    - apt-utils
+    - gnupg
+    yum:
+    - curl
+  # see install for node https://github.com/nodesource/distributions#installation-scripts
+  instructions: |
+    if [ ! -z `which node` ] ; then \
+      echo "node is installed, skipping its install." ; \
+    else \
+      {{ self.install_dependencies() }}
+      {%- if self.pkg_manager == "apt" %}
+        curl -SLO https://deb.nodesource.com/nsolid_setup_deb.sh
+        chmod 500 nsolid_setup_deb.sh
+        ./nsolid_setup_deb.sh {{ self.node_version }}
+        {{ self.install(["nodejs"]) }} ; \
+      {% elif self.pkg_manager == "yum" %}
+        curl -SLO https://rpm.nodesource.com/nsolid_setup_rpm.sh
+        chmod 500 nsolid_setup_rpm.sh
+        ./nsolid_setup_rpm.sh {{ self.node_version }}
+        {{ self.install(["nodejs --setopt=nodesource-nodejs.module_hotfixes=1"]) }} ; \
+      {% endif -%}
+    fi
+    node --version
+    npm --version
+    npm install -g bids-validator@{{ self.version }}
