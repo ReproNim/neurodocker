@@ -1,6 +1,7 @@
 # Instructions to install Convert3D.
 
 name: convert3d
+url: http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Convert3D
 binaries:
   arguments:
     required:

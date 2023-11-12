@@ -1,10 +1,10 @@
 # Instructions to install CAT12 toolbox with SPM.
 #
-# Website: http://141.35.69.218/cat/
 # Documentation: http://www.neuro.uni-jena.de/cat12-html/cat_versions.html
 
 
 name: cat12
+url: https://neuro-jena.github.io/cat/
 binaries:
   arguments:
     required:

@@ -2,7 +2,36 @@ Examples
 ========
 
 This page includes examples of using Neurodocker to build containers with popular
-neuroimaging packages. The commands generate Dockerfiles. To generate Singularity
+neuroimaging packages.
+
+Supported software
+------------------
+
+.. INSERT LIST START (will be updated automatically in ci)
+
+- `afni <https://afni.nimh.nih.gov>`_
+- `ants <http://stnava.github.io/ANTs/>`_
+- `cat12 <https://neuro-jena.github.io/cat/>`_
+- `convert3d <http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Convert3D>`_
+- `dcm2niix <https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage>`_
+- `freesurfer <https://surfer.nmr.mgh.harvard.edu/>`_
+- `fsl <https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/>`_
+- `jq <https://jqlang.github.io/jq/>`_
+- `matlabmcr <https://www.mathworks.com/products/compiler/matlab-runtime.html>`_
+- `minc <https://github.com/BIC-MNI/minc-toolkit-v2>`_
+- `miniconda <https://docs.conda.io/projects/miniconda/en/latest/>`_
+- `mricron <https://github.com/neurolabusc/MRIcron>`_
+- `mrtrix3 <https://www.mrtrix.org/>`_
+- `ndfreeze <https://neuro.debian.net/pkgs/neurodebian-freeze.html>`_
+- `neurodebian <http://neuro.debian.net>`_
+- `niftyreg <https://github.com/KCL-BMEIS/niftyreg>`_
+- `petpvc <https://github.com/UCL/PETPVC>`_
+- `spm12 <https://www.fil.ion.ucl.ac.uk/spm/>`_
+- `vnc <https://www.realvnc.com/>`_
+
+.. INSERT LIST END
+
+The commands generate Dockerfiles. To generate Singularity
 recipes, simply replace
 
 .. code-block:: bash

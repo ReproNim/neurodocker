@@ -1,6 +1,7 @@
 # Instructions to install dcm2niix.
 
 name: dcm2niix
+url: https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
 binaries:
   arguments:
     required:

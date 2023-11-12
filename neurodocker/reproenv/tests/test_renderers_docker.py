@@ -11,6 +11,7 @@ def test_docker_renderer_add_template():
 
     d = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar"},
             "env": {"foo": "bar"},
@@ -64,6 +65,7 @@ def test_docker_renderer_add_template():
     # Test required arguments.
     d = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar"},
             "env": {"foo": "bar"},
@@ -90,6 +92,7 @@ RUN apt-get update -qq \\
 
     d = {
         "name": "foobar",
+        "url": "some-url",
         "binaries": {
             "urls": {"1.0.0": "foobar"},
             "env": {"foo": "bar"},

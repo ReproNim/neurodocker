@@ -3,7 +3,8 @@
   "title": "Template Schema",
   "type": "object",
   "required": [
-    "name"
+    "name",
+    "url"
   ],
   "anyOf": [
     {
@@ -19,6 +20,9 @@
   ],
   "properties": {
     "name": {
+      "type": "string"
+    },
+    "url":{
       "type": "string"
     },
     "alert": {

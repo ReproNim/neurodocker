@@ -3,6 +3,7 @@
 # TODO: consider updating the source instructions to use cmake.
 
 name: afni
+url: https://afni.nimh.nih.gov
 binaries:
   arguments:
     optional:
