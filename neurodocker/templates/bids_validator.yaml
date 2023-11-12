@@ -21,8 +21,8 @@ binaries:
     - curl
   # see install for node https://github.com/nodesource/distributions#installation-scripts
   instructions: |
-    if [ ! -z `which npm` ] ; then \
-      echo "npm is installed, skipping its install." ; \
+    if [ ! -z `which node` ] ; then \
+      echo "node is installed, skipping its install." ; \
     else \
       {{ self.install_dependencies() }}
       {%- if self.pkg_manager == "apt" %}
