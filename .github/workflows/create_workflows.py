@@ -82,6 +82,9 @@ def software() -> dict[str, dict[str, list[str]]]:
         "fsl": {
             "methods": ["binaries"],
         },
+        "jq": {
+            "methods": ["binaries", "source"],
+        },
         "matlabmcr": {
             "methods": ["binaries"],
         },
