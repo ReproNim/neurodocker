@@ -11,10 +11,13 @@ binaries:
       curl_opts: ""
       install_path: /opt/MCR-{{ self.version }}
   urls:
-    "2023a": https://ssd.mathworks.com/supportfiles/downloads/R2023a/Release/4/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023a_Update_4_glnxa64.zip
+    "2023b": https://ssd.mathworks.com/supportfiles/downloads/R2023b/Release/3/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023b_Update_3_glnxa64.zip
+    "2023a": https://ssd.mathworks.com/supportfiles/downloads/R2023a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023a_Update_5_glnxa64.zip
+    "2022b": https://ssd.mathworks.com/supportfiles/downloads/R2022b/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2022b_Update_7_glnxa64.zip
+    "2022a": https://ssd.mathworks.com/supportfiles/downloads/R2022a/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2022a_Update_7_glnxa64.zip
     "2021b": https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/2/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_Update_2_glnxa64.zip
-    "2021a": https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_5_glnxa64.zip
-    "2020b": https://ssd.mathworks.com/supportfiles/downloads/R2020b/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020b_Update_6_glnxa64.zip
+    "2021a": https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/8/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_8_glnxa64.zip
+    "2020b": https://ssd.mathworks.com/supportfiles/downloads/R2020b/Release/8/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020b_Update_8_glnxa64.zip
     "2020a": https://ssd.mathworks.com/supportfiles/downloads/R2020a/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020a_Update_7_glnxa64.zip
     "2019b": https://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/9/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019b_Update_9_glnxa64.zip
     "2019a": https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/9/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019a_Update_9_glnxa64.zip
