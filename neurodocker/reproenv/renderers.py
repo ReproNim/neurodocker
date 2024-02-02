@@ -373,7 +373,7 @@ class _Renderer:
         destination: PathType | list[PathType],
     ) -> _Renderer:
         raise NotImplementedError()
-    
+
     def add(
         self,
         source: PathType,

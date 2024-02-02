@@ -223,7 +223,8 @@ def _get_common_renderer_params() -> list[click.Parameter]:
             multiple=True,
             type=tuple,
             help=(
-                "Extract a tar file as a layer in the container. Provide a source and destination path."
+                "Extract a tar file as a layer in the container."
+                " Provide a source and destination path."
             ),
         ),
         OptionEatAll(
