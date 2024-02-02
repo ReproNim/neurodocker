@@ -219,6 +219,14 @@ def _get_common_renderer_params() -> list[click.Parameter]:
             ),
         ),
         OptionEatAll(
+            ["--add"],
+            multiple=True,
+            type=tuple,
+            help=(
+                "Extract a tar file as a layer in the container. Provide a source and destination path."
+            ),
+        ),
+        OptionEatAll(
             ["--env"],
             multiple=True,
             type=KeyValuePair(),
@@ -339,6 +347,14 @@ def _get_instruction_for_param(ctx: click.Context, param: click.Parameter, value
         if len(value) < 2:
             raise click.ClickException("expected at least two values for --copy")
         source, destination = list(value[:-1]), value[-1]
+        d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
+    # add
+    elif param.name == "add":
+        if not isinstance(value, tuple):
+            raise ValueError("expected this value to be a tuple (contact developers)")
+        if len(value) < 2:
+            raise click.ClickException("expected at least two values for --add")
+        source, destination = value
         d = {"name": param.name, "kwds": {"source": source, "destination": destination}}
     # env
     elif param.name == "env":
