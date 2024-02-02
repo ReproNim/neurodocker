@@ -373,6 +373,13 @@ class _Renderer:
         destination: PathType | list[PathType],
     ) -> _Renderer:
         raise NotImplementedError()
+    
+    def add(
+        self,
+        source: PathType,
+        destination: PathType,
+    ) -> _Renderer:
+        raise NotImplementedError()
 
     def env(self, **kwds: str) -> _Renderer:
         raise NotImplementedError()
@@ -481,6 +488,17 @@ class DockerRenderer(_Renderer):
         if chown is not None:
             s += f"--chown={chown} "
         s += files
+        self._parts.append(s)
+        return self
+
+    @_log_instruction
+    def add(
+        self,
+        source: PathType,
+        destination: PathType,
+    ) -> DockerRenderer:
+        """Add a Dockerfile `ADD` instruction."""
+        s = f"ADD {source} {destination}"
         self._parts.append(s)
         return self
 

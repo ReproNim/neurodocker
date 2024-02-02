@@ -51,6 +51,9 @@
             "$ref": "#/definitions/copy"
           },
           {
+            "$ref": "#/definitions/add"
+          },
+          {
             "$ref": "#/definitions/env"
           },
           {
@@ -158,6 +161,37 @@
               "items": {
                 "type": "string"
               }
+            },
+            "destination": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [],
+      "additionalProperties": false
+    },
+    "add": {
+      "required": [
+        "name",
+        "kwds"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "add"
+          ]
+        },
+        "kwds": {
+          "type": "object",
+          "required": [
+            "source",
+            "destination"
+          ],
+          "properties": {
+            "source": {
+              "type": "string"
             },
             "destination": {
               "type": "string"
