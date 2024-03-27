@@ -30,6 +30,7 @@ binaries:
     - libglib2.0-0
     - libglw1-mesa
     - libgomp1
+    - libpng-dev
     - libssl-dev
     - libudunits2-dev
     - libxm4
@@ -72,7 +73,6 @@ binaries:
     debs:
       - https://snapshot.debian.org/archive/debian-security/20221017T140424Z/pool/updates/main/g/glibc/multiarch-support_2.28-10%2Bdeb10u2_amd64.deb
       - https://snapshot.debian.org/archive/debian/20140820T220424Z/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-      - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
     {% if self.install_python3.lower() in ["true", "1", "y"] -%}
@@ -123,6 +123,7 @@ source:
     - libgsl-dev
     - libmotif-dev
     - libnetpbm10-dev
+    - libpng-dev
     - libxext-dev
     - libxi-dev
     - libxmu-headers
@@ -162,7 +163,6 @@ source:
     debs:
       - https://snapshot.debian.org/archive/debian-security/20221017T140424Z/pool/updates/main/g/glibc/multiarch-support_2.28-10%2Bdeb10u2_amd64.deb
       - https://snapshot.debian.org/archive/debian/20140820T220424Z/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-      - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
     {%- if self.install_python3.lower() in ["true", "1", "y"] %}
