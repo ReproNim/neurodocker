@@ -25,12 +25,11 @@ binaries:
     - gsl-bin
     - libcurl4-openssl-dev
     - libgl1-mesa-dri
-    - libjpeg-turbo8-dev
+    - libjpeg-dev
     - libglu1-mesa-dev
     - libglib2.0-0
     - libglw1-mesa
     - libgomp1
-    - libjpeg62
     - libssl-dev
     - libudunits2-dev
     - libxm4
