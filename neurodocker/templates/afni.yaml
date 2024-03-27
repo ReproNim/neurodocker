@@ -72,7 +72,7 @@ binaries:
     - unzip
     - ncurses-compat-libs
     debs:
-      - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+      - https://snapshot.debian.org/archive/debian/20140820T220424Z/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
       - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
@@ -162,7 +162,7 @@ source:
     - which
     - zlib-devel
     debs:
-      - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+      - https://snapshot.debian.org/archive/debian/20140820T220424Z/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
       - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
   instructions: |
     {{ self.install_dependencies() }}
