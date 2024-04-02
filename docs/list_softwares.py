@@ -2,6 +2,7 @@
 
 Read them from the registered yml templates.
 """
+
 from pathlib import Path
 
 from neurodocker.reproenv.state import registered_templates_items

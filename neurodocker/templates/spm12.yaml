@@ -1,3 +1,4 @@
+---
 # Instructions to install SPM.
 #
 # Documentation: https://www.fil.ion.ucl.ac.uk/spm/doc/
@@ -5,71 +6,72 @@
 name: spm12
 url: https://www.fil.ion.ucl.ac.uk/spm/
 binaries:
-  arguments:
-    required:
-    - version
-    optional:
-      install_path: /opt/spm12-{{ self.version }}
-      matlab_install_path: /opt/matlab-compiler-runtime-2010a
-  urls:
+    arguments:
+        required:
+        -   version
+        optional:
+            install_path: /opt/spm12-{{ self.version }}
+            matlab_install_path: /opt/matlab-compiler-runtime-2010a
+    urls:
     # Dev URL uses 2020a matlab compiler runtime, which we do not support yet.
     # dev: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/dev/spm12_latest_Linux_R2010a.zip
-    r7771: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7771_R2010a.zip
-    r7487: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7487_R2010a.zip
-    r7219: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
-    r6914: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6914_R2010a.zip
-    r6685: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6685_R2010a.zip
-    r6472: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6472_R2010a.zip
-    r6225: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6225_R2010a.zip
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    - unzip
+        r7771: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7771_R2010a.zip
+        r7487: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7487_R2010a.zip
+        r7219: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r7219_R2010a.zip
+        r6914: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6914_R2010a.zip
+        r6685: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6685_R2010a.zip
+        r6472: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6472_R2010a.zip
+        r6225: https://www.fil.ion.ucl.ac.uk/spm/download/restricted/utopia/previous/spm12_r6225_R2010a.zip
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        -   unzip
     # for matlab compiler runtime 2010a
-    - bc
-    - libncurses5
-    - libxext6
-    - libxmu6
-    - libxpm-dev
-    - libxt6
-    - multiarch-support
-    debs:
-    - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-    yum:
-    - curl
-    - unzip
+        -   bc
+        -   libncurses5
+        -   libxext6
+        -   libxmu6
+        -   libxpm-dev
+        -   libxt6
+        -   multiarch-support
+        debs:
+        -   http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        yum:
+        -   curl
+        -   unzip
     # for matlab compiler runtime 2010a
-    - bc
-    - libXext
-    - libXmu
-    - libXpm
-    - libXt
-  env:
-    FORCE_SPMMCR: "1"
-    SPM_HTML_BROWSER: "0"
-    SPMMCRCMD: "{{ self.install_path }}/run_spm12.sh {{ self.matlab_install_path }}/v713 script"
+        -   bc
+        -   libXext
+        -   libXmu
+        -   libXpm
+        -   libXt
+    env:
+        FORCE_SPMMCR: '1'
+        SPM_HTML_BROWSER: '0'
+        SPMMCRCMD: '{{ self.install_path }}/run_spm12.sh {{ self.matlab_install_path }}/v713 script'
 
     # matlab compiler runtime variables
-    LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ self.matlab_install_path }}/v713/runtime/glnxa64:{{ self.matlab_install_path }}/v713/bin/glnxa64:{{ self.matlab_install_path }}/v713/sys/os/glnxa64:{{ self.matlab_install_path }}/v713/extern/bin/glnxa64"
-    MATLABCMD: "{{ self.matlab_install_path }}/v713/toolbox/matlab"
+        LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:{{ self.matlab_install_path }}/v713/runtime/glnxa64:{{ self.matlab_install_path }}/v713/bin/glnxa64:{{
+            self.matlab_install_path }}/v713/sys/os/glnxa64:{{ self.matlab_install_path }}/v713/extern/bin/glnxa64
+        MATLABCMD: '{{ self.matlab_install_path }}/v713/toolbox/matlab'
 
-  instructions: |
-    export TMPDIR="$(mktemp -d)"
-    {{ self.install_dependencies() }}
-    echo "Downloading MATLAB Compiler Runtime ..."
-    curl -fL -o "$TMPDIR/MCRInstaller.bin" https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
-    chmod +x "$TMPDIR/MCRInstaller.bin"
-    "$TMPDIR/MCRInstaller.bin" -silent -P installLocation="{{ self.matlab_install_path }}"
-    rm -rf "$TMPDIR"
-    unset TMPDIR
-    # Install spm12
-    echo "Downloading standalone SPM12 ..."
-    curl -fL -o /tmp/spm12.zip {{ self.urls[self.version] }}
-    unzip -q /tmp/spm12.zip -d /tmp
-    mkdir -p {{ self.install_path }}
-    mv /tmp/spm12/* {{ self.install_path }}/
-    chmod -R 777 {{ self.install_path }}
-    rm -rf /tmp/spm*
-    # Test
-    {{ self.install_path }}/run_spm12.sh {{ self.matlab_install_path }}/v713 quit
+    instructions: |
+        export TMPDIR="$(mktemp -d)"
+        {{ self.install_dependencies() }}
+        echo "Downloading MATLAB Compiler Runtime ..."
+        curl -fL -o "$TMPDIR/MCRInstaller.bin" https://dl.dropbox.com/s/zz6me0c3v4yq5fd/MCR_R2010a_glnxa64_installer.bin
+        chmod +x "$TMPDIR/MCRInstaller.bin"
+        "$TMPDIR/MCRInstaller.bin" -silent -P installLocation="{{ self.matlab_install_path }}"
+        rm -rf "$TMPDIR"
+        unset TMPDIR
+        # Install spm12
+        echo "Downloading standalone SPM12 ..."
+        curl -fL -o /tmp/spm12.zip {{ self.urls[self.version] }}
+        unzip -q /tmp/spm12.zip -d /tmp
+        mkdir -p {{ self.install_path }}
+        mv /tmp/spm12/* {{ self.install_path }}/
+        chmod -R 777 {{ self.install_path }}
+        rm -rf /tmp/spm*
+        # Test
+        {{ self.install_path }}/run_spm12.sh {{ self.matlab_install_path }}/v713 quit

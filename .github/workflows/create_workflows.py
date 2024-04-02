@@ -23,6 +23,7 @@ This requires for you to build the pages from the docs folder
 and on the branch where the workflows are pushed to (currently "test_docker_build").
 
 """
+
 import argparse
 from pathlib import Path
 

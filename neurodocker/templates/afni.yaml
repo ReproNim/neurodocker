@@ -1,3 +1,4 @@
+---
 # Instructions to install AFNI.
 
 # TODO: consider updating the source instructions to use cmake.
@@ -5,195 +6,195 @@
 name: afni
 url: https://afni.nimh.nih.gov
 binaries:
-  arguments:
-    optional:
-      install_path: /opt/afni-{{ self.version }}
-      version: latest
-      install_r_pkgs: "false"
-      install_python3: "false"
-  urls:
-    latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
-  env:
-    PATH: "{{ self.install_path }}:$PATH"
-    AFNI_PLUGINPATH: "{{ self.install_path }}"
-  dependencies:
-    apt:
-    - ca-certificates
-    - cmake
-    - curl
-    - ed
-    - gsl-bin
-    - libcurl4-openssl-dev
-    - libgl1-mesa-dri
-    - libjpeg-turbo8-dev
-    - libglu1-mesa-dev
-    - libglib2.0-0
-    - libglw1-mesa
-    - libgomp1
-    - libjpeg62
-    - libssl-dev
-    - libudunits2-dev
-    - libxm4
-    - multiarch-support
-    - netpbm
-    - python-is-python3
-    - python3-pip
-    - tcsh
-    - xfonts-base
-    - xvfb
-    yum:
-    - cmake
-    - curl
-    - ed
-    - gsl
-    - libcurl-devel
-    - libGLU
-    - libgomp
-    - libjpeg-turbo-devel
-    - libpng12
-    - libXp
-    - libXpm
-    - mesa-dri-drivers
-    - netpbm-progs
-    - openmotif
-    - openssl-devel
-    - python-is-python3
-    - python3-pip
-    - R
-    - tcsh
-    - udunits2-devel
-    - which
-    - xorg-x11-fonts-misc
-    - xorg-x11-server-Xvfb
-    - wget
-    - mesa-dri-drivers
-    - mesa-libGLw
-    - which
-    - unzip
-    - ncurses-compat-libs
-    debs:
-      - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-      - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
-  instructions: |
-    {{ self.install_dependencies() }}
-    {% if self.install_python3.lower() in ["true", "1", "y"] -%}
-    {{ self.install(["python3"]) }}
-    pip3 install matplotlib
-    {%- endif %}
-    gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
-    if [ -n "$gsl_path" ]; then \
-      ln -sfv "$gsl_path" "$(dirname $gsl_path)/libgsl.so.0"; \
-    fi
-    ldconfig
-    mkdir -p {{ self.install_path }}
-    echo "Downloading AFNI ..."
-    curl -fL {{ self.urls[self.version] }} \
-    | tar -xz -C {{ self.install_path }} --strip-components 1
-    {%- if self.install_r_pkgs.lower() in ["true", "1", "y"] %}
-      {%- if self.pkg_manager == "apt" %}
-      {{ self.install(["r-base", "r-base-dev", "libnlopt-dev"]) }}
-      {% elif self.pkg_manager == "yum" %}
-      {{ self.install(["R-devel"]) }}
-      {% endif -%}
-    rPkgsInstall -pkgs ALL
-    {% endif -%}
+    arguments:
+        optional:
+            install_path: /opt/afni-{{ self.version }}
+            version: latest
+            install_r_pkgs: 'false'
+            install_python3: 'false'
+    urls:
+        latest: https://afni.nimh.nih.gov/pub/dist/tgz/linux_openmp_64.tgz
+    env:
+        PATH: '{{ self.install_path }}:$PATH'
+        AFNI_PLUGINPATH: '{{ self.install_path }}'
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   cmake
+        -   curl
+        -   ed
+        -   gsl-bin
+        -   libcurl4-openssl-dev
+        -   libgl1-mesa-dri
+        -   libjpeg-turbo8-dev
+        -   libglu1-mesa-dev
+        -   libglib2.0-0
+        -   libglw1-mesa
+        -   libgomp1
+        -   libjpeg62
+        -   libssl-dev
+        -   libudunits2-dev
+        -   libxm4
+        -   multiarch-support
+        -   netpbm
+        -   python-is-python3
+        -   python3-pip
+        -   tcsh
+        -   xfonts-base
+        -   xvfb
+        yum:
+        -   cmake
+        -   curl
+        -   ed
+        -   gsl
+        -   libcurl-devel
+        -   libGLU
+        -   libgomp
+        -   libjpeg-turbo-devel
+        -   libpng12
+        -   libXp
+        -   libXpm
+        -   mesa-dri-drivers
+        -   netpbm-progs
+        -   openmotif
+        -   openssl-devel
+        -   python-is-python3
+        -   python3-pip
+        -   R
+        -   tcsh
+        -   udunits2-devel
+        -   which
+        -   xorg-x11-fonts-misc
+        -   xorg-x11-server-Xvfb
+        -   wget
+        -   mesa-dri-drivers
+        -   mesa-libGLw
+        -   which
+        -   unzip
+        -   ncurses-compat-libs
+        debs:
+        -   http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        -   http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
+    instructions: |
+        {{ self.install_dependencies() }}
+        {% if self.install_python3.lower() in ["true", "1", "y"] -%}
+        {{ self.install(["python3"]) }}
+        pip3 install matplotlib
+        {%- endif %}
+        gsl_path="$(find / -name 'libgsl.so.??' || printf '')"
+        if [ -n "$gsl_path" ]; then \
+          ln -sfv "$gsl_path" "$(dirname $gsl_path)/libgsl.so.0"; \
+        fi
+        ldconfig
+        mkdir -p {{ self.install_path }}
+        echo "Downloading AFNI ..."
+        curl -fL {{ self.urls[self.version] }} \
+        | tar -xz -C {{ self.install_path }} --strip-components 1
+        {%- if self.install_r_pkgs.lower() in ["true", "1", "y"] %}
+          {%- if self.pkg_manager == "apt" %}
+          {{ self.install(["r-base", "r-base-dev", "libnlopt-dev"]) }}
+          {% elif self.pkg_manager == "yum" %}
+          {{ self.install(["R-devel"]) }}
+          {% endif -%}
+        rPkgsInstall -pkgs ALL
+        {% endif -%}
 
 source:
-  arguments:
-    required:
-    - version
-    optional:
-      repo: https://github.com/afni/afni.git
-      install_path: /opt/afni-{{ self.version }}
-      install_r_pkgs: "false"
-      install_python3: "false"
-  env:
-    PATH: "{{ self.install_path }}:$PATH"
-    AFNI_PLUGINPATH: "{{ self.install_path }}"
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    - ed
-    - g++
-    - gcc
-    - git
-    - libgl1-mesa-dri
-    - libglib2.0-dev
-    - libglu1-mesa-dev
-    - libgsl-dev
-    - libmotif-dev
-    - libnetpbm10-dev
-    - libxext-dev
-    - libxi-dev
-    - libxmu-headers
-    - libxpm-dev
-    - libxt-dev
-    - m4
-    - make
-    - mesa-common-dev
-    - multiarch-support
-    - tcsh
-    - zlib1g-dev
-    yum:
-    - compat-gcc-34
-    - curl
-    - expat-devel
-    - gcc
-    - gcc-c++
-    - gcc-gfortran
-    - git
-    - glib2-devel
-    - gsl-devel
-    - libXext-devel
-    - libXi-devel
-    - libXmu-devel
-    - libXpm-devel
-    - libXt-devel
-    - m4
-    - make
-    - mesa-dri-drivers
-    - mesa-libGL-devel
-    - mesa-libGLU-devel
-    - netpbm-devel
-    - openmotif-devel
-    - R
-    - tcsh
-    - which
-    - zlib-devel
-    debs:
-      - http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
-      - http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
-  instructions: |
-    {{ self.install_dependencies() }}
-    {%- if self.install_python3.lower() in ["true", "1", "y"] %}
-    {{ self.install(["python3"]) }}{% endif %}
-    git clone {{ self.repo }} {{ self.install_path }}
-    cd {{ self.install_path }}
-    {% if self.version != "master" and self.version != "latest" -%}
-    git fetch --tags
-    git checkout {{ self.version }}
-    {% endif -%}
-    cd src
-    cp Makefile.linux_openmp_64 Makefile
-    perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile
-    perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile
-    perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile
-    perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile
-    perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile
-    perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
-    perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
-    perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile
-    perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile
-    # If we do not symlink, gcc complains that it cannot find these libraries.
-    ln -s /usr/lib/x86_64-linux-gnu/libXmu.so.6 /usr/lib/x86_64-linux-gnu/libXmu.so
-    ln -s /usr/lib/x86_64-linux-gnu/libXp.so.6 /usr/lib/x86_64-linux-gnu/libXp.so
-    make INSTALLDIR="{{ self.install_path }}" vastness
-    {%- if self.install_r_pkgs.lower() in ["true", "1", "y"] %}
-      {%- if self.pkg_manager == "apt" %}
-      {{ self.install(["r-base", "r-base-dev", "libnlopt-dev"]) }}
-      {% elif self.pkg_manager == "yum" %}
-      {{ self.install(["R-devel"]) }}
-      {% endif -%}
-    rPkgsInstall -pkgs ALL
-    {% endif -%}
+    arguments:
+        required:
+        -   version
+        optional:
+            repo: https://github.com/afni/afni.git
+            install_path: /opt/afni-{{ self.version }}
+            install_r_pkgs: 'false'
+            install_python3: 'false'
+    env:
+        PATH: '{{ self.install_path }}:$PATH'
+        AFNI_PLUGINPATH: '{{ self.install_path }}'
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        -   ed
+        -   g++
+        -   gcc
+        -   git
+        -   libgl1-mesa-dri
+        -   libglib2.0-dev
+        -   libglu1-mesa-dev
+        -   libgsl-dev
+        -   libmotif-dev
+        -   libnetpbm10-dev
+        -   libxext-dev
+        -   libxi-dev
+        -   libxmu-headers
+        -   libxpm-dev
+        -   libxt-dev
+        -   m4
+        -   make
+        -   mesa-common-dev
+        -   multiarch-support
+        -   tcsh
+        -   zlib1g-dev
+        yum:
+        -   compat-gcc-34
+        -   curl
+        -   expat-devel
+        -   gcc
+        -   gcc-c++
+        -   gcc-gfortran
+        -   git
+        -   glib2-devel
+        -   gsl-devel
+        -   libXext-devel
+        -   libXi-devel
+        -   libXmu-devel
+        -   libXpm-devel
+        -   libXt-devel
+        -   m4
+        -   make
+        -   mesa-dri-drivers
+        -   mesa-libGL-devel
+        -   mesa-libGLU-devel
+        -   netpbm-devel
+        -   openmotif-devel
+        -   R
+        -   tcsh
+        -   which
+        -   zlib-devel
+        debs:
+        -   http://mirrors.kernel.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb
+        -   http://snapshot.debian.org/archive/debian-security/20160113T213056Z/pool/updates/main/libp/libpng/libpng12-0_1.2.49-1%2Bdeb7u2_amd64.deb
+    instructions: |
+        {{ self.install_dependencies() }}
+        {%- if self.install_python3.lower() in ["true", "1", "y"] %}
+        {{ self.install(["python3"]) }}{% endif %}
+        git clone {{ self.repo }} {{ self.install_path }}
+        cd {{ self.install_path }}
+        {% if self.version != "master" and self.version != "latest" -%}
+        git fetch --tags
+        git checkout {{ self.version }}
+        {% endif -%}
+        cd src
+        cp Makefile.linux_openmp_64 Makefile
+        perl -p -i -e 's/^LGIFTI.*/LGIFTI    = -lexpat/' Makefile
+        perl -p -i -e 's/^USE_LOCAL_X_TREE/#USE_LOCAL_X_TREE/' Makefile
+        perl -p -i -e 's/XLIBS = \$\(XROOT\)\/lib64\/libXm.a -lXt/XLIBS = \$\(XROOT\)\/lib64\/libXm.a \$\(XROOT\)\/lib\/x86_64-linux-gnu\/libXm.a -lXt/' Makefile
+        perl -p -i -e 's/^# XLIBS =/XLIBS =/' Makefile
+        perl -p -i -e 's/^CCOLD.*/CCOLD  = \$\(CC\)/' Makefile
+        perl -p -i -e 's/(^LFLAGS.*)/$1 -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+        perl -p -i -e 's/(^PLFLAGS.*)/$1 -L\/usr\/lib -L\/usr\/lib\/x86_64-linux-gnu/' Makefile
+        perl -p -i -e 's/-lXpm -lXext/-lXpm -lfontconfig -lXext/' Makefile
+        perl -p -i -e 's/(^SUMA_INCLUDE_PATH.*)/$1 -I\/usr\/lib\/x86_64-linux-gnu\/glib-2.0\/include/' Makefile
+        # If we do not symlink, gcc complains that it cannot find these libraries.
+        ln -s /usr/lib/x86_64-linux-gnu/libXmu.so.6 /usr/lib/x86_64-linux-gnu/libXmu.so
+        ln -s /usr/lib/x86_64-linux-gnu/libXp.so.6 /usr/lib/x86_64-linux-gnu/libXp.so
+        make INSTALLDIR="{{ self.install_path }}" vastness
+        {%- if self.install_r_pkgs.lower() in ["true", "1", "y"] %}
+          {%- if self.pkg_manager == "apt" %}
+          {{ self.install(["r-base", "r-base-dev", "libnlopt-dev"]) }}
+          {% elif self.pkg_manager == "yum" %}
+          {{ self.install(["R-devel"]) }}
+          {% endif -%}
+        rPkgsInstall -pkgs ALL
+        {% endif -%}

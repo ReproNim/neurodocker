@@ -1,4 +1,5 @@
 """Remove all files under a directory but not caught by `reprozip trace`."""
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -1,28 +1,29 @@
+---
 # Instructions to install Convert3D.
 
 name: convert3d
 url: http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Convert3D
 binaries:
-  arguments:
-    required:
-    - version
-    optional:
-      install_path: /opt/convert3d-{{ self.version }}
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    yum:
-    - curl
-  urls:
-    nightly: https://sourceforge.net/projects/c3d/files/c3d/Nightly/c3d-nightly-Linux-x86_64.tar.gz/download
-    "1.0.0": https://sourceforge.net/projects/c3d/files/c3d/1.0.0/c3d-1.0.0-Linux-x86_64.tar.gz/download
-  env:
-    C3DPATH: "{{ self.install_path }}"
-    PATH: "{{ self.install_path }}/bin:$PATH"
-  instructions: |
-    {{ self.install_dependencies() }}
-    echo "Downloading Convert3D ..."
-    mkdir -p {{ self.install_path }}
-    curl -fsSL {{ self.urls[self.version] }} \
-    | tar -xz -C {{ self.install_path }} --strip-components 1
+    arguments:
+        required:
+        -   version
+        optional:
+            install_path: /opt/convert3d-{{ self.version }}
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        yum:
+        -   curl
+    urls:
+        nightly: https://sourceforge.net/projects/c3d/files/c3d/Nightly/c3d-nightly-Linux-x86_64.tar.gz/download
+        1.0.0: https://sourceforge.net/projects/c3d/files/c3d/1.0.0/c3d-1.0.0-Linux-x86_64.tar.gz/download
+    env:
+        C3DPATH: '{{ self.install_path }}'
+        PATH: '{{ self.install_path }}/bin:$PATH'
+    instructions: |
+        {{ self.install_dependencies() }}
+        echo "Downloading Convert3D ..."
+        mkdir -p {{ self.install_path }}
+        curl -fsSL {{ self.urls[self.version] }} \
+        | tar -xz -C {{ self.install_path }} --strip-components 1

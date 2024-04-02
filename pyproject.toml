@@ -1,3 +1,12 @@
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.codespell]
+# didi -- some name Dear to someone
+ignore-words-list = "didi"
+skip = ".git,*.pdf,*.svg,versioneer.py,neurodocker/_version.py"
+
 [tool.isort]
 combine_as_imports = true
 line_length = 88
@@ -6,4 +15,24 @@ skip_gitignore = true
 src_paths = [
     'neurodocker',
     'docs'
+]
+
+[tool.mypy]
+no_implicit_optional = false
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "pytest",
+    "docker",
+    "jsonschema"
+]
+
+[[tool.mypy.overrides]]
+ignore_errors = true
+module = [
+    'neurodocker._version',
+    "neurodocker.reproenv.tests.*",
+    'download_templates',
+    'conf'
 ]
