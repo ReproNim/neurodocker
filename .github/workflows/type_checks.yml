@@ -30,7 +30,7 @@ jobs:
                 python-version: ${{ matrix.python-version }}
 
         -   name: Install neurodocker
-            run: python -m pip install mypy
+            run: python -m pip install . mypy
 
         -   name: Check types
             run: mypy --install-types --non-interactive neurodocker
