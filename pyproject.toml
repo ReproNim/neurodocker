@@ -114,7 +114,7 @@ module = [
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = [
-    'neurodocker._version',
+    "neurodocker._version",
     "neurodocker.reproenv.tests.*",
     'download_templates',
     'conf'
