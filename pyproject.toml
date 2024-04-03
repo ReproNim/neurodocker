@@ -108,7 +108,8 @@ ignore_missing_imports = true
 module = [
     "pytest",
     "docker",
-    "jsonschema"
+    "jsonschema",
+    "neurodocker._version"
 ]
 
 [[tool.mypy.overrides]]
