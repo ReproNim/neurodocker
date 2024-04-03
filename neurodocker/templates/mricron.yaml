@@ -1,41 +1,42 @@
+---
 # Instructions to install MRIcron.
 
 name: mricron
 url: https://github.com/neurolabusc/MRIcron
 binaries:
-  arguments:
-    required:
-    - version
-    optional:
-      install_path: /opt/mricron-{{ self.version }}
-  urls:
-    "1.0.20190902": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190902/MRIcron_linux.zip
-    "1.0.20190410": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190410/mricron_linux.zip
-    "1.0.20181114": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20181114/mricron_linux.zip
-    "1.0.20180614": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20180614/mricron_linux.zip
-    "1.0.20180404": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20180404/mricron_lx64.zip
-    "1.0.20171220": https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20171220/mricron_linux.zip
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    - libatk-adaptor
-    - libcanberra-gtk-module
-    - libgail-common
-    - libgtk2.0-0
-    - unzip
-    yum:
-    - curl
-    - gtk2
-    - unzip
-  env:
-    PATH: "{{ self.install_path }}:$PATH"
-  instructions: |
-    {{ self.install_dependencies() }}
-    echo "Downloading MRIcron ..."
-    mkdir -p {{ self.install_path }}
-    curl -fL -O {{ self.urls[self.version] }}
-    unzip "*cron*.zip"
-    rm -f "*cron*.zip"
-    mv mricron/* {{ self.install_path }}
-    rmdir mricron
+    arguments:
+        required:
+        -   version
+        optional:
+            install_path: /opt/mricron-{{ self.version }}
+    urls:
+        1.0.20190902: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190902/MRIcron_linux.zip
+        1.0.20190410: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20190410/mricron_linux.zip
+        1.0.20181114: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20181114/mricron_linux.zip
+        1.0.20180614: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20180614/mricron_linux.zip
+        1.0.20180404: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20180404/mricron_lx64.zip
+        1.0.20171220: https://github.com/neurolabusc/MRIcron/releases/download/v1.0.20171220/mricron_linux.zip
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        -   libatk-adaptor
+        -   libcanberra-gtk-module
+        -   libgail-common
+        -   libgtk2.0-0
+        -   unzip
+        yum:
+        -   curl
+        -   gtk2
+        -   unzip
+    env:
+        PATH: '{{ self.install_path }}:$PATH'
+    instructions: |
+        {{ self.install_dependencies() }}
+        echo "Downloading MRIcron ..."
+        mkdir -p {{ self.install_path }}
+        curl -fL -O {{ self.urls[self.version] }}
+        unzip "*cron*.zip"
+        rm -f "*cron*.zip"
+        mv mricron/* {{ self.install_path }}
+        rmdir mricron

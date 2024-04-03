@@ -1,4 +1,5 @@
 """Stateful objects in reproenv runtime."""
+
 from __future__ import annotations
 
 import copy

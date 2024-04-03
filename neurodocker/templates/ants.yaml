@@ -1,101 +1,102 @@
+---
 # Instructions to install ANTs (https://github.com/ANTsX/ANTs)
 
 name: ants
 url: http://stnava.github.io/ANTs/
 binaries:
-  arguments:
-    required:
-    - version
-    optional:
-      install_path: /opt/ants-{{ self.version }}
-  urls:
+    arguments:
+        required:
+        -   version
+        optional:
+            install_path: /opt/ants-{{ self.version }}
+    urls:
     # Official binaries are provided as of 2.4.1 (https://github.com/ANTsX/ANTs/releases)
-    "2.4.3": https://github.com/ANTsX/ANTs/releases/download/v2.4.3/ants-2.4.3-centos7-X64-gcc.zip
-    "2.4.2": https://github.com/ANTsX/ANTs/releases/download/v2.4.2/ants-2.4.2-centos7-X64-gcc.zip
-    "2.4.1": https://github.com/ANTsX/ANTs/releases/download/v2.4.1/ants-2.4.1-centos7-X64-gcc.zip
+        2.4.3: https://github.com/ANTsX/ANTs/releases/download/v2.4.3/ants-2.4.3-centos7-X64-gcc.zip
+        2.4.2: https://github.com/ANTsX/ANTs/releases/download/v2.4.2/ants-2.4.2-centos7-X64-gcc.zip
+        2.4.1: https://github.com/ANTsX/ANTs/releases/download/v2.4.1/ants-2.4.1-centos7-X64-gcc.zip
     # Binaries prior to 2.4.x were compiled by Jakub Kaczmarzyk (https://github.com/kaczmarj)
-    "2.3.4": https://dl.dropbox.com/s/gwf51ykkk5bifyj/ants-Linux-centos6_x86_64-v2.3.4.tar.gz
-    "2.3.2": https://dl.dropbox.com/s/hrm530kcqe3zo68/ants-Linux-centos6_x86_64-v2.3.2.tar.gz
-    "2.3.1": https://dl.dropbox.com/s/1xfhydsf4t4qoxg/ants-Linux-centos6_x86_64-v2.3.1.tar.gz
-    "2.3.0": https://dl.dropbox.com/s/b3iymb9ml36ecp9/ants-Linux-centos6_x86_64-v2.3.0.tar.gz
-    "2.2.0": https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz
-    "2.1.0": https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz
-    "2.0.3": https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz
-    "2.0.0": https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    - unzip
-    yum:
-    - curl
-    - unzip
-  env:
-    ANTSPATH: "{{ self.install_path }}/"
-    PATH: "{{ self.install_path }}:$PATH"
-  instructions: |
-    {{ self.install_dependencies() }}
-    echo "Downloading ANTs ..."
-    {% if (self.version == "2.4.1" or self.version == "2.4.2" or self.version == "2.4.3") -%}
-    curl -fsSL -o ants.zip {{ self.urls[self.version] }}
-    unzip ants.zip -d /opt
-    mv {{ self.install_path }}/bin/* {{ self.install_path }}
-    rm ants.zip
-    {% elif self.version != "2.4.1" -%}
-    mkdir -p {{ self.install_path }}
-    curl -fsSL {{ self.urls[self.version] }} \
-    | tar -xz -C {{ self.install_path }} --strip-components 1
-    {% endif -%}
+        2.3.4: https://dl.dropbox.com/s/gwf51ykkk5bifyj/ants-Linux-centos6_x86_64-v2.3.4.tar.gz
+        2.3.2: https://dl.dropbox.com/s/hrm530kcqe3zo68/ants-Linux-centos6_x86_64-v2.3.2.tar.gz
+        2.3.1: https://dl.dropbox.com/s/1xfhydsf4t4qoxg/ants-Linux-centos6_x86_64-v2.3.1.tar.gz
+        2.3.0: https://dl.dropbox.com/s/b3iymb9ml36ecp9/ants-Linux-centos6_x86_64-v2.3.0.tar.gz
+        2.2.0: https://dl.dropbox.com/s/2f4sui1z6lcgyek/ANTs-Linux-centos5_x86_64-v2.2.0-0740f91.tar.gz
+        2.1.0: https://dl.dropbox.com/s/h8k4v6d1xrv0wbe/ANTs-Linux-centos5_x86_64-v2.1.0-78931aa.tar.gz
+        2.0.3: https://dl.dropbox.com/s/oe4v52lveyt1ry9/ANTs-Linux-centos5_x86_64-v2.0.3-c996539.tar.gz
+        2.0.0: https://dl.dropbox.com/s/kgqydc44cc2uigb/ANTs-Linux-centos5_x86_64-v2.0.0-7ae1107.tar.gz
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        -   unzip
+        yum:
+        -   curl
+        -   unzip
+    env:
+        ANTSPATH: '{{ self.install_path }}/'
+        PATH: '{{ self.install_path }}:$PATH'
+    instructions: |
+        {{ self.install_dependencies() }}
+        echo "Downloading ANTs ..."
+        {% if (self.version == "2.4.1" or self.version == "2.4.2" or self.version == "2.4.3") -%}
+        curl -fsSL -o ants.zip {{ self.urls[self.version] }}
+        unzip ants.zip -d /opt
+        mv {{ self.install_path }}/bin/* {{ self.install_path }}
+        rm ants.zip
+        {% elif self.version != "2.4.1" -%}
+        mkdir -p {{ self.install_path }}
+        curl -fsSL {{ self.urls[self.version] }} \
+        | tar -xz -C {{ self.install_path }} --strip-components 1
+        {% endif -%}
 
 source:
-  arguments:
-    required:
-    - version
-    optional:
-      repo: https://github.com/ANTsX/ANTs.git
-      install_path: /opt/ants-{{ self.version }}
-      cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
-      make_opts: -j1
-  dependencies:
-    apt:
-    - ca-certificates
-    - cmake
-    - g++
-    - gcc
-    - git
-    - make
-    - zlib1g-dev
-    yum:
-    - ca-certificates
-    - cmake
-    - gcc-c++
-    - git
-    - make
-    - zlib-devel
-  env:
-    ANTSPATH: "{{ self.install_path }}/bin"
-    PATH: "{{ self.install_path }}/bin:{{ self.install_path }}/Scripts:$PATH"
-    LD_LIBRARY_PATH: "{{ self.install_path }}/lib:$LD_LIBRARY_PATH"
-  instructions: |
-    {{ self.install_dependencies() }}
-    mkdir -p /tmp/ants/build
-    git clone {{ self.repo }} /tmp/ants/source
-    {% if self.version != "master" and self.version != "latest" -%}
-    cd /tmp/ants/source
-    git fetch --tags
-    git -c advice.detachedHead=false checkout v{{ self.version }}
-    {% endif -%}
-    cd /tmp/ants/build
-    cmake {{ self.cmake_opts }} /tmp/ants/source
-    make {{ self.make_opts }}
-    mkdir -p {{ self.install_path }}
-    # Recent versions of ants create ANTS-build.
-    if [ -d ANTS-build ]; then \
-      cd ANTS-build \
-      && make install \
-      && mv ../../source/Scripts/ {{ self.install_path }}; \
-    else \
-      mv bin lib {{ self.install_path }}/ \
-      mv ../Scripts/* {{ self.install_path }} ; \
-    fi
-    rm -rf /tmp/ants
+    arguments:
+        required:
+        -   version
+        optional:
+            repo: https://github.com/ANTsX/ANTs.git
+            install_path: /opt/ants-{{ self.version }}
+            cmake_opts: -DCMAKE_INSTALL_PREFIX={{ self.install_path }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
+            make_opts: -j1
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   cmake
+        -   g++
+        -   gcc
+        -   git
+        -   make
+        -   zlib1g-dev
+        yum:
+        -   ca-certificates
+        -   cmake
+        -   gcc-c++
+        -   git
+        -   make
+        -   zlib-devel
+    env:
+        ANTSPATH: '{{ self.install_path }}/bin'
+        PATH: '{{ self.install_path }}/bin:{{ self.install_path }}/Scripts:$PATH'
+        LD_LIBRARY_PATH: '{{ self.install_path }}/lib:$LD_LIBRARY_PATH'
+    instructions: |
+        {{ self.install_dependencies() }}
+        mkdir -p /tmp/ants/build
+        git clone {{ self.repo }} /tmp/ants/source
+        {% if self.version != "master" and self.version != "latest" -%}
+        cd /tmp/ants/source
+        git fetch --tags
+        git -c advice.detachedHead=false checkout v{{ self.version }}
+        {% endif -%}
+        cd /tmp/ants/build
+        cmake {{ self.cmake_opts }} /tmp/ants/source
+        make {{ self.make_opts }}
+        mkdir -p {{ self.install_path }}
+        # Recent versions of ants create ANTS-build.
+        if [ -d ANTS-build ]; then \
+          cd ANTS-build \
+          && make install \
+          && mv ../../source/Scripts/ {{ self.install_path }}; \
+        else \
+          mv bin lib {{ self.install_path }}/ \
+          mv ../Scripts/* {{ self.install_path }} ; \
+        fi
+        rm -rf /tmp/ants

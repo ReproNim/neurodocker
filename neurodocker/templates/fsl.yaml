@@ -1,3 +1,4 @@
+---
 # Instructions to install FSL.
 #
 # *****************************************************************************
@@ -12,118 +13,118 @@ name: fsl
 url: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
 alert: FSL is non-free. If you are considering commercial use of FSL, please consult the relevant license(s).
 binaries:
-  arguments:
-    required:
-    - version
-    optional:
-      install_path: /opt/fsl-{{ self.version }}
-      exclude_paths: ""
-  urls:
-    "6.0.7.4": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.7.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.6.4": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.6.3": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.6.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.6.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.6": https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
-    "6.0.5.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.2-centos7_64.tar.gz
-    "6.0.5.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.1-centos7_64.tar.gz
-    "6.0.5": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5-centos7_64.tar.gz
-    "6.0.4": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.4-centos6_64.tar.gz
-    "6.0.3": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.3-centos6_64.tar.gz
-    "6.0.2": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.2-centos6_64.tar.gz
-    "6.0.1": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.1-centos6_64.tar.gz
-    "6.0.0": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.0-centos6_64.tar.gz
-    "5.0.11": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.11-centos6_64.tar.gz
-    "5.0.10": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz
-    "5.0.9": https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
-    "5.0.8": https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
-  dependencies:
-    apt:
-    - bc
-    - ca-certificates
-    - curl
-    - dc
-    - file
-    - libfontconfig1
-    - libfreetype6
-    - libgl1-mesa-dev
-    - libgl1-mesa-dri
-    - libglu1-mesa-dev
-    - libgomp1
-    - libice6
-    - libopenblas-base
-    - libxcursor1
-    - libxft2
-    - libxinerama1
-    - libxrandr2
-    - libxrender1
-    - libxt6
-    - nano
-    - python3
-    - sudo
-    - wget
-    yum:
-    - bc
-    - curl
-    - file
-    - libGL
-    - libGLU
-    - libICE
-    - libSM
-    - libX11
-    - libXcursor
-    - libXext
-    - libXft
-    - libXinerama
-    - libXrandr
-    - libXt
-    - libgomp
-    - libjpeg
-    - libmng
-    - libpng12
-    - nano
-    - openblas-serial
-    - python3
-    - sudo
-    - wget
-  env:
-    FSLDIR: "{{ self.install_path }}"
-    PATH: "{{ self.install_path }}/bin:$PATH"
-    FSLOUTPUTTYPE: "NIFTI_GZ"
-    FSLMULTIFILEQUIT: "TRUE"
-    FSLTCLSH: "{{ self.install_path }}/bin/fsltclsh"
-    FSLWISH: "{{ self.install_path }}/bin/fslwish"
-    FSLLOCKDIR: ""
-    FSLMACHINELIST: ""
-    FSLREMOTECALL: ""
-    FSLGECUDAQ: "cuda.q"
-  instructions: |
-    {{ self.install_dependencies() }}
-    {% if self.version.split('.') | map('int') | list >= [6, 0, 6] %}
-    echo "Installing FSL ..."
-    curl -fsSL {{ self.urls[self.version] }} | python3 - -d {{ self.install_path }} -V {{ self.version }}
-    {% else %}
-    echo "Downloading FSL ..."
-    mkdir -p {{ self.install_path }}
-    curl -fL {{ self.urls[self.version] }} \
-    | tar -xz -C {{ self.install_path }} --strip-components 1 {% if self.exclude_paths -%}\
-    {%- for exclude_path in self.exclude_paths.split() %}
-      {% if not loop.last -%}
-      --exclude='{{ exclude_path }}' \
-      {%- else -%}
-      --exclude='{{ exclude_path }}'
-      {%- endif -%}
-    {%- endfor %}
-    {%- endif %}
-    {% if self.version not in ("5.0.9", "5.0.8") -%}
-    echo "Installing FSL conda environment ..."
-    bash {{ self.install_path }}/etc/fslconf/fslpython_install.sh -f {{ self.install_path }}
-    {% endif -%}
-    {% if self.version in ("6.0.1") -%}
-    echo "Downgrading deprecation module per https://github.com/kaczmarj/neurodocker/issues/271#issuecomment-514523420"
-    {{ self.install_path }}/fslpython/bin/conda install -n fslpython -c conda-forge -y deprecation==1.*
-    echo "Removing bundled with FSLeyes libz likely incompatible with the one from OS"
-    rm -f {{ self.install_path }}/bin/FSLeyes/libz.so.1
-    {% endif -%}
-    {% endif -%}
+    arguments:
+        required:
+        -   version
+        optional:
+            install_path: /opt/fsl-{{ self.version }}
+            exclude_paths: ''
+    urls:
+        6.0.7.4: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.7.1: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.6.4: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.6.3: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.6.2: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.6.1: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.6: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
+        6.0.5.2: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.2-centos7_64.tar.gz
+        6.0.5.1: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5.1-centos7_64.tar.gz
+        6.0.5: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.5-centos7_64.tar.gz
+        6.0.4: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.4-centos6_64.tar.gz
+        6.0.3: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.3-centos6_64.tar.gz
+        6.0.2: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.2-centos6_64.tar.gz
+        6.0.1: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.1-centos6_64.tar.gz
+        6.0.0: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-6.0.0-centos6_64.tar.gz
+        5.0.11: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.11-centos6_64.tar.gz
+        5.0.10: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz
+        5.0.9: https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.9-centos6_64.tar.gz
+        5.0.8: https://fsl.fmrib.ox.ac.uk/fsldownloads/oldversions/fsl-5.0.8-centos6_64.tar.gz
+    dependencies:
+        apt:
+        -   bc
+        -   ca-certificates
+        -   curl
+        -   dc
+        -   file
+        -   libfontconfig1
+        -   libfreetype6
+        -   libgl1-mesa-dev
+        -   libgl1-mesa-dri
+        -   libglu1-mesa-dev
+        -   libgomp1
+        -   libice6
+        -   libopenblas-base
+        -   libxcursor1
+        -   libxft2
+        -   libxinerama1
+        -   libxrandr2
+        -   libxrender1
+        -   libxt6
+        -   nano
+        -   python3
+        -   sudo
+        -   wget
+        yum:
+        -   bc
+        -   curl
+        -   file
+        -   libGL
+        -   libGLU
+        -   libICE
+        -   libSM
+        -   libX11
+        -   libXcursor
+        -   libXext
+        -   libXft
+        -   libXinerama
+        -   libXrandr
+        -   libXt
+        -   libgomp
+        -   libjpeg
+        -   libmng
+        -   libpng12
+        -   nano
+        -   openblas-serial
+        -   python3
+        -   sudo
+        -   wget
+    env:
+        FSLDIR: '{{ self.install_path }}'
+        PATH: '{{ self.install_path }}/bin:$PATH'
+        FSLOUTPUTTYPE: NIFTI_GZ
+        FSLMULTIFILEQUIT: 'TRUE'
+        FSLTCLSH: '{{ self.install_path }}/bin/fsltclsh'
+        FSLWISH: '{{ self.install_path }}/bin/fslwish'
+        FSLLOCKDIR: ''
+        FSLMACHINELIST: ''
+        FSLREMOTECALL: ''
+        FSLGECUDAQ: cuda.q
+    instructions: |
+        {{ self.install_dependencies() }}
+        {% if self.version.split('.') | map('int') | list >= [6, 0, 6] %}
+        echo "Installing FSL ..."
+        curl -fsSL {{ self.urls[self.version] }} | python3 - -d {{ self.install_path }} -V {{ self.version }}
+        {% else %}
+        echo "Downloading FSL ..."
+        mkdir -p {{ self.install_path }}
+        curl -fL {{ self.urls[self.version] }} \
+        | tar -xz -C {{ self.install_path }} --strip-components 1 {% if self.exclude_paths -%}\
+        {%- for exclude_path in self.exclude_paths.split() %}
+          {% if not loop.last -%}
+          --exclude='{{ exclude_path }}' \
+          {%- else -%}
+          --exclude='{{ exclude_path }}'
+          {%- endif -%}
+        {%- endfor %}
+        {%- endif %}
+        {% if self.version not in ("5.0.9", "5.0.8") -%}
+        echo "Installing FSL conda environment ..."
+        bash {{ self.install_path }}/etc/fslconf/fslpython_install.sh -f {{ self.install_path }}
+        {% endif -%}
+        {% if self.version in ("6.0.1") -%}
+        echo "Downgrading deprecation module per https://github.com/kaczmarj/neurodocker/issues/271#issuecomment-514523420"
+        {{ self.install_path }}/fslpython/bin/conda install -n fslpython -c conda-forge -y deprecation==1.*
+        echo "Removing bundled with FSLeyes libz likely incompatible with the one from OS"
+        rm -f {{ self.install_path }}/bin/FSLeyes/libz.so.1
+        {% endif -%}
+        {% endif -%}

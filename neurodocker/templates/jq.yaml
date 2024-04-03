@@ -1,51 +1,52 @@
+---
 # Sample template. Installs `jq` (a JSON parser) from binaries or from source.
 
 name: jq
 url: https://jqlang.github.io/jq/
 binaries:
-  arguments:
-    required:
-    - version
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    yum:
-    - curl
-  instructions: |
-    {{ self.install_dependencies() }}
-    curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
-    chmod +x /usr/local/bin/jq
-  urls:
-    '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-    '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    arguments:
+        required:
+        -   version
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        yum:
+        -   curl
+    instructions: |
+        {{ self.install_dependencies() }}
+        curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
+        chmod +x /usr/local/bin/jq
+    urls:
+        '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
 source:
-  arguments:
-    required:
-    - version
-  dependencies:
-    apt:
-    - ca-certificates
-    - curl
-    - automake
-    - gcc
-    - git
-    - libtool
-    - make
-    yum:
-    - ca-certificates
-    - curl
-    - automake
-    - gcc
-    - git
-    - libtool
-    - make
-  instructions: |
-    mkdir jq
-    cd jq
-    curl -fsSL https://github.com/stedolan/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
-    | tar xz --strip-components 1
-    {% if self.version == "1.6" -%} autoreconf -fi {% endif %}
-    ./configure --disable-maintainer-mode
-    make
-    make install
+    arguments:
+        required:
+        -   version
+    dependencies:
+        apt:
+        -   ca-certificates
+        -   curl
+        -   automake
+        -   gcc
+        -   git
+        -   libtool
+        -   make
+        yum:
+        -   ca-certificates
+        -   curl
+        -   automake
+        -   gcc
+        -   git
+        -   libtool
+        -   make
+    instructions: |
+        mkdir jq
+        cd jq
+        curl -fsSL https://github.com/stedolan/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
+        | tar xz --strip-components 1
+        {% if self.version == "1.6" -%} autoreconf -fi {% endif %}
+        ./configure --disable-maintainer-mode
+        make
+        make install
