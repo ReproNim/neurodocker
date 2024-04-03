@@ -1,0 +1,36 @@
+---
+name: type checking
+
+# runs type checks on several pythons as some errors may only show up on older versions
+
+on:
+    pull_request:
+        branches: [master]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    typecheck:
+
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                python-version: ['3.12', '3.11', '3.10', '3.9', '3.8']
+
+        steps:
+        -   uses: actions/checkout@v4
+
+        -   name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: ${{ matrix.python-version }}
+
+        -   name: Install neurodocker
+            run: python -m pip install . mypy
+
+        -   name: Check types
+            run: mypy --install-types --non-interactive neurodocker

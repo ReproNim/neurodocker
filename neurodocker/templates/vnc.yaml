@@ -1,3 +1,4 @@
+---
 # Instructions to configure VNC.
 #
 # Run:
@@ -6,23 +7,23 @@ name: vnc
 url: https://www.realvnc.com/
 # Not actually source, but we do not want to provide binaries.
 source:
-  arguments:
-    required:
-    - passwd
-  dependencies:
-    apt:
-    - openbox
-    - tightvncserver
-    - xfonts-base
-    - xvfb
-    yum:
-    - openbox
-    - tightvnc-server
-    - xorg-x11-fonts
-    - xorg-x11-server-Xvfb
-  instructions: |
-    {{ self.install_dependencies() }}
-    echo 'Configuring VNC password ...'
-    mkdir -p ~/.vnc
-    echo {{ self.passwd }} | vncpasswd -f > ~/.vnc/passwd
-    chmod 0600 ~/.vnc/passwd
+    arguments:
+        required:
+        -   passwd
+    dependencies:
+        apt:
+        -   openbox
+        -   tightvncserver
+        -   xfonts-base
+        -   xvfb
+        yum:
+        -   openbox
+        -   tightvnc-server
+        -   xorg-x11-fonts
+        -   xorg-x11-server-Xvfb
+    instructions: |
+        {{ self.install_dependencies() }}
+        echo 'Configuring VNC password ...'
+        mkdir -p ~/.vnc
+        echo {{ self.passwd }} | vncpasswd -f > ~/.vnc/passwd
+        chmod 0600 ~/.vnc/passwd
