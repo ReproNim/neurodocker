@@ -1,6 +1,9 @@
 # MACOS related
 .DS_Store
 
+# hatchling autogenerates it on install
+neurodocker/_version.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
