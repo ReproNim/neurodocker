@@ -1,3 +1,71 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
+
+[project]
+authors = [{name = "Neurodocker Developers"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "click",
+    "etelemetry >= 0.2.0",
+    "jinja2 >= 2.0",
+    "jsonschema >= 3.0",
+    "mypy-extensions",
+    "pyyaml  >= 5.0",
+    "typing-extensions"
+]
+description = "A generic generator of Dockerfiles and Singularity recipes."
+dynamic = ["version"]
+license = {text = "Apache License, 2.0"}
+maintainers = [{name = "Jakub Kaczmarzyk", email = "jakub.kaczmarzyk@gmail.com"}]
+name = "neurodocker"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+all = ["neurodocker[minify,dev,doc]"]
+dev = [
+    "neurodocker[minify]",
+    "codecov",
+    "coverage[toml]",
+    "pre-commit",
+    "pytest >= 6.0",
+    "pytest-cov >= 2.0.0",
+    "pytest-reportlog >= 0.1.2",
+    "pytest-xdist >= 2.2.0"
+]
+doc = [
+    "sphinx <7",
+    "pydata-sphinx-theme >= 0.13",
+    "sphinxcontrib.apidoc >= 0.3"
+]
+minify = [
+    "docker >= 4.4.1"
+]
+
+[project.scripts]
+neurodocker = "neurodocker.cli.cli:cli"
+
+[project.urls]
+Development = "https://github.com/repronim/neurodocker"
+Homepage = "https://www.repronim.org/neurodocker/"
+
 [tool.black]
 line-length = 88
 target-version = ['py38']
@@ -6,6 +74,21 @@ target-version = ['py38']
 # didi -- some name Dear to someone
 ignore-words-list = "didi"
 skip = ".git,*.pdf,*.svg,versioneer.py,neurodocker/_version.py"
+
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "neurodocker/_version.py"
+]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "neurodocker/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["neurodocker"]
+
+[tool.hatch.version]
+source = "vcs"
 
 [tool.isort]
 combine_as_imports = true
@@ -25,14 +108,28 @@ ignore_missing_imports = true
 module = [
     "pytest",
     "docker",
-    "jsonschema"
+    "jsonschema",
+    "neurodocker._version"
 ]
 
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = [
-    'neurodocker._version',
+    "neurodocker._version",
     "neurodocker.reproenv.tests.*",
     'download_templates',
     'conf'
 ]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers --showlocals -s -vv --cov=neurodocker --cov-config=pyproject.toml"
+doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"
+junit_family = "xunit2"
+markers = [
+    "builds_docker: builds a docker image",
+    "builds_singularity: builds a singularity image",
+    "long: mark a test as taking a long time (minutes)",
+    "verylong: mark a test as taking a very long time (over 10 minutes)"
+]
+minversion = "6.0"
+xfail_strict = true

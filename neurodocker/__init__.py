@@ -6,10 +6,9 @@ It includes ReproEnv, which is an extensible, generic container generator.
 from pathlib import Path
 
 from neurodocker import reproenv  # noqa: F401
-from neurodocker._version import get_versions
+from neurodocker._version import __version__
 
-__version__ = get_versions()["version"]
-del get_versions
+__version__ = __version__
 
 # Register neurodocker templates
 # TODO: remove registration from the `generate` cli. otherwise we register twice.
