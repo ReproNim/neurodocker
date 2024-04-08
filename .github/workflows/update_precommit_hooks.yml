@@ -46,7 +46,7 @@ jobs:
             uses: peter-evans/create-pull-request@v6
             with:
                 commit-message: pre-commit hooks auto-update
-                base: main
+                base: master
                 token: ${{ secrets.GITHUB_TOKEN }}
                 delete-branch: true
                 title: '[BOT] update pre-commit hooks'
