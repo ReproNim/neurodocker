@@ -5,17 +5,17 @@ name: gentoo
 url: https://www.gentoo.org/
 binaries:
     urls:
-        australia: http://neuro.debian.net/lists/{{ self.os_codename }}.au.{{ self.full_or_libre }}
-        china-tsinghua: http://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj1.{{ self.full_or_libre }}
-        china-scitech: http://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj2.{{ self.full_or_libre }}
-        china-zhejiang: http://neuro.debian.net/lists/{{ self.os_codename }}.cn-zj.{{ self.full_or_libre }}
-        germany-munich: http://neuro.debian.net/lists/{{ self.os_codename }}.de-m.{{ self.full_or_libre }}
-        germany-magdeburg: http://neuro.debian.net/lists/{{ self.os_codename }}.de-md.{{ self.full_or_libre }}
-        greece: http://neuro.debian.net/lists/{{ self.os_codename }}.gr.{{ self.full_or_libre }}
-        japan: http://neuro.debian.net/lists/{{ self.os_codename }}.jp.{{ self.full_or_libre }}
-        usa-ca: http://neuro.debian.net/lists/{{ self.os_codename }}.us-ca.{{ self.full_or_libre }}
-        usa-nh: http://neuro.debian.net/lists/{{ self.os_codename }}.us-nh.{{ self.full_or_libre }}
-        usa-tn: http://neuro.debian.net/lists/{{ self.os_codename }}.us-tn.{{ self.full_or_libre }}
+        australia: https://neuro.debian.net/lists/{{ self.os_codename }}.au.{{ self.full_or_libre }}
+        china-tsinghua: https://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj1.{{ self.full_or_libre }}
+        china-scitech: https://neuro.debian.net/lists/{{ self.os_codename }}.cn-bj2.{{ self.full_or_libre }}
+        china-zhejiang: https://neuro.debian.net/lists/{{ self.os_codename }}.cn-zj.{{ self.full_or_libre }}
+        germany-munich: https://neuro.debian.net/lists/{{ self.os_codename }}.de-m.{{ self.full_or_libre }}
+        germany-magdeburg: https://neuro.debian.net/lists/{{ self.os_codename }}.de-md.{{ self.full_or_libre }}
+        greece: https://neuro.debian.net/lists/{{ self.os_codename }}.gr.{{ self.full_or_libre }}
+        japan: https://neuro.debian.net/lists/{{ self.os_codename }}.jp.{{ self.full_or_libre }}
+        usa-ca: https://neuro.debian.net/lists/{{ self.os_codename }}.us-ca.{{ self.full_or_libre }}
+        usa-nh: https://neuro.debian.net/lists/{{ self.os_codename }}.us-nh.{{ self.full_or_libre }}
+        usa-tn: https://neuro.debian.net/lists/{{ self.os_codename }}.us-tn.{{ self.full_or_libre }}
     arguments:
         required:
         -   version
