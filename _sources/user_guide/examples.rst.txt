@@ -24,7 +24,7 @@ Supported software
 - `mricron <https://github.com/neurolabusc/MRIcron>`_
 - `mrtrix3 <https://www.mrtrix.org/>`_
 - `ndfreeze <https://neuro.debian.net/pkgs/neurodebian-freeze.html>`_
-- `neurodebian <http://neuro.debian.net>`_
+- `neurodebian <https://neuro.debian.net>`_
 - `niftyreg <https://github.com/KCL-BMEIS/niftyreg>`_
 - `petpvc <https://github.com/UCL/PETPVC>`_
 - `spm12 <https://www.fil.ion.ucl.ac.uk/spm/>`_
