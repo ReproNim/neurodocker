@@ -113,3 +113,23 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
         stdout, _ = run_fn(img, args=["env"])
         assert "CAT=FOO" in stdout
         assert "DOG=BAR" in stdout
+
+def test_gentoo_image(tmp_path: Path):
+    # also add singularity like in the test above
+
+    cmd = "neurodocker generate docker"
+
+    _TemplateRegistry._reset()
+    runner = CliRunner()
+    result = runner.invoke(
+        generate,
+        [
+            cmd,
+            "--pkg-manager apt",
+            "--base-image neurodebian:bullseye",
+            "--ants version=2.4.3",
+            "--user nonroot"
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    (tmp_path / "specs.json").write_text(result.output)
