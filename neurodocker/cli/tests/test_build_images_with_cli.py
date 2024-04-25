@@ -117,7 +117,7 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
 def test_gentoo_image(tmp_path: Path):
     # also add singularity like in the test above
 
-    cmd = "neurodocker generate docker"
+    cmd = "docker"
 
     _TemplateRegistry._reset()
     runner = CliRunner()
