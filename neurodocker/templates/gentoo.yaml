@@ -4,6 +4,11 @@
 name: gentoo
 url: https://www.gentoo.org/
 binaries:
+    # ATM template jsonschema demands having urls and instructions.
+    # In the future we might use urls to point to git repositories
+    # which are currently under gentoo-portage/ config files.
+    urls:
+        something: not-used
     instructions: |
         FROM docker.io/gentoo/portage:20240324 as portage
         FROM docker.io/gentoo/stage3:20240318
@@ -17,7 +22,7 @@ binaries:
         ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"
         # This will be bound, and contents available outside of container
         RUN mkdir /outputs
-        COPY .gentoo/portage/ /etc/portage/
+        COPY gentoo-portage/ /etc/portage/
         # Moving gentoo repo from default rsync to git
         RUN rm /var/db/repos/gentoo -rf
         # Cloning manually to prevent vdb update, pinning state via git
@@ -46,4 +51,3 @@ binaries:
         ### Emerge cool stuff here
         ### Autounmask-continue enables all features on dependencies which the top level packages require
         ### By default this needs user confirmation which would interrupt the build.
-        RUN emerge --autounmask-continue afni fsl

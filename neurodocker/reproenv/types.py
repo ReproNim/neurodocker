@@ -32,6 +32,7 @@ class _InstallationDependenciesType(TypedDict, total=False):
 
     apt: list[str]
     debs: list[str]
+    portage: list[str]
     yum: list[str]
 
 

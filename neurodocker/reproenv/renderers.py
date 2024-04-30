@@ -753,6 +753,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
 def _install(pkgs: list[str], pkg_manager: str, opts: str = None) -> str:
     if pkg_manager == "apt":
         return _apt_install(pkgs, opts)
+    elif pkg_manager == "portage":
+        return _portage_install(pkgs, opts)
     elif pkg_manager == "yum":
         return _yum_install(pkgs, opts)
     # TODO: add debs here?
@@ -800,6 +802,25 @@ apt-get update -qq
 apt-get install --yes --quiet --fix-missing
 rm -rf /var/lib/apt/lists/*"""
     return s
+
+
+def _portage_install(pkgs: list[str], opts: str = None, sort=True) -> str:
+    """Return command to install packages with `portage` (Gentoo).
+
+    `opts` are options passed to `emerge`.
+    Default is "--autounmask-continue".
+    """
+    pkgs = sorted(pkgs) if sort else pkgs
+    opts = "--autounmask-continue" if opts is None else opts
+
+    s = """\
+emerge {opts} \\
+    {pkgs}
+rm -rf /var/tmp/portage/*
+""".format(
+        opts=opts, pkgs=" \\\n    ".join(pkgs)
+    )
+    return s.strip()
 
 
 def _yum_install(pkgs: list[str], opts: str = None, sort=True) -> str:
