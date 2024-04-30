@@ -9,9 +9,13 @@ binaries:
     # which are currently under gentoo-portage/ config files.
     urls:
         something: not-used
+    arguments:
+        optional:
+            portage_image_version: "20240324"
+            stage3_image_version: "20240318"
     instructions: |
-        FROM docker.io/gentoo/portage:20240324 as portage
-        FROM docker.io/gentoo/stage3:20240318
+        FROM docker.io/gentoo/portage:{{ self.portage_image_version }} as portage
+        FROM docker.io/gentoo/stage3:{{ self.stage3_image_version }}
         # copy the entire portage volume in
         COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
         RUN emerge -v --noreplace dev-vcs/git
