@@ -518,10 +518,14 @@ class DockerRenderer(_Renderer):
     @_log_instruction
     def from_(self, base_image: str, as_: str = None) -> DockerRenderer:
         """Add a Dockerfile `FROM` instruction."""
-        if as_ is None:
-            s = "FROM " + base_image
+        if base_image == "gentoo":
+            s = f"FROM docker.io/gentoo/portage:20240324 as portage \n"
+            s += f"FROM docker.io/gentoo/stage3:20240318"
         else:
-            s = f"FROM {base_image} AS {as_}"
+            if as_ is None:
+                s = "FROM " + base_image
+            else:
+                s = f"FROM {base_image} AS {as_}"
         self._parts.append(s)
         return self
 
