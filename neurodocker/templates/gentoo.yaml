@@ -11,18 +11,15 @@ binaries:
         something: not-used
     arguments:
         optional:
-            portage_image_version: "20240324"
-            stage3_image_version: "20240318"
+            gentoo_hash: "2d25617a1d085316761b06c17a93ec972f172fc6"
+            science_hash: "73916dd3680ffd92e5bd3d32b262e5d78c86a448"
     instructions: |
-        FROM docker.io/gentoo/portage:{{ self.portage_image_version }} as portage
-        FROM docker.io/gentoo/stage3:{{ self.stage3_image_version }}
-        # copy the entire portage volume in
         COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
         RUN emerge -v --noreplace dev-vcs/git
         RUN emerge -v1u portage
         # Pinned commits for the dependency tree state
-        ARG gentoo_hash=2d25617a1d085316761b06c17a93ec972f172fc6
-        ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448
+        ARG gentoo_hash={{ self.gentoo_hash }}
+        ARG science_hash={{ self.science_hash }}
         ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"
         # This will be bound, and contents available outside of container
         RUN mkdir /outputs
