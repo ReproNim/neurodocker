@@ -12,7 +12,7 @@ binaries:
     arguments:
         optional:
             gentoo_hash: "0e9370b45a589867220384ca6c63bc6bcaec3f74"
-            science_hash: "6d9b772f10ed51682604e5c1cb6f9c278a5c6c72"
+            science_hash: "5307342730267714f7019d62f77b2d9bf7624d8c"
     # Below echo commands will be indented by _indent_run_instruction which
     # would cause trailing spaces to be added to the files. But it should be ok
     # for us, thus we are not bothering to workaround via inlining.
