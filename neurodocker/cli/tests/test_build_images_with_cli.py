@@ -26,7 +26,13 @@ from neurodocker.reproenv.tests.utils import (
     ],
 )
 @pytest.mark.parametrize(
-    ["pkg_manager", "base_image"], [("apt", "debian:buster-slim"), ("yum", "centos:7")]
+    ["pkg_manager", "base_image"],
+    [
+        ("apt", "debian:buster-slim"),
+        ("yum", "centos:7"),
+        # TODO: make it work -- seems has difficulty installing jq, may be curl isn't there or alike
+        # ("portage", "gentoo"),
+     ],
 )
 def test_build_image_from_registered(
     tmp_path: Path, cmd: str, pkg_manager: str, base_image: str
@@ -114,8 +120,9 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
         assert "CAT=FOO" in stdout
         assert "DOG=BAR" in stdout
 
+
 def test_gentoo_image(tmp_path: Path):
-    # also add singularity like in the test above
+    # TODO: also add singularity like in the test above
 
     cmd = "docker"
 
@@ -125,11 +132,13 @@ def test_gentoo_image(tmp_path: Path):
         generate,
         [
             cmd,
-            "--pkg-manager apt",
-            "--base-image neurodebian:bullseye",
-            "--ants version=2.4.3",
-            "--user nonroot"
+            "--pkg-manager", "portage",
+            "--base-image", "gentoo",
+            # TODO: this flips it out for some reason in the test, works on CLI
+            # "--gentoo", "gentoo_hash=0e9370b45a589867220384ca6c63bc6bcaec3f74",
+            "--install", "afni",  # TODO: replace with some tiny / quick to install pkg
         ],
     )
     assert result.exit_code == 0, result.output
     (tmp_path / "specs.json").write_text(result.output)
+    # TODO: add more testing here of the result that it is usable
