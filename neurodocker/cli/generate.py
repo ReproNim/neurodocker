@@ -442,9 +442,7 @@ def _base_generate(
     # Make sure to add default instructions if they are available among the templates
     if "_default" in registered_templates():
         # Add header to the instructions, after the base image.
-        renderer_dict["instructions"].insert(
-            1, {"name": "_default", "kwds": {}}
-        )
+        renderer_dict["instructions"].insert(1, {"name": "_default", "kwds": {}})
         # Use default entrypoint if user did not specify one.
         instruction_names = [instr["name"] for instr in renderer_dict["instructions"]]
         if "entrypoint" not in instruction_names:
