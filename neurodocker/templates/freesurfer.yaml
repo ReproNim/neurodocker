@@ -71,7 +71,7 @@ binaries:
     # default freesurfer options
         FS_OVERRIDE: '0'
         FIX_VERTEX_AREA: ''
-        FSF_OUTPUT_FORMAT: nii.gz# mni env requirements
+        FSF_OUTPUT_FORMAT: nii.gz
     # mni environment requirements
         MINC_BIN_DIR: '{{ self.install_path }}/mni/bin'
         MINC_LIB_DIR: '{{ self.install_path }}/mni/lib'
