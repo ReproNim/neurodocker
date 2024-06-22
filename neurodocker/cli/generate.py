@@ -307,6 +307,8 @@ def _get_params_for_registered_templates() -> list[click.Parameter]:
     names_tmpls = list(registered_templates_items())
     names_tmpls.sort(key=lambda r: r[0])  # sort by name
     for name, tmpl in names_tmpls:
+        if name.startswith("_"):  # Templates starting with _ are private
+            continue
         hlp = _create_help_for_template(Template(tmpl))
         param = OptionEatAll(
             [f"--{name.lower()}"], type=KeyValuePair(), multiple=True, help=hlp
