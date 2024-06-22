@@ -24,7 +24,7 @@
 - added versions to Library PATH [#593](https://github.com/ReproNim/neurodocker/pull/593) ([@stebo85](https://github.com/stebo85))
 - update matlabmcr [#592](https://github.com/ReproNim/neurodocker/pull/592) ([@stebo85](https://github.com/stebo85))
 - [FIX] add url bids validator [#591](https://github.com/ReproNim/neurodocker/pull/591) ([@Remi-Gau](https://github.com/Remi-Gau))
-- [DOC] add list of supported softwares [#587](https://github.com/ReproNim/neurodocker/pull/587) ([@Remi-Gau](https://github.com/Remi-Gau))
+- [DOC] add list of supported software [#587](https://github.com/ReproNim/neurodocker/pull/587) ([@Remi-Gau](https://github.com/Remi-Gau))
 - [ENH] add templates bids_validator [#586](https://github.com/ReproNim/neurodocker/pull/586) ([@Remi-Gau](https://github.com/Remi-Gau))
 - [MAINT] test build jq [#589](https://github.com/ReproNim/neurodocker/pull/589) ([@Remi-Gau](https://github.com/Remi-Gau))
 - [ENH] test on python 3.12 [#588](https://github.com/ReproNim/neurodocker/pull/588) ([@Remi-Gau](https://github.com/Remi-Gau))
