@@ -4,7 +4,7 @@
 
 # TODO: read this about locales http://jaredmarkell.com/docker-and-locales/
 
-name: _header
+name: _default
 url: n/a
 # Not actually source, but we do not want to provide URLs.
 source:
@@ -28,14 +28,14 @@ source:
         LC_ALL: en_US.UTF-8
         ND_ENTRYPOINT: /neurodocker/startup.sh
     instructions: |
-        export ND_ENTRYPOINT="{{ _header._env['ND_ENTRYPOINT'] }}"
-        {{ _header.install_dependencies() }}
-        {%- if _header.pkg_manager == "apt" %}
-        sed -i -e 's/# {{ _header._env['LC_ALL'] }} UTF-8/{{ _header._env['LC_ALL'] }} UTF-8/' /etc/locale.gen
+        export ND_ENTRYPOINT="{{ self.env['ND_ENTRYPOINT'] }}"
+        {{ self.install_dependencies() }}
+        {%- if self.pkg_manager == "apt" %}
+        sed -i -e 's/# {{ self.env['LC_ALL'] }} UTF-8/{{ self.env['LC_ALL'] }} UTF-8/' /etc/locale.gen
         dpkg-reconfigure --frontend=noninteractive locales
-        update-locale LANG="{{ _header._env['LANG'] }}"
-        {%- elif _header.pkg_manager == "yum" %}
-        localedef -i {{ _header._env['LC_ALL'].split('.')[0] }} -f {{ _header._env['LC_ALL'].split('.')[1] }} {{ _header._env['LC_ALL'] }}
+        update-locale LANG="{{ self.env['LANG'] }}"
+        {%- elif self.pkg_manager == "yum" %}
+        localedef -i {{ self.env['LC_ALL'].split('.')[0] }} -f {{ self.env['LC_ALL'].split('.')[1] }} {{ self.env['LC_ALL'] }}
         {%- endif %}
         chmod 777 /opt && chmod a+s /opt
         mkdir -p /neurodocker

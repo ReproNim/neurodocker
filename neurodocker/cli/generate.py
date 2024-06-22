@@ -307,6 +307,8 @@ def _get_params_for_registered_templates() -> list[click.Parameter]:
     names_tmpls = list(registered_templates_items())
     names_tmpls.sort(key=lambda r: r[0])  # sort by name
     for name, tmpl in names_tmpls:
+        if name.startswith("_"):  # Templates starting with _ are private
+            continue
         hlp = _create_help_for_template(Template(tmpl))
         param = OptionEatAll(
             [f"--{name.lower()}"], type=KeyValuePair(), multiple=True, help=hlp
@@ -438,6 +440,18 @@ def _base_generate(
     `generate singularity`. The difference between those two is the renderer used.
     """
     renderer_dict = _params_to_renderer_dict(ctx=ctx, pkg_manager=pkg_manager)
+
+    # Make sure to add default instructions if they are available among the templates
+    if "_default" in registered_templates():
+        # Add header to the instructions, after the base image.
+        renderer_dict["instructions"].insert(1, {"name": "_default", "kwds": {}})
+        # Use default entrypoint if user did not specify one.
+        instruction_names = [instr["name"] for instr in renderer_dict["instructions"]]
+        if "entrypoint" not in instruction_names:
+            renderer_dict["instructions"].append(
+                {"name": "entrypoint", "kwds": {"args": ["/neurodocker/startup.sh"]}}
+            )
+
     r = renderer.from_dict(renderer_dict)
 
     # Print the instructions in JSON if that's what the user wants.
