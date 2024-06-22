@@ -327,6 +327,16 @@ def _params_to_renderer_dict(ctx: click.Context, pkg_manager) -> dict:
             renderer_dict["instructions"].append(d)
     if not renderer_dict["instructions"]:
         ctx.fail("not enough instructions to generate a container specification")
+    # Add header to the instructions, after the base image.
+    renderer_dict["instructions"].insert(
+        1, {"name": "_default", "kwds": {}}
+    )
+    # Use default entrypoint if user did not specify one.
+    if "entrypoint" not in [param.name for param, _ in cmd._options]:
+        renderer_dict["instructions"].append(
+            {"name": "entrypoint", "kwds": {"args": ["/neurodocker/startup.sh"]}}
+        )
+
     return renderer_dict
 
 
