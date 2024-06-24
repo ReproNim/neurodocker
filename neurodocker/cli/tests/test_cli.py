@@ -19,7 +19,7 @@ def test_fail_on_empty_args(cmd: str):
 
 
 @pytest.mark.parametrize("cmd", _cmds)
-@pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
+@pytest.mark.parametrize("pkg_manager", ["apt", "portage", "yum"])
 def test_fail_on_no_base(cmd: str, pkg_manager: str):
     runner = CliRunner()
     result = runner.invoke(generate, [cmd, "--pkg-manager", pkg_manager])
@@ -34,7 +34,7 @@ def test_fail_on_no_pkg_manager(cmd: str):
 
 
 @pytest.mark.parametrize("cmd", _cmds)
-@pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
+@pytest.mark.parametrize("pkg_manager", ["apt", "portage", "yum"])
 def test_minimal_args(cmd: str, pkg_manager: str):
     runner = CliRunner()
     result = runner.invoke(
@@ -107,7 +107,7 @@ def test_optioneatall_type_issue_498():
 
 
 @pytest.mark.parametrize("cmd", _cmds)
-@pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
+@pytest.mark.parametrize("pkg_manager", ["apt", "portage", "yum"])
 def test_all_args(cmd: str, pkg_manager: str):
     runner = CliRunner()
     result = runner.invoke(
@@ -156,7 +156,7 @@ def test_all_args(cmd: str, pkg_manager: str):
 # is what registers the templates. Using the `docker` function
 # (`reproenv generate docker`) directly does not fire `generate`.
 @pytest.mark.parametrize("cmd", _cmds)
-@pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
+@pytest.mark.parametrize("pkg_manager", ["apt", "portage", "yum"])
 def test_render_registered(cmd: str, pkg_manager: str):
     template_path = Path(__file__).parent
     runner = CliRunner(env={"REPROENV_TEMPLATE_PATH": str(template_path)})
