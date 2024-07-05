@@ -9,6 +9,7 @@ Supported software
 
 .. INSERT LIST START (will be updated automatically in ci)
 
+- `_default <n/a>`_
 - `afni <https://afni.nimh.nih.gov>`_
 - `ants <http://stnava.github.io/ANTs/>`_
 - `bids_validator <https://github.com/bids-standard/bids-validator>`_
