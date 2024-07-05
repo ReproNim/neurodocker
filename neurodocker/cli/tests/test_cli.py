@@ -214,6 +214,6 @@ def test_default_header_and_entrypoint(cmd: str, pkg_manager: str, entrypoint: s
         ) in result.output
 
         if entrypoint == "default":
-            assert '%runscript\n/neurodocker/startup.sh\n' in result.output
+            assert "%runscript\n/neurodocker/startup.sh\n" in result.output
         else:
-            assert '%runscript\nI decide\n' in result.output
+            assert "%runscript\nI decide\n" in result.output
