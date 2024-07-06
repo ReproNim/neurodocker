@@ -84,7 +84,7 @@ binaries:
         echo "Downloading FreeSurfer ..."
         mkdir -p {{ self.install_path }}
         curl -fL {{ self.urls[self.version] }} \
-        | tar -xz -C {{ self.install_path }} --owner root --group root --no-same-owner --strip-components 1 {% if self.exclude_paths -%}\
+        | tar -xz -C {{ self.install_path }} --owner root --group root --no-same-owner --transform='s,freesurfer/,,' {% if self.exclude_paths -%}\
         {%- for exclude_path in self.exclude_paths.split() %}
           {% if not loop.last -%}
           --exclude='{{ exclude_path }}' \
