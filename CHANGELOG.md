@@ -1,3 +1,23 @@
+# 1.0.1 (Sat Jul 06 2024)
+
+#### 🐛 Bug Fix
+
+- FIX use --transform in freesurfer's template to generalize across freesurfer versions to strip leading `freesurfer/` folder [#626](https://github.com/ReproNim/neurodocker/pull/626) ([@mvdoc](https://github.com/mvdoc))
+- FIX remove comment from freesurfer env line [#622](https://github.com/ReproNim/neurodocker/pull/622) ([@mvdoc](https://github.com/mvdoc))
+- FIX add default header and entrypoint to docker and singularity files [#623](https://github.com/ReproNim/neurodocker/pull/623) ([@mvdoc](https://github.com/mvdoc))
+- [BOT] update pre-commit hooks [#627](https://github.com/ReproNim/neurodocker/pull/627) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- Fix typo of "softwares" [#624](https://github.com/ReproNim/neurodocker/pull/624) ([@yarikoptic](https://github.com/yarikoptic))
+- [BOT] update pre-commit hooks [#621](https://github.com/ReproNim/neurodocker/pull/621) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+
+#### Authors: 4
+
+- [@github-actions[bot]](https://github.com/github-actions[bot])
+- Matteo Visconti di Oleggio Castello ([@mvdoc](https://github.com/mvdoc))
+- Remi Gau ([@Remi-Gau](https://github.com/Remi-Gau))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 1.0.0 (Tue Jun 11 2024)
 
 #### 💥 Breaking Change
