@@ -11,8 +11,8 @@ binaries:
         something: not-used
     arguments:
         optional:
-            gentoo_hash: "0e9370b45a589867220384ca6c63bc6bcaec3f74"
-            science_hash: "5307342730267714f7019d62f77b2d9bf7624d8c"
+            gentoo_hash: "282c4b518562e6c194761d9ce0882f30672219c5"
+            science_hash: "e4579f5851734f245b02cc1e98f3b69d9df67e09"
     # Below echo commands will be indented by _indent_run_instruction which
     # would cause trailing spaces to be added to the files. But it should be ok
     # for us, thus we are not bothering to workaround via inlining.
