@@ -134,9 +134,7 @@ def test_gentoo_image(tmp_path: Path):
             cmd,
             "--pkg-manager", "portage",
             "--base-image", "gentoo",
-            # TODO: this flips it out for some reason in the test, works on CLI
-            # "--gentoo", "gentoo_hash=0e9370b45a589867220384ca6c63bc6bcaec3f74",
-            "--install", "afni",  # TODO: replace with some tiny / quick to install pkg
+            "--install", " app-text/asciidoc",  # TODO: replace with some tiny / quick to install pkg
         ],
     )
     assert result.exit_code == 0, result.output
