@@ -134,7 +134,7 @@ def test_gentoo_image(tmp_path: Path):
             cmd,
             "--pkg-manager", "portage",
             "--base-image", "gentoo",
-            "--install", " app-text/asciidoc",  # TODO: replace with some tiny / quick to install pkg
+            "--install", "app-misc/mime-types",  # TODO: replace with some tiny / quick to install pkg
         ],
     )
     assert result.exit_code == 0, result.output
