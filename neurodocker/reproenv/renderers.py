@@ -519,14 +519,15 @@ class DockerRenderer(_Renderer):
     def from_(self, base_image: str, as_: str = None) -> DockerRenderer:
         """Add a Dockerfile `FROM` instruction."""
         if base_image == "gentoo":
-            # TODO (if we can, likely not): make neurodocker argument "portage_date" for which we
+            # TODO (if we can, likely not):
+            # make neurodocker argument "portage_date" for which we
             # figure out the corresponding stage3 date and hashes.
             s = "FROM docker.io/gentoo/portage:20240529 as portage\n"
             s += "FROM docker.io/gentoo/stage3:20240527\n"
             s += "COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo\n"
             # TODO: figure out hashes for the date
-            #s += "ARG gentoo_hash=2d25617a1d085316761b06c17a93ec972f172fc6\n"
-            #s += "ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448\n"
+            # s += "ARG gentoo_hash=2d25617a1d085316761b06c17a93ec972f172fc6\n"
+            # s += "ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448\n"
             s += "ARG FEATURES=\"-ipc-sandbox -network-sandbox -pid-sandbox\"\n"
         else:
             if as_ is None:

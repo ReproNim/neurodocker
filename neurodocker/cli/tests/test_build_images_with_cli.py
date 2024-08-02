@@ -30,7 +30,8 @@ from neurodocker.reproenv.tests.utils import (
     [
         ("apt", "debian:buster-slim"),
         ("yum", "centos:7"),
-        # TODO: make it work -- seems has difficulty installing jq, may be curl isn't there or alike
+        # TODO: make it work -- seems has difficulty installing jq,
+        # may be curl isn't there or alike
         # ("portage", "gentoo"),
      ],
 )
@@ -134,7 +135,7 @@ def test_gentoo_image(tmp_path: Path):
             cmd,
             "--pkg-manager", "portage",
             "--base-image", "gentoo",
-            "--install", "app-misc/mime-types",  # TODO: replace with some tiny / quick to install pkg
+            "--install", "app-misc/mime-types",
         ],
     )
     assert result.exit_code == 0, result.output
