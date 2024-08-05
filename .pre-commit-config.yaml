@@ -47,12 +47,12 @@ repos:
         args: [--autofix, --indent, '4']
 
 -   repo: https://github.com/pycqa/flake8
-    rev: 7.1.0
+    rev: 7.1.1
     hooks:
     -   id: flake8
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.0
+    rev: v1.11.1
     hooks:
     -   id: mypy
         additional_dependencies: [types-all]
