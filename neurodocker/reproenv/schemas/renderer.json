@@ -11,10 +11,12 @@
       "type": "string",
       "enum": [
         "apt",
+        "portage",
         "yum"
       ],
       "examples": [
         "apt",
+        "portage",
         "yum"
       ]
     },
