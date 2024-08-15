@@ -177,3 +177,43 @@ def test_render_registered(cmd: str, pkg_manager: str):
     assert result.exit_code == 0, result.output
     assert "jq-1.5/jq-linux64" in result.output
     assert "jq-1.6/jq-linux64" in result.output
+
+
+# Test that we add the default header and default/custom entrypoints
+@pytest.mark.parametrize("cmd", _cmds)
+@pytest.mark.parametrize("pkg_manager", ["apt", "yum"])
+@pytest.mark.parametrize("entrypoint", ["default", "custom"])
+def test_default_header_and_entrypoint(cmd: str, pkg_manager: str, entrypoint: str):
+    runner = CliRunner()
+    cmd_ = [
+        cmd,
+        "--base-image",
+        "debian:buster",
+        "--pkg-manager",
+        pkg_manager,
+    ]
+    if entrypoint == "custom":
+        cmd_.extend(["--entrypoint", "I", "decide"])
+    result = runner.invoke(generate, cmd_)
+    assert result.exit_code == 0, result.output
+
+    if cmd == "docker":
+        assert (
+            'ND_ENTRYPOINT="/neurodocker/startup.sh"\n'
+            'RUN export ND_ENTRYPOINT="/neurodocker/startup.sh"'
+        ) in result.output
+
+        if entrypoint == "default":
+            assert '\nENTRYPOINT ["/neurodocker/startup.sh"]\n' in result.output
+        else:
+            assert '\nENTRYPOINT ["I", "decide"]\n' in result.output
+    else:
+        assert (
+            '\nexport ND_ENTRYPOINT="/neurodocker/startup.sh"\n\n'
+            '%post\nexport ND_ENTRYPOINT="/neurodocker/startup.sh"\n'
+        ) in result.output
+
+        if entrypoint == "default":
+            assert "%runscript\n/neurodocker/startup.sh\n" in result.output
+        else:
+            assert "%runscript\nI decide\n" in result.output

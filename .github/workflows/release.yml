@@ -8,7 +8,7 @@ on:
         -   master
 
 env:
-    AUTO_VERSION: v10.37.6
+    AUTO_VERSION: v11.1.6
 
 jobs:
     auto-release:

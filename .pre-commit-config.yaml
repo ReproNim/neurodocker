@@ -17,7 +17,7 @@ repos:
     -   id: mixed-line-ending
 
 -   repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
     -   id: codespell
         additional_dependencies:
@@ -30,7 +30,7 @@ repos:
         args: [--profile, black]
 
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.3.0
+    rev: 24.8.0
     hooks:
     -   id: black
 
@@ -41,20 +41,20 @@ repos:
         args: [--mapping, '4', --sequence, '4', --offset, '0']
 
 -   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.13.0
+    rev: v2.14.0
     hooks:
     -   id: pretty-format-toml
         args: [--autofix, --indent, '4']
 
 -   repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.1
     hooks:
     -   id: flake8
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+    rev: v1.11.1
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all]
+        additional_dependencies: [types-PyYAML, types-Jinja2, types-click]
         files: neurodocker
         args: [--config-file, pyproject.toml, --install-types]
