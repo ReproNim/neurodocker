@@ -33,7 +33,7 @@ from neurodocker.reproenv.tests.utils import (
         # TODO: make it work -- seems has difficulty installing jq,
         # may be curl isn't there or alike
         # ("portage", "gentoo"),
-     ],
+    ],
 )
 def test_build_image_from_registered(
     tmp_path: Path, cmd: str, pkg_manager: str, base_image: str
@@ -133,9 +133,12 @@ def test_gentoo_image(tmp_path: Path):
         generate,
         [
             cmd,
-            "--pkg-manager", "portage",
-            "--base-image", "gentoo",
-            "--install", "app-misc/mime-types",
+            "--pkg-manager",
+            "portage",
+            "--base-image",
+            "gentoo",
+            "--install",
+            "app-misc/mime-types",
         ],
     )
     assert result.exit_code == 0, result.output

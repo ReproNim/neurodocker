@@ -528,7 +528,7 @@ class DockerRenderer(_Renderer):
             # TODO: figure out hashes for the date
             # s += "ARG gentoo_hash=2d25617a1d085316761b06c17a93ec972f172fc6\n"
             # s += "ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448\n"
-            s += "ARG FEATURES=\"-ipc-sandbox -network-sandbox -pid-sandbox\"\n"
+            s += 'ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"\n'
         else:
             if as_ is None:
                 s = "FROM " + base_image
