@@ -42,3 +42,21 @@ jobs:
                 ~/auto shipit -vv
             env:
                 GH_TOKEN: ${{ secrets.AUTO_USER_TOKEN }}
+        
+        -   name: Build Docker images
+            if: steps.auto-version.outputs.version != ''
+            run: |
+                docker build \
+                  -t repronim/neurodocker:master \
+                  -t repronim/neurodocker:latest \
+                  -t repronim/neurodocker:"$(git describe | sed -e 's,^v,,g')" \
+                  .
+    
+        -   name: Push Docker images
+            if: steps.auto-version.outputs.version != ''
+            run: |
+                docker login -u "$DOCKER_LOGIN" --password-stdin <<<"$DOCKER_TOKEN"
+                docker push --all-tags repronim/neurodocker
+            env:
+                DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
+                DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
