@@ -20,6 +20,7 @@ binaries:
             install_path: /opt/fsl-{{ self.version }}
             exclude_paths: ''
     urls:
+        6.0.7.14: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.8: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.4: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.1: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
