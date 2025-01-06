@@ -16,24 +16,27 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -43,6 +46,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -58,19 +62,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -78,7 +71,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -86,8 +78,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -154,29 +146,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -213,15 +197,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -238,7 +218,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -278,15 +259,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -322,9 +299,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -342,8 +324,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -355,7 +335,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">neurodocker....</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">neurodocker.reproenv.renderers</span></li>
   </ul>
 </nav>
 </div>
@@ -375,22 +355,22 @@ document.write(`
   <h1>Source code for neurodocker.reproenv.renderers</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Container specification renderers.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NoReturn</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NoReturn</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">jinja2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
 
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.exceptions</span> <span class="kn">import</span> <span class="n">RendererError</span><span class="p">,</span> <span class="n">TemplateError</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.state</span> <span class="kn">import</span> <span class="n">_TemplateRegistry</span><span class="p">,</span> <span class="n">_validate_renderer</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.template</span> <span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">_BaseInstallationTemplate</span>
-<span class="kn">from</span> <span class="nn">neurodocker.reproenv.types</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neurodocker.reproenv.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RendererError</span><span class="p">,</span> <span class="n">TemplateError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neurodocker.reproenv.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TemplateRegistry</span><span class="p">,</span> <span class="n">_validate_renderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neurodocker.reproenv.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">_BaseInstallationTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neurodocker.reproenv.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">REPROENV_SPEC_FILE_IN_CONTAINER</span><span class="p">,</span>
     <span class="n">_SingularityHeaderType</span><span class="p">,</span>
     <span class="n">allowed_installation_methods</span><span class="p">,</span>
@@ -409,7 +389,7 @@ document.write(`
 <span class="c1"># template.</span>
 
 
-<span class="k">def</span> <span class="nf">_raise_helper</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_raise_helper</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
     <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
@@ -421,7 +401,7 @@ document.write(`
 <span class="n">PathType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_render_string_from_template</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_string_from_template</span><span class="p">(</span>
     <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Take a string from a template and render&quot;&quot;&quot;</span>
@@ -450,7 +430,7 @@ document.write(`
         <span class="k">try</span><span class="p">:</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">tmpl</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UndefinedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">n_renders</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">n_renders</span> <span class="o">&gt;</span> <span class="n">max_renders</span><span class="p">:</span>
@@ -461,14 +441,14 @@ document.write(`
     <span class="k">return</span> <span class="n">source</span>
 
 
-<span class="k">def</span> <span class="nf">_log_instruction</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_instruction</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that logs instructions passed to a Renderer.</span>
 
 <span class="sd">    This adds the logs to the `_instructions` attribute of the Renderer instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">with_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_instructions&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;This wrapper should only be applied to Renderer instances.&quot;</span>
@@ -504,8 +484,8 @@ document.write(`
     <span class="k">return</span> <span class="n">with_logging</span>
 
 
-<span class="k">class</span> <span class="nc">_Renderer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pkg_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_pkg_managers</span><span class="p">:</span>
@@ -533,11 +513,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_json_save_start</span> <span class="o">=</span> <span class="s2">&quot;# Save specification to JSON.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_json_save_end</span> <span class="o">=</span> <span class="s2">&quot;# End saving to specification to JSON.&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">_Renderer</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">rm_empty_lines</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">rm_empty_lines</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">j</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
@@ -547,17 +527,17 @@ document.write(`
         <span class="c1"># Empty lines and commented lines do not affect container definitions.</span>
         <span class="k">return</span> <span class="n">rm_empty_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">rm_empty_lines</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">masthead</span> <span class="o">=</span> <span class="s2">&quot;# Generated by Neurodocker and Reproenv.&quot;</span>
         <span class="n">image_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">masthead</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">image_spec</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a new renderer from a dictionary of instructions.&quot;&quot;&quot;</span>
         <span class="c1"># raise error if invalid</span>
         <span class="n">_validate_renderer</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
@@ -580,7 +560,7 @@ document.write(`
                     <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Error on step &#39;</span><span class="si">{</span><span class="n">method_or_template</span><span class="si">}</span><span class="s2">&#39;. Please see the&quot;</span>
                         <span class="s2">&quot; traceback above for details.&quot;</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
             <span class="c1"># This is actually a template.</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -589,10 +569,10 @@ document.write(`
                     <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Error on template &#39;</span><span class="si">{</span><span class="n">method_or_template</span><span class="si">}</span><span class="s2">&#39;. Please see above&quot;</span>
                         <span class="s2">&quot; for more information.&quot;</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">return</span> <span class="n">renderer</span>
 
-    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a rendered string of the container specification.</span>
 
 <span class="sd">        This method should take care of combining all of the instructions in a way that</span>
@@ -604,7 +584,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses must implement .render()&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_template</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_template</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Template</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">installation_methods_type</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a template to the renderer.</span>
@@ -659,7 +639,7 @@ document.write(`
 
         <span class="c1"># Patch the `template_method.install_dependencies` instance method so it can be</span>
         <span class="c1"># used (ie rendered) in a template and have access to the pkg_manager requested.</span>
-        <span class="k">def</span> <span class="nf">install_patch</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">install_patch</span><span class="p">(</span>
             <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="o">=</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">)</span>
@@ -675,7 +655,7 @@ document.write(`
 
         <span class="c1"># Patch the `template_method.install_dependencies` instance method so it can be</span>
         <span class="c1"># used (ie rendered) in a template and have access to the pkg_manager requested.</span>
-        <span class="k">def</span> <span class="nf">install_dependencies_patch</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">install_dependencies_patch</span><span class="p">(</span>
             <span class="n">inner_self</span><span class="p">:</span> <span class="n">_BaseInstallationTemplate</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
             <span class="c1"># TODO: test that template with empty dependencies (apt: []) does not render</span>
@@ -710,7 +690,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">add_registered_template</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_registered_template</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">installation_methods_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="c1"># Template was validated at registration time.</span>
@@ -739,65 +719,65 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">add_template</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a set of labels to the dockerfile from a dict. This permits</span>
 <span class="sd">        labels that can include special chars (e.g. &#39;.&#39;).&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="o">**</span><span class="n">labels_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">run_bash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_bash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="n">command</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bash -c &#39;</span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Renderer</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return instructions used in this renderer in JSON format.</span>
 
 <span class="sd">        json_kwds are keyword arguments passed to `json.dumps`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_instructions</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kwds</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_instructions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_instructions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return string representation of a printf command that writes the renderer</span>
 <span class="sd">        instructions to a JSON file in the container.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -817,12 +797,12 @@ document.write(`
         <span class="k">return</span> <span class="n">cmd</span>
 
 
-<div class="viewcode-block" id="DockerRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer">[docs]</a><span class="k">class</span> <span class="nc">DockerRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DockerRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DockerRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="DockerRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="DockerRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.render">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the rendered Dockerfile.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">)</span>
 
@@ -838,14 +818,14 @@ document.write(`
         <span class="k">return</span> <span class="n">s</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.arg"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.arg">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `ARG` instruction.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ARG </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;ARG </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
@@ -867,7 +847,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.add"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.add">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
@@ -878,20 +858,20 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.env"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.env">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `ENV` instruction.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;ENV &quot;</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;ENTRYPOINT [&quot;</span><span class="si">{}</span><span class="s1">&quot;]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&quot;, &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.from_"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.from_">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `FROM` instruction.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">as_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;FROM &quot;</span> <span class="o">+</span> <span class="n">base_image</span>
@@ -901,7 +881,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_indent_run_instruction</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
@@ -909,14 +889,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.label"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.label">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `LABEL` instruction.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;LABEL &quot;</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">      &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.run"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.run">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `RUN` instruction.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: should the command be quoted?</span>
         <span class="c1"># s = shlex.quote(command)</span>
@@ -928,7 +908,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.user"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.user">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `USER` instruction. If the user is not in</span>
 <span class="sd">        `self.users`, then a `RUN` instruction that creates the user</span>
 <span class="sd">        will also be added.</span>
@@ -946,14 +926,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="DockerRenderer.workdir"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.workdir">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `WORKDIR` instruction.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WORKDIR &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
-<div class="viewcode-block" id="SingularityRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer">[docs]</a><span class="k">class</span> <span class="nc">SingularityRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SingularityRenderer"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SingularityRenderer</span><span class="p">(</span><span class="n">_Renderer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="n">pkg_managers_type</span><span class="p">,</span> <span class="n">users</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pkg_manager</span><span class="o">=</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
@@ -967,7 +947,7 @@ document.write(`
         <span class="c1"># TODO: is it OK to use a dict here? Labels could be overwritten.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="SingularityRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="SingularityRenderer.render"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.render">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="c1"># Create header.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span>
@@ -1014,7 +994,7 @@ document.write(`
         <span class="k">return</span> <span class="n">s</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.arg"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.arg">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="c1"># TODO: look into whether singularity has something like ARG, like passing in</span>
         <span class="c1"># environment variables.</span>
         <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1022,7 +1002,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.copy"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.copy">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
         <span class="n">destination</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
@@ -1034,18 +1014,18 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.env"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.env">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="c1"># TODO: why does this raise a type error?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entrypoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runscript</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.from_"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.from_">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;://&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_image</span><span class="p">:</span>
             <span class="n">bootstrap</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">base_image</span>
@@ -1062,14 +1042,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.install"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.install">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install system packages.&quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">pkg_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkg_manager</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.label"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.label">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="c1"># TODO: why are we getting this error?</span>
         <span class="c1"># Argument 1 to &quot;update&quot; of &quot;dict&quot; has incompatible type</span>
         <span class="c1"># &quot;Dict[str, Mapping[str, str]]&quot;; expected &quot;Mapping[str, str]&quot;</span>
@@ -1077,12 +1057,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.run"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.run">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.user"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.user">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_users</span><span class="p">:</span>
             <span class="n">post</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;test &quot;$(getent passwd </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">)&quot; </span><span class="se">\\\n</span><span class="s1">|| useradd &#39;</span>
@@ -1095,12 +1075,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.workdir"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.workdir">[docs]</a>    <span class="nd">@_log_instruction</span>
-    <span class="k">def</span> <span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mkdir -p </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">cd </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_indent_run_instruction</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_indent_run_instruction</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return indented string for Dockerfile `RUN` command.&quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
@@ -1125,7 +1105,7 @@ document.write(`
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pkg_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;apt&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">pkg_manager</span> <span class="o">==</span> <span class="s2">&quot;yum&quot;</span><span class="p">:</span>
@@ -1135,7 +1115,7 @@ document.write(`
         <span class="k">raise</span> <span class="n">RendererError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown package manager &#39;</span><span class="si">{</span><span class="n">pkg_manager</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apt_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q --no-install-recommends&quot;.</span>
@@ -1153,13 +1133,13 @@ document.write(`
     <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_apt_install_debs</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apt_install_debs</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install deb packages with `apt-get` (Debian-based distros).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">install_one</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install_one</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">_reproenv_tmppath=&quot;$(mktemp -t tmp.XXXXXXXXXX.deb)&quot;</span>
 <span class="s2">curl -fsSL --retry 5 -o &quot;$</span><span class="se">{{</span><span class="s2">_reproenv_tmppath</span><span class="se">}}</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">url</span><span class="si">}</span>
@@ -1177,7 +1157,7 @@ document.write(`
     <span class="k">return</span> <span class="n">s</span>
 
 
-<span class="k">def</span> <span class="nf">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_yum_install</span><span class="p">(</span><span class="n">pkgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return command to install packages with `yum` (CentOS, Fedora).</span>
 
 <span class="sd">    `opts` are options passed to `yum install`. Default is &quot;-q&quot;.</span>
@@ -1223,8 +1203,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1257,7 +1237,8 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
