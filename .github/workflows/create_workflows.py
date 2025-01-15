@@ -31,12 +31,12 @@ import yaml  # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 apt_based = [
+    "ubuntu:24.04",
     "ubuntu:22.04",
-    "ubuntu:18.04",
+    "debian:bookworm-slim",
     "debian:bullseye-slim",
-    "debian:buster-slim",
 ]
-yum_based = ["fedora:36", "centos:7"]
+yum_based = ["fedora:40", "fedora:41", "centos:7"]
 
 """
 Add a "skip_versions" key to the software dictionary if you want to skip
