@@ -83,7 +83,7 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
             cmd,
             "--json",
             "--base-image",
-            "debian:buster-slim",
+            "debian:bullseye-slim",
             "--pkg-manager",
             "apt",
             "--install",
