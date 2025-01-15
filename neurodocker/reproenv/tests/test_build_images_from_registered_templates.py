@@ -83,7 +83,7 @@ def test_build_using_renderer_from_dict(
 )
 @pytest.mark.parametrize(
     ["pkg_manager", "base_image"],
-    [("apt", "debian:bullseye-slim"), ("yum", "fedora:33")],
+    [("apt", "debian:bullseye-slim"), ("yum", "fedora:40")],
 )
 @pytest.mark.parametrize(["method"], [("binaries",), ("source",)])
 @pytest.mark.parametrize(
