@@ -117,7 +117,7 @@ Docker
 
     neurodocker generate docker \
         --pkg-manager yum \
-        --base-image fedora:36 \
+        --base-image fedora:40 \
         --afni method=binaries version=latest \
     > afni-binaries.Dockerfile
 
@@ -130,7 +130,7 @@ This does not install AFNI's R packages. To install relevant R things, use the f
 
     neurodocker generate docker \
         --pkg-manager yum \
-        --base-image fedora:36 \
+        --base-image fedora:40 \
         --afni method=binaries version=latest install_r_pkgs=true \
     > afni-binaries-r.Dockerfile
 
@@ -149,7 +149,7 @@ This does not install AFNI's R packages. To install relevant R things, use the f
 
 ..     neurodocker generate docker \
 ..         --pkg-manager yum \
-..         --base-image fedora:36 \
+..         --base-image fedora:40 \
 ..         --afni method=source version=master \
 ..     > afni-source.Dockerfile
 

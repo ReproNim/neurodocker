@@ -165,7 +165,7 @@ def test_render_registered(cmd: str, pkg_manager: str):
         [
             cmd,
             "--base-image",
-            "debian:buster",
+            "debian:bullseye",
             "--pkg-manager",
             pkg_manager,
             "--jq",
@@ -188,7 +188,7 @@ def test_default_header_and_entrypoint(cmd: str, pkg_manager: str, entrypoint: s
     cmd_ = [
         cmd,
         "--base-image",
-        "debian:buster",
+        "debian:bullseye",
         "--pkg-manager",
         pkg_manager,
     ]

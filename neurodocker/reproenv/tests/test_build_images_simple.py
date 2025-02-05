@@ -21,9 +21,9 @@ def test_build_simple(cmd: str, tmp_path):
     # Create a Dockerfile.
     r = rcls("apt")
     if isinstance(r, DockerRenderer):
-        r.from_("debian:buster-slim", as_="builder")
+        r.from_("debian:bullseye-slim", as_="builder")
     else:
-        r.from_("debian:buster-slim")
+        r.from_("debian:bullseye-slim")
     r.arg("FOO")
     r.copy(["foo.txt", "tst/baz.txt"], "/opt/")
     r.env(PATH="$PATH:/opt/foo/bin")
