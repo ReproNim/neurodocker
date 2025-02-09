@@ -1,0 +1,65 @@
+---
+# Instructions to add NeuroDebian repositories.
+
+name: gentoo
+url: https://www.gentoo.org/
+binaries:
+    # ATM template jsonschema demands having urls and instructions.
+    # In the future we might use urls to point to git repositories
+    # which are currently under gentoo-portage/ config files.
+    urls:
+        something: not-used
+    arguments:
+        optional:
+            gentoo_hash: 282c4b518562e6c194761d9ce0882f30672219c5
+            science_hash: e4579f5851734f245b02cc1e98f3b69d9df67e09
+    # Below echo commands will be indented by _indent_run_instruction which
+    # would cause trailing spaces to be added to the files. But it should be ok
+    # for us, thus we are not bothering to workaround via inlining.
+    instructions: |
+        mkdir -p /etc/portage/; \
+        echo -e "\
+        \nCOMMON_FLAGS=\"-O2 -pipe -march=native\" \
+        \nMAKEOPTS=\"--jobs 8 --load-average 9\" \
+        \nCFLAGS=\"\${COMMON_FLAGS}\" \
+        \nCXXFLAGS=\"\${COMMON_FLAGS}\" \
+        \nFCFLAGS=\"\${COMMON_FLAGS}\" \
+        \nFFLAGS=\"\${COMMON_FLAGS}\" \
+        \nLC_MESSAGES=C \
+        \nUSE=\"\${USE} science\" \
+        \nACCEPT_LICENSE=\"*\" \
+        "  > "/etc/portage/make.conf"; \
+        mkdir -p "/etc/portage/package.accept_keywords"; \
+        echo -e "*/* ~amd64"  > "/etc/portage/package.accept_keywords/gen" ; \
+        mkdir -p "/etc/portage/package.mask"; \
+        touch "/etc/portage/package.mask/bugs"; \
+        mkdir -p "/etc/portage/repos.conf" ; \
+        echo -e "[gentoo] \
+        \nlocation = /var/db/repos/gentoo \
+        \nsync-type = git \
+        \nsync-uri = https://anongit.gentoo.org/git/repo/gentoo.git \
+        \nsync-git-verify-commit-signature = yes"  > "/etc/portage/repos.conf/gentoo"; \
+        echo -e "[science] \
+        \nlocation = /var/db/repos/science \
+        \nsync-type = git \
+        \nsync-uri = https://anongit.gentoo.org/git/proj/sci.git \
+        \npriority = 7777"  > "/etc/portage/repos.conf/science"; \
+        emerge -v --noreplace dev-vcs/git \
+        && emerge -v1u portage \
+        && mkdir /outputs \
+        && rm /var/db/repos/gentoo -rf \
+        && git config --global init.defaultBranch master \
+        && \
+               set -x && export GIT_TRACE=1 && \
+               REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/gentoo | sed -e "s/sync-uri *= *//g") && \
+               git clone --depth 1 ${REPO_URL} /var/db/repos/gentoo && \
+               cd /var/db/repos/gentoo && \
+                       git fetch --depth 1 origin {{ self.gentoo_hash }} && \
+                       git reset --hard {{ self.gentoo_hash }} && \
+               rm .git -rf && \
+               REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/science | sed -e "s/sync-uri *= *//g") && \
+               git clone --depth 1 ${REPO_URL} /var/db/repos/science && \
+               cd /var/db/repos/science && \
+                       git fetch --depth 1 origin {{ self.science_hash }} && \
+                       git reset --hard {{ self.science_hash }} && \
+               rm .git -rf

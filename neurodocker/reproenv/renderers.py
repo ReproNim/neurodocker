@@ -518,10 +518,22 @@ class DockerRenderer(_Renderer):
     @_log_instruction
     def from_(self, base_image: str, as_: str = None) -> DockerRenderer:
         """Add a Dockerfile `FROM` instruction."""
-        if as_ is None:
-            s = "FROM " + base_image
+        if base_image == "gentoo":
+            # TODO (if we can, likely not):
+            # make neurodocker argument "portage_date" for which we
+            # figure out the corresponding stage3 date and hashes.
+            s = "FROM docker.io/gentoo/portage:20240529 as portage\n"
+            s += "FROM docker.io/gentoo/stage3:20240527\n"
+            s += "COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo\n"
+            # TODO: figure out hashes for the date
+            # s += "ARG gentoo_hash=2d25617a1d085316761b06c17a93ec972f172fc6\n"
+            # s += "ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448\n"
+            s += 'ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"\n'
         else:
-            s = f"FROM {base_image} AS {as_}"
+            if as_ is None:
+                s = "FROM " + base_image
+            else:
+                s = f"FROM {base_image} AS {as_}"
         self._parts.append(s)
         return self
 
@@ -753,6 +765,8 @@ def _indent_run_instruction(string: str, indent=4) -> str:
 def _install(pkgs: list[str], pkg_manager: str, opts: str = None) -> str:
     if pkg_manager == "apt":
         return _apt_install(pkgs, opts)
+    elif pkg_manager == "portage":
+        return _portage_install(pkgs, opts)
     elif pkg_manager == "yum":
         return _yum_install(pkgs, opts)
     # TODO: add debs here?
@@ -800,6 +814,25 @@ apt-get update -qq
 apt-get install --yes --quiet --fix-missing
 rm -rf /var/lib/apt/lists/*"""
     return s
+
+
+def _portage_install(pkgs: list[str], opts: str = None, sort=True) -> str:
+    """Return command to install packages with `portage` (Gentoo).
+
+    `opts` are options passed to `emerge`.
+    Default is "--autounmask-continue".
+    """
+    pkgs = sorted(pkgs) if sort else pkgs
+    opts = "--autounmask-continue" if opts is None else opts
+
+    s = """\
+emerge {opts} \\
+    {pkgs}
+rm -rf /var/tmp/portage/*
+""".format(
+        opts=opts, pkgs=" \\\n    ".join(pkgs)
+    )
+    return s.strip()
 
 
 def _yum_install(pkgs: list[str], opts: str = None, sort=True) -> str:

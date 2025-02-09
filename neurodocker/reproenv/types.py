@@ -18,8 +18,8 @@ REPROENV_SPEC_FILE_IN_CONTAINER = "/.reproenv.json"
 allowed_installation_methods = {"binaries", "source"}
 installation_methods_type = Literal["binaries", "source"]
 
-allowed_pkg_managers = {"apt", "yum"}
-pkg_managers_type = Literal["apt", "yum"]
+allowed_pkg_managers = {"apt", "portage", "yum"}
+pkg_managers_type = Literal["apt", "portage", "yum"]
 
 # Cross-reference the dictionary types below with the JSON schemas.
 
@@ -32,6 +32,7 @@ class _InstallationDependenciesType(TypedDict, total=False):
 
     apt: list[str]
     debs: list[str]
+    portage: list[str]
     yum: list[str]
 
 
