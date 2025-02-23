@@ -24,7 +24,10 @@ def _docker_available():
     """Return `True` if docker-py is installed or docker engine is available."""
     if docker is None:
         return False
-    client = docker.from_env()
+    try:
+        client = docker.from_env()
+    except docker.errors.DockerException:
+        return False
     try:
         return client.ping()  # bool, unless engine is unresponsive (eg not installed)
     except docker.errors.APIError:
