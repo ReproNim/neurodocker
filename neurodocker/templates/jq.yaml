@@ -18,6 +18,7 @@ binaries:
         curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
         chmod +x /usr/local/bin/jq
     urls:
+        1.7.1: https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux64
         '1.7': https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux64
         '1.6': https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64
 source:
@@ -46,7 +47,6 @@ source:
         cd jq
         curl -fsSL https://github.com/jqlang/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
         | tar xz --strip-components 1
-        autoreconf -fi
-        ./configure --disable-maintainer-mode
+        ./configure --with-oniguruma=builtin
         make
         make install
