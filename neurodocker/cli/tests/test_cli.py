@@ -169,14 +169,14 @@ def test_render_registered(cmd: str, pkg_manager: str):
             "--pkg-manager",
             pkg_manager,
             "--jq",
-            "version=1.5",
-            "--jq",
             "version=1.6",
+            "--jq",
+            "version=1.7",
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "jq-1.5/jq-linux64" in result.output
     assert "jq-1.6/jq-linux64" in result.output
+    assert "jq-1.7/jq-linux64" in result.output
 
 
 # Test that we add the default header and default/custom entrypoints
