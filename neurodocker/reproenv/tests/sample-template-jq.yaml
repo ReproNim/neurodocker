@@ -12,7 +12,7 @@ binaries:
         -   ca-certificates
         -   curl
         debs:
-    # Not required for jq -- used to test if packackages are installed properly with dpkg.
+    # Not required for jq -- used to test if packages are installed properly with dpkg.
         -   http://ftp.us.debian.org/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb
         yum:
         -   curl
@@ -25,8 +25,8 @@ binaries:
         curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
         chmod +x /usr/local/bin/jq
     urls:
-        '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        '1.6': https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64
+        '1.7': https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux64
 source:
     arguments:
         required:
@@ -55,7 +55,7 @@ source:
         {{ self.install_dependencies() }}
         mkdir jq
         cd jq
-        curl -fsSL https://github.com/stedolan/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
+        curl -fsSL https://github.com/jqlang/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
         | tar xz --strip-components 1
         # Only required in version 1.6
         autoreconf -fi

@@ -22,6 +22,7 @@ source:
         -   epel-release
         -   unzip
         -   glibc-langpack-en
+        -   glibc-locale-source
     env:
         LANG: en_US.UTF-8
         LC_ALL: en_US.UTF-8

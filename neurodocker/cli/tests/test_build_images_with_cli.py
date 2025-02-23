@@ -47,11 +47,11 @@ def test_build_image_from_registered(
             "--pkg-manager",
             pkg_manager,
             "--jq",
-            "version=1.5",
+            "version=1.6",
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "jq-1.5/jq-linux64" in result.output
+    assert "jq-1.6/jq-linux64" in result.output
 
     spec = "Dockerfile" if cmd == "docker" else "Singularity"
     (tmp_path / spec).write_text(result.output)
