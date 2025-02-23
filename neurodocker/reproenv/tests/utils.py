@@ -156,7 +156,8 @@ def run_singularity_image(
     """
     scmd = "run" if entrypoint is None else "exec"
     # sudo not required
-    cmd: list[str] = ["singularity", scmd, "--cleanenv", img]
+    singularity = os.environ.get("REPROENV_APPTAINER_PROGRAM", "apptainer")
+    cmd: list[str] = [singularity, scmd, "--cleanenv", img]
     if entrypoint is not None:
         cmd.extend(entrypoint)
     if args is not None:
