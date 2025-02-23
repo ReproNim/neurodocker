@@ -57,6 +57,10 @@ source:
         cd jq
         curl -fsSL https://github.com/jqlang/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
         | tar xz --strip-components 1
-        ./configure --with-oniguruma=builtin
+        {{ if self.version == '1.6' }}
+            ./configure --with-oniguruma=builtin --disable-maintainer-mode
+        {{ else }}
+            ./configure --with-oniguruma=builtin
+        {{ endif }}
         make
         make install
