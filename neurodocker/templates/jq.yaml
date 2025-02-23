@@ -18,8 +18,8 @@ binaries:
         curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
         chmod +x /usr/local/bin/jq
     urls:
-        '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-        '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        '1.6': https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64
+        '1.5': https://github.com/jqlang/jq/releases/download/jq-1.5/jq-linux64
 source:
     arguments:
         required:

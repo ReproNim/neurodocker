@@ -21,6 +21,7 @@ source:
         -   ca-certificates
         -   epel-release
         -   unzip
+        -   glibc-langpack-en
     env:
         LANG: en_US.UTF-8
         LC_ALL: en_US.UTF-8
