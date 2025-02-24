@@ -60,6 +60,8 @@ def test_build_image_from_registered(
     with build_fn(tmp_path) as img:
         stdout, _ = run_fn(img, args=["jq", "--help"])
         assert "jq is a tool for processing JSON" in stdout
+        stdout, _ = run_fn(img, args=["jq", "--version"])
+        assert "jq-1.7" in stdout
 
 
 @pytest.mark.long

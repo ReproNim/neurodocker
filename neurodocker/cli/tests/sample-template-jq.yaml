@@ -17,6 +17,11 @@ binaries:
         ND_BAZ: '1234'
         ND_FOO: BAR
     instructions: |
+        export DUMMY="dummy"
+        {%- if self.pkg_manager == "yum" %}
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        {%- endif %}
         {{ self.install_dependencies() }}
         curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
         chmod +x /usr/local/bin/jq
@@ -48,6 +53,11 @@ source:
         ND_BAZ: '1234'
         ND_FOO: BAR
     instructions: |
+        export DUMMY="dummy"
+        {%- if self.pkg_manager == "yum" %}
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        {%- endif %}
         {{ self.install_dependencies() }}
         mkdir jq
         cd jq
