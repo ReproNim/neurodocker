@@ -105,15 +105,18 @@ def build_singularity_image(context: Path, remove=True) -> Generator[str, None, 
     cachedir = Path("/") / "dev" / "shm" / user / "apptainer"
     singularity = os.environ.get("REPROENV_APPTAINER_PROGRAM", "apptainer")
     cmd: list[str] = [
-        "sudo",
-        f"APPTAINER_CACHEDIR={cachedir}",
         singularity,
         "build",
+        "--fakeroot",
         str(sif),
         str(recipe),
     ]
+    env: dict[str, str] = {
+        "APPTAINER_CACHEDIR": cachedir,
+        "PATH": os.environ.get("PATH"),
+    }
     try:
-        _ = subprocess.check_output(cmd, cwd=context)
+        _ = subprocess.check_output(cmd, env=env, cwd=context)
         yield str(sif)
     finally:
         if remove:
