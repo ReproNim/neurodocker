@@ -17,12 +17,17 @@ binaries:
         ND_BAZ: '1234'
         ND_FOO: BAR
     instructions: |
+        export DUMMY="dummy"
+        {%- if self.pkg_manager == "yum" %}
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        {%- endif %}
         {{ self.install_dependencies() }}
         curl -fsSL --output /usr/local/bin/jq {{ self.urls[self.version]}}
         chmod +x /usr/local/bin/jq
     urls:
-        '1.5': https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        '1.6': https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        '1.6': https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64
+        '1.7': https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux64
 source:
     arguments:
         required:
@@ -48,13 +53,21 @@ source:
         ND_BAZ: '1234'
         ND_FOO: BAR
     instructions: |
+        export DUMMY="dummy"
+        {%- if self.pkg_manager == "yum" %}
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        {%- endif %}
         {{ self.install_dependencies() }}
         mkdir jq
         cd jq
-        curl -fsSL https://github.com/stedolan/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
+        curl -fsSL https://github.com/jqlang/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \
         | tar xz --strip-components 1
-        # Only required in version 1.6
-        autoreconf -fi
-        ./configure --disable-maintainer-mode
+        {%- if self.version == '1.6' %}
+            autoreconf -i
+            ./configure --with-oniguruma=builtin --disable-maintainer-mode
+        {%- else %}
+            ./configure --with-oniguruma=builtin
+        {%- endif %}
         make
         make install

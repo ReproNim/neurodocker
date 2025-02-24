@@ -307,13 +307,13 @@ RUN bash -c 'source activate'"""
     )
 
     d = DockerRenderer("apt")
-    d.from_("debian:buster-slim")
+    d.from_("debian:bullseye-slim")
     d.entrypoint(["echo", "foo bar"])
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
     assert (
         rendered
         == """\
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 ENTRYPOINT ["echo", "foo bar"]"""
     )
