@@ -43,6 +43,7 @@ source:
         -   libtool
         -   make
     instructions: |
+        {{ self.install_dependencies() }}
         mkdir jq
         cd jq
         curl -fsSL https://github.com/jqlang/jq/releases/download/jq-{{self.version}}/jq-{{self.version}}.tar.gz \

@@ -30,8 +30,11 @@ source:
     instructions: |
         export ND_ENTRYPOINT="{{ self.env['ND_ENTRYPOINT'] }}"
         {%- if self.pkg_manager == "yum" %}
-        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        if ls /etc/yum.repos.d/CentOS-* >/dev/null 2>&1; then
+            # Disable mirrorlist and switch to vault.centos.org
+            sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+            sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        fi
         {%- endif %}
         {{ self.install_dependencies() }}
         {%- if self.pkg_manager == "apt" %}
