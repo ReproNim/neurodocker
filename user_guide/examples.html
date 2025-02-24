@@ -469,7 +469,7 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 <span id="id3"></span><h3>Docker<a class="headerlink" href="#afni-docker" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>fedora:36<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>fedora:40<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--afni<span class="w"> </span><span class="nv">method</span><span class="o">=</span>binaries<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>afni-binaries.Dockerfile
 
@@ -479,7 +479,7 @@ docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w">
 <p>This does not install AFNI’s R packages. To install relevant R things, use the following:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>yum<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--base-image<span class="w"> </span>fedora:36<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-image<span class="w"> </span>fedora:40<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--afni<span class="w"> </span><span class="nv">method</span><span class="o">=</span>binaries<span class="w"> </span><span class="nv">version</span><span class="o">=</span>latest<span class="w"> </span><span class="nv">install_r_pkgs</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
 &gt;<span class="w"> </span>afni-binaries-r.Dockerfile
 
