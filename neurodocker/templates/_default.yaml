@@ -19,7 +19,6 @@ source:
         yum:
         -   bzip2
         -   ca-certificates
-        -   epel-release
         -   unzip
         -   glibc-langpack-en
         -   glibc-locale-source
