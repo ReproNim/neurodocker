@@ -55,4 +55,5 @@ Before committing changes, initialize `pre-commit` with `pre-commit install`. Th
 
 You can check the status of the build of the Docker images
 for several of the neuroimaging software packages that are supported by _Neurodocker_
-on [this page](https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md).
+on [this page](https://github.com/ReproNim/neurodocker/blob/test_docker_build/docs/README.md). This may help with identifying base images that work well for your
+use case.
