@@ -1,3 +1,56 @@
+# 2.0.0 (Mon Mar 03 2025)
+
+#### 💥 Breaking Change
+
+- Bump peter-evans/create-pull-request from 6 to 7 [#641](https://github.com/ReproNim/neurodocker/pull/641) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### 🚀 Enhancement
+
+- reorder readme [#668](https://github.com/ReproNim/neurodocker/pull/668) ([@satra](https://github.com/satra))
+- [BOT] update pre-commit hooks [#667](https://github.com/ReproNim/neurodocker/pull/667) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- Create release [#666](https://github.com/ReproNim/neurodocker/pull/666) ([@satra](https://github.com/satra))
+
+#### 🐛 Bug Fix
+
+- Fix/builds [#665](https://github.com/ReproNim/neurodocker/pull/665) ([@satra](https://github.com/satra))
+- Fix/builds [#664](https://github.com/ReproNim/neurodocker/pull/664) ([@satra](https://github.com/satra))
+- fix: jq from source needs dependencies [#663](https://github.com/ReproNim/neurodocker/pull/663) ([@satra](https://github.com/satra))
+- ref: use org secret and bump base images and toolkits [#651](https://github.com/ReproNim/neurodocker/pull/651) ([@satra](https://github.com/satra) [@iishiishii](https://github.com/iishiishii))
+- [BOT] update pre-commit hooks [#658](https://github.com/ReproNim/neurodocker/pull/658) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- reverting ' ' around nii.gz because it wasn't working [#661](https://github.com/ReproNim/neurodocker/pull/661) ([@stebo85](https://github.com/stebo85))
+- Update freesurfer.yaml [#660](https://github.com/ReproNim/neurodocker/pull/660) ([@stebo85](https://github.com/stebo85))
+- add fsl 6.0.7.16 [#659](https://github.com/ReproNim/neurodocker/pull/659) ([@stebo85](https://github.com/stebo85))
+- [BOT] update pre-commit hooks [#650](https://github.com/ReproNim/neurodocker/pull/650) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- [BOT] update pre-commit hooks [#649](https://github.com/ReproNim/neurodocker/pull/649) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- add fsl 6.0.7.14 [#648](https://github.com/ReproNim/neurodocker/pull/648) ([@stebo85](https://github.com/stebo85))
+- [BOT] update pre-commit hooks [#647](https://github.com/ReproNim/neurodocker/pull/647) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- [MAINT] Drop python 3.8 and support 3.13 [#646](https://github.com/ReproNim/neurodocker/pull/646) ([@Remi-Gau](https://github.com/Remi-Gau))
+- [BOT] update pre-commit hooks [#644](https://github.com/ReproNim/neurodocker/pull/644) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- Update matlabmcr.yaml R2023b to Update 9 [#643](https://github.com/ReproNim/neurodocker/pull/643) ([@stebo85](https://github.com/stebo85))
+- add new FSL version [#642](https://github.com/ReproNim/neurodocker/pull/642) ([@stebo85](https://github.com/stebo85))
+- [BOT] update pre-commit hooks [#639](https://github.com/ReproNim/neurodocker/pull/639) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- [BOT] update pre-commit hooks [#637](https://github.com/ReproNim/neurodocker/pull/637) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- [MAINT] drop types all from pre-commit config [#636](https://github.com/ReproNim/neurodocker/pull/636) ([@Remi-Gau](https://github.com/Remi-Gau))
+- [BOT] update pre-commit hooks [#634](https://github.com/ReproNim/neurodocker/pull/634) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- Fix typo in CHANGELOG.md to pacify codespell [#631](https://github.com/ReproNim/neurodocker/pull/631) ([@Remi-Gau](https://github.com/Remi-Gau))
+- [BOT] update pre-commit hooks [#633](https://github.com/ReproNim/neurodocker/pull/633) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- [BOT] update pre-commit hooks [#630](https://github.com/ReproNim/neurodocker/pull/630) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+
+#### ⚠️ Pushed to `master`
+
+- Update release.yml ([@satra](https://github.com/satra))
+
+#### Authors: 6
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- [@github-actions[bot]](https://github.com/github-actions[bot])
+- Remi Gau ([@Remi-Gau](https://github.com/Remi-Gau))
+- Satrajit Ghosh ([@satra](https://github.com/satra))
+- Steffen Bollmann ([@stebo85](https://github.com/stebo85))
+- Thuy Dao ([@iishiishii](https://github.com/iishiishii))
+
+---
+
 # 1.0.1 (Sat Jul 06 2024)
 
 #### 🐛 Bug Fix
