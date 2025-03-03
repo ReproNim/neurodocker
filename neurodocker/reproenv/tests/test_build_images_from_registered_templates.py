@@ -26,7 +26,8 @@ _template_filepath = Path(__file__).parent / "sample-template-jq.yaml"
     ],
 )
 @pytest.mark.parametrize(
-    ["pkg_manager", "base_image"], [("apt", "debian:buster-slim"), ("yum", "fedora:33")]
+    ["pkg_manager", "base_image"],
+    [("apt", "debian:bullseye-slim"), ("yum", "fedora:40")],
 )
 @pytest.mark.parametrize(
     ["jq_version", "jq_version_output", "fd_version_startswith"],
@@ -81,12 +82,13 @@ def test_build_using_renderer_from_dict(
     ],
 )
 @pytest.mark.parametrize(
-    ["pkg_manager", "base_image"], [("apt", "debian:buster-slim"), ("yum", "fedora:33")]
+    ["pkg_manager", "base_image"],
+    [("apt", "debian:bullseye-slim"), ("yum", "fedora:40")],
 )
 @pytest.mark.parametrize(["method"], [("binaries",), ("source",)])
 @pytest.mark.parametrize(
     ["jq_version", "jq_version_output", "fd_version_startswith"],
-    [("1.6", "jq-1.6", "fd"), ("1.5", "jq-1.5", "fd")],
+    [("1.6", "jq-1.6", "fd"), ("1.7", "jq-1.7", "fd")],
 )
 def test_build_using_renderer_instance_methods(
     cmd: str,
@@ -118,10 +120,7 @@ def test_build_using_renderer_instance_methods(
         stdout, _ = run_fn(img, args=["jq", "--help"])
         assert stdout.startswith("jq - commandline JSON processor")
         stdout, _ = run_fn(img, args=["jq", "--version"])
-        if method == "source" and jq_version == "1.5":
-            assert stdout == "jq-"
-        else:
-            assert stdout == jq_version_output
+        assert stdout == jq_version_output
         # Test that deb was installed
         if method == "binaries":
             stdout, _ = run_fn(img, args=[fd_exe, "--version"])

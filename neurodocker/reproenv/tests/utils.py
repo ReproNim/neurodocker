@@ -24,7 +24,10 @@ def _docker_available():
     """Return `True` if docker-py is installed or docker engine is available."""
     if docker is None:
         return False
-    client = docker.from_env()
+    try:
+        client = docker.from_env()
+    except docker.errors.DockerException:
+        return False
     try:
         return client.ping()  # bool, unless engine is unresponsive (eg not installed)
     except docker.errors.APIError:
@@ -102,15 +105,18 @@ def build_singularity_image(context: Path, remove=True) -> Generator[str, None, 
     cachedir = Path("/") / "dev" / "shm" / user / "apptainer"
     singularity = os.environ.get("REPROENV_APPTAINER_PROGRAM", "apptainer")
     cmd: list[str] = [
-        "sudo",
-        f"APPTAINER_CACHEDIR={cachedir}",
         singularity,
         "build",
+        "--fakeroot",
         str(sif),
         str(recipe),
     ]
+    env: dict[str, str] = {
+        "APPTAINER_CACHEDIR": cachedir,
+        "PATH": os.environ.get("PATH"),
+    }
     try:
-        _ = subprocess.check_output(cmd, cwd=context)
+        _ = subprocess.check_output(cmd, env=env, cwd=context)
         yield str(sif)
     finally:
         if remove:
@@ -153,7 +159,8 @@ def run_singularity_image(
     """
     scmd = "run" if entrypoint is None else "exec"
     # sudo not required
-    cmd: list[str] = ["singularity", scmd, "--cleanenv", img]
+    singularity = os.environ.get("REPROENV_APPTAINER_PROGRAM", "apptainer")
+    cmd: list[str] = [singularity, scmd, "--cleanenv", img]
     if entrypoint is not None:
         cmd.extend(entrypoint)
     if args is not None:

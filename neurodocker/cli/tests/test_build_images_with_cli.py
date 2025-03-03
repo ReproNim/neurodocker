@@ -26,7 +26,8 @@ from neurodocker.reproenv.tests.utils import (
     ],
 )
 @pytest.mark.parametrize(
-    ["pkg_manager", "base_image"], [("apt", "debian:buster-slim"), ("yum", "centos:7")]
+    ["pkg_manager", "base_image"],
+    [("apt", "debian:bullseye-slim"), ("yum", "centos:8")],
 )
 def test_build_image_from_registered(
     tmp_path: Path, cmd: str, pkg_manager: str, base_image: str
@@ -46,11 +47,11 @@ def test_build_image_from_registered(
             "--pkg-manager",
             pkg_manager,
             "--jq",
-            "version=1.5",
+            "version=1.7",
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "jq-1.5/jq-linux64" in result.output
+    assert "jq-1.7/jq-linux64" in result.output
 
     spec = "Dockerfile" if cmd == "docker" else "Singularity"
     (tmp_path / spec).write_text(result.output)
@@ -59,6 +60,8 @@ def test_build_image_from_registered(
     with build_fn(tmp_path) as img:
         stdout, _ = run_fn(img, args=["jq", "--help"])
         assert "jq is a tool for processing JSON" in stdout
+        stdout, _ = run_fn(img, args=["jq", "--version"])
+        assert "jq-1.7" in stdout
 
 
 @pytest.mark.long
@@ -82,7 +85,7 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
             cmd,
             "--json",
             "--base-image",
-            "debian:buster-slim",
+            "debian:bullseye-slim",
             "--pkg-manager",
             "apt",
             "--install",
