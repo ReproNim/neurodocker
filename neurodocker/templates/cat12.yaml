@@ -13,6 +13,7 @@ binaries:
         optional:
             install_path: /opt/CAT12-{{ self.version }}
     urls:
+        r2577_R2017b: https://github.com/ChristianGaser/cat12/releases/download/12.9/CAT12.9_R2017b_MCR_Linux.zip
         r1933_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8_r1933_R2017b_MCR_Linux.zip
         r2166_R2017b: http://www.neuro.uni-jena.de/cat12/CAT12.8.2_r2166_R2017b_MCR_Linux.zip
     dependencies:
