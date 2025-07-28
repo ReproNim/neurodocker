@@ -41,18 +41,18 @@ repos:
         args: [--mapping, '4', --sequence, '4', --offset, '0']
 
 -   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.14.0
+    rev: v2.15.0
     hooks:
     -   id: pretty-format-toml
         args: [--autofix, --indent, '4']
 
 -   repo: https://github.com/pycqa/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
     -   id: flake8
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.17.0
     hooks:
     -   id: mypy
         additional_dependencies: [types-PyYAML, types-Jinja2, types-click]
