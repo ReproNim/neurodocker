@@ -11,6 +11,15 @@ binaries:
             install_path: /opt/dcm2niix-{{ self.version }}
     urls:
         latest: https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip
+        v1.0.20250506: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20250506/dcm2niix_lnx.zip
+        v1.0.20250505: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20250505/dcm2niix_lnx.zip
+        v1.0.20241211: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20241211/dcm2niix_lnx.zip
+        v1.0.20241208: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20241208/dcm2niix_lnx.zip
+        v1.0.20240202: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20240202/dcm2niix_lnx.zip
+        v1.0.20230411: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20230411/dcm2niix_lnx.zip
+        v1.0.20220720: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20220720/dcm2niix_lnx.zip
+        v1.0.20211006: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20211006/dcm2niix_lnx.zip
+        v1.0.20210317: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20210317/dcm2niix_lnx.zip
         v1.0.20201102: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20201102/dcm2niix_lnx.zip
         v1.0.20200331: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20200331/dcm2niix_lnx.zip
         v1.0.20190902: https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20190902/dcm2niix_lnx.zip
