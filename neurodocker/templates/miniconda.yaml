@@ -44,6 +44,7 @@ binaries:
         curl -fsSL -o "$conda_installer" {{ self.urls["*"] }}
         bash "$conda_installer" -b -p {{ self.install_path }}
         rm -f "$conda_installer"
+        conda tos accept
         {% if self.version == "latest" -%}
         conda update -yq -nbase conda
         {% endif -%}
