@@ -1,3 +1,26 @@
+# 2.0.1 (Fri Aug 01 2025)
+
+#### 🐛 Bug Fix
+
+- adds latest ANTs versions [#679](https://github.com/ReproNim/neurodocker/pull/679) ([@tclose](https://github.com/tclose))
+- Updated copyright period to be inclusive of 2025 [#678](https://github.com/ReproNim/neurodocker/pull/678) ([@tclose](https://github.com/tclose))
+- [BOT] update pre-commit hooks [#674](https://github.com/ReproNim/neurodocker/pull/674) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- adds the latest dcm2niix versions to neurodocker [#675](https://github.com/ReproNim/neurodocker/pull/675) ([@tclose](https://github.com/tclose))
+- Accept conda TOS [#676](https://github.com/ReproNim/neurodocker/pull/676) ([@tclose](https://github.com/tclose))
+- [BOT] update pre-commit hooks [#672](https://github.com/ReproNim/neurodocker/pull/672) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+- removed broken cat12 build and updated with new build [#671](https://github.com/ReproNim/neurodocker/pull/671) ([@stebo85](https://github.com/stebo85))
+- Update cat12.yaml - cat12 changed versioning scheme [#670](https://github.com/ReproNim/neurodocker/pull/670) ([@stebo85](https://github.com/stebo85))
+- Update cat12.yaml to add new version 12.9 [#669](https://github.com/ReproNim/neurodocker/pull/669) ([@stebo85](https://github.com/stebo85))
+
+#### Authors: 4
+
+- [@github-actions[bot]](https://github.com/github-actions[bot])
+- Remi Gau ([@Remi-Gau](https://github.com/Remi-Gau))
+- Steffen Bollmann ([@stebo85](https://github.com/stebo85))
+- Tom Close ([@tclose](https://github.com/tclose))
+
+---
+
 # 2.0.0 (Mon Mar 03 2025)
 
 #### 💥 Breaking Change
