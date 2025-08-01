@@ -1,0 +1,62 @@
+# This is file is automatically generated. Do not edit.
+name: 'dcm2niix'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["test_docker_build"]
+
+jobs:
+
+  dcm2niix:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        base_image: ['ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim', 'fedora:40', 'centos:8']
+        version: ['latest', 'v1.0.20250506', 'v1.0.20250505', 'v1.0.20241211', 'v1.0.20241208', 'v1.0.20240202', 'v1.0.20230411', 'v1.0.20220720', 'v1.0.20211006', 'v1.0.20210317', 'v1.0.20201102', 'v1.0.20200331', 'v1.0.20190902']
+        method: ['binaries', 'source']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
+
+      - name: Generate Dockerfile
+        run: |
+
+          apt_based=('ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim')
+          if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="apt"
+          fi
+
+          yum_based=('fedora:40', 'centos:8')
+          if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ matrix.base_image }} \
+            --pkg-manager=${pkg_manager} \
+            --yes \
+            --dcm2niix \
+            version=${{ matrix.version }} \
+            method=${{ matrix.method }} \
+            > Dockerfile_tmp
+
+          cat Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .
