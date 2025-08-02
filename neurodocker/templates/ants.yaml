@@ -47,7 +47,7 @@ binaries:
     instructions: |
         {{ self.install_dependencies() }}
         echo "Downloading ANTs ..."
-        {% if (self.version == "2.4.1" or self.version == "2.4.2" or self.version == "2.4.3") -%}
+        {% if self.urls[self.version].endswith('.zip') -%}
         curl -fsSL -o ants.zip {{ self.urls[self.version] }}
         unzip ants.zip -d /opt
         mv {{ self.install_path }}/bin/* {{ self.install_path }}
