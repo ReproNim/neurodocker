@@ -20,6 +20,7 @@ binaries:
             install_path: /opt/fsl-{{ self.version }}
             exclude_paths: ''
     urls:
+        6.0.7.18: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.16: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.14: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
         6.0.7.8: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py
@@ -56,7 +57,7 @@ binaries:
         -   libglu1-mesa-dev
         -   libgomp1
         -   libice6
-        -   libopenblas-base
+        -   libopenblas0
         -   libxcursor1
         -   libxft2
         -   libxinerama1
