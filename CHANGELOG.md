@@ -1,3 +1,20 @@
+# 2.0.2 (Tue Aug 05 2025)
+
+#### 🐛 Bug Fix
+
+- Fixes bug in determining whether to unzip or untar ANTs download [#680](https://github.com/ReproNim/neurodocker/pull/680) ([@tclose](https://github.com/tclose))
+- add new FSL version and update libopenblas name for ubuntu 24.04 [#682](https://github.com/ReproNim/neurodocker/pull/682) ([@stebo85](https://github.com/stebo85))
+- [BOT] update pre-commit hooks [#681](https://github.com/ReproNim/neurodocker/pull/681) ([@Remi-Gau](https://github.com/Remi-Gau) [@github-actions[bot]](https://github.com/github-actions[bot]))
+
+#### Authors: 4
+
+- [@github-actions[bot]](https://github.com/github-actions[bot])
+- Remi Gau ([@Remi-Gau](https://github.com/Remi-Gau))
+- Steffen Bollmann ([@stebo85](https://github.com/stebo85))
+- Tom Close ([@tclose](https://github.com/tclose))
+
+---
+
 # 2.0.1 (Fri Aug 01 2025)
 
 #### 🐛 Bug Fix
