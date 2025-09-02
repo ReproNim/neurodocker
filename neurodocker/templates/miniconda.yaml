@@ -34,7 +34,7 @@ binaries:
             pip_opts: ''
             yaml_file: ''
             mamba: 'false'
-            arch: 'x86_64'
+            arch: x86_64
     instructions: |
         {% if not self.installed.lower() in ["true", "y", "1"] -%}
         {{ self.install_dependencies() }}
