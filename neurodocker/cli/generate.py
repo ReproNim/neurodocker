@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json as json_lib
 import sys
+import typing as ty
 from pathlib import Path
 from typing import IO, Any, Optional, Type, cast
 
@@ -27,6 +28,9 @@ from neurodocker.reproenv.state import (
 )
 from neurodocker.reproenv.template import Template
 from neurodocker.reproenv.types import allowed_pkg_managers
+
+if ty.TYPE_CHECKING:
+    from click.parser import ParsingState
 
 
 class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
@@ -137,7 +141,7 @@ class OptionEatAll(click.Option):
         self._eat_all_parser = None
 
     def add_to_parser(self, parser, ctx):
-        def parser_process(value, state: click.parser.ParsingState):
+        def parser_process(value, state: ParsingState):
             # method to hook to the parser.process
             done = False
             value = [value]
