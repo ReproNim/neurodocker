@@ -146,12 +146,12 @@ class OptionEatAll(click.Option):
             done = False
             value = [value]
             # grab everything up to the next option
-            while state.rargs and not done:
+            while state.rargs and not done:  # type: ignore[attr-defined]
                 for prefix in self._eat_all_parser.prefixes:
-                    if state.rargs[0].startswith(prefix):
+                    if state.rargs[0].startswith(prefix):  # type: ignore[attr-defined]
                         done = True
                 if not done:
-                    value.append(state.rargs.pop(0))
+                    value.append(state.rargs.pop(0))  # type: ignore[attr-defined]
             value = tuple(value)
             # call the actual process
             self._previous_parser_process(value, state)
