@@ -5,8 +5,8 @@ name: miniconda
 url: https://docs.conda.io/projects/miniconda/en/latest/
 binaries:
     urls:
-        latest: https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-x86_64.sh
-        '*': https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-x86_64.sh
+        latest: https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-{{ self.arch }}.sh
+        '*': https://repo.continuum.io/miniconda/Miniconda3-{{ self.version }}-Linux-{{ self.arch }}.sh
     env:
         CONDA_DIR: '{{ self.install_path }}'
         PATH: '{{ self.install_path }}/bin:$PATH'
@@ -34,6 +34,7 @@ binaries:
             pip_opts: ''
             yaml_file: ''
             mamba: 'false'
+            arch: x86_64
     instructions: |
         {% if not self.installed.lower() in ["true", "y", "1"] -%}
         {{ self.install_dependencies() }}
