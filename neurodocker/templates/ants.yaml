@@ -10,7 +10,6 @@ binaries:
         optional:
             install_path: /opt/ants-{{ self.version }}
     urls:
-    
     # Official binaries are provided as of 2.4.1 (https://github.com/ANTsX/ANTs/releases)
         2.6.2: https://github.com/ANTsX/ANTs/releases/download/v2.6.2/ants-2.6.2-centos7-X64-gcc.zip
         2.6.1: https://github.com/ANTsX/ANTs/releases/download/v2.6.1/ants-2.6.1-centos7-X64-gcc.zip
