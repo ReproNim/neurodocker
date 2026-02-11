@@ -43,9 +43,7 @@ def test_singularity_renderer_add_template():
     s.add_template(Template(d, binaries_kwds=dict(myname="Bjork")), method="binaries")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 %environment
 export foo="bar"
 
@@ -56,7 +54,6 @@ apt-get install -y -q --no-install-recommends \\
     wget
 rm -rf /var/lib/apt/lists/*
 echo hello Bjork"""
-    )
 
     d = {
         "name": "baz",
@@ -76,9 +73,7 @@ echo hello Bjork"""
     s.add_template(Template(d), method="binaries")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 %environment
 export foo="bar"
 
@@ -88,7 +83,6 @@ apt-get install -y -q --no-install-recommends \\
     curl wget
 rm -rf /var/lib/apt/lists/*
 echo hello foo"""
-    )
 
 
 def test_singularity_render_from_instance_methods():
@@ -97,9 +91,7 @@ def test_singularity_render_from_instance_methods():
     s.copy(["foo/bar/baz.txt", "foo/baz/cat.txt"], "/opt/")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -108,7 +100,6 @@ foo/bar/baz.txt /opt/
 foo/baz/cat.txt /opt/
 
 %post"""
-    )
 
     s = SingularityRenderer("apt")
     s.from_("alpine")
@@ -116,9 +107,7 @@ foo/baz/cat.txt /opt/
     s.env(FOO="BAR")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -130,7 +119,6 @@ foo/baz/cat.txt /opt/
 export FOO="BAR"
 
 %post"""
-    )
 
     # Label
     s = SingularityRenderer("apt")
@@ -140,9 +128,7 @@ export FOO="BAR"
     s.label(ORG="BAZ")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -158,7 +144,6 @@ export FOO="BAR"
 
 %labels
 ORG BAZ"""
-    )
 
     # Run
     s = SingularityRenderer("apt")
@@ -170,9 +155,7 @@ ORG BAZ"""
     s.run("echo foobar")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -189,7 +172,6 @@ echo foobar
 %labels
 ORG BAZ
 org.test.label BAX"""
-    )
 
     # User
     s = SingularityRenderer("apt")
@@ -201,9 +183,7 @@ org.test.label BAX"""
     s.user("nonroot")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -225,7 +205,6 @@ su - nonroot
 
 %labels
 ORG BAZ"""
-    )
 
     # nonroot user
     s = SingularityRenderer("apt")
@@ -240,9 +219,7 @@ ORG BAZ"""
     s.user("nonroot")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -271,7 +248,6 @@ su - nonroot
 
 %labels
 ORG BAZ"""
-    )
 
     # run bash
     s = SingularityRenderer("apt")
@@ -287,9 +263,7 @@ ORG BAZ"""
     s.run_bash("source activate")
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: alpine
 
@@ -320,16 +294,13 @@ bash -c 'source activate'
 
 %labels
 ORG BAZ"""
-    )
 
     s = SingularityRenderer("apt")
     s.from_("debian:bullseye-slim")
     s.entrypoint(["echo", "foobar baz"])
     rendered = str(s)
     rendered = prune_rendered(rendered).strip()
-    assert (
-        rendered
-        == """\
+    assert rendered == """\
 Bootstrap: docker
 From: debian:bullseye-slim
 
@@ -338,4 +309,3 @@ From: debian:bullseye-slim
 
 %runscript
 echo foobar baz"""
-    )
