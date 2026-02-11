@@ -33,7 +33,7 @@ jobs:
                 echo APPTAINER_CACHEDIR=/dev/shm/$(whoami)/singularity >> $GITHUB_ENV
         -   uses: actions/checkout@v6
         -   name: Set up Python
-            uses: actions/setup-python@v5
+            uses: actions/setup-python@v6
             with:
                 python-version: ${{ matrix.python-version }}
                 allow-prereleases: true
