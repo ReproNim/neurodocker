@@ -24,7 +24,10 @@ jobs:
         -   name: Unset header
         # checkout@v2 adds a header that makes branch protection report errors
         # because the Github action bot is not a collaborator on the repo
-            run: git config --local --unset http.https://github.com/.extraheader
+            run: |
+                if git config --local --get-all http.https://github.com/.extraheader > /dev/null; then
+                    git config --local --unset-all http.https://github.com/.extraheader
+                fi
 
         -   name: Set up Python
             uses: actions/setup-python@v6
