@@ -1127,9 +1127,7 @@
 <span class="s2">apt-get install -y </span><span class="si">{opts}</span><span class="s2"> </span><span class="se">\\</span>
 <span class="s2">    </span><span class="si">{pkgs}</span>
 <span class="s2">rm -rf /var/lib/apt/lists/*</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span>
-    <span class="p">)</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
@@ -1170,9 +1168,7 @@
 <span class="s2">    </span><span class="si">{pkgs}</span>
 <span class="s2">yum clean all</span>
 <span class="s2">rm -rf /var/cache/yum/*</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">)</span>
-    <span class="p">)</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="n">opts</span><span class="p">,</span> <span class="n">pkgs</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkgs</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 </pre></div>
 
