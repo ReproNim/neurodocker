@@ -13,7 +13,8 @@ binaries:
         -   curl
         debs:
     # Not required for jq -- used to test if packages are installed properly with dpkg.
-        -   http://ftp.us.debian.org/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb
+    # Use an immutable snapshot URL to avoid 404s from mirror pruning.
+        -   https://snapshot.debian.org/archive/debian-archive/20240331T102506Z/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb
         yum:
         -   curl
         -   fd-find

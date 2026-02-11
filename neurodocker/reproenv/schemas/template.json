@@ -152,7 +152,7 @@
             "python3-dev"
           ],
           "debs": [
-            "http://ftp.us.debian.org/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb"
+            "https://snapshot.debian.org/archive/debian-archive/20240331T102506Z/debian/pool/main/r/rust-fd-find/fd-find_7.2.0-2_amd64.deb"
           ],
           "yum": [
             "curl",
