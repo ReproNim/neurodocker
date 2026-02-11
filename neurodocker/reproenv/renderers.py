@@ -772,9 +772,7 @@ apt-get update -qq
 apt-get install -y {opts} \\
     {pkgs}
 rm -rf /var/lib/apt/lists/*
-""".format(
-        opts=opts, pkgs=" \\\n    ".join(pkgs)
-    )
+""".format(opts=opts, pkgs=" \\\n    ".join(pkgs))
     return s.strip()
 
 
@@ -815,7 +813,5 @@ yum install -y {opts} \\
     {pkgs}
 yum clean all
 rm -rf /var/cache/yum/*
-""".format(
-        opts=opts, pkgs=" \\\n    ".join(pkgs)
-    )
+""".format(opts=opts, pkgs=" \\\n    ".join(pkgs))
     return s.strip()
