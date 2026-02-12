@@ -44,11 +44,13 @@ dev = [
     "neurodocker[minify]",
     "codecov",
     "coverage[toml]",
+    "mypy",
     "pre-commit",
     "pytest >= 6.0",
     "pytest-cov >= 2.0.0",
     "pytest-reportlog >= 0.1.2",
-    "pytest-xdist >= 2.2.0"
+    "pytest-xdist >= 2.2.0",
+    "types-PyYAML"
 ]
 doc = [
     "sphinx <7",
