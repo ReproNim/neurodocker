@@ -41,7 +41,7 @@ pip
 ---
 
 Neurodocker can also be installed with :code:`pip`. This is useful if you want to use
-the Neurodocker Python API. Python 3.7 or newer is required.
+the Neurodocker Python API. Python 3.10 or newer is required.
 
 .. code-block:: bash
 
@@ -56,7 +56,7 @@ In order to create a new :code:`conda` environment and install Neurodocker:
 
 .. code-block:: bash
 
-    conda create -n neurodocker python=3.9
+    conda create -n neurodocker python=3.10
     conda activate neurodocker
     python -m pip install neurodocker
     neurodocker --help

@@ -45,7 +45,7 @@ jobs:
                 ~/auto shipit -vv
             env:
                 GH_TOKEN: ${{ secrets.AUTO_USER_TOKEN }}
-        
+
         -   name: Build Docker images
             if: steps.auto-version.outputs.version != ''
             run: |
@@ -54,7 +54,7 @@ jobs:
                   -t repronim/neurodocker:latest \
                   -t repronim/neurodocker:"$(git describe | sed -e 's,^v,,g')" \
                   .
-    
+
         -   name: Push Docker images
             if: steps.auto-version.outputs.version != ''
             run: |
