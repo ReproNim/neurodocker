@@ -113,7 +113,7 @@ def minify(
     \b
     Examples
     --------
-    docker run --rm -itd --name to-minify python:3.9-slim bash
+    docker run --rm -itd --name to-minify python:3.10-slim bash
     neurodocker minify \\
         --container to-minify \\
         --dir /usr/local \\

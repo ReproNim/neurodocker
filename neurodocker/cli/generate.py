@@ -178,7 +178,7 @@ class KeyValuePair(click.ParamType):
         def fn(v: str):
             # Limiting to one split allows values to include =.
             # For example, package versions in miniconda can include =,
-            # like conda_install="python=3.9".
+            # like conda_install="python=3.10".
             strs = v.split("=", maxsplit=1)
             if len(strs) != 2:
                 self.fail("expected string in format 'key=value'", param, ctx)
