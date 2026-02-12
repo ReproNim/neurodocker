@@ -142,7 +142,7 @@ commands.
 .. code-block:: bash
 
     # running a container in the background and assigning `to-minify` name to the container
-    docker run --rm -itd --name to-minify python:3.9-slim bash
+    docker run --rm -itd --name to-minify python:3.10-slim bash
     # running minify command for a specific set of python commands
     neurodocker minify \
       --container to-minify \

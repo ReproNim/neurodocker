@@ -492,7 +492,7 @@ these commands.</p>
 <p><a class="reference external" href="https://www.reprozip.org/">ReproZip</a> is used to determine the files used by the
 commands.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># running a container in the background and assigning `to-minify` name to the container</span>
-docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-itd<span class="w"> </span>--name<span class="w"> </span>to-minify<span class="w"> </span>python:3.9-slim<span class="w"> </span>bash
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-itd<span class="w"> </span>--name<span class="w"> </span>to-minify<span class="w"> </span>python:3.10-slim<span class="w"> </span>bash
 <span class="c1"># running minify command for a specific set of python commands</span>
 neurodocker<span class="w"> </span>minify<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--container<span class="w"> </span>to-minify<span class="w"> </span><span class="se">\</span>
