@@ -1,3 +1,26 @@
+# 2.1.0 (Fri Feb 13 2026)
+
+#### 🚀 Enhancement
+
+- Drop Python 3.9 support, require Python 3.10+ [#698](https://github.com/ReproNim/neurodocker/pull/698) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🐛 Bug Fix
+
+- add publish container to github registry [#697](https://github.com/ReproNim/neurodocker/pull/697) ([@stebo85](https://github.com/stebo85))
+
+#### 🏠 Internal
+
+- Add mypy and types-PyYAML to dev dependencies [#700](https://github.com/ReproNim/neurodocker/pull/700) ([@yarikoptic](https://github.com/yarikoptic))
+- Add quick build/upload of docker images based on what we have in heudiconv [#638](https://github.com/ReproNim/neurodocker/pull/638) ([@yarikoptic](https://github.com/yarikoptic) [@satra](https://github.com/satra))
+
+#### Authors: 3
+
+- Satrajit Ghosh ([@satra](https://github.com/satra))
+- Steffen Bollmann ([@stebo85](https://github.com/stebo85))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 2.0.2 (Tue Aug 05 2025)
 
 #### 🐛 Bug Fix
