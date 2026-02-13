@@ -40,26 +40,39 @@ jobs:
                 wget -O- "$auto_download_url" | gunzip > ~/auto
                 chmod a+x ~/auto
 
+        -   name: Query 'auto' on type of the release
+            id: auto-version
+            run: |
+                set -o pipefail
+                ~/auto version -vv | tee /tmp/auto-version
+                version="$(sed -ne '/Calculated SEMVER bump:/s,.*: *,,p' /tmp/auto-version)"
+                echo "version=$version" >> "$GITHUB_OUTPUT"
+            env:
+                GH_TOKEN: ${{ secrets.AUTO_USER_TOKEN }}
+
         -   name: Create release
+            if: steps.auto-version.outputs.version != ''
             run: |
                 ~/auto shipit -vv
             env:
                 GH_TOKEN: ${{ secrets.AUTO_USER_TOKEN }}
 
-        -   name: Build Docker images
-            if: steps.auto-version.outputs.version != ''
-            run: |
-                docker build \
-                  -t repronim/neurodocker:master \
-                  -t repronim/neurodocker:latest \
-                  -t repronim/neurodocker:"$(git describe | sed -e 's,^v,,g')" \
-                  .
-
-        -   name: Push Docker images
-            if: steps.auto-version.outputs.version != ''
+        -   name: Login to Docker Hub
             run: |
                 docker login -u "$DOCKER_LOGIN" --password-stdin <<<"$DOCKER_TOKEN"
-                docker push --all-tags repronim/neurodocker
             env:
                 DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
                 DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+        -   name: Build and push master Docker image
+            run: |
+                docker build -t repronim/neurodocker:master .
+                docker push repronim/neurodocker:master
+
+        -   name: Build and push release Docker images
+            if: steps.auto-version.outputs.version != ''
+            run: |
+                docker tag repronim/neurodocker:master repronim/neurodocker:latest
+                docker tag repronim/neurodocker:master repronim/neurodocker:"$(git describe | sed -e 's,^v,,g')"
+                docker push repronim/neurodocker:latest
+                docker push repronim/neurodocker:"$(git describe | sed -e 's,^v,,g')"
