@@ -1,3 +1,15 @@
+# 2.1.1 (Fri Feb 13 2026)
+
+#### 🏠 Internal
+
+- Add auto-version query step and push Docker master tag on every build [#701](https://github.com/ReproNim/neurodocker/pull/701) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 1
+
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 2.1.0 (Fri Feb 13 2026)
 
 #### 🚀 Enhancement
