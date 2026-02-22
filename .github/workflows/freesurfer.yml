@@ -1,0 +1,60 @@
+# This is file is automatically generated. Do not edit.
+name: 'freesurfer'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["test_docker_build"]
+
+jobs:
+
+  freesurfer:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        base_image: ['ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim', 'fedora:40', 'centos:8']
+        version: ['7.4.1', '7.3.2', '7.3.1', '7.3.0', '7.2.0', '7.1.1', '7.1.1-min', '7.1.0', '6.0.1', '6.0.0', '6.0.0-min']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
+
+      - name: Generate Dockerfile
+        run: |
+
+          apt_based=('ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim')
+          if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="apt"
+          fi
+
+          yum_based=('fedora:40', 'centos:8')
+          if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ matrix.base_image }} \
+            --pkg-manager=${pkg_manager} \
+            --yes \
+            --freesurfer \
+            version=${{ matrix.version }} \
+            > Dockerfile_tmp
+
+          cat Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .

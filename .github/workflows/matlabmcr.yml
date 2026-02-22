@@ -1,0 +1,62 @@
+# This is file is automatically generated. Do not edit.
+name: 'matlabmcr'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["test_docker_build"]
+
+jobs:
+
+  matlabmcr:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        base_image: ['ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim', 'fedora:40', 'centos:8']
+        version: ['2023b', '2023a', '2022b', '2022a', '2021b', '2021a', '2020b', '2020a', '2019b', '2019a', '2018b', '2018a', '2017b', '2017a', '2016b', '2016a', '2015b', '2015aSP1', '2015a', '2014a', '2014b', '2013b', '2013a', '2012b', '2012a', '2010a']
+        method: ['binaries']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install neurodocker
+        run: python -m pip install --editable .[dev]
+
+      - name: Generate Dockerfile
+        run: |
+
+          apt_based=('ubuntu:24.04', 'ubuntu:22.04', 'debian:bookworm-slim', 'debian:bullseye-slim')
+          if [[ " ${apt_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="apt"
+          fi
+
+          yum_based=('fedora:40', 'centos:8')
+          if [[ " ${yum_based[*]} " =~ ${{ matrix.base_image }} ]]; then
+            pkg_manager="yum"
+          fi
+
+          neurodocker \
+            generate docker \
+            --base-image=${{ matrix.base_image }} \
+            --pkg-manager=${pkg_manager} \
+            --yes \
+            --matlabmcr \
+            version=${{ matrix.version }} \
+            method=${{ matrix.method }} \
+            > Dockerfile_tmp
+
+          cat Dockerfile_tmp
+
+      - name: Build the Docker image
+        run: docker build -f Dockerfile_tmp .
