@@ -52,7 +52,7 @@ Clone the repository and install in editable mode.
 ```
 git clone https://github.com/ReproNim/neurodocker
 cd neurodocker
-python -m pip install --no-cache-dir --editable .[all]
+python -m pip install --no-cache-dir --editable . --group all
 ```
 
 Before committing changes, initialize `prek` with `prek install`, or `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `ruff` for formatting.
