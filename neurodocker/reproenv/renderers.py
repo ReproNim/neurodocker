@@ -519,7 +519,7 @@ class DockerRenderer(_Renderer):
     def from_(self, base_image: str, as_: str = None) -> DockerRenderer:
         """Add a Dockerfile `FROM` instruction."""
         if as_ is None:
-            s = "FROM " + base_image
+            s = f"FROM {base_image}"
         else:
             s = f"FROM {base_image} AS {as_}"
         self._parts.append(s)
@@ -573,7 +573,7 @@ class DockerRenderer(_Renderer):
     @_log_instruction
     def workdir(self, path: PathType) -> DockerRenderer:
         """Add a Dockerfile `WORKDIR` instruction."""
-        self._parts.append("WORKDIR " + str(path))
+        self._parts.append(f"WORKDIR {path}")
         return self
 
 

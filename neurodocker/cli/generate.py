@@ -130,7 +130,7 @@ class OptionEatAll(click.Option):
 
     def __init__(self, *args, **kwargs):
         nargs = kwargs.pop("nargs", -1)
-        assert nargs == -1, "nargs, if set, must be -1 not {}".format(nargs)
+        assert nargs == -1, f"nargs, if set, must be -1 not {nargs}"
         super(OptionEatAll, self).__init__(*args, **kwargs)
         if self.type is click.STRING:
             raise ValueError(
