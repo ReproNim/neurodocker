@@ -220,7 +220,7 @@ class _BaseInstallationTemplate:
     def dependencies(self, pkg_manager: str) -> list[str]:
         deps_dict = self._template.get("dependencies", {})
         # TODO: not sure why the following line raises a type error in mypy.
-        return deps_dict.get(pkg_manager, [])  # type: ignore
+        return deps_dict.get(pkg_manager, [])  # type: ignore[return-value]
 
     def install(self, pkgs: list[str], opts: str = None) -> str:
         raise NotImplementedError(

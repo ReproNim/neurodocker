@@ -27,7 +27,7 @@ and on the branch where the workflows are pushed to (currently "test_docker_buil
 import argparse
 from pathlib import Path
 
-import yaml  # type: ignore
+import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 apt_based = [
