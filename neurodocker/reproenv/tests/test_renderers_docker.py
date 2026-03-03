@@ -37,24 +37,30 @@ def test_docker_renderer_add_template():
     r.add_template(Template(d), method="binaries")
     assert len(r._parts) == 2
     assert r._parts[0] == 'ENV foo="bar"'
-    assert r._parts[1] == """RUN apt-get update -qq \\
+    assert (
+        r._parts[1]
+        == """RUN apt-get update -qq \\
     && apt-get install -y -q --no-install-recommends \\
            curl \\
     && rm -rf /var/lib/apt/lists/* \\
     && echo hello \\
     && echo world"""
+    )
 
     # Test yum.
     r = DockerRenderer("yum")
     r.add_template(Template(d), method="binaries")
     assert len(r._parts) == 2
     assert r._parts[0] == 'ENV foo="bar"'
-    assert r._parts[1] == """RUN yum install -y -q \\
+    assert (
+        r._parts[1]
+        == """RUN yum install -y -q \\
            python \\
     && yum clean all \\
     && rm -rf /var/cache/yum/* \\
     && echo hello \\
     && echo world"""
+    )
 
     # Test required arguments.
     d = {
@@ -74,12 +80,15 @@ def test_docker_renderer_add_template():
     r.add_template(Template(d, binaries_kwds=dict(name="Bjork")), method="binaries")
     rendered = str(r)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """ENV foo="bar"
+    assert (
+        rendered
+        == """ENV foo="bar"
 RUN apt-get update -qq \\
     && apt-get install -y -q --no-install-recommends \\
            curl \\
     && rm -rf /var/lib/apt/lists/* \\
     && echo hello Bjork"""
+    )
 
     d = {
         "name": "foobar",
@@ -99,12 +108,15 @@ RUN apt-get update -qq \\
     r.add_template(Template(d), method="binaries")
     rendered = str(r)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """ENV foo="bar"
+    assert (
+        rendered
+        == """ENV foo="bar"
 RUN apt-get update -qq \\
     && apt-get install -y -q --no-install-recommends \\
            curl \\
     && rm -rf /var/lib/apt/lists/* \\
     && echo hello foo"""
+    )
 
 
 def test_docker_render_from_instance_methods():
@@ -130,12 +142,15 @@ def test_docker_render_from_instance_methods():
     )
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
       "foo/baz/cat.txt", \\
       "/opt/"]"""
+    )
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
@@ -146,13 +161,16 @@ COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
     d.env(PATH="$PATH:/opt/foo/bin")
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
       "foo/baz/cat.txt", \\
       "/opt/"]
 ENV PATH="$PATH:/opt/foo/bin\""""
+    )
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
@@ -165,7 +183,9 @@ ENV PATH="$PATH:/opt/foo/bin\""""
     d.labels({"org.test.label": "another label"})
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
@@ -174,6 +194,7 @@ COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
 ENV PATH="$PATH:/opt/foo/bin"
 LABEL ORG="myorg"
 LABEL org.test.label="another label\""""
+    )
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
@@ -186,7 +207,9 @@ LABEL org.test.label="another label\""""
     d.run("echo foobar")
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
@@ -195,6 +218,7 @@ COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
 ENV PATH="$PATH:/opt/foo/bin"
 LABEL ORG="myorg"
 RUN echo foobar"""
+    )
 
     d = DockerRenderer("apt")
     d.from_("alpine", as_="builder")
@@ -208,7 +232,9 @@ RUN echo foobar"""
     d.user("nonroot")
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
@@ -220,6 +246,7 @@ RUN echo foobar
 RUN test "$(getent passwd nonroot)" \\
     || useradd --no-user-group --create-home --shell /bin/bash nonroot
 USER nonroot"""
+    )
 
     d = DockerRenderer("apt", users={"root", "nonroot"})
     d.from_("alpine", as_="builder")
@@ -234,7 +261,9 @@ USER nonroot"""
     d.workdir("/opt/foobar")
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
@@ -245,6 +274,7 @@ LABEL ORG="myorg"
 RUN echo foobar
 USER nonroot
 WORKDIR /opt/foobar"""
+    )
 
     d = DockerRenderer("apt", users={"root", "nonroot"})
     d.from_("alpine", as_="builder")
@@ -260,7 +290,9 @@ WORKDIR /opt/foobar"""
     d.run_bash("source activate")
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM alpine AS builder
 ARG FOO
 COPY --from=builder --chown=neuro ["foo/bar/baz.txt", \\
@@ -272,12 +304,16 @@ RUN echo foobar
 USER nonroot
 WORKDIR /opt/foobar
 RUN bash -c 'source activate'"""
+    )
 
     d = DockerRenderer("apt")
     d.from_("debian:bullseye-slim")
     d.entrypoint(["echo", "foo bar"])
     rendered = str(d)
     rendered = prune_rendered(rendered).strip()
-    assert rendered == """\
+    assert (
+        rendered
+        == """\
 FROM debian:bullseye-slim
 ENTRYPOINT ["echo", "foo bar"]"""
+    )

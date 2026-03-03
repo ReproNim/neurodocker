@@ -296,8 +296,9 @@ def _create_help_for_template(template: Template) -> str:
             h += f"\n    - {arg} [required]"
             # TODO: should we only include versions if using binaries?
             if arg == "version" and method == "binaries":
-                h += f"""\n        version=[{'|'.join(
-                    sorted(getattr(template, method).versions, reverse=True))}]"""
+                h += f"""\n        version=[{
+                    "|".join(sorted(getattr(template, method).versions, reverse=True))
+                }]"""
         for arg, default in getattr(template, method).optional_arguments.items():
             h += f"\n    - {arg} [default: {default}]"
     if template.alert:
