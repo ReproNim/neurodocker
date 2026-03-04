@@ -102,6 +102,7 @@ src_paths = [
 ]
 
 [tool.mypy]
+enable_error_code = ["ignore-without-code"]
 no_implicit_optional = false
 warn_unreachable = true
 
