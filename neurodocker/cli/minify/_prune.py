@@ -40,9 +40,6 @@ def main(
     files_to_keep = config["other_files"]
     files_to_keep = {Path(p) for p in files_to_keep}
 
-    if isinstance(directories_to_prune, (Path, str)):
-        directories_to_prune = [directories_to_prune]
-
     directories_to_prune = [Path(d) for d in directories_to_prune]
 
     # TODO: consider moving this check to the `neurodocker minify` cli. perhaps make a

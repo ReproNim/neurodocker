@@ -103,6 +103,7 @@ src_paths = [
 
 [tool.mypy]
 no_implicit_optional = false
+warn_unreachable = true
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
