@@ -125,6 +125,7 @@ module = [
 [tool.pytest.ini_options]
 addopts = "-ra --strict-config --strict-markers --showlocals -s -vv --cov=neurodocker --cov-config=pyproject.toml"
 doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"
+filterwarnings = ["error"]
 junit_family = "xunit2"
 markers = [
     "builds_docker: builds a docker image",
