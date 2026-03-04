@@ -55,4 +55,4 @@ cd neurodocker
 python -m pip install --no-cache-dir --editable .[all]
 ```
 
-Before committing changes, initialize `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `ruff` for formatting.
+Before committing changes, initialize `prek` with `prek install`, or `pre-commit` with `pre-commit install`. This will format code with each commit to keep the style consistent. _Neurodocker_ uses `ruff` for formatting.

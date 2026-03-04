@@ -1,5 +1,5 @@
 ---
-name: pre-commit
+name: prek
 
 on:
     pull_request:
@@ -7,9 +7,8 @@ on:
         branches: [master]
 
 jobs:
-    pre-commit:
+    prek:
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/setup-python@v6
         -   uses: actions/checkout@v6
-        -   uses: pre-commit/action@v3.0.1
+        -   uses: j178/prek-action@v1
