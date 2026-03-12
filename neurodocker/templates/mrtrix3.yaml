@@ -16,7 +16,7 @@ binaries:
         -   ca-certificates
         -   curl
         -   libpng16-16
-        -   libtiff5
+        -   libtiff6
         yum:
         -   bzip2
         -   curl
