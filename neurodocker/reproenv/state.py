@@ -16,7 +16,7 @@ import yaml
 try:
     from yaml import CSafeLoader as SafeLoader
 except ImportError:  # pragma: no cover
-    from yaml import SafeLoader  # type: ignore  # pragma: no cover
+    from yaml import SafeLoader  # type: ignore[assignment]  # pragma: no cover
 
 from neurodocker.reproenv.exceptions import (
     RendererError,

@@ -660,8 +660,7 @@ class SingularityRenderer(_Renderer):
 
     @_log_instruction
     def env(self, **kwds: str) -> SingularityRenderer:
-        # TODO: why does this raise a type error?
-        self._environment.extend(kwds.items())  # type: ignore
+        self._environment.extend(kwds.items())
         return self
 
     @_log_instruction
@@ -695,10 +694,7 @@ class SingularityRenderer(_Renderer):
 
     @_log_instruction
     def label(self, **kwds: str) -> SingularityRenderer:
-        # TODO: why are we getting this error?
-        # Argument 1 to "update" of "dict" has incompatible type
-        # "Dict[str, Mapping[str, str]]"; expected "Mapping[str, str]"
-        self._labels.update(kwds)  # type: ignore
+        self._labels.update(kwds)
         return self
 
     @_log_instruction
