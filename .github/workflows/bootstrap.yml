@@ -30,6 +30,7 @@ permissions:
 jobs:
     bootstrap:
         runs-on: ubuntu-22.04
+        if: github.repository == 'ReproNim/neurodocker'
 
         steps:
         -   uses: actions/checkout@v6
