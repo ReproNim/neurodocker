@@ -68,7 +68,7 @@ def build_docker_image(context: Path, remove=False) -> Generator[str, None, None
     df = context / "Dockerfile"
     if not df.exists():
         raise FileNotFoundError(f"Dockerfile not found: {df}")
-    tag = "reproenv-pytest-" + uuid.uuid4().hex
+    tag = f"reproenv-pytest-{uuid.uuid4().hex}"
     cmd: list[str] = ["docker", "build", "--tag", tag, str(context)]
     try:
         _ = subprocess.check_output(cmd, cwd=context)
