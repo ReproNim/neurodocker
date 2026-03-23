@@ -1015,8 +1015,7 @@
 
 <div class="viewcode-block" id="SingularityRenderer.env"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.env">[docs]</a>    <span class="nd">@_log_instruction</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
-        <span class="c1"># TODO: why does this raise a type error?</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_environment</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.entrypoint"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.entrypoint">[docs]</a>    <span class="nd">@_log_instruction</span>
@@ -1050,10 +1049,7 @@
 
 <div class="viewcode-block" id="SingularityRenderer.label"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.label">[docs]</a>    <span class="nd">@_log_instruction</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingularityRenderer</span><span class="p">:</span>
-        <span class="c1"># TODO: why are we getting this error?</span>
-        <span class="c1"># Argument 1 to &quot;update&quot; of &quot;dict&quot; has incompatible type</span>
-        <span class="c1"># &quot;Dict[str, Mapping[str, str]]&quot;; expected &quot;Mapping[str, str]&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SingularityRenderer.run"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.SingularityRenderer.run">[docs]</a>    <span class="nd">@_log_instruction</span>
