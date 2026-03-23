@@ -874,7 +874,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">from_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `FROM` instruction.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">as_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;FROM &quot;</span> <span class="o">+</span> <span class="n">base_image</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">as_</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -928,7 +928,7 @@
 <div class="viewcode-block" id="DockerRenderer.workdir"><a class="viewcode-back" href="../../../api/neurodocker.reproenv.renderers.html#neurodocker.reproenv.renderers.DockerRenderer.workdir">[docs]</a>    <span class="nd">@_log_instruction</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DockerRenderer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a Dockerfile `WORKDIR` instruction.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WORKDIR &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WORKDIR </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
