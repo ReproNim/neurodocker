@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Mapping
+from typing import Mapping, TypedDict
 
-from mypy_extensions import TypedDict
 from typing_extensions import Literal
 
 # The path to the JSON file within the container, which contains the information of
