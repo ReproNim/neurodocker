@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling>=1.27.0", "hatch-vcs"]
 
 [project]
 authors = [{name = "Neurodocker Developers"}]
@@ -9,7 +9,6 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -31,7 +30,8 @@ dependencies = [
 ]
 description = "A generic generator of Dockerfiles and Singularity recipes."
 dynamic = ["version"]
-license = {text = "Apache License, 2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 maintainers = [{name = "Jakub Kaczmarzyk", email = "jakub.kaczmarzyk@gmail.com"}]
 name = "neurodocker"
 readme = "README.md"
