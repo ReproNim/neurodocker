@@ -5,7 +5,7 @@ It includes ReproEnv, which is an extensible, generic container generator.
 
 from pathlib import Path
 
-from neurodocker import reproenv  # noqa: F401
+from neurodocker import reproenv
 from neurodocker._version import __version__
 
 __version__ = __version__

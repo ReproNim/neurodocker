@@ -67,10 +67,6 @@ neurodocker = "neurodocker.cli.cli:cli"
 Development = "https://github.com/repronim/neurodocker"
 Homepage = "https://www.repronim.org/neurodocker/"
 
-[tool.black]
-line-length = 88
-target-version = ['py310']
-
 [tool.codespell]
 # didi -- some name Dear to someone
 ignore-words-list = "didi"
@@ -90,16 +86,6 @@ packages = ["neurodocker"]
 
 [tool.hatch.version]
 source = "vcs"
-
-[tool.isort]
-combine_as_imports = true
-line_length = 88
-profile = "black"
-skip_gitignore = true
-src_paths = [
-    'neurodocker',
-    'docs'
-]
 
 [tool.mypy]
 no_implicit_optional = false
@@ -134,3 +120,11 @@ markers = [
 ]
 minversion = "6.0"
 xfail_strict = true
+
+[tool.ruff.lint]
+extend-select = [
+    "I"  # isort
+]
+
+[tool.ruff.lint.per-file-ignores]
+"neurodocker/reproenv/tests/test_state.py" = ["E714"]
