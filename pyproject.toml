@@ -3,12 +3,20 @@ build-backend = "hatchling.build"
 requires = ["hatchling>=1.27.0", "hatch-vcs"]
 
 [dependency-groups]
-all = [
-    {include-group = "dev"},
-    {include-group = "doc"},
-    {include-group = "minify"}
-]
 dev = [
+    {include-group = "doc"},
+    {include-group = "minify"},
+    {include-group = "test"}
+]
+doc = [
+    "sphinx <7",
+    "pydata-sphinx-theme >= 0.13",
+    "sphinxcontrib.apidoc >= 0.3"
+]
+minify = [
+    "docker >= 4.4.1"
+]
+test = [
     {include-group = "minify"},
     "codecov",
     "coverage[toml]",
@@ -19,14 +27,6 @@ dev = [
     "pytest-reportlog >= 0.1.2",
     "pytest-xdist >= 2.2.0",
     "types-PyYAML"
-]
-doc = [
-    "sphinx <7",
-    "pydata-sphinx-theme >= 0.13",
-    "sphinxcontrib.apidoc >= 0.3"
-]
-minify = [
-    "docker >= 4.4.1"
 ]
 
 [project]
