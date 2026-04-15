@@ -27,7 +27,7 @@ binaries:
         -   jq
   # see install for node https://github.com/nodesource/distributions#installation-scripts
     instructions: |
-        {%- if self.version[0] == '1' %} \
+        {%- if self.version.split('.')[0] | int < 2 %} \
           if [ ! -z `which node` ] ; then \
             echo "node is installed, skipping its install." ; \
           else \
@@ -55,8 +55,8 @@ binaries:
           jq -r ".version|=\"{{ self.version }}\"" deno.json > ._deno.json
           mv ._deno.json deno.json
           deno run -A ./build.ts
-          cp dist/validator/bids-validator.js /usr/bin/
-          echo 'deno -A /usr/bin//bids-validator.js $@' > /usr/bin/bids-validator
+          cp dist/validator/bids-validator.js /usr/bin/bids-validator.js
+          echo 'deno -A /usr/bin/bids-validator.js "$@"' > /usr/bin/bids-validator
           chmod +x /usr/bin/bids-validator
-          rm -Rf $PWD
+          cd .. && rm -rf "bids-validator-{{ self.version }}"
         {% endif -%}
