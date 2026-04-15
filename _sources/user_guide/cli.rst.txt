@@ -14,7 +14,7 @@ neurodocker generate
 
 .. literalinclude:: generate_cli_help.txt
 
-The ``neurodocker generate`` command has two subcommands: `docker` and `singularity`.
+The ``neurodocker generate`` command has two subcommands: ``docker`` and ``singularity``.
 Most of the arguments for these subcommands are identical, but please check the details below.
 
 neurodocker generate docker

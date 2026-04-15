@@ -466,7 +466,7 @@
         <span class="c1"># User-defined arguments that are passed to template at render time.</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">kwds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">kwds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># type: ignore[unreachable]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kwds</span> <span class="o">=</span> <span class="n">kwds</span>
 
         <span class="c1"># This is meant to be overwritten by renderers, so that self.pkg_manager can</span>

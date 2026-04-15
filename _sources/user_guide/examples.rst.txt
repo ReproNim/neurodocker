@@ -60,7 +60,7 @@ or
     neurodocker generate singularity --help
 
 
-.. note ::
+.. note::
 
     Neurodocker is meant to create command-line environments. At the moment, graphical
     user interfaces (like FreeView and FSLEyes) are not installed properly. It is

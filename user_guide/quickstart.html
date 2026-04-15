@@ -416,12 +416,12 @@ neurodocker<span class="w"> </span>generate<span class="w"> </span>docker<span c
 docker<span class="w"> </span>build<span class="w"> </span>--tag<span class="w"> </span>nipype-ants<span class="w"> </span>.
 </pre></div>
 </div>
-<p>The image :code: <cite>nipype-ants</cite> contains :code: <cite>ANTs</cite> and a Python environment with :code: <cite>Nipype</cite> and :code: <cite>Jupyter Notebook</cite>.
+<p>The image <code class="code docutils literal notranslate"><span class="pre">nipype-ants</span></code> contains <code class="code docutils literal notranslate"><span class="pre">ANTs</span></code> and a Python environment with <code class="code docutils literal notranslate"><span class="pre">Nipype</span></code> and <code class="code docutils literal notranslate"><span class="pre">Jupyter</span> <span class="pre">Notebook</span></code>.
 You can start a Jupyter Notebook with the following command. This will mount
 the current working directory to <code class="code docutils literal notranslate"><span class="pre">work</span></code> within the container, so any files you
 create in this directory are saved. If we had not mounted this directory, all of the files
 created in <code class="code docutils literal notranslate"><span class="pre">/work</span></code> would be gone after the container was stopped.
-:code: <cite>–publish 8888:8888</cite> and :code: <cite>–ip 0.0.0.0 –port 8888</cite> is required in order to use Jupyter Notebook from a Docker container.</p>
+<code class="code docutils literal notranslate"><span class="pre">--publish</span> <span class="pre">8888:8888</span></code> and <code class="code docutils literal notranslate"><span class="pre">--ip</span> <span class="pre">0.0.0.0</span> <span class="pre">--port</span> <span class="pre">8888</span></code> is required in order to use Jupyter Notebook from a Docker container.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--workdir<span class="w"> </span>/work<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--volume<span class="w"> </span><span class="nv">$PWD</span>:/work<span class="w"> </span><span class="se">\</span>
@@ -435,7 +435,7 @@ created in <code class="code docutils literal notranslate"><span class="pre">/wo
 <h3>Singularity<a class="headerlink" href="#singularity" title="Permalink to this heading">#</a></h3>
 <p>In most cases the only difference between generating Dockerfile and
 <a class="reference external" href="https://sylabs.io/guides/3.7/user-guide/definition_files.html">Singularity definition file</a> (the file that is used to create a Singularity container) is in
-a form of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span></code> command,  <cite>neurodocker generate singularity</cite> has to be used instead of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span> <span class="pre">docker</span></code>.</p>
+a form of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span></code> command, <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span> <span class="pre">singularity</span></code> has to be used instead of <code class="code docutils literal notranslate"><span class="pre">neurodocker</span> <span class="pre">generate</span> <span class="pre">docker</span></code>.</p>
 <p><strong>This requires having `Singularity &lt;https://sylabs.io/guides/3.7/user-guide/quick_start.html&gt;`_ installed first.</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>neurodocker<span class="w"> </span>generate<span class="w"> </span>singularity<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pkg-manager<span class="w"> </span>apt<span class="w"> </span><span class="se">\</span>
