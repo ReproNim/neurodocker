@@ -111,7 +111,7 @@ class _BaseInstallationTemplate:
         # User-defined arguments that are passed to template at render time.
         for key, value in kwds.items():
             if not isinstance(value, str):
-                kwds[key] = str(value)
+                kwds[key] = str(value)  # type: ignore[unreachable]
         self._kwds = kwds
 
         # This is meant to be overwritten by renderers, so that self.pkg_manager can
