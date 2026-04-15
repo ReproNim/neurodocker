@@ -44,7 +44,7 @@ dev = [
     "codecov",
     "coverage[toml]",
     "mypy",
-    "pre-commit",
+    "prek",
     "pytest >= 6.0",
     "pytest-cov >= 2.0.0",
     "pytest-reportlog >= 0.1.2",

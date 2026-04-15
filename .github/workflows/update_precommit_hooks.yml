@@ -38,10 +38,10 @@ jobs:
             with:
                 python-version: '3.12'
                 allow-prereleases: false
-        -   name: Install pre-commit
-            run: pip install pre-commit
+        -   name: Install prek
+            run: pip install prek
         -   name: Update pre-commit hooks
-            run: pre-commit autoupdate
+            run: prek auto-update
         -   name: Create Pull Request
             uses: peter-evans/create-pull-request@v8
             with:
