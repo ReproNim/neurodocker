@@ -1,0 +1,7 @@
+{% extends "!layout.html" %}
+{% block extrahead %}
+{% if pagename == 'index' %}
+<base href="/neurodocker/">
+{% endif %}
+{{ super() }}
+{% endblock %}
