@@ -8,6 +8,7 @@ binaries:
         1.11.0: https://github.com/bids-standard/bids-validator/releases/tag/v1.11.0
         1.10.0: https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0
         1.9.0: https://github.com/bids-standard/bids-validator/releases/tag/v1.10.0
+        2.4.1: https://github.com/bids-standard/bids-validator/releases/tag/2.4.1
     arguments:
         required:
         -   version
@@ -19,26 +20,43 @@ binaries:
         -   curl
         -   apt-utils
         -   gnupg
+        -   jq
+        -   unzip
         yum:
-        -   curl
+        -   unzip
+        -   jq
   # see install for node https://github.com/nodesource/distributions#installation-scripts
     instructions: |
-        if [ ! -z `which node` ] ; then \
-          echo "node is installed, skipping its install." ; \
-        else \
+        {%- if self.version.split('.')[0] | int < 2 %} \
+          if [ ! -z `which node` ] ; then \
+            echo "node is installed, skipping its install." ; \
+          else \
+            {{ self.install_dependencies() }}
+            {%- if self.pkg_manager == "apt" %}
+              curl -SLO https://deb.nodesource.com/nsolid_setup_deb.sh
+              chmod 500 nsolid_setup_deb.sh
+              ./nsolid_setup_deb.sh {{ self.node_version }}
+              {{ self.install(["nodejs"]) }} ; \
+            {% elif self.pkg_manager == "yum" %}
+              curl -SLO https://rpm.nodesource.com/nsolid_setup_rpm.sh
+              chmod 500 nsolid_setup_rpm.sh
+              ./nsolid_setup_rpm.sh {{ self.node_version }}
+              {{ self.install(["nodejs --setopt=nodesource-nodejs.module_hotfixes=1"]) }} ; \
+            {% endif -%}
+          fi ; \
+          node --version
+          npm --version
+          npm install -g bids-validator@{{ self.version }} ; \
+        {% else %} \
           {{ self.install_dependencies() }}
-          {%- if self.pkg_manager == "apt" %}
-            curl -SLO https://deb.nodesource.com/nsolid_setup_deb.sh
-            chmod 500 nsolid_setup_deb.sh
-            ./nsolid_setup_deb.sh {{ self.node_version }}
-            {{ self.install(["nodejs"]) }} ; \
-          {% elif self.pkg_manager == "yum" %}
-            curl -SLO https://rpm.nodesource.com/nsolid_setup_rpm.sh
-            chmod 500 nsolid_setup_rpm.sh
-            ./nsolid_setup_rpm.sh {{ self.node_version }}
-            {{ self.install(["nodejs --setopt=nodesource-nodejs.module_hotfixes=1"]) }} ; \
-          {% endif -%}
-        fi
-        node --version
-        npm --version
-        npm install -g bids-validator@{{ self.version }}
+          curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
+          curl -L https://github.com/bids-standard/bids-validator/archive/refs/tags/{{ self.version }}.tar.gz | tar -xz
+          cd bids-validator-{{ self.version }}
+          jq -r ".version|=\"{{ self.version }}\"" deno.json > ._deno.json
+          mv ._deno.json deno.json
+          deno run -A ./build.ts
+          cp dist/validator/bids-validator.js /usr/bin/bids-validator.js
+          echo 'deno -A /usr/bin/bids-validator.js "$@"' > /usr/bin/bids-validator
+          chmod +x /usr/bin/bids-validator
+          cd .. && rm -rf "bids-validator-{{ self.version }}"
+        {% endif -%}
