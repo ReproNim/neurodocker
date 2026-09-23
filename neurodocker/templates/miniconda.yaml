@@ -82,7 +82,7 @@ binaries:
         {% endfor %}
         {% endif -%}
         {% if self.pip_install -%}
-        bash -c "source activate {{ self.env_name }}
+        bash -c 'source activate {{ self.env_name }}
           python -m pip install --no-cache-dir {{ self.pip_opts }} \
           {%- for pkg in self.pip_install.split() %}
               {% if not loop.last -%}
@@ -90,7 +90,7 @@ binaries:
               {%- else -%}
               "{{ pkg }}"
               {%- endif -%}
-          {% endfor %}"
+          {% endfor %}'
         {% endif -%}
         # Clean up
         sync && conda clean --all --yes && sync
