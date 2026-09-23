@@ -27,7 +27,7 @@ _template_filepath = Path(__file__).parent / "sample-template-jq.yaml"
 )
 @pytest.mark.parametrize(
     ["pkg_manager", "base_image"],
-    [("apt", "debian:bullseye-slim"), ("yum", "fedora:40")],
+    [("apt", "debian:bookworm-slim"), ("yum", "fedora:40")],
 )
 @pytest.mark.parametrize(
     ["jq_version", "jq_version_output", "fd_version_startswith"],
@@ -83,7 +83,7 @@ def test_build_using_renderer_from_dict(
 )
 @pytest.mark.parametrize(
     ["pkg_manager", "base_image"],
-    [("apt", "debian:bullseye-slim"), ("yum", "fedora:40")],
+    [("apt", "debian:bookworm-slim"), ("yum", "fedora:40")],
 )
 @pytest.mark.parametrize(["method"], [("binaries",), ("source",)])
 @pytest.mark.parametrize(

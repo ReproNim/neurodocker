@@ -1,6 +1,6 @@
 neurodocker generate docker \
     --pkg-manager apt \
-    --base-image debian:bullseye-slim \
+    --base-image debian:bookworm-slim \
     --miniconda \
         version=latest \
         env_name=envA \

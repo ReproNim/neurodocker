@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import copy
 import json as json_lib
 import sys
 import typing as ty
@@ -82,7 +83,8 @@ class GroupAddCommonParamsAndRegisteredTemplates(click.Group):
         ]
         params = _get_common_renderer_params()
         params += _get_params_for_registered_templates()
-        command.params += params
+        command = copy.copy(command)
+        command.params = command.params + params
         return command
 
 
