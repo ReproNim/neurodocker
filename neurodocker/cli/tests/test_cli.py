@@ -248,3 +248,17 @@ def test_issue_728_dependency_warnings(cmd, caplog):
     assert "libtiff5" in result.stdout
     assert "libtiff6" not in result.stdout
     assert "/v713/runtime/glnxa64" in result.stdout
+
+
+@pytest.mark.parametrize("cmd", _cmds)
+def test_repeated_generation_does_not_accumulate_options(cmd):
+    runner = CliRunner()
+    command = generate.commands[cmd]
+    original_params = list(command.params)
+    args = [cmd, "-p", "apt", "--base-image", "debian:bookworm"]
+    first = runner.invoke(generate, args)
+    second = runner.invoke(generate, args)
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    assert first.output == second.output
+    assert command.params == original_params
