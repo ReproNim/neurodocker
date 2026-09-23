@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import inspect
 import json
+import logging
 import os
 import pathlib
 import types
@@ -12,6 +13,7 @@ from typing import Callable, Mapping, NoReturn, Optional, Union
 
 import jinja2
 
+from neurodocker.reproenv.apt import unavailable_apt_packages
 from neurodocker.reproenv.exceptions import RendererError, TemplateError
 from neurodocker.reproenv.state import _TemplateRegistry, _validate_renderer
 from neurodocker.reproenv.template import Template, _BaseInstallationTemplate
@@ -261,6 +263,34 @@ class _Renderer:
         # Validate kwds passed by user to template, and raise an exception if any are
         # invalid.
         template_method.validate_kwds()
+
+        if self.pkg_manager == "apt":
+            base_image = next(
+                (
+                    instruction["kwds"]["base_image"]
+                    for instruction in reversed(self._instructions["instructions"])
+                    if instruction["name"] == "from_"
+                ),
+                "",
+            )
+            missing = unavailable_apt_packages(
+                base_image, template_method.dependencies("apt")
+            )
+            if missing:
+                guidance = (
+                    "Choose a compatible base image or supply these dependencies."
+                )
+                if method == "binaries" and template.source is not None:
+                    guidance += " Alternatively, use method=source."
+                logging.getLogger(__name__).warning(
+                    "%s (%s): APT packages unavailable in the default repositories "
+                    "of %s: %s. %s",
+                    template.name,
+                    method,
+                    base_image,
+                    ", ".join(missing),
+                    guidance,
+                )
 
         # TODO: print a message if the template has a nonempty `alert` property.
         # If we print to stdout, however, we can cause problems if the user is piping

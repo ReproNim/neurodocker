@@ -217,3 +217,34 @@ def test_default_header_and_entrypoint(cmd: str, pkg_manager: str, entrypoint: s
             assert "%runscript\n/neurodocker/startup.sh\n" in result.output
         else:
             assert "%runscript\nI decide\n" in result.output
+
+
+@pytest.mark.parametrize("cmd", _cmds)
+def test_issue_728_dependency_warnings(cmd, caplog):
+    result = CliRunner().invoke(
+        generate,
+        [
+            cmd,
+            "-p",
+            "apt",
+            "--base-image",
+            "debian:bullseye",
+            "--fsl",
+            "version=6.0.7.8",
+            "--mrtrix3",
+            "version=3.0.4",
+            "method=binaries",
+            "--spm12",
+            "version=r7771",
+            "--matlabmcr",
+            "version=2010a",
+        ],
+        input="y\n",
+    )
+    assert result.exit_code == 0, result.output
+    assert "multiarch-support" in caplog.text
+    assert "openjdk-8-jre" in caplog.text
+    assert "APT packages unavailable" not in result.stdout
+    assert "libtiff5" in result.stdout
+    assert "libtiff6" not in result.stdout
+    assert "/v713/runtime/glnxa64" in result.stdout
