@@ -4,9 +4,9 @@ requires = ["hatchling>=1.27.0", "hatch-vcs"]
 
 [dependency-groups]
 dev = [
-    {include-group = "doc"},
-    {include-group = "minify"},
-    {include-group = "test"}
+    { include-group = "doc" },
+    { include-group = "minify" },
+    { include-group = "test" }
 ]
 doc = [
     "sphinx <7",
@@ -17,7 +17,7 @@ minify = [
     "docker >= 4.4.1"
 ]
 test = [
-    {include-group = "minify"},
+    { include-group = "minify" },
     "codecov",
     "coverage[toml]",
     "mypy",
@@ -30,7 +30,7 @@ test = [
 ]
 
 [project]
-authors = [{name = "Neurodocker Developers"}]
+authors = [{ name = "Neurodocker Developers" }]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -59,7 +59,7 @@ description = "A generic generator of Dockerfiles and Singularity recipes."
 dynamic = ["version"]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-maintainers = [{name = "Jakub Kaczmarzyk", email = "jakub.kaczmarzyk@gmail.com"}]
+maintainers = [{ name = "Jakub Kaczmarzyk", email = "jakub.kaczmarzyk@gmail.com" }]
 name = "neurodocker"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -27,7 +27,7 @@ from neurodocker.reproenv.tests.utils import (
 )
 @pytest.mark.parametrize(
     ["pkg_manager", "base_image"],
-    [("apt", "debian:bullseye-slim"), ("yum", "centos:8")],
+    [("apt", "debian:bookworm-slim"), ("yum", "centos:8")],
 )
 def test_build_image_from_registered(
     tmp_path: Path, cmd: str, pkg_manager: str, base_image: str
@@ -85,7 +85,7 @@ def test_json_roundtrip(cmd: str, inputs: str, tmp_path: Path):
             cmd,
             "--json",
             "--base-image",
-            "debian:bullseye-slim",
+            "debian:bookworm-slim",
             "--pkg-manager",
             "apt",
             "--install",
